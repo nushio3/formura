@@ -16,3 +16,4 @@ subroutine proceed
   A = 1/3*(B(0,-1) + B + B(0,1))
 end subroutine proceed
 
+interpolate U(1/4,0,0) = (3*U+U(1,0,0))/4
