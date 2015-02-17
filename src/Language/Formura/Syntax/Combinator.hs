@@ -1,12 +1,12 @@
 {-# LANGUAGE Arrows, ConstraintKinds, KindSignatures, TypeFamilies, TypeOperators #-}
-module Language.Formura.Syntax.Combinator 
-(  
+module Language.Formura.Syntax.Combinator
+(
    module Control.Category.Structures,
    module Control.SIArrow,
-   module Data.Syntax, 
-   module Data.Syntax.Char, 
+   module Data.Syntax,
+   module Data.Syntax.Char,
    SyntaxF(..),
-   meta)       
+   meta)
        where
 
 import           Control.Arrow
@@ -20,7 +20,7 @@ import Language.Formura.AST
 
 infix 0 ?>
 
-class (Arrow syn, Syntax syn) => SyntaxF syn where
+class (Arrow syn, SyntaxText syn) => SyntaxF syn where
   -- | Give a name to the underlying syntax component.
   (?>) :: String -> syn () a -> syn () a
   -- | Parse the parser metadata at the position; prints nothing.
@@ -32,5 +32,3 @@ meta parseS = proc u -> do
   s <- parseS -< u
   m <- metadata -< u
   returnA -< Meta m s
-  
-  

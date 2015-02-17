@@ -21,13 +21,13 @@ wholeType :: Syn (WholeType & Meta)
 wholeType = meta $ _WholeType /$/ variableNameText
 
 statementTerminator :: Syn ()
-statementTerminator = endOfLine /+/ char ';'
+statementTerminator = (endOfLine /+/ char ';')
 
 statement :: Syn (Statement & Meta)
-statement = meta $ _Declaration /$~ variableName  /*/ S.spaces
-                                /*/ S.string "::" /*/ S.spaces
-                                /*/ wholeType     /*/ S.spaces                                
-                                /*/ statementTerminator
-                                
-program :: Syn (Program & Meta)                                
+statement = meta $ _Declaration /$~ variableName  /*/ spaces
+                                /*/ S.string "::" /*/ spaces
+                                /*/ wholeType     /*/ spaces
+                                /*/ statementTerminator  /*/ spaces
+
+program :: Syn (Program & Meta)
 program = meta $ _Program /$~ simany statement
