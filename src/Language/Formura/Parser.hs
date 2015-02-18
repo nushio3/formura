@@ -23,7 +23,7 @@ import           Control.Category
 import           Control.Category.Structures
 import           Control.Monad
 import           Control.SIArrow
-import           Text.Trifecta as Δ
+import qualified Text.Trifecta as Δ
 import           Data.Scientific (fromFloatDigits)
 import           Data.Syntax
 import           Data.Syntax.Char
@@ -71,6 +71,7 @@ instance Isolable WrappedParser where
 instance SyntaxChar WrappedParser
 instance SyntaxF WrappedParser where
   metadata = wrap $ (fmap Metadata  Δ.rend)
+  try s = Wrapped $ Kleisli $ \a ->  Δ.try (unwrap s a)
 
 -- | Extracts the parser.
 getParser :: WrappedParser a b -> a -> Δ.Parser b

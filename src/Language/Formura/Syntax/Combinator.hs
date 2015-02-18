@@ -2,6 +2,7 @@
 module Language.Formura.Syntax.Combinator
 (
    module Control.Category.Structures,
+  module           Control.Lens.SemiIso,
    module Control.SIArrow,
    module Data.Syntax,
    module Data.Syntax.Char,
@@ -11,9 +12,9 @@ module Language.Formura.Syntax.Combinator
 
 import           Control.Category.Structures
 import           Control.SIArrow
+import           Control.Lens.SemiIso
 import           Data.Syntax
 import           Data.Syntax.Char
-import qualified Text.Trifecta as Δ
 
 import Language.Formura.AST
 
@@ -24,8 +25,22 @@ class SyntaxText syn => SyntaxF syn where
   (?>) :: String -> syn () a -> syn () a
   -- | Parse the parser metadata at the position; prints nothing.
   metadata :: syn () Metadata
+  -- | Create the trying parser.
+  try :: syn () a -> syn () a
+
 
 
 meta :: SyntaxF syn => syn () (s Meta) -> syn () (s & Meta)
 meta parseS =
  _Meta /$~  metadata /*/ parseS
+
+
+
+{-
+-- | Composes an arrow with a SemiIso.
+(>>^) :: SIArrow cat => cat a b -> ASemiIso' b c -> cat a c
+a >>^ f = siarr f . a
+
+
+
+-}

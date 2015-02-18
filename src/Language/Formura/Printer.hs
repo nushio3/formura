@@ -121,6 +121,7 @@ instance SyntaxChar Printer where
 
 instance SyntaxF Printer where
   metadata =  wrap $ Right . (\_ -> B.fromText "")
+  try = id
 
 -- | Runs the printer.
 runPrinter :: Printer a b -> b -> Either String (Builder, a)
