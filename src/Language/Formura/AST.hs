@@ -6,16 +6,19 @@ import           Control.Lens (makePrisms, iso, lens, Lens')
 import           Data.Text (Text)
 import           Text.Trifecta (Rendering, HasRendering(..))
 
+newtype Metadata = Metadata {_metadataRendering :: Rendering}
+instance Show Metadata where
+  show = const ""
+
 data Meta a = Meta Metadata a
+makePrisms ''Meta
+
 instance (Show a) => Show (Meta a) where
   show (Meta _ x) = show x
 
 instance HasRendering (Meta a) where
   rendering = lens (\(Meta m _) -> m) (\(Meta _ a) m-> Meta m a) . rendering
 
-newtype Metadata = Metadata {_metadataRendering :: Rendering}
-instance Show Metadata where
-  show = const ""
 
 instance HasRendering Metadata where
   rendering = iso _metadataRendering Metadata

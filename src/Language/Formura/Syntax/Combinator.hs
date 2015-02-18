@@ -9,7 +9,6 @@ module Language.Formura.Syntax.Combinator
    meta)
        where
 
-import           Control.Arrow
 import           Control.Category.Structures
 import           Control.SIArrow
 import           Data.Syntax
@@ -20,7 +19,7 @@ import Language.Formura.AST
 
 infix 0 ?>
 
-class (Arrow syn, SyntaxText syn) => SyntaxF syn where
+class SyntaxText syn => SyntaxF syn where
   -- | Give a name to the underlying syntax component.
   (?>) :: String -> syn () a -> syn () a
   -- | Parse the parser metadata at the position; prints nothing.
@@ -28,7 +27,5 @@ class (Arrow syn, SyntaxText syn) => SyntaxF syn where
 
 
 meta :: SyntaxF syn => syn () (s Meta) -> syn () (s & Meta)
-meta parseS = proc u -> do
-  s <- parseS -< u
-  m <- metadata -< u
-  returnA -< Meta m s
+meta parseS =
+ _Meta /$~  metadata /*/ parseS

@@ -32,12 +32,15 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:
-      base >=4.7 && <4.8
+                base >=4.7 && <4.8
+     ,bifunctors
      ,bytestring
      ,containers
      ,lens
      ,scientific
-     ,semi-iso
+              , semi-iso
+              , semigroupoids
+
      ,syntax
      ,text
      ,trifecta
@@ -58,7 +61,7 @@ executable test-parser
      ,formura
      ,lens
      ,scientific
-     ,semi-iso
+              , semi-iso
      ,syntax
      ,text
      ,trifecta
