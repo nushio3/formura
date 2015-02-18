@@ -29,7 +29,7 @@ statementTerminator = (try $ morphed /$/ char ';' /*/ spaces_ /*/ endOfLine)
 statement :: Syn (Statement & Meta)
 statement = meta $ _Declaration /$~ variableName  /*/ spaces
                                 /*/ S.string "::" /*/ spaces
-                                /*/ wholeType     /*/ spaces
+                                /*/ wholeType     /*/ spaces_
                                 /*/ statementTerminator  /*/ spaces_
 
 program :: Syn (Program & Meta)
