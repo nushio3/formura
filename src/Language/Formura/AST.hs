@@ -60,8 +60,18 @@ data WholeType (f :: * -> *) = WholeType Text
   deriving (Show)
 makePrisms ''WholeType
 
-data Statement f = Declaration (VariableName & f) (WholeType & f) 
-                 | Substitution (VariableWritePattern & f) (Expression & f) 
+data ElementType f = AtomicType Text
+                   | ArrayType Int (ElementType f)
+                   | GridType Int (ElementType f)
+  deriving (Show)
+makePrisms ''ElementType
+
+data ExtentType (f :: * -> *) = ExtentType [(Rational, Rational)]
+  deriving (Show)
+makePrisms ''ExtentType
+
+data Statement f = Declaration (VariableName & f) (WholeType & f)
+                 | Substitution (VariableWritePattern & f) (Expression & f)
 deriving instance Show (Statement Meta)
 makePrisms ''Statement
 
