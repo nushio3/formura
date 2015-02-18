@@ -6,9 +6,11 @@ import           Data.Char (isAlphaNum, isAlpha)
 import           Data.Text (Text)
 
 import Language.Formura.AST as AST
-import Language.Formura.Syntax.Combinator as S
+import Language.Formura.Syntax.Combinator as S -- hiding (spaces)
 
 type Syn a = SyntaxF syn => syn () a
+
+
 
 -- | A sequence of characters suitable for variable names.
 variableNameText :: SyntaxF syn => syn () Text
