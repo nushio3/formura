@@ -1,0 +1,7 @@
+#!/bin/sh
+
+while :
+do
+    cabal build
+    inotifywait -e modify -r ./src/
+done
