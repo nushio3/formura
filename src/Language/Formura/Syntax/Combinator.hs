@@ -20,7 +20,7 @@ import Language.Formura.AST
 
 infix 0 ?>
 
-class (Arrow syn, SyntaxText syn) => SyntaxF syn where
+class (Arrow syn, Syntax syn) => SyntaxF syn where
   -- | Give a name to the underlying syntax component.
   (?>) :: String -> syn () a -> syn () a
   -- | Parse the parser metadata at the position; prints nothing.
