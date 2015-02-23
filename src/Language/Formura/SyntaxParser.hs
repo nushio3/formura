@@ -50,9 +50,10 @@ arrayIndexPattern = do
 
 variableWritePattern :: Parser (VariableWritePattern & Meta)
 variableWritePattern = meta $ VariableWritePattern 
-                       <$> variableName
-                       <*  strTok "["
-                       <*> sepBy arrayIndexPattern (strTok ",")
+                       <$> variableName <*> (try indexing <|> return [])
+  where indexing =                        
+                       strTok "["
+                       *> sepBy arrayIndexPattern (strTok ",")
                        <*  strTok "]"
                        
 atomicExpression :: Parser (Expression & Meta)
