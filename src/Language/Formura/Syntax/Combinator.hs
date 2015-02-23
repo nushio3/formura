@@ -5,6 +5,7 @@ module Language.Formura.Syntax.Combinator
   module           Control.Lens.SemiIso,
    module Control.SIArrow,
    module Data.Syntax,
+   module Data.Syntax.Combinator,
    module Data.Syntax.Char,
    SyntaxF(..),
    meta)
@@ -14,6 +15,7 @@ import           Control.Category.Structures
 import           Control.SIArrow
 import           Control.Lens.SemiIso
 import           Data.Syntax
+import           Data.Syntax.Combinator
 import           Data.Syntax.Char
 
 import Language.Formura.AST
@@ -35,12 +37,3 @@ meta parseS =
  _Meta /$~  metadata /*/ parseS
 
 
-
-{-
--- | Composes an arrow with a SemiIso.
-(>>^) :: SIArrow cat => cat a b -> ASemiIso' b c -> cat a c
-a >>^ f = siarr f . a
-
-
-
--}

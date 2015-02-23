@@ -1,0 +1,3 @@
+density :: grid3;
+velocity :: grid2array1;
+density[]=velocity[];

@@ -22,7 +22,7 @@ module Language.Formura.Printer (
     )
     where
 
-import           Control.Arrow (Kleisli(..), Arrow)
+import           Control.Arrow (Kleisli(..))
 import           Control.Applicative
 import           Control.Category
 import           Control.Category.Structures
@@ -120,6 +120,7 @@ instance SyntaxChar Printer where
     scientific = wrap $ Right . B.scientificBuilder
 
 instance SyntaxF Printer where
+  _ ?> x = x
   metadata =  wrap $ Right . (\_ -> B.fromText "")
   try = id
 

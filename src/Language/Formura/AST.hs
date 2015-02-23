@@ -34,7 +34,7 @@ data VariableName (f :: * -> *) = VariableName Text
 makePrisms ''VariableName
 
 
-data RationalLiteral (f :: * -> *) = RationalLiteral Rational
+data RationalLiteral (f :: * -> *) = IntegerLiteral Integer | FractionalLiteral Rational
   deriving (Show)
 makePrisms ''RationalLiteral
 
@@ -46,21 +46,17 @@ deriving instance Show (ArrayIndexPattern Meta)
 makePrisms ''ArrayIndexPattern
 
 
-data ArrayAccessPattern f = ArrayAccessPattern [ArrayIndexPattern & f]
-deriving instance Show (ArrayAccessPattern Meta)
-makePrisms ''ArrayAccessPattern
-
-
-data VariablePattern f = VariablePattern (VariableName & f) (ArrayAccessPattern & f)
-deriving instance Show (VariablePattern Meta)
-makePrisms ''VariablePattern
+data VariableWritePattern f = VariableWritePattern (VariableName & f) [ArrayIndexPattern & f]
+deriving instance Show (VariableWritePattern Meta)
+makePrisms ''VariableWritePattern
 
 
 data WholeType (f :: * -> *) = WholeType Text
   deriving (Show)
 makePrisms ''WholeType
 
-data Statement f = Declaration (VariablePattern & f) (WholeType & f)
+data Statement f = Declaration (VariableName & f) (WholeType & f) 
+                 | Substitution (VariableWritePattern & f) (VariableWritePattern & f) 
 deriving instance Show (Statement Meta)
 makePrisms ''Statement
 

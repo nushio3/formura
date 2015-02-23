@@ -68,8 +68,14 @@ instance Isolable WrappedParser where
 --    isolate p = Wrapped $ Kleisli $ either fail return . Δ.parseString (unwrap p ()) (error "no delta") . (Text.unpack)
   isolate = error "no isolate"
 
-instance SyntaxChar WrappedParser
+instance SyntaxChar WrappedParser where
+  decimal = wrap $ fmap fromIntegral Δ.decimal
+  hexadecimal = wrap $ fmap fromIntegral Δ.hexadecimal  
+  realFloat = wrap $ fmap (fromRational . toRational) Δ.double  
+  scientific = wrap $ fmap (fromRational . toRational) Δ.double    
+
 instance SyntaxF WrappedParser where
+  name ?> s = Wrapped $ Kleisli $ \a ->  unwrap s a Δ.<?> name
   metadata = wrap $ (fmap Metadata  Δ.rend)
   try s = Wrapped $ Kleisli $ \a ->  Δ.try (unwrap s a)
 
