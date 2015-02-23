@@ -1,3 +1,4 @@
 density :: grid3;
 velocity :: grid2array1;
 density[i,j,k]=velocity[i+1/2,j+1/2,k+3];
+momentum[i,j,k]=density[i,j,k]*velocity[i,j,k];

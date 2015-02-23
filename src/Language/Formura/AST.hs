@@ -50,13 +50,18 @@ data VariableWritePattern f = VariableWritePattern (VariableName & f) [ArrayInde
 deriving instance Show (VariableWritePattern Meta)
 makePrisms ''VariableWritePattern
 
+data Expression f = RationalLiteralAtom (RationalLiteral & f)
+                  | VariableAtom (VariableWritePattern & f)
+                  | UnaryExpr Text (Expression & f)
+                  | BinaryExpr Text (Expression & f) (Expression & f)
+deriving instance Show (Expression Meta)
 
 data WholeType (f :: * -> *) = WholeType Text
   deriving (Show)
 makePrisms ''WholeType
 
 data Statement f = Declaration (VariableName & f) (WholeType & f) 
-                 | Substitution (VariableWritePattern & f) (VariableWritePattern & f) 
+                 | Substitution (VariableWritePattern & f) (Expression & f) 
 deriving instance Show (Statement Meta)
 makePrisms ''Statement
 
