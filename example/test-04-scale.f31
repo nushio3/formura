@@ -1,0 +1,13 @@
+densBar[1/2,,] = (dens[,,] + dens[+1,,])/2
+densBar[,1/2,] = (dens[,,] + dens[,+1,])/2
+densBar[,,1/2] = (dens[,,] + dens[,,+1])/2
+vxBar = momx / densBarX
+vyBar = momy / densBarY
+vzBar = momz / densBarZ
+vxBar = (momx[-1/2,,] + momx[+1/2,,]) / (2 * dens)
+vyBar = (momy[,-1/2,] + momy[,+1/2,]) / (2 * dens)
+vzBar = (momz[,,-1/2] + momz[,,+1/2]) / (2 * dens)
+
+
+
+
