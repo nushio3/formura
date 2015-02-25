@@ -51,3 +51,7 @@ momxDot = - div (momBar * vBar)
 
 momBarX = 1/12*(-mom[3/2*X] + 7 * mom[1/2*X] +  7 * mom[-1/2*X] - mom[-3/2*X])
 momBar(d) = 1/12*(-mom[3/2*d] + 7 * mom[1/2*d] +  7 * mom[-1/2*d] - mom[-3/2*d])
+
+
+momz[i,j] = solveDirect(f1[i,j], f2[i,j], f3[i,j], c[i,j])
+momz = solveDirect(f1, f2, f3, c)
