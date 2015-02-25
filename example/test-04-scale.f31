@@ -1,13 +1,53 @@
-densBar[1/2,,] = (dens[,,] + dens[+1,,])/2
-densBar[,1/2,] = (dens[,,] + dens[,+1,])/2
-densBar[,,1/2] = (dens[,,] + dens[,,+1])/2
-vxBar = momx / densBarX
-vyBar = momy / densBarY
-vzBar = momz / densBarZ
-vxBar = (momx[-1/2,,] + momx[+1/2,,]) / (2 * dens)
-vyBar = (momy[,-1/2,] + momy[,+1/2,]) / (2 * dens)
-vzBar = (momz[,,-1/2] + momz[,,+1/2]) / (2 * dens)
+pres = p00 * (rhot * rstar / p00) ** (cpstar / (cpstar - rstar))
+pott = rhot / rho
 
 
+rhoBar[i+1/2,j,k] = (rho[i,j,k] + rho[i+1,j,k]) / 2
+rhoBar[i,j+1/2,k] = (rho[i,j,k] + rho[i,j+1,k]) / 2
+rhoBar[i,j,k+1/2] = (rho[i,j,k] + rho[i,j,k+1]) / 2
 
 
+rhoBar[+1/2,,] = (rho[,,] + rho[1,,]) / 2
+rhoBar[,+1/2,] = (rho[,,] + rho[,1,]) / 2
+rhoBar[,,+1/2] = (rho[,,] + rho[,,1]) / 2
+
+
+rhoBar[+1/2*X] = (rho + rho[X]) / 2
+rhoBar[+1/2*Y] = (rho + rho[Y]) / 2
+rhoBar[+1/2*Z] = (rho + rho[Z]) / 2
+
+vxBar[1/2,,] = momx[1/2,,] / rhoBar[1/2,,]
+vyBar[,1/2,] = momy[,1/2,] / rhoBar[,1/2,]
+vzBar[,,1/2] = momz[,,1/2] / rhoBar[,,1/2]
+
+vx = (momx[-1/2,,] + momx[+1/2,,])/(2 * dens)
+vy = (momy[,-1/2,] + momy[,+1/2,])/(2 * dens)
+vz = (momz[,,-1/2] + momz[,,+1/2])/(2 * dens)
+
+densDot = - (momx[+1/2,,]-momx[-1/2,,])/deltax
+          - (momy[,+1/2,]-momy[,-1/2,])/deltay
+	  - (momz[,,+1/2]-momz[,,-1/2])/deltaz
+
+
+sum d:id, e:expresion = {d -> e}(X) + {d -> e}(Y) + {d -> e}(Z) 
+partial(d,a) = (a[1/2 * d] - a[-1/2 * d]) / delta(d)
+div a = sum d, partial d, a(d)
+
+densDot = - sum d, (mom(d)[1/2 * d] - mom(d)[-1/2 * d]) / delta(d)
+densDot = - sum d, partial d, mom(d)
+densDot = - div mom
+
+momxDot[1/2,,] = - (momxBar[1,,] * vxBar[1,,] - momxBar[0,,] * vxBar[0,,]) / deltaX
+                 - (momyBar[1/2,1/2,] * vyBar[1/2,1/2,] - momyBar[1/2,-1/2,] * vyBar[1/2,-1/2,]) / deltaY
+                 - (momzBar[1/2,,1/2] * vzBar[1/2,,1/2] - momzBar[1/2,,-1/2] * vzBar[1/2,,-1/2]) / deltaZ
+
+momxDot :: [1/2 .. extentX-1/2, 0 .. extentY, 0..extentZ]
+momxDot = - (momxBar[1/2*X] * vxBar[1/2*X] - momxBar[-1/2*X] * vxBar[-1/2*X]) / deltaX
+          - (momyBar[1/2*Y] * vyBar[1/2*Y] - momyBar[-1/2*Y] * vyBar[-1/2*Y]) / deltaY
+          - (momzBar[1/2*Z] * vzBar[1/2*Z] - momzBar[-1/2*Z] * vzBar[-1/2*Z]) / deltaZ
+
+
+momxDot = - div (momBar * vBar)	       	       
+
+momBarX = 1/12*(-mom[3/2*X] + 7 * mom[1/2*X] +  7 * mom[-1/2*X] - mom[-3/2*X])
+momBar(d) = 1/12*(-mom[3/2*d] + 7 * mom[1/2*d] +  7 * mom[-1/2*d] - mom[-3/2*d])
