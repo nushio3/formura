@@ -1,0 +1,15 @@
+
+definition degree of freedom for system s are:
+
+  s_dens[i,j,k] for i in [0..99],  j in [0..99],  k in [0..99]
+  s_mom_d[i,j,k] for i in [0..99],  j in [0..99],  k in [0..99], d in [x,y,z]
+  s_rhot[i,j,k] for i in [0..99],  j in [0..99],  k in [0..99]
+
+end definition
+
+initial condition is init;
+step function is step;
+
+
+
+

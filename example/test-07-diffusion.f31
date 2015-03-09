@@ -1,0 +1,35 @@
+delta_x = 0.1
+delta_y = 0.1
+delta_z = 0.1
+
+delta_t = 0.1
+
+system(s)
+  forall (i in [0..99], j in [0..99], k in [0..99])
+    s_dens[i,j,k]
+  end forall
+end system
+
+forall (a, i, j,k )
+  partial_x(a)[i,j,k] = (a[i+1,j,k] - a[i-1,j,k]) / (2 * delta_x)
+  partial_y(a)[i,j,k] = (a[i,j+1,k] - a[i,j-1,k]) / (2 * delta_y)
+  partial_z(a)[i,j,k] = (a[i,j,k+1] - a[i,j,k-1]) / (2 * delta_z)
+end forall
+
+forall (a, d in [x,y,z] )
+  grad(a)_d = partial_d(a)
+end forall
+
+forall (a)
+  div(a) = partial_x(a_x) +  partial_y(a_y) +  partial_z(a_z) 
+end forall
+
+forall (i,j,k)
+  init_dens[i,j,k] = exp(- ((i-50)**2 + (j-50)**2 + (k-50)**2) / 100)
+end forall
+
+forall (s)
+  step(s) = next
+    where
+  next_dens = 0.1 * div(grad(s_dens)) * delta_t
+end forall
