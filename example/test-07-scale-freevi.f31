@@ -1,0 +1,63 @@
+
+main = (init, step)
+
+degree of freedom for system s
+  = s_dens, s_mom_x, s_mom_y, s_mom_z, s_rhot
+
+
+
+
+init_dens = // ... 初期条件
+init_mom_x = // ... 初期条件
+
+
+step(phi) = rk4(step1, phi)
+
+rk4(op, phi) = phi4
+  where
+    phi1 = phi + 1/4 * op(phi)
+    phi2 = phi + 1/3 * op(phi1)
+    phi3 = phi + 1/2 * op(phi2)
+    phi4 = phi +       op(phi3)
+  end where
+
+
+
+partial_x(a) = (a[i+1/2][j][k] - a[i-1/2][j][k]) / delta_x
+partial_y(a) = (a[i][j+1/2][k] - a[i][j-1/2][k]) / delta_y
+partial_z(a) = (a[i][j][k+1/2] - a[i][j][k-1/2]) / delta_z
+
+div(a) = partial_x(a_x) + partial_y(a_y) + partial_z(a_z)
+
+grad(a)_x = partial_x(a)
+grad(a)_y = partial_y(a)
+grad(a)_z = partial_z(a)
+
+for (a in array, n in integer)
+  a@(x,n) = a[i+n][j][k]
+  a@(y,n) = a[i][j+n][k]
+  a@(z,n) = a[i][j][k+n]
+end for
+
+for (a in array, d in [x,y,z])
+  interpolate4_d(a) = 1/12 * (-a@(d,+3/2) + 7 * a@(d,+1/2) +  7 * a(d,-1/2) - a(d,-3/2))
+end for
+
+step1(phi) = phiDot
+  where
+    dens0 = phi_dens
+    mom0  = phi_mom
+    rhot0 = phi_rhot
+
+    for d in [x,y,z]:
+      momBar_d = interolate4_d(mom0_d)
+      veloBar_d = mom0_d / rhoBar || 0
+      pottBar = interolate4_d(pott_d)
+    end for
+
+    rhoBar_d = (rho[d-1/2] + rho[d+1/2]) / 2
+
+    phiDot_dens = - div(mom0),
+    phiDot_mom  = - div((momBar * veloBar) - grad(pres)),
+    phiDot_rhot = - div((mom * pottBar))
+  end where

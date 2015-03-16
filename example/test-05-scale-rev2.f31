@@ -1,0 +1,46 @@
+
+main = (init, step)
+
+
+[dens, mom.x, mom.y, mom.z, rhot] :: c, [0..99] :: x, [0..99] :: y,  [0..99] :: z =>
+field :: init_c[x,y,z];
+init = // ... 初期条件
+
+field :: phi => field :: step(phi);
+step(phi) = rk4(step1, phi)
+
+
+field -> field :: op , field :: phi =>
+field :: rk4(op, phi);
+rk4(op, phi) = phi4
+  where
+    phi1 = phi + 1/4 * op(phi)
+    phi2 = phi + 1/3 * op(phi1)
+    phi3 = phi + 1/2 * op(phi2)
+    phi4 = phi +       op(phi3)
+  end where
+
+
+(symbol, field) -> field :: partial
+partial(d,a) = (a[d+1/2] - a[d-1/2]) / delta_d
+
+field -> field :: div
+div(a) = partial(x,a_x) + partial(y,a_y) + partial(z,a_z)
+
+field -> field :: step1;
+step1(phi) = phiDot
+  where
+    dens0 = phi_dens
+    mom0  = phi_mom
+    rhot0 = phi_rhot
+
+    momBar_d = 1/12 * (-mom0_d[d+3/2] + 7 * mom0_d[d+1/2] +  7 * mom0_d[d-1/2] - mom0_d[d-3/2])
+    veloBar_d = mom0_d / rhoBar || 0
+    pottBar_d  = 1/12 * (-pott[d+3/2] + 7 * pott[d+1/2] +  7 * pott[d-1/2] - pott[d-3/2])
+
+
+    rhoBar_d = (rho[d-1/2] + rho[d+1/2]) / 2
+
+    phiDot_dens = - div(mom0),
+    phiDot_mom  = - div((momBar * velBar) - grad pres),
+    phiDot_rhot = - div((mom * pottBar))
