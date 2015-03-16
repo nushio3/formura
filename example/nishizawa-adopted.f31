@@ -1,0 +1,157 @@
+# vector関数の定義
+define vector(a,b,c)
+  {x: a, y: b, z: c}
+end define
+
+# 空間、時間刻みの定義
+delta_x = 0.1
+delta_y = 0.1
+delta_z = 0.1
+delta_t = 0.1
+
+# 解像度の定義
+nx = 100
+ny = 100
+nz = 100
+
+# システムの独立変数の定義
+@x = range(x, 0...NX)
+@y = range(y, 0...NY)
+@z = range(z, 0...NZ)
+
+@xh = @x + 1/2
+@yh = @y + 1/2
+@zh = (@z + 1/2)[0...NZ-1]
+
+[@x,@y,@z] :: dens
+[@x,@y,@z] :: rhot
+vector([@xh,@y,@z], [@x,@yh,@z], [@z,@y,@zh])  :: mom 
+
+system = {dens: [@x,@y,@z], rhot: [@x,@y,@z], mom: vector([@xh,@y,@z], [@x,@yh,@z], [@z,@y,@zh])}
+
+# 添字アクセス用変数の定義
+index(x) :: i
+index(y) :: j
+index(z) :: k
+
+
+################################################################
+# ライブラリ
+################################################################
+# 偏微分演算子
+define partial(a)
+  # コード生成時に余分な計算は取り除かれる
+  vector(( a[i+1/2,j,k] - a[i-1/2,j,k] ) / delta_x,
+         ( a[i,j+1/2,k] - a[i,j-1/2,k] ) / delta_y,
+         ( a[i,j,k+1/2] - a[i,j,k-1/2] ) / delta_z)
+end define
+    
+# グラジエント演算子
+define grad(a)
+  partial(a)
+end define
+
+# ダイバージェンス演算子
+define div(a)
+  partial(a.x).x + partial(a.y).y + partial(a.z).z
+end define
+
+# 2次の補間関数の定義
+define interpolate2(a)
+  vector(
+    ( a[i+1/2,j,k] + a[i-1/2,j,k] ) / 2, 
+    ( a[i,j+1/2,k] + a[i,j-1/2,k] ) / 2,
+    ( a[i,j,k+1/2] + a[i,j,k-1/2] ) / 2)
+end define
+
+# 4次の補間関数の定義
+define interpolate4(a)
+  vector(
+    ( -a[i+3/2,j,k] + 7*a[i+1/2,j,k] + 7*a[i-1/2,j,k] - a[i-3/2,j,k] ) / 12,
+    ( -a[i,j+3/2,k] + 7*a[i,j+1/2,k] + 7*a[i,j-1/2,k] - a[i,j-3/2,k] ) / 12,
+    ( -a[i,j,k+3/2] + 7*a[i,j,k+1/2] + 7*a[i,j,k-1/2] - a[i,j,k-3/2] ) / 12)
+end define
+
+# 配列をずらす演算子の定義(今回は使ってない)
+define <<(a,n) syntax(a<<n)
+  a[i+n.x,j+n.y,k+n.z]
+end define
+
+################################################################
+# 流体力学ソルバの実装
+################################################################
+
+# 4次の「ルンゲクッタ法」の定義
+define rk4(op, phi)
+  phi1 = phi + 1/4 * op(phi)
+  phi2 = phi + 1/3 * op(phi1)
+  phi3 = phi + 1/2 * op(phi2)
+  phi4 = phi +       op(phi3)
+  return phi4
+end define
+
+# 1次の時間発展オペレータの定義
+# 現在の状態(current) から次の状態(next)を求める
+define step1(current)
+  pres = p00 * (current.rhot * rstar / p00) ** (cpstar / (cpstar - rstar))
+  pott = current.rhot / current.dens
+
+  vector([@xh,@y,@z], [@x,@yh,@z], [@x,@y,@zh]) :: rhoBar 
+  rhoBar  = interpolate2(rho)
+
+  vector([@xh,@y,@z], [@x,@yh,@z], [@x,@y,@zh]) :: vFullBar
+  vFullBar = current.mom / rhoBar
+
+
+  [@x, @y, @z] ::
+     ddt_dens = - div(mom) || 0
+
+  vector([@xh,@y,@z], [@x,@yh,@z], [@x,@y,@zh]) :: ddt_mom
+  vector([@xh,@y,@z], [@x,@yh,@z], [@x,@y,@zh]) :: momBar, vBar
+
+  momBar = interpolate4(mom.x)
+  vBar.x = interpolate2(vFullBar.x).x
+  vBar.y = interpolate2(vFullBar.y).x
+  vBar.z = interpolate2(vFullBar.z).x
+  ddt_mom.x  = - div(vBar * momBar) - grad(pres).x
+
+  momBar = interpolate4(mom.y)
+  vBar.x = interpolate2(vFullBar.x).y
+  vBar.y = interpolate2(vFullBar.y).y
+  vBar.z = interpolate2(vFullBar.z).y
+  ddt_mom.y  = - div(vBar * momBar) - grad(pres).y
+
+  momBar = interpolate4(mom.z)
+  vBar.x = interpolate2(vFullBar.x).z
+  vBar.y = interpolate2(vFullBar.y).z
+  vBar.z = interpolate2(vFullBar.z).z
+  ddt_mom.z  = - div(vBar * momBar) - grad(pres).z
+
+
+  vector([@xh,@y,@z], [@x,@yh,@z], [@x,@y,@zh]) :: pottBar 
+  pottBar = interpolate4(pott)
+
+  ddt_rhot = -div(current.mom * pottBar)
+
+  system :: next
+
+  next.dens = ddt_dens * delta_t
+  next.mom  = ddt_mom  * delta_t
+  next.rhot = ddt_rhot * delta_t
+
+  return next
+end define
+
+
+system :: s
+
+# 初期条件
+s.dens[i,j,k] = exp(- k * delta_z / 50)
+s.rhot[i,j,k] = ( 273 - k * delta_z / 10 ) * s.dens[i,j,k]
+s.mom = 0
+
+
+# 時間発展
+NT.times do 
+  s = rk4(step1, s)
+end
