@@ -37,12 +37,14 @@ library
      ,scientific
      ,text
      ,trifecta
-     ,vector
+
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -O2 -Wall
 
+
 executable test-parser
+  buildable: False
   hs-source-dirs: exe-src
   main-is: test-parser.hs
   ghc-options:         -O2 -Wall
