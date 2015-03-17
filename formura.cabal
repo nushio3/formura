@@ -23,11 +23,7 @@ source-repository head
 
 library
   exposed-modules:
-    Language.Formura.AST
     Language.Formura.Parser
-    Language.Formura.Printer
-    Language.Formura.SyntaxParser
-    Language.Formura.Syntax.Combinator
 
   -- other-modules:
   -- other-extensions:
@@ -39,10 +35,6 @@ library
      ,lens
      ,parsers
      ,scientific
-              , semi-iso
-              , semigroupoids
-
-     ,syntax
      ,text
      ,trifecta
      ,vector
