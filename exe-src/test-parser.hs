@@ -12,17 +12,14 @@ import Text.Trifecta
 import Text.Printf
 import Text.PrettyPrint.ANSI.Leijen as Pretty hiding (line, (<>), (<$>), empty, integer)
 
-import Language.Formura.AST
-import Language.Formura.SyntaxParser (program)
 import Language.Formura.Parser
-import Language.Formura.Printer
 
 
 
 main :: IO ()
 main = do
   (fileName:_ ) <- getArgs
-  res <- parseFromFileEx (program <* eof) fileName
+  res <- parseFromFileEx (internalP program <* eof) fileName
   case res of
     Success ast -> do
       print ast

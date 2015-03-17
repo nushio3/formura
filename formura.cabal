@@ -44,19 +44,17 @@ library
 
 
 executable test-parser
-  buildable: False
   hs-source-dirs: exe-src
   main-is: test-parser.hs
   ghc-options:         -O2 -Wall
   build-depends:
-                base >=4.7 && <4.8
-              , ansi-wl-pprint
+     base >=4.7 && <4.8
+     , ansi-wl-pprint
      ,bytestring
      , containers
      ,formura
      ,lens
      ,scientific
-              , semi-iso
      ,syntax
      ,text
      ,trifecta
