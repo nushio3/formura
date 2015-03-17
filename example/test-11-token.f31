@@ -1,0 +1,6 @@
+begin program
+  begin function
+    a  b
+    return c
+  end function
+end program
