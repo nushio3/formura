@@ -1,0 +1,15 @@
+  double :: d
+  d = 0.1
+  double[0..99, 0..99] :: a
+  a[i,j] = 1e4 * (i==50) * (j==50)
+
+  double[-1..100, -1..100] :: a_extend
+  a_extend = a || 0
+
+  double[-1/2..99+1/2, 0..99] :: flux_x
+  double[0..99, -1/2..99+1/2] :: flux_y
+  flux_x[i+1/2,j] = a[i+1,j] - a[i,j]
+  flux_y[i,j+1/2] = a[i,j+1/2] - a[i,j]
+
+  double[0..99, 0..99] :: a_next
+  a_next[i,j] = a[i,j] + d * (flux_x[i+1/2,j]-flux_x[i-1/2,j] + flux_y[i+1/2,j]-flux_y[i-1/2,j])
