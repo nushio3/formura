@@ -23,7 +23,9 @@ source-repository head
 
 library
   exposed-modules:
+    Language.Formura.Core
     Language.Formura.Parser
+    Language.Formura.Enforest
 
   -- other-modules:
   -- other-extensions:
@@ -34,7 +36,8 @@ library
      ,containers
      ,lens
      ,parsers
-     ,scientific
+              , scientific
+              , split
      ,text
      ,trifecta
 

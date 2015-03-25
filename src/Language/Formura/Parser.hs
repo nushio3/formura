@@ -50,6 +50,10 @@ data Term = RationalLiteral
 
 makeLenses ''Term
 
+isStatementDelimiter :: Term -> Bool
+isStatementDelimiter (StatementDelimiter _) = True
+isStatementDelimiter _                      = False
+
 instance HasRendering Term where
   rendering = termMetadata . metadataRendering
 
@@ -63,6 +67,7 @@ instance Show Term where
 
 pprRational :: Rational -> String
 pprRational r
+  | length (show r) >= 80 = show (fromRational r :: Double)
   | denominator r == 1 = show (numerator r)
   | otherwise          =
       show (numerator r) ++ "/" ++ show (denominator r)
@@ -156,7 +161,7 @@ termWithMeta meta =
       RationalLiteral meta . toRational <$> double-}
     beginEndList = do
       try $ keywordAlpha "begin"
-      str <- many alphaNum
+      str <- identifierString
       let ending = do
             try $ keywordAlpha "end"
             symbol str

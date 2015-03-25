@@ -13,6 +13,7 @@ import Text.Printf
 import Text.PrettyPrint.ANSI.Leijen as Pretty hiding (line, (<>), (<$>), empty, integer)
 
 import Language.Formura.Parser
+import Language.Formura.Enforest
 
 
 
@@ -23,4 +24,5 @@ main = do
   case res of
     Success ast -> do
       print ast
+      enforest ast
     Failure xs -> displayIO stdout $ renderPretty 0.8 80 $ xs <> linebreak
