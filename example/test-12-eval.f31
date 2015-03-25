@@ -1,0 +1,6 @@
+a = 6
+b = 7
+begin subroutine excellent
+  solve the suffering of life
+end subroutine
+main = a * b
