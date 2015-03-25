@@ -5,6 +5,7 @@ import Control.Applicative
 import Control.Lens
 import Control.Monad
 import Data.Char
+import qualified Data.Map as M
 import Data.Ratio
 import Text.Trifecta as T
 import Text.Trifecta.Delta
@@ -47,6 +48,8 @@ data Term = RationalLiteral
             {_termMetadata :: Metadata}
           | ListTerm
             {_termMetadata :: Metadata, _termCar :: String, _termCdr :: [Term]}
+          | TreeTerm
+            {_termMetadata :: Metadata, _termCar :: String, _termLeaves :: M.Map String Term}
 
 makeLenses ''Term
 
@@ -128,7 +131,7 @@ keywordAlpha str =
 
 program :: P Term
 program = do
-    someSpace
+    spaces
     m <- metadata
     ListTerm m "program" <$> many term
 
@@ -153,6 +156,7 @@ termWithMeta meta =
   RationalLiteral meta <$> rational <|>
   StatementDelimiter meta <$ some (token newline <|> token semi) <|>
   SymbolLiteral meta <$> identifierString
+
   where
     {-
     rationalFromInteger =
