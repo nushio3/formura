@@ -65,8 +65,8 @@ mkSymbolAt t xs = SymbolLiteral (t^.termMetadata) xs
 enforest :: [Term] -> [(Term -> Term, Int)] -> Term
 enforest [] _ = error "Cannot enforest an empty term list. "
 enforest [t] [] = t
-enforest (t:ts) stack | (isUnaryOp t) =
-                          let f rhs = mkTreeAt t [("car",t),("rhs",rhs)]
+enforest (t@SymbolLiteral{_termSymbol=s}:ts) stack | (isUnaryOp t) =
+                          let f rhs = mkTreeAt t [("car",mkSymbolAt t ("unary" ++ s)),("rhs",rhs)]
                           in enforest ts ((f, precUnaryOp t) : stack)
 enforest (t@ListTerm{_termCar="()", _termCdr=cdr}:ts) stack =
                         let inner = enforest cdr [(id,0)]
