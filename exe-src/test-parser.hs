@@ -24,5 +24,5 @@ main = do
   case res of
     Success ast -> do
       print ast
-      enforest ast
-    Failure xs -> displayIO stdout $ renderPretty 0.8 80 $ xs <> linebreak
+      mapM_ print $ readProgram ast
+    Failure doc -> displayIO stdout $ renderPretty 0.8 80 $ doc <> linebreak
