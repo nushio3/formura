@@ -26,6 +26,7 @@ library
     Language.Formura.Core
     Language.Formura.Parser
     Language.Formura.Enforest
+    Language.Formura.Tree
 
   -- other-modules:
   -- other-extensions:
