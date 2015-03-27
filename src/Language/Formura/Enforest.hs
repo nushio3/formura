@@ -15,13 +15,10 @@ import Language.Formura.Parser
 import Language.Formura.Tree
 
 
-readProgram :: Term -> [Term]
-readProgram (ListTerm _ _ ts) = map (\ts1 -> enforest ts1 [(id,0)]) $ filter (not . null) $ wordsBy isStatementDelimiter ts
-readProgram t = abortCompilerAt t "top level program is not a list" [] ["list term"]
 
-readProgram2 :: Term -> [Tree]
-readProgram2 (ListTerm _ _ ts) = map (\ts1 -> enforest20 ts1) $ filter (not . null) $ wordsBy isStatementDelimiter ts
-readProgram2 t = abortCompilerAt t "top level program is not a list" [] ["list term"]
+readProgram :: Term -> [Tree]
+readProgram (ListTerm _ _ ts) = map (\ts1 -> enforest0 ts1) $ filter (not . null) $ wordsBy isStatementDelimiter ts
+readProgram t = abortCompilerAt t "top level program is not a list" [] ["list term"]
 
 
 
@@ -67,52 +64,43 @@ precBinaryOp = maybe 0 id . asBinaryOp
 
 
 
-enforest20 :: [Term] -> Tree
-enforest20 ts = enforest2 Nothing ts [(id,0)]
+enforest0 :: [Term] -> Tree
+enforest0 ts = enforest Nothing ts [(id,0)]
 
-enforest2 :: Maybe Tree -> [Term] -> [(Tree -> Tree, Int)] -> Tree
-enforest2 Nothing [] _ = error "Cannot enforest2 an empty term list. "
-enforest2 (Just t) [] [] = t
-enforest2 Nothing (RationalLiteral m x:ts) stack = enforest2 (Just $ RationalLeaf m x) ts stack
+enforest :: Maybe Tree -> [Term] -> [(Tree -> Tree, Int)] -> Tree
+enforest Nothing [] _ = error "Cannot enforest an empty term list. "
+enforest (Just t) [] [] = t
+enforest Nothing (RationalLiteral m x:ts) stack = enforest (Just $ RationalLeaf m x) ts stack
 
-enforest2 Nothing (t@SymbolLiteral{_termSymbol=s}:ts) stack | (isUnaryOp t) =
+enforest Nothing (t@SymbolLiteral{_termSymbol=s}:ts) stack | (isUnaryOp t) =
                           let f rhs = Unary m (SymbolLeaf m s) rhs
                               m = t^.termMetadata
-                          in enforest2 Nothing ts ((f, precUnaryOp t) : stack)
+                          in enforest Nothing ts ((f, precUnaryOp t) : stack)
 
-enforest2 Nothing (SymbolLiteral m x:ts) stack = enforest2 (Just $ SymbolLeaf m x) ts stack
-enforest2 Nothing (t@ListTerm{_termCar="()", _termCdr=cdr}:ts) stack =
-                        let inner = enforest20 cdr
-                        in enforest2 (Just inner) ts stack
+enforest Nothing (SymbolLiteral m x:ts) stack = enforest (Just $ SymbolLeaf m x) ts stack
+enforest Nothing (t@ListTerm{_termCar="()", _termCdr=cdr}:ts) stack =
+                        let inner = enforest0 cdr
+                        in enforest (Just inner) ts stack
 
-enforest2 (Just t) (t2@SymbolLiteral{_termSymbol = s}:ts) stack@((combine,prec):stackRest) | (isBinaryOp t2) =
+enforest (Just t) (t2@SymbolLiteral{_termSymbol = s}:ts) stack@((combine,prec):stackRest) | (isBinaryOp t2) =
                        let f rhs = Binary m (SymbolLeaf m s) t rhs
                            m = t2 ^. termMetadata
                            prec2 = precBinaryOp t2
-                       in if (prec2 > prec) then enforest2 Nothing ts ((f,prec2):stack)
-                          else enforest2 (Just $ combine t) (t2:ts) stackRest
-enforest2 (Just t)  (t2@ListTerm{_termMetadata = m, _termCar="()", _termCdr=cdr}:ts) stack
-  = let args = enforest20 cdr
+                       in if (prec2 > prec) then enforest Nothing ts ((f,prec2):stack)
+                          else enforest (Just $ combine t) (t2:ts) stackRest
+enforest (Just t)  (t2@ListTerm{_termMetadata = m, _termCar="()", _termCdr=cdr}:ts) stack
+  = let args = enforest0 cdr
         ap1 = Binary m (SymbolLeaf m "call") t args
-    in enforest2 (Just ap1) ts stack
+    in enforest (Just ap1) ts stack
 
-enforest2 (Just t) (t2@ListTerm{_termMetadata = m, _termCar="[]", _termCdr=cdr}:ts) stack
-  = let args = enforest20 cdr
+enforest (Just t) (t2@ListTerm{_termMetadata = m, _termCar="[]", _termCdr=cdr}:ts) stack
+  = let args = enforest0 cdr
         ap1 = Binary m (SymbolLeaf m "array-access") t args
-    in enforest2 (Just ap1) ts stack
-enforest2 (Just t) ts ((f,_):rest) = enforest2 (Just $ f t) ts rest
-enforest2 t (t2:_) [] = abortCompilerAt t2 "unexpected redundant term" [] ["end of expression"]
-enforest2 Nothing (t2:_) _ = abortCompilerAt t2 "unexpected head term" [] ["end of expression"]
+    in enforest (Just ap1) ts stack
+enforest (Just t) ts ((f,_):rest) = enforest (Just $ f t) ts rest
+enforest t (t2:_) [] = abortCompilerAt t2 "unexpected redundant term" [] ["end of expression"]
+enforest Nothing (t2:_) _ = abortCompilerAt t2 "unexpected head term" [] ["end of expression"]
 
-{-
-enforest2 (t@SymbolLiteral{}:t2@ListTerm{_termCar="[]", _termCdr=cdr}:ts) stack
-  = let args = enforest2 cdr [(id,0)]
-        ap1 = mkTreeAt t [("car",mkSymbolAt t "array-access"), ("lhs", t), ("rhs", args)]
-    in enforest2 (ap1:ts) stack
-enforest2 (t:ts) ((f,_):rest) = enforest2 (f t:ts) rest
-enforest2 (t:t2:_) [] = abortCompilerAt t2 "unexpected redundant term" [] ["end of expression"]
-
--}
 
 
 abortCompilerAt :: HasRendering r => r -> String -> [String] -> [String] -> a
