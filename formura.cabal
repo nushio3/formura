@@ -23,6 +23,7 @@ source-repository head
 
 library
   exposed-modules:
+    Language.Formura.AST
     Language.Formura.Core
     Language.Formura.Parser
     Language.Formura.Enforest
