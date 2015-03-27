@@ -6,29 +6,38 @@ import Data.Traversable
 import Data.Array.Repa as R
 import Data.Array.Repa.Repr.Unboxed as R
 
-data UnishapeG sh where
-  Sh0 :: sh -> UnishapeG sh
-  Sh1 :: UnishapeG (sh:.Int) -> UnishapeG sh
+
+data UnishapeG sh a where
+  Sh0 :: sh -> UnishapeG sh a
+  Sh1 :: UnishapeG (sh:.a) a -> UnishapeG sh a
   deriving (Show)
 
 
-type Unishape = UnishapeG Z
+type Unishape a = UnishapeG Z a
 
-cons :: Int -> UnishapeG sh  -> UnishapeG sh
+cons :: a -> UnishapeG sh a -> UnishapeG sh a
 cons x (Sh0 y) = Sh1 (Sh0 (y:.x))
 cons x (Sh1 xs) = Sh1 (cons x xs)
 
--- foldru :: (Int -> b -> b) -> b -> UnishapeG sh -> b
--- foldru c n (Sh0 Z) = n
--- foldru c n (Sh1 xs) = (foldru c n xs)
+uhead :: UnishapeG (sh:.a) a -> a
+uhead (Sh0 (_ :. x)) = x
+uhead (Sh1 xs) = uhead xs
 
-up :: [Int] -> Unishape
+utail :: UnishapeG (sh:.a) a -> UnishapeG sh a
+utail (Sh0 (xs:. _)) = Sh0 xs
+utail (Sh1 xs) = Sh1 (utail xs)
+
+ufoldr :: (a -> b -> b) -> b -> UnishapeG sh a -> b
+ufoldr c n (Sh0 _) = n
+ufoldr c n (Sh1 xs) = c (uhead xs) (ufoldr c n (utail xs))
+
+up :: [a] -> Unishape a
 up [] = Sh0 Z
 up (x:xs) = cons x $ up xs
 
--- down :: Unishape -> [Int]
--- down (Sh0 Z) = []
--- down (Sh1 x) =
+down :: Unishape a -> [a]
+down (Sh0 Z) = []
+down (Sh1 x) = uhead x : down (utail x)
 
 
 {-
