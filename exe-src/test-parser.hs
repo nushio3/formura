@@ -25,8 +25,6 @@ main = do
     Success ast -> do
       putStrLn "#### Tokenized Program ####"
       print ast
-      putStrLn "#### Enforest Mk. 1 ####"
+      putStrLn "#### Enforested Program ####"
       mapM_ print $ readProgram ast
-      putStrLn "#### Enforest Mk. 2 ####"
-      mapM_ print $ readProgram2 ast
     Failure doc -> displayIO stdout $ renderPretty 0.8 80 $ doc <> linebreak
