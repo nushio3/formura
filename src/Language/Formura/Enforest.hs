@@ -56,36 +56,6 @@ precBinaryOp :: Term -> Int
 precBinaryOp = maybe 0 id . asBinaryOp
 
 
-mkTreeAt :: Term -> [(String, Term)] -> Term
-mkTreeAt t xs = TreeTerm (t^.termMetadata) (M.fromList xs)
-
-mkSymbolAt :: Term -> String -> Term
-mkSymbolAt t xs = SymbolLiteral (t^.termMetadata) xs
-
-enforest :: [Term] -> [(Term -> Term, Int)] -> Term
-enforest [] _ = error "Cannot enforest an empty term list. "
-enforest [t] [] = t
-enforest (t@SymbolLiteral{_termSymbol=s}:ts) stack | (isUnaryOp t) =
-                          let f rhs = mkTreeAt t [("car",mkSymbolAt t ("unary" ++ s)),("rhs",rhs)]
-                          in enforest ts ((f, precUnaryOp t) : stack)
-enforest (t@ListTerm{_termCar="()", _termCdr=cdr}:ts) stack =
-                        let inner = enforest cdr [(id,0)]
-                        in enforest (inner:ts) stack
-enforest (t:t2:ts) stack@((combine,prec):stackRest) | (isBinaryOp t2) =
-                       let f rhs = mkTreeAt t2 [("car",t2),("lhs",t),("rhs",rhs)]
-                           prec2 = precBinaryOp t2
-                       in if (prec2 > prec) then enforest ts ((f,prec2):stack)
-                          else enforest (combine t:t2:ts) stackRest
-enforest (t@SymbolLiteral{}:t2@ListTerm{_termCar="()", _termCdr=cdr}:ts) stack
-  = let args = enforest cdr [(id,0)]
-        ap1 = mkTreeAt t [("car",mkSymbolAt t "call"), ("lhs", t), ("rhs", args)]
-    in enforest (ap1:ts) stack
-enforest (t@SymbolLiteral{}:t2@ListTerm{_termCar="[]", _termCdr=cdr}:ts) stack
-  = let args = enforest cdr [(id,0)]
-        ap1 = mkTreeAt t [("car",mkSymbolAt t "array-access"), ("lhs", t), ("rhs", args)]
-    in enforest (ap1:ts) stack
-enforest (t:ts) ((f,_):rest) = enforest (f t:ts) rest
-enforest (t:t2:_) [] = abortCompilerAt t2 "unexpected redundant term" [] ["end of expression"]
 
 
 abortCompilerAt :: HasRendering r => r -> String -> [String] -> [String] -> a

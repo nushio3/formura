@@ -48,8 +48,6 @@ data Term = RationalLiteral
             {_termMetadata :: Metadata}
           | ListTerm
             {_termMetadata :: Metadata, _termCar :: String, _termCdr :: [Term]}
-          | TreeTerm
-            {_termMetadata :: Metadata, _termLeaves :: M.Map String Term}
 
 makeLenses ''Term
 
@@ -67,11 +65,7 @@ instance Show Term where
   show (ListTerm _ car cdr) =
     "(" ++ unwords (car : map show cdr) ++
     ")"
-  show (TreeTerm _ m) =
-    case M.lookup "car" m of
-      Just (SymbolLiteral{_termSymbol = car}) -> let args = map (show . snd) $ M.toList $ M.delete "car" m in
-        "(" ++ unwords (car:args) ++ ")"
-      _ -> "?"
+
 
 pprRational :: Rational -> String
 pprRational r
