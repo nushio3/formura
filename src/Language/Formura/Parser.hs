@@ -112,11 +112,11 @@ isIdentifierAlphabet1 c = isAlphaNum c || c == '_'
 isIdentifierSymbol :: Char -> Bool
 isIdentifierSymbol c = isPrint c &&
   not (isIdentifierAlphabet1 c || isSpace c ||
-      c `elem` "'\"(),;[]`{}")
+      c `elem` "'\"(),;[]`{}\\")
 
 isStandaloneIdentifierSymbol :: Char -> Bool
 isStandaloneIdentifierSymbol c =
-      c `elem` ",`"
+      c `elem` ",`\\"
 
 keyword :: String -> P String
 keyword str = (token $ string str)
