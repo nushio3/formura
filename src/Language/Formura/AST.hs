@@ -1,10 +1,17 @@
 {-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances, GADTs, StandaloneDeriving, KindSignatures, TemplateHaskell #-}
 module Language.Formura.AST where
 
+import qualified Data.Map.Strict as M
+
 import Control.Lens
 import Language.Formura.Parser
 import Text.Trifecta
 import Text.Printf
+
+data FValue = FVInt Int
+            | FVFloat Float
+            | FVDouble Double
+            | FVArray (M.Map [Int] FValue)
 
 data Range = Range {_rangeMetadata :: Metadata, _rangeLower :: Rational, _rangeSize :: Int}
 

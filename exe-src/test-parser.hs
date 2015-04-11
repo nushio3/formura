@@ -5,7 +5,7 @@ import Control.Lens
 import Control.Monad
 import Data.Monoid
 import qualified Data.Text.IO as T
-import qualified Data.Map as M
+import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 import System.Environment
 import System.IO
@@ -44,18 +44,34 @@ tSepBy n t = go t
                  = tSepBy n lhs ++ tSepBy n rhs
     go t = [t]
 
+tCarVariableName :: Tree -> SymbolName
+tCarVariableName t@(RationalLeaf{}) = abortCompilerAt t "unexpected literal" [] ["variable name"]
+tCarVariableName (SymbolLeaf{_treeSymbol=s}) = s
+tCarVariableName t = tCarVariableName (_treeCar t)
+
 analyze :: [Tree] -> IO ()
 analyze progTree = do
-  putStrLn "#### Declaration Analysis ####"
   let findDecl :: Tree -> [(Tree, Tree)]
       findDecl (Binary{_treeCar=SymbolLeaf{_treeSymbol="::"}, _treeLhs=lhs, _treeRhs=rhs})
                       = [(n,lhs) | n <- tSepBy "," rhs]
       findDecl _ = []
-  mapM_ print $ progTree >>= findDecl
 
-  putStrLn "#### Definition Analysis ####"
+      declTable :: M.Map SymbolName (Tree, Tree)
+      declTable = M.fromList [(tCarVariableName l,(l,r))
+          | (l,r) <- progTree >>= findDecl ]
+
   let findDef :: Tree -> [(Tree, Tree)]
       findDef (Binary{_treeCar=SymbolLeaf{_treeSymbol="="}, _treeLhs=lhs, _treeRhs=rhs})
                       = [(lhs,rhs) ]
       findDef _ = []
-  mapM_ print $ progTree >>= findDef
+
+      defTable :: M.Map SymbolName (Tree, Tree)
+      defTable = M.fromList [(tCarVariableName l,(l,r))
+          | (l,r) <- progTree >>= findDef ]
+
+
+  putStrLn "#### Declaration Analysis ####"
+  mapM_ print $ M.toList declTable
+
+  putStrLn "#### Definition Analysis ####"
+  mapM_ print $ M.toList defTable
