@@ -2,15 +2,21 @@
 module Language.Formura.Tree where
 
 import Control.Lens
+import Data.String
 import Language.Formura.Parser
 import Text.Trifecta
 import Text.Printf
 
+type SymbolName = String
+
 data Tree
   = RationalLeaf {_treeMetadata :: Metadata, _treeRational :: Rational}
-  | SymbolLeaf {_treeMetadata :: Metadata, _treeSymbol :: String}
+  | SymbolLeaf {_treeMetadata :: Metadata, _treeSymbol :: SymbolName}
   | Unary {_treeMetadata :: Metadata, _treeCar :: Tree, _treeRhs :: Tree}
   | Binary {_treeMetadata :: Metadata, _treeCar :: Tree, _treeLhs :: Tree, _treeRhs :: Tree}
+
+
+
 makeLenses ''Tree
 
 instance Show Tree where

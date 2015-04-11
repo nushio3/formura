@@ -20,9 +20,6 @@ readProgram :: Term -> [Tree]
 readProgram (ListTerm _ _ ts) = map (\ts1 -> enforest0 ts1) $ filter (not . null) $ wordsBy isStatementDelimiter ts
 readProgram t = abortCompilerAt t "top level program is not a list" [] ["list term"]
 
-
-
-
 isAtom :: Term -> Bool
 isAtom RationalLiteral{} = True
 isAtom SymbolLiteral{} = True
@@ -47,7 +44,7 @@ asBinaryOp SymbolLiteral{_termSymbol = s} = case s of
   "-" -> Just 6
   "*" -> Just 7
   "/" -> Just 7
-  "||" -> Just 5
+  "|" -> Just 5
   "==" -> Just 4
   ".." -> Just 5
   "," -> Just 3

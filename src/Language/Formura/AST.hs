@@ -15,7 +15,6 @@ data TTree f a where
   Atom :: a -> TTree f a
   Cons :: TTree f (f a) -> TTree f a
 
-
 instance (Show a) =>  Show (TTree [] a) where
   show (Atom x) = show x
   show (Cons x) = show x
