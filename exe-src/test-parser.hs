@@ -6,6 +6,7 @@ import Control.Lens
 import Control.Monad
 import Data.Maybe
 import Data.Monoid
+import qualified Data.Traversable as Tr
 import qualified Data.Text.IO as T
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -69,10 +70,10 @@ isSpecialDeclarationSymbol _ = False
 treeToKnowledge :: Tree -> [(SymbolName, Knowledge)]
 treeToKnowledge t0@Binary{_treeCar=SymbolLeaf{_treeSymbol="::"}, _treeLhs=lhs, _treeRhs=rhs}
   = let k :: Tree -> Knowledge
-        k t1 = case isSpecialDeclarationSymbol lhs
-                 of True -> defaultKnowledge{_knowSpecialDeclaration = Just t1}
-                    False-> defaultKnowledge{_knowTypeDeclaration = Just t1}
-    in [(definedName n,k (t0{_treeLhs=n, _treeRhs=lhs})) | n <- tSepBy "," rhs]
+        k n = case isSpecialDeclarationSymbol lhs
+                of True -> defaultKnowledge{_knowSpecialDeclaration = Just lhs}
+                   False-> defaultKnowledge{_knowTypeDeclaration = Just t0{_treeLhs=n, _treeRhs=lhs}}
+    in [(definedName n,k n) | n <- tSepBy "," rhs]
 treeToKnowledge t0@Binary{_treeCar=SymbolLeaf{_treeSymbol="="}, _treeLhs=lhs, _treeRhs=rhs}
                = [(definedName lhs,defaultKnowledge{_knowSubstitution = Just t0}) ]
 treeToKnowledge t = abortCompilerAt t "unknown kind of sentence" [] ["declaration", "substitution"]
@@ -82,9 +83,19 @@ analyze :: [Tree] -> IO ()
 analyze progTree = do
   let kmap :: M.Map SymbolName Knowledge
       kmap = M.fromListWith mergeKnowledge $ progTree >>= treeToKnowledge
-  putStrLn "#### Special Decls ####"
-  mapM_ print $ map (^. _2 . knowSpecialDeclaration) $ M.toList $ kmap
 
+  let showKnowledge klens = mapM_ print $ catMaybes $
+        map Tr.sequence $ -- :: (a, Maybe b) -> Maybe (a,b)
+        map (_2 %~ klens) $ M.toList $ kmap
+
+  putStrLn "#### Special Decls ####"
+  showKnowledge _knowSpecialDeclaration
+
+  putStrLn "#### Type Decls ####"
+  showKnowledge _knowTypeDeclaration
+
+  putStrLn "#### Substitutions ####"
+  showKnowledge _knowSubstitution
 
 
 main :: IO ()
