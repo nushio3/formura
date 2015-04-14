@@ -2,6 +2,7 @@
 module Language.Formura.AST where
 
 import qualified Data.Map as M
+import Data.Ratio
 
 import Control.Lens
 import Language.Formura.Parser
@@ -9,9 +10,11 @@ import Text.Trifecta
 import Text.Printf
 
 data FValue = FVInt Int
+            | FVRational Rational
             | FVFloat Float
             | FVDouble Double
             | FVArray (M.Map [Int] FValue)
+  deriving (Show)
 
 data Range = Range {_rangeMetadata :: Metadata, _rangeLower :: Rational, _rangeSize :: Int}
 

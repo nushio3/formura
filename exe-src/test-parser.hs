@@ -16,6 +16,7 @@ import Text.Trifecta
 import Text.Printf
 import Text.PrettyPrint.ANSI.Leijen as Pretty hiding (line, (<>), (<$>), empty, integer)
 
+import Language.Formura.AST
 import Language.Formura.Tree
 import Language.Formura.Parser
 import Language.Formura.Enforest
@@ -55,7 +56,7 @@ mergeKnowledge (Knowledge as at ad) (Knowledge bs bt bd)
               (mg "substitution" ad bd)
   where
     mg :: String -> Maybe Tree -> Maybe Tree -> Maybe Tree
-    mg what (Just a) (Just b) = abortCompilerAtRs [a ^. rendering, b ^. rendering] ("multiple " ++ what) [] []
+    mg what (Just a) (Just b) = abortCompilerAtRs [a ^. rendering, b ^. rendering] ("duplicated " ++ what) [] []
     mg _ a b = a <|> b
 
 specialDeclarationKeywords :: [SymbolName]
@@ -97,6 +98,21 @@ analyze progTree = do
   putStrLn "#### Substitutions ####"
   showKnowledge _knowSubstitution
 
+  let bind :: Binding
+      bind = eval bind kmap
+
+  mapM_ print $ M.toList bind
+
+
+type Binding = M.Map SymbolName FValue
+
+eval :: Binding -> M.Map SymbolName Knowledge -> Binding
+eval binding = M.mapWithKey (eval1 binding)
+
+eval1 :: Binding -> SymbolName -> Knowledge -> FValue
+eval1 binding name know = FVInt 42
+
+
 
 main :: IO ()
 main = do
@@ -112,4 +128,5 @@ main = do
       putStrLn "#### Enforested Program ####"
       mapM_ print progTree
       analyze progTree
+
     Failure doc -> displayIO stdout $ renderPretty 0.8 80 $ doc <> linebreak
