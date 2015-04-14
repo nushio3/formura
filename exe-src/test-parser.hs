@@ -116,7 +116,7 @@ eval1 binding name know = case know of
   Knowledge _ (Just typeDecl) (Just subst) -> eval2 binding name typeDecl subst
   Knowledge _ (Just x) Nothing -> abortCompilerAt x (name ++ " lacks substitution") [] []
   Knowledge _ Nothing (Just x) -> abortCompilerAt x (name ++ " lacks type declaration") [] []
-  Knowledge _ _ _ -> abortCompilerAt x ("The name " ++ name ++ " came out of whitehole") [] []
+  Knowledge _ _ _ -> abortCompilerAtRs [] ("The name " ++ name ++ " came out of whitehole") [] []
 
 eval2 :: Binding -> SymbolName -> Tree -> Tree -> FValue
 eval2 binding name typeDecl subst = FVInt 42
