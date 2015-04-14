@@ -101,6 +101,7 @@ analyze progTree = do
   let bind :: Binding
       bind = eval bind kmap
 
+  putStrLn "#### Eval ####"
   mapM_ print $ M.toList bind
 
 
@@ -110,8 +111,15 @@ eval :: Binding -> M.Map SymbolName Knowledge -> Binding
 eval binding = M.mapWithKey (eval1 binding)
 
 eval1 :: Binding -> SymbolName -> Knowledge -> FValue
-eval1 binding name know = FVInt 42
+eval1 binding name know = case know of
+  Knowledge (Just _) _ _ -> FVInt 451
+  Knowledge _ (Just typeDecl) (Just subst) -> eval2 binding name typeDecl subst
+  Knowledge _ (Just x) Nothing -> abortCompilerAt x (name ++ " lacks substitution") [] []
+  Knowledge _ Nothing (Just x) -> abortCompilerAt x (name ++ " lacks type declaration") [] []
+  Knowledge _ _ _ -> abortCompilerAt x ("The name " ++ name ++ " came out of whitehole") [] []
 
+eval2 :: Binding -> SymbolName -> Tree -> Tree -> FValue
+eval2 binding name typeDecl subst = FVInt 42
 
 
 main :: IO ()
