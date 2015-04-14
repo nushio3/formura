@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances, FlexibleContexts, UndecidableInstances, GADTs, StandaloneDeriving, KindSignatures, TemplateHaskell #-}
 module Language.Formura.AST where
 
-import qualified Data.Map.Strict as M
+import qualified Data.Map as M
 
 import Control.Lens
 import Language.Formura.Parser

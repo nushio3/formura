@@ -1,6 +1,7 @@
 module Language.Formura.Enforest where
 
 import Control.Lens
+import Control.Monad
 import Data.List.Split (wordsBy)
 import Data.Maybe
 import qualified Data.Map as M
@@ -109,6 +110,21 @@ abortCompilerAt r0 reason0 footnotes0 expected0 =
     error "compiler error"
   where
     r1 = r0 ^. rendering
+    reason1
+      | reason0 == "" = Nothing
+      | otherwise     = Just $ Ppr.text reason0
+    footnotes1 = map Ppr.text footnotes0
+    expected1 = S.fromList expected0
+
+abortCompilerAtRs :: [Rendering] -> String -> [String] -> [String] -> a
+abortCompilerAtRs rs reason0 footnotes0 expected0 =
+  unsafePerformIO $ do
+    forM_ rs $ \r1 -> do
+      Ppr.displayIO stdout $
+        Ppr.renderPretty 0.8 80 $
+          (explain (addCaret (delta r1) r1) (Err reason1 footnotes1 expected1)) Ppr.<> Ppr.linebreak
+    error "compiler error"
+  where
     reason1
       | reason0 == "" = Nothing
       | otherwise     = Just $ Ppr.text reason0
