@@ -9,6 +9,13 @@ import Language.Formura.Parser
 import Text.Trifecta
 import Text.Printf
 
+data FType = FTInt
+           | FTRational
+           | FTFloat
+           | FTDouble
+           | FTArray FType
+ deriving (Show)
+
 data FValue = FVInt Int
             | FVRational Rational
             | FVFloat Float

@@ -105,22 +105,30 @@ analyze progTree = do
   mapM_ print $ M.toList bind
 
 
-type Binding = M.Map SymbolName FValue
+type Binding = M.Map SymbolName (FType, FValue)
 
 eval :: Binding -> M.Map SymbolName Knowledge -> Binding
 eval binding = M.mapWithKey (eval1 binding)
 
-eval1 :: Binding -> SymbolName -> Knowledge -> FValue
+todo = (FTInt, FVInt 451)
+
+eval1 :: Binding -> SymbolName -> Knowledge -> (FType, FValue)
 eval1 binding name know = case know of
-  Knowledge (Just _) _ _ -> FVInt 451
+  Knowledge (Just _) _ _ -> todo
   Knowledge _ (Just typeDecl) (Just subst) -> eval2 binding name typeDecl subst
   Knowledge _ (Just x) Nothing -> abortCompilerAt x (name ++ " lacks substitution") [] []
   Knowledge _ Nothing (Just x) -> abortCompilerAt x (name ++ " lacks type declaration") [] []
   Knowledge _ _ _ -> abortCompilerAtRs [] ("The name " ++ name ++ " came out of whitehole") [] []
 
-eval2 :: Binding -> SymbolName -> Tree -> Tree -> FValue
-eval2 binding name typeDecl subst = FVInt 42
+eval2 :: Binding -> SymbolName -> Tree -> Tree -> (FType, FValue)
+eval2 binding name typeDecl subst = case _treeRhs typeDecl of
+  SymbolLeaf{_treeSymbol = tn} -> (evalScalarType tn, FVInt 42)
+  Binary{_treeCar = _ , _treeLhs = lhs} -> (FTArray FTDouble, FVInt 42)
+  _ -> todo
 
+evalScalarType :: String -> FType
+evalScalarType "double" = FTDouble
+evalScalarType str = abortCompilerAtRs [] ("Unknown type:" ++ str)  [] []
 
 main :: IO ()
 main = do
