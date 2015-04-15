@@ -13,13 +13,17 @@ data FType = FTInt
            | FTRational
            | FTFloat
            | FTDouble
-           | FTArray FType
+           | FTString
+           | FTRange
+           | FTArray [Range] FType
  deriving (Show)
 
 data FValue = FVInt Int
             | FVRational Rational
             | FVFloat Float
             | FVDouble Double
+            | FVString String
+            | FVRange Range
             | FVArray (M.Map [Int] FValue)
   deriving (Show)
 
