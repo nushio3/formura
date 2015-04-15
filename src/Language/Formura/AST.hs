@@ -16,15 +16,7 @@ data FValue = FVInt Int
             | FVArray (M.Map [Int] FValue)
   deriving (Show)
 
-data Range = Range {_rangeMetadata :: Metadata, _rangeLower :: Rational, _rangeSize :: Int}
+data Range = Range {_rangeMetadata :: Metadata, _rangeOffset :: Rational, _rangeLower :: Int, _rangeUpper :: Int}
 
 instance Show Range where
-  show (Range _ l s) = printf "%s..%s" (pprRational l) (pprRational $ l+fromIntegral s)
-
-data TTree f a where
-  Atom :: a -> TTree f a
-  Cons :: TTree f (f a) -> TTree f a
-
-instance (Show a) =>  Show (TTree [] a) where
-  show (Atom x) = show x
-  show (Cons x) = show x
+  show (Range _ o l u) = printf "%s..%s" (pprRational $ o+fromIntegral l) (pprRational $ o+fromIntegral u)
