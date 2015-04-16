@@ -45,6 +45,7 @@ asBinaryOp SymbolLiteral{_termSymbol = s} = case s of
   "-" -> Just 6
   "*" -> Just 7
   "/" -> Just 7
+  "**" -> Just 8
   "|" -> Just 5
   "==" -> Just 4
   ".." -> Just 5

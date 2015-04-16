@@ -99,36 +99,54 @@ analyze progTree = do
   showKnowledge _knowSubstitution
 
   let bind :: Binding
-      bind = eval bind kmap
+      bind = M.map (evalK bind)  kmap
 
   putStrLn "#### Eval ####"
   mapM_ print $ M.toList bind
 
 
-type Binding = M.Map SymbolName (FType, FValue)
+type Binding = M.Map SymbolName FValue
 
-eval :: Binding -> M.Map SymbolName Knowledge -> Binding
-eval binding = M.mapWithKey (eval1 binding)
+todo [] = FVString "TODO"
+todo x = FVString $ "TODO " ++ x
 
-todo = (FTInt, FVInt 451)
+-- -- transformBin (a,b) = case (a,b) of
+-- --   (FVRange)
 
-eval1 :: Binding -> SymbolName -> Knowledge -> (FType, FValue)
-eval1 binding name know = case know of
-  Knowledge (Just _) _ _ -> todo
-  Knowledge _ (Just typeDecl) (Just subst) -> eval2 binding name typeDecl subst
-  Knowledge _ (Just x) Nothing -> abortCompilerAt x (name ++ " lacks substitution") [] []
-  Knowledge _ Nothing (Just x) -> abortCompilerAt x (name ++ " lacks type declaration") [] []
-  Knowledge _ _ _ -> abortCompilerAtRs [] ("The name " ++ name ++ " came out of whitehole") [] []
+evalK :: Binding -> Knowledge -> FValue
+evalK binding k = case k ^.knowSubstitution of
+  Just t -> eval binding (_treeRhs t)
+  Nothing -> todo ""
 
-eval2 :: Binding -> SymbolName -> Tree -> Tree -> (FType, FValue)
-eval2 binding name typeDecl subst = case _treeRhs typeDecl of
-  SymbolLeaf{_treeSymbol = tn} -> (evalScalarType tn, FVInt 42)
-  Binary{_treeCar = _ , _treeLhs = lhs} -> (FTArray FTDouble, FVInt 42)
-  _ -> todo
-
-evalScalarType :: String -> FType
-evalScalarType "double" = FTDouble
-evalScalarType str = abortCompilerAtRs [] ("Unknown type:" ++ str)  [] []
+eval :: Binding -> Tree -> FValue
+eval binding t = case t of
+  RationalLeaf _ r -> FVRational r
+  SymbolLeaf m s -> case M.lookup s binding  of
+    Just v -> v
+    Nothing -> abortCompilerAt m "undefined symbol" [] []
+  Binary m o l r -> case _treeSymbol o of
+    "+" -> fromMaybe (todo $ show t) $ do
+      let FVRational lv = eval binding l
+          FVRational rv = eval binding r
+      return $ FVRational $ lv + rv
+    "-" -> fromMaybe (todo $ show t) $ do
+      let FVRational lv = eval binding l
+          FVRational rv = eval binding r
+      return $ FVRational $ lv - rv
+    "*" -> fromMaybe (todo $ show t) $ do
+      let FVRational lv = eval binding l
+          FVRational rv = eval binding r
+      return $ FVRational $ lv * rv
+    "/" -> fromMaybe (todo $ show t) $ do
+      let FVRational lv = eval binding l
+          FVRational rv = eval binding r
+      return $ FVRational $ lv / rv
+    "**" -> fromMaybe (todo $ show t) $ do
+      let FVRational lv = eval binding l
+          FVRational rv = eval binding r
+      return $ FVRational $ lv ^ (round rv::Int)
+    _   -> todo $ show t
+  _ -> todo ""
 
 main :: IO ()
 main = do

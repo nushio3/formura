@@ -24,7 +24,7 @@ data FValue = FVInt Int
             | FVDouble Double
             | FVString String
             | FVRange Range
-            | FVArray (M.Map [Int] FValue)
+            | FVArray [Range] (M.Map [Int] FValue)
   deriving (Show)
 
 data Range = Range {_rangeMetadata :: Metadata, _rangeOffset :: Rational, _rangeLower :: Int, _rangeUpper :: Int}

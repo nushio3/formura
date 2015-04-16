@@ -14,9 +14,6 @@ data Tree
   | SymbolLeaf {_treeMetadata :: Metadata, _treeSymbol :: SymbolName}
   | Unary {_treeMetadata :: Metadata, _treeCar :: Tree, _treeRhs :: Tree}
   | Binary {_treeMetadata :: Metadata, _treeCar :: Tree, _treeLhs :: Tree, _treeRhs :: Tree}
-
-
-
 makeLenses ''Tree
 
 instance Show Tree where
