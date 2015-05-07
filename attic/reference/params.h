@@ -9,5 +9,6 @@ const int NG=NT/NS/2; // 32
 const int NTO=NX/NT; // 16
 const int NF=NTO*NG; // 16*32 = 512
 
+
 const int N_SLAB = NF+NG;
 const int N_STICK = NF+NG;
