@@ -147,6 +147,13 @@ void compute_pitch() {
 
 
 int main(){
+cout << "yslabs" << (NTO)*(NTO)*(NF)*(NT)*(2) << endl;
+cout << "xslabs" << (NTO)*(NTO)*(NF)*(NT)*(2) << endl;
+cout << "sticks" << (NTO)*(NTO)*(NT)*(4) << endl;
+ cout << "pads" << (NTO)*(NTO)*(NT+2*NS)*(NT+2*NS) << endl;
+
+
+
   init();
   double wct0 = second();
   for(int t=0; t<N_TIME; ++t){
