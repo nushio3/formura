@@ -19,10 +19,20 @@ void proceed_region
 ( double yslab[NF][NT][2],
   double xslab[NF][NT][2],
   double stick[NF][4],
+  double pad_input[NT][NT],
   double yslab_next[NF][NT][2],
   double xslab_next[NF][NT][2],
-  double stick_next[NF][4]
+  double stick_next[NF][4],
+  double pad_next[NT][NT]
 ) {
+    for(int y=0;y<NT;++y) {
+      for(int x=0;x<NT;++x) {
+        pad[y][x] = pad_input[y][x];
+      }
+    }
+
+
+
   for(int t=0; t<NF; ++t){
     for (int i=0;i<NT;++i) {
       pad[i][NT] = yslab[t][i][0];
@@ -56,5 +66,11 @@ void proceed_region
     stick[t][1] = pad[0][1];
     stick[t][2] = pad[1][0];
     stick[t][3] = pad[1][1];
+  }
+
+  for(int y=0;y<NT;++y) {
+    for(int x=0;x<NT;++x) {
+      pad_next[y][x] = pad[y][x];
+    }
   }
 }
