@@ -20,6 +20,25 @@ double dens[NY][NX];
 double dens_next[NY][NX];
 double dens_std[NY][NX];
 double dens_pitch[NY][NX];
+
+
+double yslabs[NTO][NTO][NF][NT][2] = {0};
+double xslabs[NTO][NTO][NF][NT][2] = {0};
+double sticks[NTO][NTO][NT][4] = {0};
+double pads[NTO][NTO][NT+2*NS][NT+2*NS] = {0};
+
+long ctr = 0;
+
+void proceed_region
+( double yslab[NF][NT][2],
+  double xslab[NF][NT][2],
+  double stick[NF][4],
+  double yslab_next[NF][NT][2],
+  double xslab_next[NF][NT][2],
+  double stick_next[NF][4]
+  );
+
+
 /*
 double second()
 {
@@ -89,56 +108,10 @@ void proceed(){
   swap(dens, dens_next);
 }
 
-double pad[NT+2*NS][NT+2*NS];
 
-double yslabs[NTO][NTO][NF][NT][2] = {0};
-double xslabs[NTO][NTO][NF][NT][2] = {0};
-double sticks[NTO][NTO][NT][4] = {0};
-double pads[NTO][NTO][NT+2*NS][NT+2*NS] = {0};
 
-#define dens_at_pitch(y,x) pad[(y)][(x)]
 
-void proceed_region
-( double yslab[NF][NT][2],
-  double xslab[NF][NT][2],
-  double stick[NF][4],
-  double yslab_next[NF][NT][2],
-  double xslab_next[NF][NT][2],
-  double stick_next[NF][4]
-) {
-  for(int t=0; t<NF; ++t){
-    for (int i=0;i<NT;++i) {
-      pad[i][NT] = yslab[t][i][0];
-      pad[i][NT+1] = yslab[t][i][1];
-      pad[NT][i] = xslab[t][i][0];
-      pad[NT+1][i] = xslab[t][i][1];
-    }
-    pad[NT][NT]=stick[t][0];
-    pad[NT][NT+1]=stick[t][1];
-    pad[NT+1][NT]=stick[t][2];
-    pad[NT+1][NT+1]=stick[t][3];
 
-    for(int y=1;y<=NT;++y) {
-      for(int x=1;x<=NT;++x) {
-        pad[y-1][x-1] =
-          0.5*dens_at_pitch(y,x);
-        0.125*((dens_at_pitch(y,x-1)+dens_at_pitch(y,x+1))
-               +(dens_at_pitch(y-1,x)+dens_at_pitch(y+1,x)));
-      }
-    }
-
-    for (int i=0;i<NT;++i) {
-      yslab_next[t][i][0] = pad[i][0]  ;
-      yslab_next[t][i][1] = pad[i][1]  ;
-      xslab_next[t][i][0] = pad[0][i]  ;
-      xslab_next[t][i][1] = pad[1][i]  ;
-    }
-    stick[t][0] = pad[0][0];
-    stick[t][1] = pad[0][1];
-    stick[t][2] = pad[1][0];
-    stick[t][3] = pad[1][1];
-  }
-}
 
 void compute_pitch() {
   for (int large_t=0; large_t < N_TIME/NF; ++large_t) {
@@ -166,6 +139,7 @@ int main(){
     proceed();
   }
   double wct1 = second();
+  cerr << (wct1-wct0) << " sec" << endl;
 
   double flops = double(NX*NY)*N_TIME*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
@@ -175,11 +149,11 @@ int main(){
   wct0 = second();
   compute_pitch();
   wct1 = second();
-
+  cerr << (wct1-wct0) << " sec" << endl;
   flops = double(NX*NY)*N_TIME*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
-  flops = double(N_TIME/NF)*NTO*NTO*NF*NT*NT*6.0/(wct1-wct0);
+  flops = double(N_TIME/NF)*double(NTO*NTO)*double(NF*NT*NT)*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
-
+  cerr << "ctr: " << ctr << " " << double(NX*NY)*N_TIME << endl;
 
 }
