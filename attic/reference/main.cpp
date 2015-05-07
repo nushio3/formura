@@ -172,6 +172,8 @@ int main(){
 
   flops = double(NX*NY)*NT*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
+  flops = double(N_TIME/NF)*NTO*NTO*NF*NT*NT*6.0/(wct1-wct0);
+  cerr << flops << " FLOP/s" << endl;
 
 
 }
