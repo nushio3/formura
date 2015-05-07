@@ -161,7 +161,7 @@ int main(){
   }
   double wct1 = second();
 
-  double flops = double(NX*NY)*NT*6.0/(wct1-wct0);
+  double flops = double(NX*NY)*N_TIME*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
 
   dump("test.txt");
@@ -170,7 +170,7 @@ int main(){
   compute_pitch();
   wct1 = second();
 
-  flops = double(NX*NY)*NT*6.0/(wct1-wct0);
+  flops = double(NX*NY)*N_TIME*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
   flops = double(N_TIME/NF)*NTO*NTO*NF*NT*NT*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
