@@ -5,41 +5,34 @@
 #include <sys/time.h>
 
 
-const int NX=1024, NY= 1024, N_TIME=1024;
-//const int NX=512, NY= 512, N_TIME=512;
-const int X_MASK = NX-1, Y_MASK = NY-1;
-
-const int NS=1;
-const int NT=64;
-const int T_MASK = NT-1;
-const int NG=NT/NS/2; // 32
-const int NTO=NX/NT; // 16
-const int NF=NX/NT*NG; // 16*32 = 512
-
 using namespace std;
+
+#include <params.h>
 
 double dens[NY][NX];
 double dens_next[NY][NX];
 double dens_std[NY][NX];
 double dens_pitch[NY][NX];
 
+const int N_SLAB = NF+NG;
+const int N_STICK = NF+NG;
 
-double yslabs[NTO][NTO][NF][NT][2] = {0};
-double xslabs[NTO][NTO][NF][NT][2] = {0};
-double sticks[NTO][NTO][NT][4] = {0};
+double yslabs[NTO][NTO][N_SLAB][NT][2] = {0};
+double xslabs[NTO][NTO][N_SLAB][NT][2] = {0};
+double sticks[NTO][NTO][N_STICK][4] = {0};
 double pads[NTO][NTO][NT][NT] = {0};
 
 long ctr = 0;
 
 void proceed_region
-( double yslab[NF][NT][2],
-  double xslab[NF][NT][2],
-  double stick[NF][4],
+( double yslab[N_SLAB][NT][2],
+  double xslab[N_SLAB][NT][2],r
+  double stick[N_STICK][4],
   double pad_input[NT][NT],
   double yslab_next[NF][NT][2],
-  double xslab_next[NF][NT][2],
-  double stick_next[NF][4],
-  double pad_next[NT][NT]
+  double xslab_next[N_SLAB][NT][2],
+  double stick_next[N_SLAB][4],
+  double pad_next[N_STICK][NT]
   );
 
 
