@@ -7,15 +7,13 @@
 
 using namespace std;
 
-#include <params.h>
+#include "params.h"
 
 double dens[NY][NX];
 double dens_next[NY][NX];
 double dens_std[NY][NX];
 double dens_pitch[NY][NX];
 
-const int N_SLAB = NF+NG;
-const int N_STICK = NF+NG;
 
 double yslabs[NTO][NTO][N_SLAB][NT][2] = {0};
 double xslabs[NTO][NTO][N_SLAB][NT][2] = {0};
@@ -26,7 +24,7 @@ long ctr = 0;
 
 void proceed_region
 ( double yslab[N_SLAB][NT][2],
-  double xslab[N_SLAB][NT][2],r
+  double xslab[N_SLAB][NT][2],
   double stick[N_STICK][4],
   double pad_input[NT][NT],
   double yslab_next[NF][NT][2],

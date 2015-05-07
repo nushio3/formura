@@ -16,7 +16,7 @@ extern long ctr;
 __attribute__ ((noinline))
 void proceed_region
 ( double yslab[N_SLAB][NT][2],
-  double xslab[N_SLAB][NT][2],r
+  double xslab[N_SLAB][NT][2],
   double stick[N_STICK][4],
   double pad_input[NT][NT],
   double yslab_next[NF][NT][2],
