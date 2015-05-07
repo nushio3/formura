@@ -22,7 +22,7 @@ double dens[NY][NX];
 double dens_next[NY][NX];
 double dens_std[NY][NX];
 double dens_pitch[NY][NX];
-
+/*
 double second()
 {
   struct timeval tm;
@@ -43,6 +43,12 @@ double second()
   }
 
   return t ;
+}*/
+
+static double second(){
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return double(tv.tv_sec) + 1.e-6*double(tv.tv_usec);
 }
 
 
