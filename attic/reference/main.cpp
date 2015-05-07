@@ -179,6 +179,7 @@ int main(){
 
 
   init();
+  dump("t0.txt");
   double wct0 = second();
   for(int t=0; t<N_TIME; ++t){
     proceed();
