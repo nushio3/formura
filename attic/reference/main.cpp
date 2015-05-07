@@ -5,45 +5,39 @@
 #include <sys/time.h>
 
 
-//const int NX=1024, NY= 1024, N_TIME=1024;
-const int NX=512, NY= 512, N_TIME=512;
-const int X_MASK = NX-1, Y_MASK = NY-1;
-
-const int NS=1;
-const int NT=64;
-const int T_MASK = NT-1;
-const int NG=NT/NS/2; // 32
-const int NTO=NX/NT; // 16
-const int NF=NX/NT*NG; // 16*32 = 512
-
 using namespace std;
+
+#include "params.h"
 
 double dens[NY][NX];
 double dens_next[NY][NX];
 double dens_std[NY][NX];
 double dens_pitch[NY][NX];
-/*
-double second()
-{
-  struct timeval tm;
-  double t ;
 
-  static int base_sec = 0,base_usec = 0;
+char virgin[N_TIME][NY][NX] = {0};
 
-  gettimeofday(&tm, NULL);
+double yslabs[NTO][NTO][N_SLAB][NT][2] = {0};
+double xslabs[NTO][NTO][N_SLAB][NT][2] = {0};
+double sticks[NTO][NTO][N_STICK][4] = {0};
+double pads[NTO][NTO][NT][NT] = {0};
 
-  if(base_sec == 0 && base_usec == 0)
-    {
-      base_sec = tm.tv_sec;
-      base_usec = tm.tv_usec;
-      t = 0.0;
-  } else {
-    t = (double) (tm.tv_sec-base_sec) +
-      ((double) (tm.tv_usec-base_usec))/1.0e6 ;
-  }
+long ctr = 0;
 
-  return t ;
-}*/
+void proceed_region
+( int orig_t,
+  int orig_y,
+  int orig_x,
+  double yslab[N_SLAB][NT][2],
+  double xslab[N_SLAB][NT][2],
+  double stick[N_STICK][4],
+  double pad_input[NT][NT],
+  double yslab_next[NF][NT][2],
+  double xslab_next[N_SLAB][NT][2],
+  double stick_next[N_SLAB][4],
+  double pad_next[N_STICK][NT]
+  );
+
+
 
 static double second(){
   struct timeval tv;
@@ -91,82 +85,22 @@ void proceed(){
   swap(dens, dens_next);
 }
 
-double pad[NT+2*NS][NT+2*NS];
-
-double yslabs[NTO][NTO][NF][NT][2] = {0};
-double xslabs[NTO][NTO][NF][NT][2] = {0};
-double sticks[NTO][NTO][NT][4] = {0};
-double pads[NTO][NTO][NT][NT] = {0};
-
-#define dens_at_pitch(y,x) pad[(y)][(x)]
-
-void proceed_region
-( double yslab[NF][NT][2],
-  double xslab[NF][NT][2],
-  double stick[NF][4],
-  double pad_input[NT][NT],
-  double yslab_next[NF][NT][2],
-  double xslab_next[NF][NT][2],
-  double stick_next[NF][4],
-  double pad_next[NT][NT]
-) {
-    for(int y=0;y<NT;++y) {
-      for(int x=0;x<NT;++x) {
-        pad[y][x] = pad_input[y][x];
-      }
-    }
-
-  for(int t=0; t<NF; ++t){
-    for (int i=0;i<NT;++i) {
-      pad[i][NT] = yslab[t][i][0];
-      pad[i][NT+1] = yslab[t][i][1];
-      pad[NT][i] = xslab[t][i][0];
-      pad[NT+1][i] = xslab[t][i][1];
-    }
-    pad[NT][NT]=stick[t][0];
-    pad[NT][NT+1]=stick[t][1];
-    pad[NT+1][NT]=stick[t][2];
-    pad[NT+1][NT+1]=stick[t][3];
-
-    for(int y=1;y<=NT;++y) {
-      for(int x=1;x<=NT;++x) {
-        pad[y-1][x-1] =
-          0.5*dens_at_pitch(y,x);
-        0.125*((dens_at_pitch(y,x-1)+dens_at_pitch(y,x+1))
-               +(dens_at_pitch(y-1,x)+dens_at_pitch(y+1,x)));
-      }
-    }
-
-    for (int i=0;i<NT;++i) {
-      yslab_next[t][i][0] = pad[i][0]  ;
-      yslab_next[t][i][1] = pad[i][1]  ;
-      xslab_next[t][i][0] = pad[0][i]  ;
-      xslab_next[t][i][1] = pad[1][i]  ;
-    }
-    stick_next[t][0] = pad[0][0];
-    stick_next[t][1] = pad[0][1];
-    stick_next[t][2] = pad[1][0];
-    stick_next[t][3] = pad[1][1];
-  }
-  for(int y=0;y<NT;++y) {
-    for(int x=0;x<NT;++x) {
-      pad_next[y][x] = pad[y][x];
-    }
-  }
-
-}
-
 void compute_pitch() {
-  for (int large_t=0; large_t < N_TIME/NF; ++large_t) {
-    for (int y5=NTO;y5>=0; --y5) {
-      for (int x5=NTO;x5>=0; --x5) {
+  for (int large_t=-10; large_t <= N_TIME/NF+10; ++large_t) {
+    for (int y5=NTO-1;y5>=0; --y5) {
+      for (int x5=NTO-1;x5>=0; --x5) {
         int x4=(x5-1) & NTO;
         int y4=(y5-1) & NTO;
-        proceed_region(yslabs[y5][x5], xslabs[y5][x5], sticks[y5][x5],pads[y5][x5],
-                       yslabs[y4][x5], xslabs[y5][x4], sticks[y4][x4],pads[y5][x5]);
+        proceed_region
+          (NF*large_t - NG*(x5 + y5),
+           (NT*large_t + NT*y5) & Y_MASK,
+           (NT*large_t + NT*x5) & X_MASK,
+           yslabs[y5][x5], xslabs[y5][x5], sticks[y5][x5],pads[y5][x5],
+           yslabs[y4][x5], xslabs[y5][x4], sticks[y4][x4],pads[y5][x5]);
       }
     }
   }
+  swap(dens, dens_next);
 }
 
 
@@ -176,36 +110,37 @@ int main(){
   cout << "sticks " << (NTO)*(NTO)*(NT)*(4) << endl;
   cout << "pads   " << (NTO)*(NTO)*(NT+2*NS)*(NT+2*NS) << endl;
 
+  double wct0, wct1, flops;
 
 
   init();
   dump("t0.txt");
-  double wct0 = second();
+  wct0 = second();
   for(int t=0; t<N_TIME; ++t){
     proceed();
   }
-  double wct1 = second();
+  wct1 = second();
+  cerr << (wct1-wct0) << " sec" << endl;
 
-  double flops = double(NX*NY)*N_TIME*6.0/(wct1-wct0);
+  flops = double(NX*NY)*N_TIME*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
 
   dump("test.txt");
 
   init();
-  for (int y=0;y<NY; ++y) {
-    for (int x=0; x<NX; ++x) {
-      pads[y/NT][x/NT][y&T_MASK][x&T_MASK] = dens[y][x];
-    }
-  }
 
   wct0 = second();
   compute_pitch();
   wct1 = second();
-
+  cerr << (wct1-wct0) << " sec" << endl;
   flops = double(NX*NY)*N_TIME*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
-  flops = double(N_TIME/NF)*NTO*NTO*NF*NT*NT*6.0/(wct1-wct0);
+  double superficial_cnt = double(N_TIME/NF+1)*double(NTO*NTO)*double((NF+NG)*NT*NT);
+  flops = superficial_cnt*6.0/(wct1-wct0);
   cerr << flops << " FLOP/s" << endl;
+
+  cerr << "ctr: " << ctr << " " << superficial_cnt << endl;
+
   init();
   for (int y=0;y<NY; ++y) {
     for (int x=0; x<NX; ++x) {
@@ -214,4 +149,19 @@ int main(){
   }
   dump("test-pitch.txt");
 
+  {
+    int cntr=0;
+    ofstream ofs("thru.txt");
+    for (int t=0; t< N_TIME;++t) {
+      for (int y=0;y<NY; ++y) {
+        for (int x=0; x<NX; ++x) {
+          if(virgin[t][y][x]==0) {
+            ofs << x << " " << y << " " << t << endl;
+            cntr++;
+          }
+          if(cntr>1e6) return 0;
+        }
+      }
+    }
+  }
 }
