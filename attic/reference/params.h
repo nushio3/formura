@@ -22,9 +22,9 @@ const int X_MASK = NX-1, Y_MASK = NY-1;
 const int NS=1;
 const int NT=16;
 const int T_MASK = NT-1;
-const int NG=NT/NS/2; // 32
-const int NTO=NX/NT; // 16
-const int NF=NTO*NG; // 16*32 = 512
+const int NG=NT/NS/2; // 8
+const int NTO=NX/NT; // 4
+const int NF=NTO*NG; // 32
 
 
 const int N_SLAB = NF+2*NG; // some bampei
