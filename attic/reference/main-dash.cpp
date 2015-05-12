@@ -1,10 +1,78 @@
 #include <algorithm>
+#include <cassert>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
-
+#include <string>
+#include <vector>
 
 using namespace std;
+
+#define DEBUG
+
+#ifdef DEBUG
+struct Real{
+  int t,y,x;
+  vector<Real> children ;
+  Real() : t(0xdeadbeef), y(0xdeadbeef), x(0xdeadbeef), children() {}
+  Real(int t0,int y0,int x0) : t(t0), y(y0), x(x0), children() {}
+  int size() {
+    if(children.size()==0) return 1; // leaf
+    int ret=0;
+    for(int i=0;i<children.size();++i) {
+      ret += children[i].size();
+    }
+    return ret;
+  }
+  bool test_fail (string msg) {
+    cerr << msg << endl;
+    return false;
+  }
+
+  bool test_stencil() {
+    if(children.size()!=2) return test_fail("not +");
+    if(size()!=5) return test_fail("not stencil");
+    if(children[0].size()!=1) return test_fail("not 1");
+    if(children[1].size()!=4) return test_fail("not 4");
+
+    t=children[0].t+1;
+    y=children[0].y;
+    x=children[0].x;
+    children.resize(0);
+
+    return true;
+  }
+
+};
+
+ostream& operator<<(ostream &cout, const Real &p) {
+  cout << "(" << p.t << ","
+       << p.y << ","
+       << p.x << ")";
+  return cout;
+}
+
+Real operator+(const Real &a, const Real &b) {
+  Real ret;
+  ret.children.push_back(a);
+  ret.children.push_back(b);
+  return ret;
+}
+Real operator*(const Real &a, const Real &b) {
+  Real ret;
+  ret.children.push_back(a);
+  ret.children.push_back(b);
+  return ret;
+}
+Real operator*(const double a, const Real &b) {
+  return b;
+}
+
+#else
+typedef double Real;
+#endif
+
+
 
 const int N_TIME = 1024, NY =256,NX =NY;
 const int X_MASK = NX-1, Y_MASK = NY-1;
@@ -13,10 +81,14 @@ const int T_STEP = NX/4;
 const int T_FIN = N_TIME-NX;
 const int NT = 16;
 
-double deadbeef=1e99;
-double pat[N_TIME][NY+2][NX+2];
-double init_state[NY][NX];
-double fin_state[NY][NX];
+#ifdef DEBUG
+const Real deadbeef = Real();
+#else
+Real deadbeef=1e99;
+#endif
+Real pat[N_TIME][NY+2][NX+2];
+Real init_state[NY][NX];
+Real fin_state[NY][NX];
 
 void init() {
   for(int t=0;t<N_TIME;++t){
@@ -27,6 +99,13 @@ void init() {
     }
   }
 
+#ifdef DEBUG
+  for (int y=0;y<NY; ++y) {
+    for (int x=0; x<NX; ++x) {
+      init_state[y][x]=Real(0,y,x);
+    }
+  }
+#else
   for (int y=0;y<NY; ++y) {
     for (int x=0; x<NX; ++x) {
       int p1=x, p2=y, fac=1, sum=0;
@@ -38,6 +117,7 @@ void init() {
       init_state[y][x]=sum;
     }
   }
+#endif
 }
 
 void dump(const char *fn) {
@@ -78,6 +158,19 @@ void compute_ref() {
 
 }
 
+#ifdef DEBUG
+inline Real compute_stencil(Real o, Real a, Real b, Real c, Real d) {
+  return 0.5*o+0.125*((a+b)+(c+d));
+}
+
+
+#else
+
+inline double compute_stencil(double o, double a, double b, double c, double d) {
+  return 0.5*o+0.125*((a+b)+(c+d));
+}
+
+#endif
 
 void compute_pitch() {
   for(int to=0;to<N_TIME; to+=T_STEP) {

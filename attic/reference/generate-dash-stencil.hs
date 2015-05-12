@@ -16,8 +16,8 @@ densAt t y x =
     f :: Rational -> Int
     f = floor
 
-gen :: Rational -> Rational -> String
-gen y x = printf "%s = 0.5*%s + 0.125*((%s+%s)+(%s+%s));"
+gen' :: Rational -> Rational -> String
+gen' y x = printf "%s = 0.5*%s + 0.125*((%s+%s)+(%s+%s));"
           (densAt t y x)
           (densAt (t-0.5) (y+1) (x+1))
           (densAt (t-0.75) (y+1) (x))
@@ -32,6 +32,26 @@ gen y x = printf "%s = 0.5*%s + 0.125*((%s+%s)+(%s+%s));"
       | x < 0 = onZero $ x+1
       | x >=1 = onZero $ x-1
       | otherwise = x
+
+
+gen :: Rational -> Rational -> String
+gen y x = printf "%s = compute_stencil(%s, %s, %s, %s, %s);"
+          (densAt t y x)
+          (densAt (t-0.5) (y+1) (x+1))
+          (densAt (t-0.75) (y+1) (x))
+          (densAt (t-0.25) (y+1) (x+2))
+          (densAt (t-0.75) (y) (x+1))
+          (densAt (t-0.25) (y+2) (x+1))
+  where
+    t0 = 0.25*(x+y)
+    t = onZero t0
+
+    onZero x
+      | x < 0 = onZero $ x+1
+      | x >=1 = onZero $ x-1
+      | otherwise = x
+
+
 
 genInit :: Int -> Int -> String
 genInit y x = printf "pat[t][y+%d][x+%d]=init_state[y+%d][x+%d];" y x y x
