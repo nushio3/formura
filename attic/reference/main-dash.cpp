@@ -7,6 +7,8 @@
 using namespace std;
 
 const int N_TIME = 1024, NY =256,NX =NY;
+const int X_MASK = NX-1, Y_MASK = NY-1;
+
 const int T_STEP = NX/4;
 const int T_FIN = N_TIME-NX;
 const int NT = 16;
@@ -48,10 +50,37 @@ void dump(const char *fn) {
   }
 }
 
+#define dens_at(y,x) pat[t-1][(y)&Y_MASK][(x)&X_MASK]
+
+void compute_ref() {
+
+  for (int y=0;y<NY; ++y) {
+    for (int x=0; x<NX; ++x) {
+      pat[0][y][x]=init_state[y][x];
+    }
+  }
+
+  for(int t=1;t<=T_FIN;++t){
+    for (int y=0;y<NY; ++y) {
+      for (int x=0; x<NX; ++x) {
+        pat[t][y][x]=0.5*pat[t-1][y][x]+
+        0.125*((dens_at(y,x-1)+dens_at(y,x+1))
+               +(dens_at(y-1,x)+dens_at(y+1,x)));
+      }
+    }
+  }
+
+  for (int y=0;y<NY; ++y) {
+    for (int x=0; x<NX; ++x) {
+      fin_state[y][x]=pat[T_FIN][y][x];
+    }
+  }
+
+}
+
 
 void compute_pitch() {
   for(int to=0;to<N_TIME; to+=T_STEP) {
-    cout << to << endl;
     if(to>0) { //periodic boundary condition.
       for(int t=to;t<to+T_STEP;++t) {
         for(int y=0;y<NY;++y) {
@@ -73,24 +102,11 @@ void compute_pitch() {
           for(int y=yo+NT-4;y>=yo;y-=4) {
             for(int x=xo+NT-4;x>=xo;x-=4) {
               if(t+((x+y)%4-(x+y))<=0){
-                #include "gen-init.cpp"
+#include "gen-init.cpp"
               } else{
-                for(int dy=0;dy<6;++dy){
-                  for(int dx=0;dx<6;++dx){
-                    if(dx<4 && dy<4) continue;
-                    if(pat[t][y+dy][x+dx]==deadbeef){
-                      printf( "deadbeef %d %d %d\n" ,t,y+dy,x+dx);
-                    }
-                  }
-                }
 #include "gen.cpp"
-                if(t==127 && y == 32 && x==4)
-                  {
-                    printf("t==127 && y == 32 && x==4\n");
-                    printf("%lf\n", pat[127][33][5]);
-                  }
               }
-                if(t+((x+y)%4-(x+y))==T_FIN){
+              if(t+((x+y)%4-(x+y))==T_FIN){
 #include "gen-fin.cpp"
               }
             }
@@ -103,7 +119,10 @@ void compute_pitch() {
 
 int main () {
   init();
-  dump("dash-init.txt");
+  compute_ref();
+  dump("dash-ref.txt");
+
+  init();
   compute_pitch();
   dump("dash-pitch.txt");
   return 0;
