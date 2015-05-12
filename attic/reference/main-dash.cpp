@@ -73,12 +73,22 @@ void compute_pitch() {
           for(int y=yo+NT-4;y>=yo;y-=4) {
             for(int x=xo+NT-4;x>=xo;x-=4) {
               if(t+((x+y)%4-(x+y))<=0){
-#include "gen-init.cpp"
+                #include "gen-init.cpp"
               } else{
-                if(pat[t][y+5][x+4]==deadbeef){
-                printf( "deadbeef %d %d %d\n" ,t,y,x);
-              }
+                for(int dy=0;dy<6;++dy){
+                  for(int dx=0;dx<6;++dx){
+                    if(dx<4 && dy<4) continue;
+                    if(pat[t][y+dy][x+dx]==deadbeef){
+                      printf( "deadbeef %d %d %d\n" ,t,y+dy,x+dx);
+                    }
+                  }
+                }
 #include "gen.cpp"
+                if(t==127 && y == 32 && x==4)
+                  {
+                    printf("t==127 && y == 32 && x==4\n");
+                    printf("%lf\n", pat[127][33][5]);
+                  }
               }
                 if(t+((x+y)%4-(x+y))==T_FIN){
 #include "gen-fin.cpp"

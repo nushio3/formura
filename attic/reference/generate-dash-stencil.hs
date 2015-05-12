@@ -43,7 +43,7 @@ genFin y x = printf "fin_state[y+%d][x+%d]=pat[t][y+%d][x+%d];" y x y x
 main :: IO ()
 main = do
   writeFile "gen.cpp" $
-    unlines [gen y x | y <- [0..3], x <- [0..3]]
+    unlines [gen y x | y <- reverse [0..3], x <- reverse [0..3]]
   writeFile "gen-init.cpp" $
     unlines [genInit y x | y <- [0..3], x <- [0..3]]
   writeFile "gen-fin.cpp" $
