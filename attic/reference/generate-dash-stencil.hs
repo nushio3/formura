@@ -9,7 +9,7 @@ densAt :: Rational -> Rational -> Rational -> String
 densAt t y x =
   T.unpack $
   T.replace "+-" "-" $
-  T.replace "+0" "" $
+--  T.replace "+0" "" $
   T.pack $
   printf "pat[t+%d][y+%d][x+%d]" (f t) (f y) (f x)
   where

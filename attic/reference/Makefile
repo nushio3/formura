@@ -7,7 +7,7 @@ gen.cpp: generate-dash-stencil.hs
 	runhaskell generate-dash-stencil.hs
 
 main-dash.out: main-dash.cpp gen.cpp
-	g++ -O2 -Wall -march=core-avx2 main-dash.cpp -o main-dash.out
+	g++ -O2 -Wall main-dash.cpp -o main-dash.out #-march=core-avx2
 
 main.out: main.cpp proceed-region.cpp params.h
 	g++ -O2 -Wall main.cpp proceed-region.cpp -o main.out

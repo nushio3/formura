@@ -8,41 +8,21 @@
 
 using namespace std;
 
-#define DEBUG
+// #define DEBUG
+
+const int N_TIME = 1024, NY =256,NX =NY;
+const int X_MASK = NX-1, Y_MASK = NY-1;
+
+const int T_STEP = NX/4;
+const int T_FIN = N_TIME-NX;
+const int NT = 16;
+
 
 #ifdef DEBUG
 struct Real{
   int t,y,x;
-  vector<Real> children ;
-  Real() : t(0xdeadbeef), y(0xdeadbeef), x(0xdeadbeef), children() {}
-  Real(int t0,int y0,int x0) : t(t0), y(y0), x(x0), children() {}
-  int size() {
-    if(children.size()==0) return 1; // leaf
-    int ret=0;
-    for(int i=0;i<children.size();++i) {
-      ret += children[i].size();
-    }
-    return ret;
-  }
-  bool test_fail (string msg) {
-    cerr << msg << endl;
-    return false;
-  }
-
-  bool test_stencil() {
-    if(children.size()!=2) return test_fail("not +");
-    if(size()!=5) return test_fail("not stencil");
-    if(children[0].size()!=1) return test_fail("not 1");
-    if(children[1].size()!=4) return test_fail("not 4");
-
-    t=children[0].t+1;
-    y=children[0].y;
-    x=children[0].x;
-    children.resize(0);
-
-    return true;
-  }
-
+  Real() : t(0xdeadbeef), y(0xdeadbeef), x(0xdeadbeef){}
+  Real(int t0,int y0,int x0) : t(t0), y(y0), x(x0) {}
 };
 
 ostream& operator<<(ostream &cout, const Real &p) {
@@ -52,21 +32,17 @@ ostream& operator<<(ostream &cout, const Real &p) {
   return cout;
 }
 
+bool operator==(const Real &a, const Real &b) {
+  return (a.t==b.t && a.y==b.y && a.x==b.x);
+}
+bool operator!=(const Real &a, const Real &b) {
+  return not(a==b);
+}
+
 Real operator+(const Real &a, const Real &b) {
-  Real ret;
-  ret.children.push_back(a);
-  ret.children.push_back(b);
-  return ret;
+  return Real(a.t+b.t, (a.y+b.y)&Y_MASK, (a.x+b.x)&X_MASK);
 }
-Real operator*(const Real &a, const Real &b) {
-  Real ret;
-  ret.children.push_back(a);
-  ret.children.push_back(b);
-  return ret;
-}
-Real operator*(const double a, const Real &b) {
-  return b;
-}
+
 
 #else
 typedef double Real;
@@ -74,12 +50,6 @@ typedef double Real;
 
 
 
-const int N_TIME = 1024, NY =256,NX =NY;
-const int X_MASK = NX-1, Y_MASK = NY-1;
-
-const int T_STEP = NX/4;
-const int T_FIN = N_TIME-NX;
-const int NT = 16;
 
 #ifdef DEBUG
 const Real deadbeef = Real();
@@ -133,7 +103,8 @@ void dump(const char *fn) {
 #define dens_at(y,x) pat[t-1][(y)&Y_MASK][(x)&X_MASK]
 
 void compute_ref() {
-
+#ifdef DEBUG
+#else
   for (int y=0;y<NY; ++y) {
     for (int x=0; x<NX; ++x) {
       pat[0][y][x]=init_state[y][x];
@@ -155,12 +126,25 @@ void compute_ref() {
       fin_state[y][x]=pat[T_FIN][y][x];
     }
   }
-
+#endif
 }
 
 #ifdef DEBUG
+
+#define assertEq(a,b)  if ((a) != (b))  cerr << "expected : " << (b) << " actual: " << (a) << endl; assert((a)==(b));
+
 inline Real compute_stencil(Real o, Real a, Real b, Real c, Real d) {
-  return 0.5*o+0.125*((a+b)+(c+d));
+  cerr << o << a << b << c << d << endl;
+  assert(o != deadbeef);
+  assert(a != deadbeef);
+  assert(b != deadbeef);
+  assert(c != deadbeef);
+  assert(d != deadbeef);
+  assertEq(a , o + Real(0,0,-1));
+  assertEq(b , o + Real(0,0,1));
+  assertEq(c , o + Real(0,-1,0));
+  assertEq(d , o + Real(0,1,0));
+  return o + Real(1,0,0);
 }
 
 
@@ -177,7 +161,7 @@ void compute_pitch() {
     if(to>0) { //periodic boundary condition.
       for(int t=to;t<to+T_STEP;++t) {
         for(int y=0;y<NY;++y) {
-          pat[t][y][NX] = pat[t-T_STEP][y][0] ;
+          pat[t][y][NX]   = pat[t-T_STEP][y][0] ;
           pat[t][y][NX+1] = pat[t-T_STEP][y][1] ;
         }
       }
@@ -213,10 +197,14 @@ void compute_pitch() {
 int main () {
   init();
   compute_ref();
+#ifndef DEBUG
   dump("dash-ref.txt");
+#endif
 
   init();
   compute_pitch();
+#ifndef DEBUG
   dump("dash-pitch.txt");
+#endif
   return 0;
 }
