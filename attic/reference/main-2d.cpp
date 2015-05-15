@@ -10,7 +10,7 @@
 using namespace std;
 
 const int NX=256, NY=NX;
-const int T_FINAL = 192;
+const int T_FINAL = 1024;
 
 const int X_MASK = NX-1, Y_MASK=NY-1;
 
@@ -145,7 +145,7 @@ void pitch_kernel
 }
 
 void compute_pitch(){
-  for(int t_orig=-10*NX; t_orig <= T_FINAL+2*NX; t_orig+=NF) {
+  for(int t_orig=-2*NX; t_orig <= T_FINAL; t_orig+=NF) {
     int y_orig = -t_orig;
     int x_orig = -t_orig;
     for (int yo=0;yo<NTO;++yo) {
