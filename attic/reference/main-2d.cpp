@@ -10,8 +10,8 @@
 
 using namespace std;
 
-const int NX=1024, NY=NX;
-int T_FINAL=4096;
+const int NX=256, NY=NX;
+int T_FINAL;
 
 const int X_MASK = NX-1, Y_MASK=NY-1;
 
@@ -116,6 +116,7 @@ void pitch_kernel
 
         if (in_region) {
           if (t+t_orig>0 && y>=2 && x>=2) {
+            asm volatile("#kernel");
             ret = stencil_function(buf[y-1][x-1],buf[y-2][x-1],buf[y][x-1],buf[y-1][x-2],buf[y-1][x]);
           }
           if (t_dash == 0) {
@@ -173,24 +174,32 @@ void compute_pitch(){
 
 int main ()
 {
-  initialize();
-  double n_flop=6.0*NX*NX*double(T_FINAL);
-  double t1 = second();
-  compute_pitch();
-  double t2 = second();
-  cout << n_flop/(t2-t1) << "flop/s" << endl;
+  double n_flop[2], wct_pitch[2], wct_ref[2];
 
-  swap(dens_final, dens_final_pitch);
+  for(int part=0; part<2; ++part) {
+    T_FINAL = NX*(2+part);
+    initialize();
+    n_flop[part]=6.0*NX*NX*double(T_FINAL);
+    double t1 = second();
+    compute_pitch();
+    double t2 = second();
+    cout << "PiTCH: " << n_flop[part] << " flop " << (t2-t1) << " second" << endl;
+    wct_pitch[part] = t2-t1;
 
-  double t3 = second();
-  compute_reference();
-  double t4 = second();
+    swap(dens_final, dens_final_pitch);
 
-  cout << n_flop/(t4-t3) << "flop/s" << endl;
-
-  for (int y=0;y<NY;++y) {
-    for (int x=0;x<NX;++x){
-      assert(dens_final[y][x]==dens_final_pitch[y][x]);
+    double t3 = second();
+    compute_reference();
+    double t4 = second();
+    cout << "Ref: " << n_flop[part] << " flop " << (t4-t3) << " second" << endl;
+    wct_ref[part] = t4-t3;
+    for (int y=0;y<NY;++y) {
+      for (int x=0;x<NX;++x){
+        assert(dens_final[y][x]==dens_final_pitch[y][x]);
+      }
     }
   }
+
+  cerr << "PiTCH: " << (n_flop[1]-n_flop[0])/(wct_pitch[1]-wct_pitch[0]) << " flop/s " << endl;
+  cerr << "Ref: " << (n_flop[1]-n_flop[0])/(wct_ref[1]-wct_ref[0]) << " flop/s " << endl;
 }
