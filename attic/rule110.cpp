@@ -12,7 +12,7 @@ float f110(float a, float b, float c) {
   return b+c-b*c-a*b*c;
 }
 
-const int N=100;
+const int N=121;
 float pat[N];
 float pat_sub[N];
 

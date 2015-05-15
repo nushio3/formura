@@ -9,21 +9,20 @@
 
 using namespace std;
 
-const int NX=256, NY=NX;
-const int T_FINAL = 1024;
+const int NX=32, NY=NX;
+const int T_FINAL = 55;
 
 const int X_MASK = NX-1, Y_MASK=NY-1;
 
-const int NT=32;
+const int NT=8;
 const int NTO=NX/NT;
-const int NF=NX/2;
+const int NF=NX/4;
 
 
 double dens_initial[NX][NX];
 double dens_final[NX][NX];
 
 double yuka[NTO][NTO][1][NT+2][NT+2];
-double yuka2[NTO][NTO][1][NT+2][NT+2];
 
 double yuka_tmp[1][NT+2][NT+2];
 double kabe_y[NTO][NTO][NF+1][2][NT+2];
@@ -160,22 +159,6 @@ void compute_pitch(){
         swap(yuka[yo][xo], yuka_tmp);
       }
     }
-    int t_orig2 =  t_orig+NF/2;
-    int y_orig2 = -t_orig+3*NX/4;
-    int x_orig2 = -t_orig-NX/4;
-    for (int yo=0;yo<NTO;++yo) {
-      for (int xo=0;xo<NTO;++xo) {
-        int dy = yo*NT, dx = xo*NT;
-        pitch_kernel
-          (t_orig2+(dx+dy)/4,
-           y_orig2+(3*dy-dx)/4,
-           x_orig2+(3*dx-dy)/4,
-           yuka2[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-           yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        swap(yuka2[yo][xo], yuka_tmp);
-      }
-    }
-
   }
 }
 
