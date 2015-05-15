@@ -104,7 +104,7 @@ void pitch_kernel
  double yuka_in[1][NT+2][NT+2], double kabe_y_in[N_KABE][2][NT+2], double kabe_x_in[N_KABE][NT+2][2],
  double yuka_out[1][NT+2][NT+2], double kabe_y_out[N_KABE][2][NT+2], double kabe_x_out[N_KABE][NT+2][2])
 {
-  for(int t=0; t<NF+NT/2+2;++t) {
+  for(int t=0; t<NF+NT/4+2;++t) {
     for(int y=0; y<NT+2; ++y) {
       work[t][y][0] = kabe_x_in[t+NT/4][y][0];
       work[t][y][1] = kabe_x_in[t+NT/4][y][1];
@@ -128,18 +128,14 @@ void pitch_kernel
           double ret=work[t][y][x];
           if (t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
-          } else           if (t_dash == 0) {
+          } else if (t_dash == 0) {
             ret = yuka_in[0][y_dash][x_dash];
-          }else
-          if (t+t_orig>0 && y>=2 && x>=2) {
+          } else if (t+t_orig>0 && y>=2 && x>=2) {
             asm volatile("#kernel");
             ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
           }
 
-
-
           work[t][y][x] = ret;
-
 
           if (t_dash == NF) {
             yuka_out[0][y_dash][x_dash] = ret;
