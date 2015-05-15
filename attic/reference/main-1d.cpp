@@ -9,12 +9,12 @@
 
 using namespace std;
 
-const int NX=32;
+const int NX=64;
 const int T_FINAL = 4096;
 
 const int X_MASK = NX-1;
 
-const int NT=8;
+const int NT=16;
 const int NTO=NX/NT;
 const int NF=NX/2;
 
@@ -68,7 +68,11 @@ void initialize() {
 void dump(const char* fn) {
   ofstream ofs(fn);
   for(int x=0;x<NX;++x){
-    ofs << x << " " << dens_final[x] << endl;
+    if(debug_mode){
+      ofs << x << " " << ppr(dens_final[x]) << endl;
+    }else{
+      ofs << x << " " << dens_final[x] << endl;
+    }
   }
 }
 
@@ -207,8 +211,13 @@ void pitch_kernel
           cerr << "Write to kabe " << test.as_ints[0] << " " << test.as_ints[1] << endl;
         }
       }
-      if (t_k + t_orig == T_FINAL) {
+      if (t_k + t_orig == T_FINAL  && t_dash>=0 && t_dash <NF+1) {
         dens_final[(x_k+x_orig) & X_MASK] = ret;
+        if(ret==deadbeef) {
+
+          cerr << "KUSATTORU" <<x_k << " " << x_orig<< endl;
+          assert(false);
+        }
       }
     }
     swap(buf, buf2);
@@ -219,7 +228,7 @@ void pitch_kernel
 void compute_pitch(){
   int kabe_ctr=0, yuka_ctr=0;
 
-  for(int t_orig=-2*NX; t_orig <= T_FINAL; t_orig+=NT/2) {
+  for(int t_orig=-2*NX; t_orig <= T_FINAL+3*NX; t_orig+=NT/2) {
     int x_orig = t_orig & X_MASK;
     int kabe_ctr_w=(kabe_ctr+1)%NTO;
     int yuka_ctr_w=(yuka_ctr+NTO)%(NTO+1);
