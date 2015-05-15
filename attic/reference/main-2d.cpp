@@ -138,8 +138,8 @@ void pitch_kernel
           }
         }
       }
-      swap(buf, buf2);
     }
+    swap(buf, buf2);
   }
 }
 
