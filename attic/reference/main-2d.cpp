@@ -2,6 +2,7 @@
 #include <cassert>
 #include <climits>
 #include <cstdlib>
+#include <sys/time.h>
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -9,12 +10,12 @@
 
 using namespace std;
 
-const int NX=32, NY=NX;
-const int T_FINAL = 55;
+const int NX=1024, NY=NX;
+int T_FINAL=4096;
 
 const int X_MASK = NX-1, Y_MASK=NY-1;
 
-const int NT=8;
+const int NT=32;
 const int NTO=NX/NT;
 const int NF=NX/4;
 
@@ -22,11 +23,19 @@ const int NF=NX/4;
 double dens_initial[NX][NX];
 double dens_final[NX][NX];
 
+double dens_final_pitch[NX][NX];
+
 double yuka[NTO][NTO][1][NT+2][NT+2];
 
 double yuka_tmp[1][NT+2][NT+2];
 double kabe_y[NTO][NTO][NF+1][2][NT+2];
 double kabe_x[NTO][NTO][NF+1][NT+2][2];
+
+static double second(){
+  struct timeval tv;
+  gettimeofday(&tv, NULL);
+  return double(tv.tv_sec) + 1.e-6*double(tv.tv_usec);
+}
 
 
 void initialize() {
@@ -50,7 +59,7 @@ void dump(const char* fn) {
 
 
 inline double stencil_function(double o, double a, double b, double c, double d) {
-  return (o+a+b+c+d)/5;
+  return 0.5*o+0.125*(a+b+c+d);
 }
 
 
@@ -165,8 +174,23 @@ void compute_pitch(){
 int main ()
 {
   initialize();
+  double n_flop=6.0*NX*NX*double(T_FINAL);
+  double t1 = second();
   compute_pitch();
-  dump("test-2d-pitch.txt");
+  double t2 = second();
+  cout << n_flop/(t2-t1) << "flop/s" << endl;
+
+  swap(dens_final, dens_final_pitch);
+
+  double t3 = second();
   compute_reference();
-  dump("test-2d-ref.txt");
+  double t4 = second();
+
+  cout << n_flop/(t4-t3) << "flop/s" << endl;
+
+  for (int y=0;y<NY;++y) {
+    for (int x=0;x<NX;++x){
+      assert(dens_final[y][x]==dens_final_pitch[y][x]);
+    }
+  }
 }
