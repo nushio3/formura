@@ -90,10 +90,11 @@ void pitch_kernel
       }
 
       buf2[x] = ret;
+
       if (t_dash == NF) {
         yuka_out[0][x_dash] = ret;
       }
-      if (x_dash >= NT && t_dash>=0 && t_dash <NF+1) {
+      if (t_dash>=0 && t_dash <NF+1 && x_dash >= NT) {
         kabe_out[t_dash][x_dash-NT] = ret;
       }
       if (t_k + t_orig == T_FINAL  && t_dash>=0 && t_dash <NF+1) {
@@ -107,7 +108,7 @@ void pitch_kernel
 void compute_pitch(){
   int kabe_ctr=0, yuka_ctr=0;
 
-  for(int t_orig=-2*NX; t_orig <= T_FINAL+3*NX; t_orig+=NT/2) {
+  for(int t_orig=-2*NX; t_orig <= T_FINAL; t_orig+=NT/2) {
     int x_orig = t_orig & X_MASK;
     int kabe_ctr_w=(kabe_ctr+1)%NTO;
     int yuka_ctr_w=(yuka_ctr+NTO)%(NTO+1);
