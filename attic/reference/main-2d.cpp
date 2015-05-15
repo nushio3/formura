@@ -42,6 +42,7 @@ void dump(const char* fn) {
     for(int x=0;x<NX;++x) {
       ofs << x << " " << y << " " << dens_final[y][x] << endl;
     }
+    ofs << endl;
   }
 }
 

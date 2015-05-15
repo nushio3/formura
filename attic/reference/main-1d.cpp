@@ -76,29 +76,32 @@ void pitch_kernel
       int x_dash = t_k + x_k;
       double ret=0;
 
-      if (x>=2 && t+t_orig>0 && t_dash >=0 && t_dash < NF+1) {
-        ret = stencil_function(buf[x-2],buf[x-1],buf[x]);
-      }
-      if (t_dash == 0) {
-        ret = yuka_in[0][x_dash];
-      }
-      if (x_dash < 2 && t_dash >=0 && t_dash < NF+1) {
-        ret = kabe_in[t_dash][x];
-      }
-      if (t_k + t_orig == 0) {
-        ret = dens_initial[(x_k+x_orig) & X_MASK];
-      }
+      if (t_dash>=0 && t_dash <NF+1) {
 
-      buf2[x] = ret;
+        if (x>=2 && t+t_orig>0) {
+          ret = stencil_function(buf[x-2],buf[x-1],buf[x]);
+        }
+        if (t_dash == 0) {
+          ret = yuka_in[0][x_dash];
+        }
+        if (x_dash < 2) {
+          ret = kabe_in[t_dash][x];
+        }
+        if (t_k + t_orig == 0) {
+          ret = dens_initial[(x_k+x_orig) & X_MASK];
+        }
 
-      if (t_dash == NF) {
-        yuka_out[0][x_dash] = ret;
-      }
-      if (t_dash>=0 && t_dash <NF+1 && x_dash >= NT) {
-        kabe_out[t_dash][x_dash-NT] = ret;
-      }
-      if (t_k + t_orig == T_FINAL  && t_dash>=0 && t_dash <NF+1) {
-        dens_final[(x_k+x_orig) & X_MASK] = ret;
+        buf2[x] = ret;
+
+        if (t_dash == NF) {
+          yuka_out[0][x_dash] = ret;
+        }
+        if (x_dash >= NT) {
+          kabe_out[t_dash][x_dash-NT] = ret;
+        }
+        if (t_k + t_orig == T_FINAL) {
+          dens_final[(x_k+x_orig) & X_MASK] = ret;
+        }
       }
     }
     swap(buf, buf2);
