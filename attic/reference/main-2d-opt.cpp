@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const int NX=256, NY=NX;
+const int NX=1024, NY=NX;
 int T_FINAL;
 
 const int X_MASK = NX-1, Y_MASK=NY-1;
@@ -99,6 +99,7 @@ void compute_reference() {
 
 double work[N_KABE][NT+2][NT+2];
 
+template <bool near_initial, bool near_final>
 void pitch_kernel
 (int t_orig, int y_orig, int x_orig,
  double yuka_in[1][NT+2][NT+2], double kabe_y_in[N_KABE][2][NT+2], double kabe_x_in[N_KABE][NT+2][2],
@@ -125,7 +126,7 @@ void pitch_kernel
 
         if (in_region) {
           double ret=work[t][y][x];
-          if (t_k + t_orig == 0) {
+          if (t_k + t_orig == 0 && near_initial) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           } else if (t_dash == 0) {
             ret = yuka_in[0][y][x];
@@ -136,7 +137,7 @@ void pitch_kernel
 
           work[t][y][x] = ret;
 
-          if (t_k + t_orig == T_FINAL) {
+          if (t_k + t_orig == T_FINAL && near_final) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
           }
         }
@@ -149,21 +150,17 @@ void pitch_kernel
     for(int y=2; y<NT+2; ++y) {
       for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
-        int t_dash = (2*t_k-x_k-y_k)>>2;
-        const bool in_region = t_dash >=0 && t_dash < NF+1;
 
-        if (in_region) {
-          double ret=work[t][y][x];
-          if (t_k + t_orig == 0) {
-            ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
-          } else if (t+t_orig>0 && y>=2 && x>=2) {
-            asm volatile("#kernel");
-            ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
-          }
-          work[t][y][x] = ret;
-          if (t_k + t_orig == T_FINAL) {
+        double ret=work[t][y][x];
+        if (t_k + t_orig == 0 && near_initial) {
+          ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
+        } else if (t+t_orig>0 && y>=2 && x>=2) {
+          asm volatile("#kernel");
+          ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
+        }
+        work[t][y][x] = ret;
+        if (t_k + t_orig == T_FINAL && near_final) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
-          }
         }
       }
     }
@@ -180,7 +177,7 @@ void pitch_kernel
 
         if (in_region) {
           double ret=work[t][y][x];
-          if (t_k + t_orig == 0) {
+          if (t_k + t_orig == 0 && near_initial) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           } else if (t+t_orig>0 && y>=2 && x>=2) {
             asm volatile("#kernel");
@@ -192,7 +189,7 @@ void pitch_kernel
           if (t_dash == NF && t >=NF+2) {
             yuka_out[0][y][x] = ret;
           }
-          if (t_k + t_orig == T_FINAL) {
+          if (t_k + t_orig == T_FINAL && near_final) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
           }
         }
@@ -216,18 +213,43 @@ void pitch_kernel
 }
 
 void compute_pitch(){
-  for(int t_orig=-2*NX; t_orig <= T_FINAL; t_orig+=NF) {
+  for(int t_orig=-NX; t_orig <= T_FINAL; t_orig+=NF) {
     int y_orig = -t_orig;
     int x_orig = -t_orig;
     for (int yo=0;yo<NTO;++yo) {
       for (int xo=0;xo<NTO;++xo) {
         int dy = yo*NT, dx = xo*NT;
-        pitch_kernel
-          (t_orig+(dx+dy)/4,
-           y_orig+(3*dy-dx)/4,
-           x_orig+(3*dx-dy)/4,
-           yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-           yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+        bool near_initial = t_orig < 0;
+        bool near_final   = t_orig >= T_FINAL-NX;
+        if(near_initial && near_final) {
+          pitch_kernel<true, true>
+            (t_orig+(dx+dy)/4,
+             y_orig+(3*dy-dx)/4,
+             x_orig+(3*dx-dy)/4,
+             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+        }else if(near_initial) {
+          pitch_kernel<true, false>
+            (t_orig+(dx+dy)/4,
+             y_orig+(3*dy-dx)/4,
+             x_orig+(3*dx-dy)/4,
+             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+        }else  if(near_final) {
+          pitch_kernel<false, true >
+            (t_orig+(dx+dy)/4,
+             y_orig+(3*dy-dx)/4,
+             x_orig+(3*dx-dy)/4,
+             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+        }else {
+          pitch_kernel<false, false>
+            (t_orig+(dx+dy)/4,
+             y_orig+(3*dy-dx)/4,
+             x_orig+(3*dx-dy)/4,
+             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+        }
         swap(yuka[yo][xo], yuka_tmp);
       }
     }
@@ -239,7 +261,7 @@ int main ()
   double n_flop[2], wct_pitch[2], wct_ref[2];
 
   for(int part=0; part<2; ++part) {
-    T_FINAL = NX*(2+part);
+    T_FINAL = NX*(3+part);
     initialize();
     n_flop[part]=6.0*NX*NX*double(T_FINAL);
     double t1 = second();
