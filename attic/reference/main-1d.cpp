@@ -18,9 +18,9 @@ const int NT=64;
 const int NTO=NX/NT;
 const int NF=NX/2;
 
-double kabe[NTO][NF+1][2];
 double dens_initial[NX];
 double dens_final[NX];
+double kabe[NTO][NF+1][2];
 double yuka[NTO+1][1][NT+2];
 
 
