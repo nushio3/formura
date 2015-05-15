@@ -106,12 +106,24 @@ void pitch_kernel
 {
   for(int t=0; t<NF+NT/2+2;++t) {
     for(int y=0; y<NT+2; ++y) {
+      work[t][y][0] = kabe_x_in[t+NT/4][y][0];
+      work[t][y][1] = kabe_x_in[t+NT/4][y][1];
+    }
+    for(int x=0; x<NT+2; ++x) {
+      work[t][0][x] = kabe_y_in[t+NT/4][0][x];
+      work[t][1][x] = kabe_y_in[t+NT/4][1][x];
+    }
+
+  }
+
+  for(int t=0; t<NF+NT/2+2;++t) {
+    for(int y=0; y<NT+2; ++y) {
       for(int x=0; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
         int t_dash = (2*t_k-x_k-y_k)>>2;
         int y_dash = y;
         int x_dash = x;
-        double ret=0;
+        double ret=work[t][y][x];
 
         const bool in_region = t_dash >=0 && t_dash < NF+1;
 
@@ -123,17 +135,11 @@ void pitch_kernel
           if (t_dash == 0) {
             ret = yuka_in[0][y_dash][x_dash];
           }
-          if (y_dash < 2) {
-            ret = kabe_y_in[t+NT/4][y_dash][x_dash];
-          }
-          if (x_dash < 2) {
-            ret = kabe_x_in[t+NT/4][y_dash][x_dash];
-          }
           if (t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           }
-
           work[t][y][x] = ret;
+
 
           if (t_dash == NF) {
             yuka_out[0][y_dash][x_dash] = ret;
