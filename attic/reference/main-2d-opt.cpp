@@ -15,7 +15,7 @@ int T_FINAL;
 
 const int X_MASK = NX-1, Y_MASK=NY-1;
 
-const int NT=32;
+const int NT=16;
 const int NTO=NX/NT;
 const int NF=NX/4;
 
@@ -120,8 +120,6 @@ void pitch_kernel
       for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
         int t_dash = (2*t_k-x_k-y_k)>>2;
-        int y_dash = y;
-        int x_dash = x;
         const bool in_region = t_dash >=0 && t_dash < NF+1;
 
         if (in_region) {
@@ -129,7 +127,7 @@ void pitch_kernel
           if (t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           } else if (t_dash == 0) {
-            ret = yuka_in[0][y_dash][x_dash];
+            ret = yuka_in[0][y][x];
           } else if (t+t_orig>0 && y>=2 && x>=2) {
             asm volatile("#kernel");
             ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
@@ -138,7 +136,7 @@ void pitch_kernel
           work[t][y][x] = ret;
 
           if (t_dash == NF) {
-            yuka_out[0][y_dash][x_dash] = ret;
+            yuka_out[0][y][x] = ret;
           }
           if (t_k + t_orig == T_FINAL) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
