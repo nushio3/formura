@@ -76,7 +76,7 @@ void pitch_kernel
       int x_dash = t_k + x_k;
       double ret=0;
 
-      if (x>=2 && t+t_orig>0) {
+      if (x>=2 && t+t_orig>0 && t_dash >=0 && t_dash < NF+1) {
         ret = stencil_function(buf[x-2],buf[x-1],buf[x]);
       }
       if (t_dash == 0) {
