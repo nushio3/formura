@@ -96,10 +96,8 @@ void compute_reference() {
 }
 
 
-double buf[NT+2][NT+2];
-double buf2[NT+2][NT+2];
 
-
+double work[N_KABE][NT+2][NT+2];
 
 void pitch_kernel
 (int t_orig, int y_orig, int x_orig,
@@ -120,7 +118,7 @@ void pitch_kernel
         if (in_region) {
           if (t+t_orig>0 && y>=2 && x>=2) {
             asm volatile("#kernel");
-            ret = stencil_function(buf[y-1][x-1],buf[y-2][x-1],buf[y][x-1],buf[y-1][x-2],buf[y-1][x]);
+            ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
           }
           if (t_dash == 0) {
             ret = yuka_in[0][y_dash][x_dash];
@@ -135,7 +133,7 @@ void pitch_kernel
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           }
 
-          buf2[y][x] = ret;
+          work[t][y][x] = ret;
 
           if (t_dash == NF) {
             yuka_out[0][y_dash][x_dash] = ret;
@@ -152,7 +150,6 @@ void pitch_kernel
         }
       }
     }
-    swap(buf, buf2);
   }
 }
 
