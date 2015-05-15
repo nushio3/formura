@@ -115,9 +115,9 @@ void pitch_kernel
     }
   }
 
-  for(int t=0; t<NF+NT/2+2;++t) {
-    for(int y=0; y<NT+2; ++y) {
-      for(int x=0; x<NT+2; ++x) {
+  for(int t=1; t<NF+NT/2+2;++t) {
+    for(int y=2; y<NT+2; ++y) {
+      for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
         int t_dash = (2*t_k-x_k-y_k)>>2;
         int y_dash = y;
@@ -140,12 +140,6 @@ void pitch_kernel
           if (t_dash == NF) {
             yuka_out[0][y_dash][x_dash] = ret;
           }
-          if (y_dash >= NT) {
-            kabe_y_out[t][y_dash-NT][x_dash] = ret;
-          }
-          if (x_dash >= NT) {
-            kabe_x_out[t][y_dash][x_dash-NT] = ret;
-          }
           if (t_k + t_orig == T_FINAL) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
           }
@@ -153,6 +147,18 @@ void pitch_kernel
       }
     }
   }
+  for(int t=0; t<NF+NT/2+2;++t) {
+    for(int x=0; x<NT+2; ++x) {
+      kabe_y_out[t][0][x] = work[t][NT+0][x];
+      kabe_y_out[t][1][x] = work[t][NT+1][x];
+    }
+    for(int y=0; y<NT+2; ++y) {
+      kabe_x_out[t][y][0] = work[t][y][NT+0];
+      kabe_x_out[t][y][1] = work[t][y][NT+1];
+    }
+  }
+
+
 }
 
 void compute_pitch(){
