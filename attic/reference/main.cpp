@@ -90,7 +90,7 @@ void proceed(){
 }
 
 void compute_pitch() {
-  for (int large_t=0; large_t <= N_TIME/NF+10; ++large_t) {
+  for (int large_t=0; large_t <= N_TIME/NF; ++large_t) {
     for (int y5=NTO-1;y5>=0; --y5) {
       for (int x5=NTO-1;x5>=0; --x5) {
         int x4=(x5-1) & (NTO-1);

@@ -27,6 +27,7 @@ double dens_final_pitch[NX][NX];
 
 double yuka[NTO][NTO][1][NT+2][NT+2];
 
+
 double yuka_tmp[1][NT+2][NT+2];
 double kabe_y[NTO][NTO][NF+1][2][NT+2];
 double kabe_x[NTO][NTO][NF+1][NT+2][2];
