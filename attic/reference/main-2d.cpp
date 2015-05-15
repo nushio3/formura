@@ -32,6 +32,7 @@ void initialize() {
   for (int y=0; y<NY; ++y) {
     for (int x=0; x<NX; ++x) {
       dens_initial[y][x]=(rand()/double(INT_MAX)*2 > 1 ? 1 : 0);
+      dens_final[y][x]=424242;
     }
   }
 }
@@ -144,13 +145,16 @@ void pitch_kernel
 
 
 void compute_pitch(){
-  for(int t_orig=-2*NX; t_orig <= T_FINAL; t_orig+=NF) {
-    int x_orig = t_orig & X_MASK;
-    int y_orig = t_orig & X_MASK;
+  for(int t_orig=-2*NX; t_orig <= T_FINAL+2*NF; t_orig+=NF) {
+    int y_orig = t_orig;
+    int x_orig = t_orig;
     for (int yo=0;yo<NTO;++yo) {
       for (int xo=0;xo<NTO;++xo) {
+        int dy = yo*NT, dx = xo*NT;
         pitch_kernel
-          (t_orig, y_orig, x_orig,
+          (t_orig+(dx+dy)/4,
+           y_orig+(3*dy-dx)/4,
+           x_orig+(3*dx-dy)/4,
            yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
            yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
         swap(yuka[yo][xo], yuka_tmp);
@@ -162,8 +166,8 @@ void compute_pitch(){
 int main ()
 {
   initialize();
-  compute_reference();
-  dump("test-2d-ref.txt");
   compute_pitch();
   dump("test-2d-pitch.txt");
+  compute_reference();
+  dump("test-2d-ref.txt");
 }
