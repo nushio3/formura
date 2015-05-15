@@ -1,7 +1,7 @@
-all: main.out main-1.out main-dash.out
+all: main.out main-1d.out main-dash.out
 
-main-1.out: main-1.cpp
-	g++ -O2 -Wall  main-1.cpp -o main-1.out #-march=core-avx2
+main-1d.out: main-1d.cpp
+	g++ -O2 -Wall  main-1d.cpp -o main-1d.out #-march=core-avx2
 
 gen.cpp: generate-dash-stencil.hs
 	runhaskell generate-dash-stencil.hs
