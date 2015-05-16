@@ -36,6 +36,7 @@ main = forM_ (zip [1..]  badExperiments) $ \(i, xp) -> do
 
 badExperiments :: [Experiment]
 badExperiments =
+  Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = 256, nt = 0} :
   Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 256, nt = 64} :
   []
 
@@ -83,6 +84,7 @@ doExperiment really xp = do
   T.writeFile "gen/main.cpp" mainCppGen
   T.writeFile "gen/body.cpp" bodyCppGen
 
-  system "g++ -O2 -Wall -march=core-avx2 -mcmodel=large gen/main.cpp -o gen/bench.out"
+  -- -march=core-avx2
+  system "g++ -O2 -Wall  -mcmodel=large gen/main.cpp -o gen/bench.out"
   when really $ system "gen/bench.out" >> return ()
   return ()

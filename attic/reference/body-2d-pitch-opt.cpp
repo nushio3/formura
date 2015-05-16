@@ -70,7 +70,7 @@ void pitch_kernel
         double ret=work[t][y][x];
         if (t_k + t_orig == 0 && near_initial) {
           ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
-        } else if (t+t_orig>0 && y>=2 && x>=2) {
+        } else {
           asm volatile("#kernel");
           ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
         }
