@@ -77,6 +77,6 @@ doExperiment xp = do
   T.writeFile "gen/main.cpp" mainCppGen
   T.writeFile "gen/body.cpp" bodyCppGen
 
-  system "g++ -O2 -Wall gen/main.cpp -o gen/bench.out"
+  system "g++ -O2 -Wall -march=core-avx2 gen/main.cpp -o gen/bench.out"
   system "gen/bench.out"
   return ()
