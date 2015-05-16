@@ -73,12 +73,15 @@ inline double stencil_function(double o, double a, double b, double c, double d)
   return 0.5*o+0.125*(a+b+c+d);
 }
 
+double benchmark_self_reported_wct;
+int benchmark_self_reported_delta_t;
+
 #include "body.cpp"
 
 int main ()
 {
-  double n_flop[2], wct[2];
   int good_scale;
+  cerr << "calibrating..." << endl;
   for(good_scale=1;;good_scale*=2){
     initialize();
     double t1 = second();
@@ -86,23 +89,19 @@ int main ()
     solve();
     double t2 = second();
     cerr << t2 << " " << t1 << endl;
-    if(t2-t1>1) break;
+    if(t2-t1>1.0) break;
   }
-  cerr << good_scale << endl;
+  cerr << "scale: " << good_scale << endl;
 
   for(int iter=0;iter<10;++iter) {
-    cout << algorithm_tag_str << " NX: " << NX << " " ;
-    for(int part=0; part<2; ++part) {
-      T_FINAL = NX*(3+part)*good_scale;
-      initialize();
-      n_flop[part]=6.0*NX*NX*double(T_FINAL);
-      double t1 = second();
-      solve();
-      double t2 = second();
-      cout << n_flop[part] << " flop " << (t2-t1) << " second " ;
-      wct[part] = t2-t1;
-    }
-    cout << (n_flop[1]-n_flop[0])/(wct[1]-wct[0]) << " flop/s" << endl;
+    cout << algorithm_tag_str << "\tNX: " << NX << "\t" ;
+    T_FINAL = NX*3*good_scale;
+    initialize();
+    solve();
+    double n_flop=6.0*NX*NX*double(benchmark_self_reported_delta_t);
+    double wct = benchmark_self_reported_wct;
+    cout << n_flop << " flop\t" << wct << " second\t" ;
+    cout << n_flop/wct << " flop/s" << endl;
   }
   ostringstream fn;
   fn << "gen/nx-" << NX << "-" << algorithm_tag_str << ".txt";

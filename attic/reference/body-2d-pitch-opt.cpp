@@ -76,7 +76,7 @@ void pitch_kernel
         }
         work[t][y][x] = ret;
         if (t_k + t_orig == T_FINAL && near_final) {
-            dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
+          dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
         }
       }
     }
@@ -129,45 +129,79 @@ void pitch_kernel
 }
 
 void solve(){
+
+  int sim_t_1=-1, sim_t_2=-1;
+  double wct_1=-1, wct_2=-1;
+
   for(int t_orig=-NX; t_orig <= T_FINAL; t_orig+=NF) {
     bool near_initial = t_orig < 0;
     bool near_final   = t_orig >= T_FINAL-NX;
     int y_orig = -t_orig;
     int x_orig = -t_orig;
-    for (int yo=0;yo<NTO;++yo) {
-      for (int xo=0;xo<NTO;++xo) {
-        int dy = yo*NT, dx = xo*NT;
-        if(near_initial && near_final) {
+    if(near_initial && near_final) {
+      for (int yo=0;yo<NTO;++yo) {
+        for (int xo=0;xo<NTO;++xo) {
+          int dy = yo*NT, dx = xo*NT;
+
           pitch_kernel<true, true>
             (t_orig+(dx+dy)/4,
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
              yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        }else if(near_initial) {
+          swap(yuka[yo][xo], yuka_tmp);
+        }
+      }
+    }else if(near_initial) {
+      for (int yo=0;yo<NTO;++yo) {
+        for (int xo=0;xo<NTO;++xo) {
+          int dy = yo*NT, dx = xo*NT;
           pitch_kernel<true, false>
             (t_orig+(dx+dy)/4,
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
              yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        }else  if(near_final) {
+          swap(yuka[yo][xo], yuka_tmp);
+        }
+      }
+      sim_t_1 = t_orig+NF;
+      wct_1 = second();
+    }else  if(near_final) {
+      if (sim_t_2 == -1) {
+        sim_t_2 = t_orig;
+        wct_2 = second();
+      }
+      for (int yo=0;yo<NTO;++yo) {
+        for (int xo=0;xo<NTO;++xo) {
+          int dy = yo*NT, dx = xo*NT;
           pitch_kernel<false, true >
             (t_orig+(dx+dy)/4,
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
              yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        }else {
+          swap(yuka[yo][xo], yuka_tmp);
+        }
+      }
+    }else {
+      for (int yo=0;yo<NTO;++yo) {
+        for (int xo=0;xo<NTO;++xo) {
+          int dy = yo*NT, dx = xo*NT;
           pitch_kernel<false, false>
             (t_orig+(dx+dy)/4,
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
              yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+          swap(yuka[yo][xo], yuka_tmp);
         }
-        swap(yuka[yo][xo], yuka_tmp);
       }
     }
   }
+  assert( sim_t_1 != -1 && sim_t_2 != -1 &&
+          wct_1 != -1&& wct_2 != -1);
+
+  benchmark_self_reported_wct = wct_2 - wct_1;
+  benchmark_self_reported_delta_t = sim_t_2 - sim_t_1;
 }
