@@ -109,6 +109,6 @@ int main ()
     fs_log << msg.str() << endl;
   }
   ostringstream fn;
-  fn << "gen/nx-" << NX << "-" << algorithm_tag_str << ".txt";
+  fn << "gen/finalstate-nx-" << NX << "-" << algorithm_tag_str << ".txt";
   dump(fn.str().c_str());
 }
