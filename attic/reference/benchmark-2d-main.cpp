@@ -78,7 +78,7 @@ int benchmark_self_reported_delta_t;
 
 #include "body.cpp"
 
-bool debug_mode = true;
+bool debug_mode = false;
 
 int time_iteration_scaling;
 
@@ -88,7 +88,7 @@ void leave_dump () {
   dump(fn.str().c_str());
 }
 
-int main ()
+int main (int argc, char** argv)
 {
   if (debug_mode) {
     time_iteration_scaling = 1;
@@ -108,7 +108,12 @@ int main ()
   time_iteration_scaling *= 3;
   cerr << "scale: " << time_iteration_scaling << endl;
 
-  ofstream fs_log("result/benchmark.txt", ofstream::app | ofstream::out);
+  string benchmark_fn = string("") +
+    "result/" +
+    (argc>1 ? argv[1] : "") +
+    "-benchmark.txt";
+
+  ofstream fs_log(benchmark_fn.c_str(), ofstream::app | ofstream::out);
 
   for(int iter=0;iter< (debug_mode ? 1 : 10);++iter) {
     ostringstream msg;

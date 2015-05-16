@@ -1,7 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad
-import Data.List (nub)
+import Data.Char
+import Data.List (nub, isInfixOf, intercalate)
 import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -29,15 +30,15 @@ data Experiment =
 
 
 main :: IO ()
-main = forM_ (zip [1..]  allExperiments) $ \(i, xp) -> do
+main = forM_ (zip [1..] allExperiments) $ \(i, xp) -> do
   putStrLn $ show i ++ "/" ++ show (length allExperiments)
   print xp
   doExperiment True xp
 
-badExperiments :: [Experiment]
-badExperiments =
+smallExperiments :: [Experiment]
+smallExperiments =
+  Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 2048, nt = 64} :
   Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = 256, nt = 0} :
-  Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 256, nt = 64} :
   []
 
 
@@ -84,7 +85,35 @@ doExperiment really xp = do
   T.writeFile "gen/main.cpp" mainCppGen
   T.writeFile "gen/body.cpp" bodyCppGen
 
-  -- -march=core-avx2
-  system "g++ -O2 -Wall  -mcmodel=large gen/main.cpp -o gen/bench.out"
-  when really $ system "gen/bench.out" >> return ()
+  cpuinfo <- readFile "/proc/cpuinfo"
+  let cpustr :: String
+      cpustr =
+        terminalEncode $
+        drop 1 $
+        dropWhile (/=':') $
+        head $ filter (isInfixOf "model name") $
+        lines cpuinfo
+      isAvx2 = isInfixOf " avx2 " cpuinfo
+
+      compileCommand =
+        "g++ -O2 -Wall " ++
+        (if isAvx2 then " -march=core-avx2 " else "") ++
+        " -mcmodel=large gen/main.cpp -o gen/bench.out"
+
+  system "rm gen/bench.out"
+  putStrLn compileCommand
+  system compileCommand
+  when really $ do
+    system $ "gen/bench.out " ++ cpustr
+    return ()
   return ()
+
+terminalEncode :: String -> String
+terminalEncode str = intercalate "-" $ words $ map f str
+  where
+    f :: Char -> Char
+    f c
+      | isAlpha c = c
+      | isDigit c = c
+      | c=='.'    = c
+      | otherwise = ' '
