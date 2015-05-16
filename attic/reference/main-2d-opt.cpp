@@ -117,7 +117,9 @@ void pitch_kernel
   }
 
   // iter 1
-  for(int t=1; t<=NT;++t) {
+  const int t_boundary_1 = NT/2+2;
+  const int t_boundary_2 = NF+2;
+  for(int t=1; t<t_boundary_1;++t) {
     for(int y=2; y<NT+2; ++y) {
       for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
@@ -146,7 +148,7 @@ void pitch_kernel
   }
 
   // iter 2
-  for(int t=NT+1; t<=NF+1;++t) {
+  for(int t=t_boundary_1; t<t_boundary_2;++t) {
     for(int y=2; y<NT+2; ++y) {
       for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
@@ -168,7 +170,7 @@ void pitch_kernel
 
 
   // iter 3
-  for(int t=NF+2; t<NF+NT/2+2;++t) {
+  for(int t=t_boundary_2; t<NF+NT/2+2;++t) {
     for(int y=2; y<NT+2; ++y) {
       for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
