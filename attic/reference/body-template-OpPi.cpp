@@ -1,30 +1,8 @@
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <cstdlib>
-#include <sys/time.h>
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <sstream>
-
-using namespace std;
-
-const int NX=1024;
-const int NY=NX;
-int T_FINAL;
-
-const int X_MASK = NX-1, Y_MASK=NY-1;
+string tag_str = "PiTCH-16";
 
 const int NT=16;
 const int NTO=NX/NT;
 const int NF=NX/4;
-
-
-double dens_initial[NX][NX];
-double dens_final[NX][NX];
-
-double dens_final_pitch[NX][NX];
 
 double yuka[NTO][NTO][1][NT+2][NT+2];
 
@@ -32,71 +10,6 @@ const int N_KABE=NF+NT/2+2;
 double yuka_tmp[1][NT+2][NT+2];
 double kabe_y[NTO][NTO][N_KABE][2][NT+2];
 double kabe_x[NTO][NTO][N_KABE][NT+2][2];
-
-static double second(){
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  return double(tv.tv_sec) + 1.e-6*double(tv.tv_usec);
-}
-
-
-void initialize() {
-  for (int y=0; y<NY; ++y) {
-    for (int x=0; x<NX; ++x) {
-      dens_initial[y][x]=(rand()/double(INT_MAX)*2 > 1 ? 1 : 0);
-      dens_final[y][x]=424242;
-    }
-  }
-}
-void dump(const char* fn) {
-  ofstream ofs(fn);
-  for (int y=0; y<NY; ++y) {
-    for(int x=0;x<NX;++x) {
-      ofs << x << " " << y << " " << dens_final[y][x] << endl;
-    }
-    ofs << endl;
-  }
-}
-
-
-
-inline double stencil_function(double o, double a, double b, double c, double d) {
-  return 0.5*o+0.125*(a+b+c+d);
-}
-
-
-double ref_buf[NX][NX];
-double ref_buf2[NX][NX];
-
-void compute_reference() {
-  for (int y=0;y<NY;++y) {
-    for (int x=0;x<NX;++x) {
-      ref_buf[y][x]=dens_initial[y][x];
-    }
-  }
-
-  for (int t=1; t <=T_FINAL; ++t) {
-    for (int y=0;y<NY;++y) {
-      for (int x=0;x<NX;++x) {
-        ref_buf2[y][x]=stencil_function
-          (ref_buf[y][x],
-           ref_buf[(y-1)&Y_MASK][x],
-           ref_buf[(y+1)&Y_MASK][x],
-           ref_buf[y][(x-1)&X_MASK],
-           ref_buf[y][(x+1)&X_MASK]
-           );
-      }
-    }
-    swap(ref_buf, ref_buf2);
-  }
-  for (int y=0;y<NY;++y) {
-    for (int x=0;x<NX;++x) {
-      dens_final[y][x] = ref_buf[y][x];
-    }
-  }
-}
-
-
 
 double work[N_KABE][NT+2][NT+2];
 
@@ -215,7 +128,7 @@ void pitch_kernel
 
 }
 
-void compute_pitch(){
+void solve(){
   for(int t_orig=-NX; t_orig <= T_FINAL; t_orig+=NF) {
     bool near_initial = t_orig < 0;
     bool near_final   = t_orig >= T_FINAL-NX;
@@ -257,36 +170,4 @@ void compute_pitch(){
       }
     }
   }
-}
-
-int main ()
-{
-  double n_flop[2], wct_pitch[2], wct_ref[2];
-
-  for(int part=0; part<2; ++part) {
-    T_FINAL = NX*(3+part);
-    initialize();
-    n_flop[part]=6.0*NX*NX*double(T_FINAL);
-    double t1 = second();
-    compute_pitch();
-    double t2 = second();
-    cout << "PiTCH: " << n_flop[part] << " flop " << (t2-t1) << " second" << endl;
-    wct_pitch[part] = t2-t1;
-
-    swap(dens_final, dens_final_pitch);
-
-    double t3 = second();
-    compute_reference();
-    double t4 = second();
-    cout << "Ref: " << n_flop[part] << " flop " << (t4-t3) << " second" << endl;
-    wct_ref[part] = t4-t3;
-    for (int y=0;y<NY;++y) {
-      for (int x=0;x<NX;++x){
-        assert(dens_final[y][x]==dens_final_pitch[y][x]);
-      }
-    }
-  }
-
-  cerr << "PiTCH: " << (n_flop[1]-n_flop[0])/(wct_pitch[1]-wct_pitch[0]) << " flop/s " << endl;
-  cerr << "Ref: " << (n_flop[1]-n_flop[0])/(wct_ref[1]-wct_ref[0]) << " flop/s " << endl;
 }
