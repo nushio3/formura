@@ -93,18 +93,22 @@ int main ()
   }
   cerr << "scale: " << good_scale << endl;
 
+  ofstream fs_log("benchmark.txt", ofstream::app | ofstream::out);
+
   for(int iter=0;iter<10;++iter) {
-    cout << algorithm_tag_str << "\tNX: " << NX << "\t" ;
+    ostringstream msg;
+    msg << algorithm_tag_str << "\tNX: " << NX << "\t" ;
     T_FINAL = NX*3*good_scale;
     initialize();
     solve();
     double n_flop=6.0*NX*NX*double(benchmark_self_reported_delta_t);
     double wct = benchmark_self_reported_wct;
-    cout << n_flop << " flop\t" << wct << " second\t" ;
-    cout << n_flop/wct << " flop/s" << endl;
+    msg << n_flop << " flop\t" << wct << " second\t" ;
+    msg << n_flop/wct << " flop/s";
+    cerr << msg.str() << endl;
+    fs_log << msg.str() << endl;
   }
   ostringstream fn;
   fn << "gen/nx-" << NX << "-" << algorithm_tag_str << ".txt";
   dump(fn.str().c_str());
-
 }
