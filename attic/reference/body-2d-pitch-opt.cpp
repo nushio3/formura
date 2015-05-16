@@ -1,8 +1,8 @@
-string tag_str = "PiTCH-16";
+string tag_str = "PiTCH-Opt-16";
 
-const int NT=16;
-const int NTO=NX/NT;
-const int NF=NX/4;
+const int NT = 16;
+const int NTO = NX/NT;
+const int NF = NX/4;
 
 double yuka[NTO][NTO][1][NT+2][NT+2];
 
