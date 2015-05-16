@@ -30,7 +30,7 @@ main = do
             bodyCppGen =
               T.unlines $
               replaceIf (T.isInfixOf "const int NT =" ) ("const int NT = " <> thow nt <> ";") $
-              replaceIf (T.isInfixOf "string tag_str" ) ("string tag_str = \"PiTCH-Opt-" <> thow nt <> "\";") $
+              replaceIf (T.isInfixOf "string algorithm_tag_str" ) ("string algorithm_tag_str = \"PiTCH-Opt-" <> thow nt <> "\";") $
               T.lines bodyCpp
 
         T.writeFile "gen/main.cpp" mainCppGen

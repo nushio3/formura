@@ -1,4 +1,4 @@
-string tag_str = "PiTCH-Opt-16";
+string algorithm_tag_str = "PiTCH-Opt-16";
 
 const int NT = 16;
 const int NTO = NX/NT;

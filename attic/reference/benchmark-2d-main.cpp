@@ -64,7 +64,7 @@ int main ()
 {
   double n_flop[2], wct[2];
   for(int iter=0;iter<10;++iter) {
-    cout << tag_str << " NX: " << NX << " " ;
+    cout << algorithm_tag_str << " NX: " << NX << " " ;
     for(int part=0; part<2; ++part) {
       T_FINAL = NX*(3+part);
       initialize();
@@ -77,6 +77,8 @@ int main ()
     }
     cout << (n_flop[1]-n_flop[0])/(wct[1]-wct[0]) << " flop/s" << endl;
   }
-
+  ostringstream fn;
+  fn << "gen/nx-" << NX << "-" << algorithm_tag_str << ".txt";
+  dump(fn.str().c_str());
 
 }
