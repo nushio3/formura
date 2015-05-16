@@ -36,7 +36,8 @@ main = forM_ (zip [1..]  allExperiments) $ \(i, xp) -> do
 
 badExperiments :: [Experiment]
 badExperiments =
-  Experiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = 4096, nt = 8} :
+  Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = 256, nt = 0} :
+  Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 256, nt = 64} :
   []
 
 
@@ -50,7 +51,7 @@ testExperiments =
 
 allExperiments :: [Experiment]
 allExperiments = nub $ do
-  nx0 <- [2^n | n <- [10..12]]
+  nx0 <- [2^n | n <- [4..12]]
   nt0 <- [2^n | n <- [3..8]]
   guard (nx0 > nt0)
   reverse $
@@ -83,6 +84,7 @@ doExperiment really xp = do
   T.writeFile "gen/main.cpp" mainCppGen
   T.writeFile "gen/body.cpp" bodyCppGen
 
-  system "g++ -O2 -Wall -march=core-avx2 -mcmodel=large gen/main.cpp -o gen/bench.out"
+  -- -march=core-avx2
+  system "g++ -O2 -Wall  -mcmodel=large gen/main.cpp -o gen/bench.out"
   when really $ system "gen/bench.out" >> return ()
   return ()

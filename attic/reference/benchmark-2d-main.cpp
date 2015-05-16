@@ -78,27 +78,42 @@ int benchmark_self_reported_delta_t;
 
 #include "body.cpp"
 
+bool debug_mode = true;
+
+int time_iteration_scaling;
+
+void leave_dump () {
+  ostringstream fn;
+  fn << "gen/finalstate-nx-" << NX << "-S-" << time_iteration_scaling << "-" <<  algorithm_tag_str << ".txt";
+  dump(fn.str().c_str());
+}
+
 int main ()
 {
-  int good_scale;
-  cerr << "calibrating..." << endl;
-  for(good_scale=1;;good_scale*=2){
-    initialize();
-    double t1 = second();
-    T_FINAL=NX*good_scale;
-    solve();
-    double t2 = second();
-    cerr << t2 << " " << t1 << endl;
-    if(t2-t1>1.0) break;
+  if (debug_mode) {
+    time_iteration_scaling = 1;
+  } else {
+    cerr << "calibrating..." << endl;
+    for(time_iteration_scaling=1;;time_iteration_scaling*=2){
+      initialize();
+      double t1 = second();
+      T_FINAL=NX*time_iteration_scaling;
+      solve();
+      double t2 = second();
+      cerr << t2 << " " << t1 << endl;
+      if (time_iteration_scaling==1) leave_dump();
+      if(t2-t1>1.0) break;
+    }
   }
-  cerr << "scale: " << good_scale << endl;
+  time_iteration_scaling *= 3;
+  cerr << "scale: " << time_iteration_scaling << endl;
 
   ofstream fs_log("result/benchmark.txt", ofstream::app | ofstream::out);
 
-  for(int iter=0;iter<10;++iter) {
+  for(int iter=0;iter< (debug_mode ? 1 : 10);++iter) {
     ostringstream msg;
     msg << algorithm_tag_str << "\tNX: " << NX << "\t" ;
-    T_FINAL = NX*3*good_scale;
+    T_FINAL = NX*time_iteration_scaling;
     initialize();
     solve();
     double n_flop=6.0*NX*NX*double(benchmark_self_reported_delta_t);
@@ -108,7 +123,6 @@ int main ()
     cerr << msg.str() << endl;
     fs_log << msg.str() << endl;
   }
-  ostringstream fn;
-  fn << "gen/finalstate-nx-" << NX << "-" << algorithm_tag_str << ".txt";
-  dump(fn.str().c_str());
+
+  leave_dump();
 }
