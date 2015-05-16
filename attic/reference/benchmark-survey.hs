@@ -29,10 +29,10 @@ data Experiment =
 
 
 main :: IO ()
-main = forM_ (zip [1..]  badExperiments) $ \(i, xp) -> do
+main = forM_ (zip [1..]  allExperiments) $ \(i, xp) -> do
   putStrLn $ show i ++ "/" ++ show (length allExperiments)
   print xp
-  doExperiment False xp
+  doExperiment True xp
 
 badExperiments :: [Experiment]
 badExperiments =
@@ -50,10 +50,11 @@ testExperiments =
 
 allExperiments :: [Experiment]
 allExperiments = nub $ do
-  nx0 <- [2^n | n <- [6..11]]
+  nx0 <- [2^n | n <- [11..12]]
   nt0 <- [2^n | n <- [3..8]]
   guard (nx0 > nt0)
-  Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
+  reverse $
+    Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
     Experiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
     Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = nx0, nt = nt0} :
     []
