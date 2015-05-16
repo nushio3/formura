@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad
+import Data.List (nub)
 import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -21,13 +22,18 @@ data Experiment =
   , nx :: Int
   , nt :: Int
   }
+  deriving (Eq, Ord, Show)
 
 --   forM_ [2^i :: Int | i <- reverse [6..11]] $ \nx -> do
 --     forM_ [2^j :: Int | j <- reverse [3..8]] $ \nt -> do
 
 
 main :: IO ()
-main = mapM_ doExperiment testExperiments
+main = forM_ (zip [1..]  allExperiments) $ \(i, xp) -> do
+  putStrLn $ show i ++ "/" ++ show (length allExperiments)
+  print xp
+  doExperiment xp
+
 
 testExperiments :: [Experiment]
 testExperiments =
@@ -35,6 +41,18 @@ testExperiments =
   Experiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = 64, nt = 16} :
   Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 64, nt = 16} :
   []
+
+
+allExperiments :: [Experiment]
+allExperiments = nub $ do
+  nx0 <- [2^n | n <- [6..11]]
+  nt0 <- [2^n | n <- [3..8]]
+  guard (nx0 > nt0)
+  Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
+    Experiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
+    Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = nx0, nt = nt0} :
+    []
+
 
 
 
