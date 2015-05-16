@@ -93,7 +93,7 @@ int main ()
   }
   cerr << "scale: " << good_scale << endl;
 
-  ofstream fs_log("benchmark.txt", ofstream::app | ofstream::out);
+  ofstream fs_log("result/benchmark.txt", ofstream::app | ofstream::out);
 
   for(int iter=0;iter<10;++iter) {
     ostringstream msg;
