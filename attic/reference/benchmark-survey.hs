@@ -29,10 +29,15 @@ data Experiment =
 
 
 main :: IO ()
-main = forM_ (zip [1..]  allExperiments) $ \(i, xp) -> do
+main = forM_ (zip [1..]  badExperiments) $ \(i, xp) -> do
   putStrLn $ show i ++ "/" ++ show (length allExperiments)
   print xp
-  doExperiment xp
+  doExperiment False xp
+
+badExperiments :: [Experiment]
+badExperiments =
+  Experiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = 4096, nt = 8} :
+  []
 
 
 testExperiments :: [Experiment]
@@ -56,8 +61,8 @@ allExperiments = nub $ do
 
 
 
-doExperiment :: Experiment -> IO ()
-doExperiment xp = do
+doExperiment :: Bool -> Experiment -> IO ()
+doExperiment really xp = do
   mainCpp <- T.readFile "benchmark-2d-main.cpp"
   bodyCpp <- T.readFile $ bodyFileName xp
 
@@ -77,6 +82,6 @@ doExperiment xp = do
   T.writeFile "gen/main.cpp" mainCppGen
   T.writeFile "gen/body.cpp" bodyCppGen
 
-  system "g++ -O2 -Wall -march=core-avx2 gen/main.cpp -o gen/bench.out"
-  system "gen/bench.out"
+  system "g++ -O2 -Wall -march=core-avx2 -mcmodel=large gen/main.cpp -o gen/bench.out"
+  when really $ system "gen/bench.out" >> return ()
   return ()
