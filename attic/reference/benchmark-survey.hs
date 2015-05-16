@@ -19,8 +19,8 @@ main = do
   mainCpp <- T.readFile "benchmark-2d-main.cpp"
   bodyCpp <- T.readFile "body-2d-pitch-opt.cpp"
 
-  forM_ [2^i :: Int | i <- [6..10]] $ \nx -> do
-    forM_ [2^j :: Int | j <- [3..8]] $ \nt -> do
+  forM_ [2^i :: Int | i <- reverse [6..11]] $ \nx -> do
+    forM_ [2^j :: Int | j <- reverse [3..8]] $ \nt -> do
       when (nt<nx) $ do
         let mainCppGen =
               T.unlines $

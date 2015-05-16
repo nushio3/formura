@@ -1,0 +1,16 @@
+pat[t+0][y+3][x+3] = compute_stencil(pat[t+0][y+4][x+4], pat[t-1][y+4][x+3], pat[t+0][y+4][x+5], pat[t-1][y+3][x+4], pat[t+0][y+5][x+4]);
+pat[t+0][y+3][x+2] = compute_stencil(pat[t-1][y+4][x+3], pat[t-1][y+4][x+2], pat[t+0][y+4][x+4], pat[t-1][y+3][x+3], pat[t+0][y+5][x+3]);
+pat[t+0][y+3][x+1] = compute_stencil(pat[t-1][y+4][x+2], pat[t-1][y+4][x+1], pat[t-1][y+4][x+3], pat[t-1][y+3][x+2], pat[t-1][y+5][x+2]);
+pat[t+0][y+3][x+0] = compute_stencil(pat[t+0][y+4][x+1], pat[t+0][y+4][x+0], pat[t+0][y+4][x+2], pat[t+0][y+3][x+1], pat[t+0][y+5][x+1]);
+pat[t+0][y+2][x+3] = compute_stencil(pat[t-1][y+3][x+4], pat[t-1][y+3][x+3], pat[t+0][y+3][x+5], pat[t-1][y+2][x+4], pat[t+0][y+4][x+4]);
+pat[t+0][y+2][x+2] = compute_stencil(pat[t-1][y+3][x+3], pat[t-1][y+3][x+2], pat[t-1][y+3][x+4], pat[t-1][y+2][x+3], pat[t-1][y+4][x+3]);
+pat[t+0][y+2][x+1] = compute_stencil(pat[t+0][y+3][x+2], pat[t+0][y+3][x+1], pat[t+0][y+3][x+3], pat[t+0][y+2][x+2], pat[t+0][y+4][x+2]);
+pat[t+0][y+2][x+0] = compute_stencil(pat[t+0][y+3][x+1], pat[t-1][y+3][x+0], pat[t+0][y+3][x+2], pat[t-1][y+2][x+1], pat[t+0][y+4][x+1]);
+pat[t+0][y+1][x+3] = compute_stencil(pat[t-1][y+2][x+4], pat[t-1][y+2][x+3], pat[t-1][y+2][x+5], pat[t-1][y+1][x+4], pat[t-1][y+3][x+4]);
+pat[t+0][y+1][x+2] = compute_stencil(pat[t+0][y+2][x+3], pat[t+0][y+2][x+2], pat[t+0][y+2][x+4], pat[t+0][y+1][x+3], pat[t+0][y+3][x+3]);
+pat[t+0][y+1][x+1] = compute_stencil(pat[t+0][y+2][x+2], pat[t-1][y+2][x+1], pat[t+0][y+2][x+3], pat[t-1][y+1][x+2], pat[t+0][y+3][x+2]);
+pat[t+0][y+1][x+0] = compute_stencil(pat[t-1][y+2][x+1], pat[t-1][y+2][x+0], pat[t+0][y+2][x+2], pat[t-1][y+1][x+1], pat[t+0][y+3][x+1]);
+pat[t+0][y+0][x+3] = compute_stencil(pat[t+0][y+1][x+4], pat[t+0][y+1][x+3], pat[t+0][y+1][x+5], pat[t+0][y+0][x+4], pat[t+0][y+2][x+4]);
+pat[t+0][y+0][x+2] = compute_stencil(pat[t+0][y+1][x+3], pat[t-1][y+1][x+2], pat[t+0][y+1][x+4], pat[t-1][y+0][x+3], pat[t+0][y+2][x+3]);
+pat[t+0][y+0][x+1] = compute_stencil(pat[t-1][y+1][x+2], pat[t-1][y+1][x+1], pat[t+0][y+1][x+3], pat[t-1][y+0][x+2], pat[t+0][y+2][x+2]);
+pat[t+0][y+0][x+0] = compute_stencil(pat[t-1][y+1][x+1], pat[t-1][y+1][x+0], pat[t-1][y+1][x+2], pat[t-1][y+0][x+1], pat[t-1][y+2][x+1]);
