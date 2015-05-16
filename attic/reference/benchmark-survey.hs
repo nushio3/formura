@@ -50,7 +50,7 @@ testExperiments =
 
 allExperiments :: [Experiment]
 allExperiments = nub $ do
-  nx0 <- [2^n | n <- [11..12]]
+  nx0 <- [2^n | n <- [10..12]]
   nt0 <- [2^n | n <- [3..8]]
   guard (nx0 > nt0)
   reverse $
