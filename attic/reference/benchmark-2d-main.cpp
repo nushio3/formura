@@ -20,10 +20,25 @@ const int X_MASK = NX-1, Y_MASK=NY-1;
 double dens_initial[NX][NX];
 double dens_final[NX][NX];
 
-static double second(){
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  return double(tv.tv_sec) + 1.e-6*double(tv.tv_usec);
+static double second()
+{
+  struct timeval tm;
+  double t ;
+
+  static int base_sec = 0,base_usec = 0;
+
+  gettimeofday(&tm, NULL);
+
+  if(base_sec == 0 && base_usec == 0)
+    {
+      base_sec = tm.tv_sec;
+      base_usec = tm.tv_usec;
+      t = 0.0;
+  } else {
+    t = (double) (tm.tv_sec-base_sec) +
+      ((double) (tm.tv_usec-base_usec))/1.0e6 ;
+  }
+  return t ;
 }
 
 
@@ -63,10 +78,22 @@ inline double stencil_function(double o, double a, double b, double c, double d)
 int main ()
 {
   double n_flop[2], wct[2];
+  int good_scale;
+  for(good_scale=1;;good_scale*=2){
+    initialize();
+    double t1 = second();
+    T_FINAL=NX*good_scale;
+    solve();
+    double t2 = second();
+    cerr << t2 << " " << t1 << endl;
+    if(t2-t1>1) break;
+  }
+  cerr << good_scale << endl;
+
   for(int iter=0;iter<10;++iter) {
     cout << algorithm_tag_str << " NX: " << NX << " " ;
     for(int part=0; part<2; ++part) {
-      T_FINAL = NX*(3+part);
+      T_FINAL = NX*(3+part)*good_scale;
       initialize();
       n_flop[part]=6.0*NX*NX*double(T_FINAL);
       double t1 = second();
