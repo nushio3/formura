@@ -750,3 +750,14 @@ PiTCHOpt-8	NX: 4096	8.24634e+11 flop	425.897 second	1.93623e+09 flop/s
 PiTCHOpt-8	NX: 4096	8.24634e+11 flop	426.09 second	1.93535e+09 flop/s
 PiTCH-8	NX: 4096	4.12317e+11 flop	481.462 second	8.56385e+08 flop/s
 PiTCH-8	NX: 4096	4.12317e+11 flop	481.668 second	8.56019e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	481.293 second	8.56686e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	482.018 second	8.55396e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	481.939 second	8.55537e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	481.759 second	8.55857e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	481.769 second	8.55839e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	482.089 second	8.55272e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	481.905 second	8.55597e+08 flop/s
+PiTCH-8	NX: 4096	4.12317e+11 flop	481.919 second	8.55572e+08 flop/s
+NoTB-0	NX: 4096	1.23695e+12 flop	2131.72 second	5.8026e+08 flop/s
+NoTB-0	NX: 4096	1.23695e+12 flop	2130.78 second	5.80515e+08 flop/s
+NoTB-0	NX: 4096	1.23695e+12 flop	2131.9 second	5.80211e+08 flop/s

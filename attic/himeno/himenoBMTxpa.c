@@ -23,7 +23,7 @@
  This program is to measure a computer performance in MFLOPS
  by using a kernel which appears in a linear solver of pressure
  Poisson eq. which appears in an incompressible Navier-Stokes solver.
- A point-Jacobi method is employed in this solver as this method can 
+ A point-Jacobi method is employed in this solver as this method can
  be easyly vectrized and be parallelized.
  ------------------
  Finite-difference method, curvilinear coodinate system
@@ -90,7 +90,7 @@ main(int argc, char *argv[])
   }
 
   set_param(msize,size);
-  
+
   mimax= msize[0];
   mjmax= msize[1];
   mkmax= msize[2];
@@ -165,7 +165,7 @@ main(int argc, char *argv[])
 
   /*
    *   Matrix free
-   */ 
+   */
   clearMat(&p);
   clearMat(&bnd);
   clearMat(&wrk1);
@@ -173,7 +173,7 @@ main(int argc, char *argv[])
   clearMat(&a);
   clearMat(&b);
   clearMat(&c);
-  
+
   return (0);
 }
 
@@ -235,9 +235,9 @@ newMat(Matrix* Mat, int mnums,int mrows, int mcols, int mdeps)
   Mat->mcols= mcols;
   Mat->mdeps= mdeps;
   Mat->m= NULL;
-  Mat->m= (float*) 
+  Mat->m= (float*)
     malloc(mnums * mrows * mcols * mdeps * sizeof(float));
-  
+
   return(Mat->m != NULL) ? 1:0;
 }
 
@@ -321,7 +321,7 @@ jacobi(int nn, Matrix* a,Matrix* b,Matrix* c,
       for(j=1 ; j<jmax ; j++)
         for(k=1 ; k<kmax ; k++)
           MR(p,0,i,j,k)= MR(wrk2,0,i,j,k);
-    
+
   } /* end n loop */
 
   return(gosa);
@@ -337,17 +337,16 @@ second()
   static int base_sec = 0,base_usec = 0;
 
   gettimeofday(&tm, NULL);
-  
+
   if(base_sec == 0 && base_usec == 0)
     {
       base_sec = tm.tv_sec;
       base_usec = tm.tv_usec;
       t = 0.0;
   } else {
-    t = (double) (tm.tv_sec-base_sec) + 
+    t = (double) (tm.tv_sec-base_sec) +
       ((double) (tm.tv_usec-base_usec))/1.0e6 ;
   }
 
   return t ;
 }
-
