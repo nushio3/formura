@@ -51,11 +51,11 @@ testExperiments =
 
 
 allExperiments :: [Experiment]
-allExperiments = nub $ do
+allExperiments = reverse $ nub $ do
   nx0 <- [2^n | n <- [4..12]]
   nt0 <- [2^n | n <- [3..8]]
   guard (nx0 > nt0)
-  reverse $
+  id $
     Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
     Experiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
     Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = nx0, nt = nt0} :
