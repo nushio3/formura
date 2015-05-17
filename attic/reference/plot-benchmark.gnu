@@ -4,7 +4,7 @@ set log x
 set grid
 set xlabel 'Problem Size (NX^2)'
 set ylabel 'Flop/s'
-set yrange [0:4e9]
+set yrange [0:]
 set key left top
 set format y "%2.1t{/Symbol \327}10^{%L}"
 set format x "10^{%L}"
