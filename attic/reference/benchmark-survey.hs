@@ -30,14 +30,14 @@ data Experiment =
 
 
 main :: IO ()
-main = forM_ (zip [1..] allExperiments) $ \(i, xp) -> do
+main = forM_ (zip [1..] smallExperiments) $ \(i, xp) -> do
   putStrLn $ show i ++ "/" ++ show (length allExperiments)
   print xp
   doExperiment True xp
 
 smallExperiments :: [Experiment]
 smallExperiments =
-  Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 2048, nt = 64} :
+  Experiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 256, nt = 64} :
   Experiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = 256, nt = 0} :
   []
 

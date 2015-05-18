@@ -42,18 +42,18 @@ void pitch_kernel
 
         if (in_region) {
           double ret=work[t][y][x];
-          if (t_k + t_orig == 0 && near_initial) {
+          if (near_initial && t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           } else if (t_dash == 0) {
             ret = yuka_in[0][y][x];
-          } else if (t+t_orig>0 && y>=2 && x>=2) {
+          } else {
             asm volatile("#kernel");
             ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
           }
 
           work[t][y][x] = ret;
 
-          if (t_k + t_orig == T_FINAL && near_final) {
+          if (near_final && t_k + t_orig == T_FINAL) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
           }
         }
@@ -68,10 +68,10 @@ void pitch_kernel
         int t_k=t, y_k = y-t, x_k = x-t;
 
         double ret=work[t][y][x];
-        if (t_k + t_orig == 0 && near_initial) {
+        if (near_initial &&t_k + t_orig == 0) {
           ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
         } else {
-          asm volatile("#kernel");
+          asm volatile("#central kernel");
           ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
         }
         work[t][y][x] = ret;
@@ -93,9 +93,9 @@ void pitch_kernel
 
         if (in_region) {
           double ret=work[t][y][x];
-          if (t_k + t_orig == 0 && near_initial) {
+          if (near_initial && t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
-          } else if (t+t_orig>0 && y>=2 && x>=2) {
+          } else {
             asm volatile("#kernel");
             ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
           }
@@ -105,7 +105,7 @@ void pitch_kernel
           if (t_dash == NF && t >=NF+2) {
             yuka_out[0][y][x] = ret;
           }
-          if (t_k + t_orig == T_FINAL && near_final) {
+          if (near_final && t_k + t_orig == T_FINAL) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
           }
         }
