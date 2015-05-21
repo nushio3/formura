@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const int NX=2048;
+const int NX=256;
 const int NY=NX;
 int T_FINAL;
 
@@ -102,7 +102,7 @@ int main (int argc, char** argv)
       double t2 = second();
       cerr << t2 << " " << t1 << endl;
       if (time_iteration_scaling==1) leave_dump();
-      if(t2-t1>1.0) break;
+      if(t2-t1>0.1) break;
     }
   }
   time_iteration_scaling *= 3;

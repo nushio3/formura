@@ -6,10 +6,10 @@ const int NT = 64;
 const int NTO = NX/NT;
 const int NF = NX/4;
 
-double yuka[NTO][NTO][1][NT+2][NT+2];
+double yuka_hontai[NTO][NTO][1][NT+2][NT+2];
+double yuka_next_hontai[NTO][NTO][1][NT+2][NT+2];
 
 const int N_KABE=NF+NT/2+2;
-double yuka_tmp[1][NT+2][NT+2];
 double kabe_y[NTO][NTO][N_KABE][2][NT+2];
 double kabe_x[NTO][NTO][N_KABE][NT+2][2];
 
@@ -157,6 +157,9 @@ void solve(){
   int sim_t_1=-1, sim_t_2=-1;
   double wct_1=-1, wct_2=-1;
 
+  double (&yuka)[NTO][NTO][1][NT+2][NT+2] = yuka_hontai;
+  double (&yuka_next)[NTO][NTO][1][NT+2][NT+2] = yuka_next_hontai;
+
   for(int t_orig=-NX; t_orig <= T_FINAL; t_orig+=NF) {
     bool near_initial = t_orig < 0;
     bool near_final   = t_orig >= T_FINAL-NX;
@@ -172,8 +175,7 @@ void solve(){
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-          swap(yuka[yo][xo], yuka_tmp);
+             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
         }
       }
     }else if(near_initial) {
@@ -185,8 +187,7 @@ void solve(){
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-          swap(yuka[yo][xo], yuka_tmp);
+             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
         }
       }
       sim_t_1 = t_orig+NF;
@@ -204,8 +205,7 @@ void solve(){
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-          swap(yuka[yo][xo], yuka_tmp);
+             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
         }
       }
     }else {
@@ -217,11 +217,11 @@ void solve(){
              y_orig+(3*dy-dx)/4,
              x_orig+(3*dx-dy)/4,
              yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_tmp,kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-          swap(yuka[yo][xo], yuka_tmp);
+             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
         }
       }
     }
+    swap(yuka, yuka_next);
   }
   assert( sim_t_1 != -1 && sim_t_2 != -1 &&
           wct_1 != -1&& wct_2 != -1);
