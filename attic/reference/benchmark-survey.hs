@@ -69,6 +69,7 @@ allExperiments = nub $ do
   nt0 <- [2^n | n <- [3..8]]
   nthre0 <- [1,2,4,8,16,32]
   guard (nx0 > nt0)
+  guard (nx0 `div` nt0 >= nthre0)
   id $
     defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
     defaultExperiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
