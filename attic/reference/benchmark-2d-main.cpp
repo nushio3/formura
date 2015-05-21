@@ -7,6 +7,8 @@
 #include <fstream>
 #include <cstdlib>
 #include <sstream>
+#include <omp.h>
+
 
 using namespace std;
 
@@ -115,9 +117,20 @@ int main (int argc, char** argv)
 
   ofstream fs_log(benchmark_fn.c_str(), ofstream::app | ofstream::out);
 
+  int nth;
+
+  #pragma omp parallel
+  {
+    #pragma omp master
+    nth = omp_get_num_threads();
+  }
+
   for(int iter=0;iter< (debug_mode ? 1 : 10);++iter) {
     ostringstream msg;
-    msg << algorithm_tag_str << "\tNX: " << NX << "\t" ;
+    msg <<
+      algorithm_tag_str <<
+      "\tNthre: " << nth <<
+      "\tNX: " << NX << "\t"  ;
     T_FINAL = NX*time_iteration_scaling;
     initialize();
     solve();
