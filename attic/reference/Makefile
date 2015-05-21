@@ -13,6 +13,7 @@ main-2d-opt.out: main-2d-opt.cpp
 main-2d-simd.out: body-2d-pitch-simd.cpp benchmark-2d-main.cpp
 	cp body-2d-pitch-simd.cpp body.cpp
 	g++ -O2 -Wall -march=core-avx2 -S benchmark-2d-main.cpp -o main-2d-simd.s
+	cp main-2d-simd.s  main-2d-simd.0.s
 	./patch-simd.hs main-2d-simd.s
 	g++ -O2 -Wall main-2d-simd.s -o main-2d-simd.out
 

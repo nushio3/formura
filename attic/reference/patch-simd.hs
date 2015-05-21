@@ -13,7 +13,7 @@ main = getArgs >>= mapM_ process
 process :: FilePath -> IO ()
 process fn = do
   content <- T.readFile fn
-  T.writeFile fn $ T.unlines $ T.lines content
+  T.writeFile fn $ T.unlines $ patch $ T.lines content
 
 patch :: [T.Text] -> [T.Text]
 patch = vmovapd2vmovupd
@@ -27,4 +27,4 @@ vmovapd2vmovupd xs = p1 ++ rm 2 p2
     rm n (x:xs)
       | n <=0 = x:xs
       | T.isInfixOf "vmovapd" x = T.replace "vmovapd" "vmovupd" x : rm (n-1) xs
-      | otherwise = rm n xs
+      | otherwise = x:rm n xs
