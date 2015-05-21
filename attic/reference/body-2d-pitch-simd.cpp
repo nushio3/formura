@@ -9,11 +9,22 @@ const int NF = NX/4;
 double yuka_hontai[NTO][NTO][1][NT+2][NT+2];
 double yuka_next_hontai[NTO][NTO][1][NT+2][NT+2];
 
+typedef double yuka_t [NT+2][NT+2];
+
+
+yuka_t *yuka     [NTO][NTO]; //= yuka_hontai;
+yuka_t *yuka_next[NTO][NTO];// = yuka_next_hontai;
+
+
 const int N_KABE=NF+NT/2+2;
 double kabe_y[NTO][NTO][N_KABE][2][NT+2];
 double kabe_x[NTO][NTO][N_KABE][NT+2][2];
 
 double work[N_KABE][NT+2][NT+2];
+
+int sim_t_1=-1, sim_t_2=-1;
+double wct_1=-1, wct_2=-1;
+
 
 template <bool near_initial, bool near_final>
 void pitch_kernel
@@ -152,80 +163,128 @@ void pitch_kernel
 
 }
 
+int thread_local_t[NTO];
+int thread_local_yo[NTO];
+int thread_speed_flag[NTO];
+
+
+inline void proceed_thread(int xo) {
+  if (thread_speed_flag[xo] == 0) return;
+
+  int yo = thread_local_yo[xo];
+  int t_orig = thread_local_t[xo];
+  int dy = yo*NT, dx = xo*NT;
+  bool near_initial = t_orig < 0;
+  bool near_final   = t_orig >= T_FINAL-NX;
+  int y_orig = -t_orig;
+  int x_orig = -t_orig;
+
+  if(near_initial && near_final) {
+    pitch_kernel<true, true>
+      (t_orig+(dx+dy)/4,
+       y_orig+(3*dy-dx)/4,
+       x_orig+(3*dx-dy)/4,
+       yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+       yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+
+  }else if(near_initial) {
+    pitch_kernel<true, false>
+      (t_orig+(dx+dy)/4,
+       y_orig+(3*dy-dx)/4,
+       x_orig+(3*dx-dy)/4,
+       yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+       yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+    sim_t_1 = t_orig+NF;
+    wct_1 = second();
+  }else  if(near_final) {
+    if (sim_t_2 == -1) {
+      sim_t_2 = t_orig;
+      wct_2 = second();
+    }
+    int dy = yo*NT, dx = xo*NT;
+    pitch_kernel<false, true >
+      (t_orig+(dx+dy)/4,
+       y_orig+(3*dy-dx)/4,
+       x_orig+(3*dx-dy)/4,
+       yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+       yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+  }else {
+    int dy = yo*NT, dx = xo*NT;
+    pitch_kernel<false, false>
+      (t_orig+(dx+dy)/4,
+       y_orig+(3*dy-dx)/4,
+       x_orig+(3*dx-dy)/4,
+       yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
+       yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+  }
+  swap(yuka[yo][xo], yuka_next[yo][xo]);
+
+
+
+  if(thread_local_t[xo] <= T_FINAL) {
+    //cout << xo << " " << thread_local_yo[xo]<<endl;
+    thread_local_yo[xo]++;
+    if(thread_local_yo[xo] >= NTO) {
+      thread_local_yo[xo]=0;
+      thread_local_t[xo] += NF;
+    }
+  } else {
+    thread_speed_flag[xo] = 0;
+  }
+}
+
 void solve(){
 
-  int sim_t_1=-1, sim_t_2=-1;
-  double wct_1=-1, wct_2=-1;
+   sim_t_1=-1, sim_t_2=-1;
+   wct_1=-1, wct_2=-1;
 
-  double (&yuka)[NTO][NTO][1][NT+2][NT+2] = yuka_hontai;
-  double (&yuka_next)[NTO][NTO][1][NT+2][NT+2] = yuka_next_hontai;
 
-  for(int t_orig=-NX; t_orig <= T_FINAL; t_orig+=NF) {
-    bool near_initial = t_orig < 0;
-    bool near_final   = t_orig >= T_FINAL-NX;
-    int y_orig = -t_orig;
-    int x_orig = -t_orig;
-    if(near_initial && near_final) {
-      for (int yo=0;yo<NTO;++yo) {
-        for (int xo=0;xo<NTO;++xo) {
-          int dy = yo*NT, dx = xo*NT;
-
-          pitch_kernel<true, true>
-            (t_orig+(dx+dy)/4,
-             y_orig+(3*dy-dx)/4,
-             x_orig+(3*dx-dy)/4,
-             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        }
-      }
-    }else if(near_initial) {
-      for (int yo=0;yo<NTO;++yo) {
-        for (int xo=0;xo<NTO;++xo) {
-          int dy = yo*NT, dx = xo*NT;
-          pitch_kernel<true, false>
-            (t_orig+(dx+dy)/4,
-             y_orig+(3*dy-dx)/4,
-             x_orig+(3*dx-dy)/4,
-             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        }
-      }
-      sim_t_1 = t_orig+NF;
-      wct_1 = second();
-    }else  if(near_final) {
-      if (sim_t_2 == -1) {
-        sim_t_2 = t_orig;
-        wct_2 = second();
-      }
-      for (int yo=0;yo<NTO;++yo) {
-        for (int xo=0;xo<NTO;++xo) {
-          int dy = yo*NT, dx = xo*NT;
-          pitch_kernel<false, true >
-            (t_orig+(dx+dy)/4,
-             y_orig+(3*dy-dx)/4,
-             x_orig+(3*dx-dy)/4,
-             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        }
-      }
-    }else {
-      for (int yo=0;yo<NTO;++yo) {
-        for (int xo=0;xo<NTO;++xo) {
-          int dy = yo*NT, dx = xo*NT;
-          pitch_kernel<false, false>
-            (t_orig+(dx+dy)/4,
-             y_orig+(3*dy-dx)/4,
-             x_orig+(3*dx-dy)/4,
-             yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
-             yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
-        }
-      }
+  for (int yo=0;yo<NTO;yo++) {
+    for (int xo=0;xo<NTO;xo++) {
+      yuka     [yo][xo] = yuka_hontai     [yo][xo];
+      yuka_next[yo][xo] = yuka_next_hontai[yo][xo];
     }
-    swap(yuka, yuka_next);
   }
+
+  for (int xo=0;xo<NTO;xo++) {
+    thread_local_t[xo] = -NX;
+    thread_local_yo[xo] = 0;
+    thread_speed_flag[xo] = 1;
+  }
+
+  for(int yo=0;yo<NTO;yo++) {
+    for (int xo=0;xo<NTO-yo-1;xo++) {
+      proceed_thread(xo);
+    }
+  }
+
+  #pragma omp parallel
+  {
+    for (;;){
+
+      #pragma omp for
+      for(int xo=0;xo<NTO;xo++) {
+        if(thread_speed_flag[xo]>0) {
+          proceed_thread(xo);
+        }
+      }
+
+      #pragma omp barrier
+
+      bool flag=true;
+      for(int xo=0;xo<NTO;xo++) {
+        if(thread_speed_flag[xo]>0) flag=false;
+      }
+      if(flag) break;
+
+    }
+  }
+
+
   assert( sim_t_1 != -1 && sim_t_2 != -1 &&
           wct_1 != -1&& wct_2 != -1);
 
   benchmark_self_reported_wct = wct_2 - wct_1;
   benchmark_self_reported_delta_t = sim_t_2 - sim_t_1;
+
 }
