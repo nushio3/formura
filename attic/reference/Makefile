@@ -1,4 +1,4 @@
-all: main.out main-1d.out main-2d.out main-dash.out main-2d-opt.out
+all: main.out main-1d.out main-2d.out main-dash.out main-2d-opt.out main-2d-simd.out
 
 
 main-1d.out: main-1d.cpp
@@ -9,6 +9,12 @@ main-2d.out: main-2d.cpp
 
 main-2d-opt.out: main-2d-opt.cpp
 	g++ -O2 -Wall  main-2d-opt.cpp -o main-2d-opt.out -march=core-avx2
+
+main-2d-simd.out: body-2d-pitch-simd.cpp benchmark-2d-main.cpp
+	cp body-2d-pitch-simd.cpp body.cpp
+	g++ -O2 -Wall -march=core-avx2 -S benchmark-2d-main.cpp -o main-2d-simd.s
+	./patch-simd.hs main-2d-simd.s
+	g++ -O2 -Wall main-2d-simd.s -o main-2d-simd.out
 
 
 gen.cpp: generate-dash-stencil.hs

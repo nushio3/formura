@@ -68,7 +68,6 @@ void pitch_kernel
     for(int t=t_boundary_1; t<t_boundary_2;++t) {
       for(int y=2; y<NT+2; ++y) {
         for(int x=2; x<NT+2; x+=4) {
-          int t_k=t, y_k = y-t, x_k = x-t;
 
           asm volatile("#central kernel");
           const v4df imm05 = {0.5, 0.5, 0.5, 0.5};
