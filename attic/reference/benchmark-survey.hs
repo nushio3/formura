@@ -71,7 +71,7 @@ allExperiments = nub $ do
   guard (nx0 > nt0)
   guard (nx0 `div` nt0 >= nthre0)
   id $
-    defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
+--    defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
     defaultExperiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
     defaultExperiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = nx0, nt = nt0} :
     defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHPar",
