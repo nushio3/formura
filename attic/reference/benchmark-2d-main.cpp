@@ -10,7 +10,7 @@
 
 using namespace std;
 
-const int NX=256;
+const int NX=2048;
 const int NY=NX;
 int T_FINAL;
 

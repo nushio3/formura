@@ -1,10 +1,10 @@
 #include <omp.h>
 #include <algorithm>
-string algorithm_tag_str = "PiTCH-SIMD-16";
+string algorithm_tag_str = "PiTCH-SIMD";
 
 typedef double v4df __attribute__((vector_size(32)));
 
-const int NT = 64;
+const int NT = 32;
 const int NTO = NX/NT;
 const int NF = NX/4;
 
@@ -277,45 +277,18 @@ void solve(){
   {
     for (;;){
 
-      int nth = omp_get_num_threads();
-      int tid = omp_get_thread_num();
+      //int nth = omp_get_num_threads();
+      //int tid = omp_get_thread_num();
 
-
-      ostringstream ostr[32];
-//
-// int junjo[NTO];
-// for(int i =0;i<NTO;++i) {
-//   junjo[i]=i;
-// }
-// random_shuffle(junjo, junjo+NTO);
-
+      #pragma omp for
       for(int xo2=0;xo2<NTO;xo2++) {
-        int xo = xo2; //junjo[xo2];
-
-        if (xo%nth == tid) {
-
-          ostr[tid] << xo << " " << thread_local_t[xo] << " " << thread_local_yo[xo] << endl;
-
-          if(thread_speed_flag[xo]>0) {
-            proceed_thread(xo);
-          }
+        int xo = xo2;
+        if(thread_speed_flag[xo]>0) {
+          proceed_thread(xo);
         }
-
-        #pragma omp barrier
-
       }
 
-
-
-      for (int ctr=0;ctr<nth;++ctr) {
-        if(ctr==tid)  cout << ostr[tid].str() << flush;
-        #pragma omp barrier
-      }
-
-
-
-
-
+      #pragma omp barrier
 
       bool flag=true;
       for(int xo=0;xo<NTO;xo++) {
