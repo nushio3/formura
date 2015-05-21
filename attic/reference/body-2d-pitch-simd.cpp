@@ -2,7 +2,7 @@ string algorithm_tag_str = "PiTCH-SIMD-16";
 
 typedef double v4df __attribute__((vector_size(32)));
 
-const int NT = 16;
+const int NT = 64;
 const int NTO = NX/NT;
 const int NF = NX/4;
 
