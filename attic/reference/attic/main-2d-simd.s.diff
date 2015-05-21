@@ -1,0 +1,8 @@
+1975c1975
+< 	vmovapd	(%rdx,%r8), %ymm0
+---
+> 	vmovupd	(%rdx,%r8), %ymm0
+1984c1984
+< 	vmovapd	%ymm0, 8(%rsi,%rcx)
+---
+> 	vmovupd	%ymm0, 8(%rsi,%rcx)
