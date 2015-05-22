@@ -61,6 +61,8 @@ void pitch_kernel
     }
   }
 
+  // c.f. https://github.com/nitadori/Hermite/blob/master/SRC/v4df_util.h
+
   // iter 2
   for(int t=t_boundary_1; t<t_boundary_2;++t) {
     for(int y=2; y<NT+2; ++y) {
