@@ -51,7 +51,7 @@ main = do
 smallExperiments :: [Experiment]
 smallExperiments =
   defaultExperiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 256, nt = 64} :
---   defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHPar", nx = 256, nt = 64, nthre=16} :
+  defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHDB", nx = 256, nt = 64, nthre=16} :
   defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = 256, nt = 0} :
   []
 
@@ -77,7 +77,7 @@ allExperiments = sort $ nub $ do
     defaultExperiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
     defaultExperiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = nx0, nt = nt0} :
     defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHDB",
-                       nx = nx0, nt = nt0, nthre=nthre0, nice = -1-1e-10*fromIntegral nt0} :
+                       nx = nx0, nt = nt0, nthre=nthre0, nice = -1} :
     []
 
 

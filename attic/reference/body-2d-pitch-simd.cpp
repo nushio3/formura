@@ -232,10 +232,6 @@ int thread_local_t[NTO];
 int thread_local_yo[NTO];
 int thread_speed_flag[NTO];
 
-int kabe_x_done[99999][NTO][NTO] = {{{0}}};
-int kabe_y_done[99999][NTO][NTO] = {{{0}}};
-
-
 void proceed_thread(int xo) {
   if (thread_speed_flag[xo] == 0) return;
 
@@ -246,11 +242,6 @@ void proceed_thread(int xo) {
   bool near_final   = t_orig >= T_FINAL-NX;
   int y_orig = -t_orig;
   int x_orig = -t_orig;
-
-  if(!near_initial) {
-    assert(  kabe_x_done[NX+t_orig][yo][xo]);
-    assert(  kabe_y_done[NX+t_orig][yo][xo]);
-  }
 
   if(near_initial && near_final) {
     pitch_kernel<true, true>
@@ -291,11 +282,6 @@ void proceed_thread(int xo) {
        yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
   }
   swap(yuka[yo][xo], yuka_next[yo][xo]);
-
-  kabe_x_done[NX+t_orig+NF][yo][(xo+1)%NTO]=1;
-  kabe_y_done[NX+t_orig+NF][(yo+1)%NTO][xo]=1;
-
-
 
   if(thread_local_t[xo] <= T_FINAL) {
     thread_local_yo[xo]++;
