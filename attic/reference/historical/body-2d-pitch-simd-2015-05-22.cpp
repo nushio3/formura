@@ -22,11 +22,8 @@ const int N_KABE=NF+NT/2+2;
 double kabe_y[NTO][NTO][N_KABE][2][NT+2];
 double kabe_x[NTO][NTO][N_KABE][NT+2][2];
 
-typedef double work_t[NT+2][NT+2];
-static __thread work_t work_a_hontai;
-static __thread work_t work_b_hontai;
-
-
+static __thread
+double work[N_KABE][NT+2][NT+2];
 
 int sim_t_1=-1, sim_t_2=-1;
 double wct_1=-1, wct_2=-1;
@@ -38,24 +35,23 @@ void pitch_kernel
  double yuka_in[1][NT+2][NT+2], double kabe_y_in[N_KABE][2][NT+2], double kabe_x_in[N_KABE][NT+2][2],
  double yuka_out[1][NT+2][NT+2], double kabe_y_out[N_KABE][2][NT+2], double kabe_x_out[N_KABE][NT+2][2])
 {
-  work_t &work = work_a_hontai;
-  work_t &work_prev = work_b_hontai;
 
+
+  for(int t=0; t<NF+NT/4+2;++t) {
+    for(int y=0; y<NT+2; ++y) {
+      work[t][y][0] = kabe_x_in[t+NT/4][y][0];
+      work[t][y][1] = kabe_x_in[t+NT/4][y][1];
+    }
+    for(int x=0; x<NT+2; ++x) {
+      work[t][0][x] = kabe_y_in[t+NT/4][0][x];
+      work[t][1][x] = kabe_y_in[t+NT/4][1][x];
+    }
+  }
 
   // iter 1
   const int t_boundary_1 = NT/2+2;
   const int t_boundary_2 = NF+2;
   for(int t=1; t<t_boundary_1;++t) {
-    swap(work,work_prev);
-    for(int y=0; y<NT+2; ++y) {
-      work[y][0] = kabe_x_in[t+NT/4][y][0];
-      work[y][1] = kabe_x_in[t+NT/4][y][1];
-    }
-    for(int x=0; x<NT+2; ++x) {
-      work[0][x] = kabe_y_in[t+NT/4][0][x];
-      work[1][x] = kabe_y_in[t+NT/4][1][x];
-    }
-
     for(int y=2; y<NT+2; ++y) {
       for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
@@ -63,17 +59,17 @@ void pitch_kernel
         const bool in_region = t_dash >=0 && t_dash < NF+1;
 
         if (in_region) {
-          double ret=work[y][x];
+          double ret=work[t][y][x];
           if (near_initial && t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           } else if (t_dash == 0) {
             ret = yuka_in[0][y][x];
           } else {
             asm volatile("#kernel");
-            ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
+            ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
           }
 
-          work[y][x] = ret;
+          work[t][y][x] = ret;
 
           if (near_final && t_k + t_orig == T_FINAL) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
@@ -81,111 +77,54 @@ void pitch_kernel
         }
       }
     }
-    for(int x=0; x<NT+2; ++x) {
-      kabe_y_out[t][0][x] = work[NT+0][x];
-      kabe_y_out[t][1][x] = work[NT+1][x];
-    }
-    for(int y=0; y<NT+2; ++y) {
-      kabe_x_out[t][y][0] = work[y][NT+0];
-      kabe_x_out[t][y][1] = work[y][NT+1];
-    }
   }
 
+  // iter 2
   if(!near_initial && !near_final) {
-    // iter 2-a
     for(int t=t_boundary_1; t<t_boundary_2;++t) {
-      swap(work,work_prev);
-      for(int y=0; y<NT+2; ++y) {
-        work[y][0] = kabe_x_in[t+NT/4][y][0];
-        work[y][1] = kabe_x_in[t+NT/4][y][1];
-      }
-      for(int x=0; x<NT+2; ++x) {
-        work[0][x] = kabe_y_in[t+NT/4][0][x];
-        work[1][x] = kabe_y_in[t+NT/4][1][x];
-      }
-
       for(int y=2; y<NT+2; ++y) {
         for(int x=2; x<NT+2; x+=4) {
 
           asm volatile("#central kernel");
           const v4df imm05 = {0.5, 0.5, 0.5, 0.5};
           const v4df imm0125 = {0.125, 0.125, 0.125, 0.125};
-          v4df *ret = (v4df*)&(work[y][x]);
-          v4df *o = (v4df*)&(work_prev[y-1][x-1] );
-          v4df *a = (v4df*)&(work_prev[y-2][x-1] );
-          v4df *b = (v4df*)&(work_prev[y][x-1]   );
-          v4df *c = (v4df*)&(work_prev[y-1][x-2] );
-          v4df *d = (v4df*)&(work_prev[y-1][x]   );
+          v4df *ret = (v4df*)&(work[t][y][x]);
+          v4df *o = (v4df*)&(work[t-1][y-1][x-1] );
+          v4df *a = (v4df*)&(work[t-1][y-2][x-1] );
+          v4df *b = (v4df*)&(work[t-1][y][x-1]   );
+          v4df *c = (v4df*)&(work[t-1][y-1][x-2] );
+          v4df *d = (v4df*)&(work[t-1][y-1][x]   );
 
           *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
         }
       }
-      for(int x=0; x<NT+2; ++x) {
-        kabe_y_out[t][0][x] = work[NT+0][x];
-        kabe_y_out[t][1][x] = work[NT+1][x];
-      }
-      for(int y=0; y<NT+2; ++y) {
-        kabe_x_out[t][y][0] = work[y][NT+0];
-        kabe_x_out[t][y][1] = work[y][NT+1];
-      }
-
     }
 
   } else {
-    // iter 2-b
     for(int t=t_boundary_1; t<t_boundary_2;++t) {
-      swap(work,work_prev);
-      for(int y=0; y<NT+2; ++y) {
-        work[y][0] = kabe_x_in[t+NT/4][y][0];
-        work[y][1] = kabe_x_in[t+NT/4][y][1];
-      }
-      for(int x=0; x<NT+2; ++x) {
-        work[0][x] = kabe_y_in[t+NT/4][0][x];
-        work[1][x] = kabe_y_in[t+NT/4][1][x];
-      }
-
       for(int y=2; y<NT+2; ++y) {
         for(int x=2; x<NT+2; ++x) {
           int t_k=t, y_k = y-t, x_k = x-t;
 
-          double ret=work[y][x];
+          double ret=work[t][y][x];
           if (near_initial &&t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           } else {
             asm volatile("#kernel");
-            ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
+            ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
           }
-          work[y][x] = ret;
+          work[t][y][x] = ret;
           if (t_k + t_orig == T_FINAL && near_final) {
             dens_final[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK] = ret;
           }
         }
       }
-      for(int x=0; x<NT+2; ++x) {
-        kabe_y_out[t][0][x] = work[NT+0][x];
-        kabe_y_out[t][1][x] = work[NT+1][x];
-      }
-      for(int y=0; y<NT+2; ++y) {
-        kabe_x_out[t][y][0] = work[y][NT+0];
-        kabe_x_out[t][y][1] = work[y][NT+1];
-      }
-
     }
   }
 
 
   // iter 3
   for(int t=t_boundary_2; t<NF+NT/2+2;++t) {
-    swap(work,work_prev);
-    for(int y=0; y<NT+2; ++y) {
-      work[y][0] = kabe_x_in[t+NT/4][y][0];
-      work[y][1] = kabe_x_in[t+NT/4][y][1];
-    }
-    for(int x=0; x<NT+2; ++x) {
-      work[0][x] = kabe_y_in[t+NT/4][0][x];
-      work[1][x] = kabe_y_in[t+NT/4][1][x];
-    }
-
     for(int y=2; y<NT+2; ++y) {
       for(int x=2; x<NT+2; ++x) {
         int t_k=t, y_k = y-t, x_k = x-t;
@@ -193,15 +132,15 @@ void pitch_kernel
         const bool in_region = t_dash >=0 && t_dash < NF+1;
 
         if (in_region) {
-          double ret=work[y][x];
+          double ret=work[t][y][x];
           if (near_initial && t_k + t_orig == 0) {
             ret = dens_initial[(y_k+y_orig) & Y_MASK][(x_k+x_orig) & X_MASK];
           } else {
             asm volatile("#kernel");
-            ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
+            ret = stencil_function(work[t-1][y-1][x-1],work[t-1][y-2][x-1],work[t-1][y][x-1],work[t-1][y-1][x-2],work[t-1][y-1][x]);
           }
 
-          work[y][x] = ret;
+          work[t][y][x] = ret;
 
           if (t_dash == NF && t >=NF+2) {
             yuka_out[0][y][x] = ret;
@@ -212,18 +151,19 @@ void pitch_kernel
         }
       }
     }
-    for(int x=0; x<NT+2; ++x) {
-      kabe_y_out[t][0][x] = work[NT+0][x];
-      kabe_y_out[t][1][x] = work[NT+1][x];
-    }
-    for(int y=0; y<NT+2; ++y) {
-      kabe_x_out[t][y][0] = work[y][NT+0];
-      kabe_x_out[t][y][1] = work[y][NT+1];
-    }
-
   }
 
 
+  for(int t=0; t<NF+NT/2+2;++t) {
+    for(int x=0; x<NT+2; ++x) {
+      kabe_y_out[t][0][x] = work[t][NT+0][x];
+      kabe_y_out[t][1][x] = work[t][NT+1][x];
+    }
+    for(int y=0; y<NT+2; ++y) {
+      kabe_x_out[t][y][0] = work[t][y][NT+0];
+      kabe_x_out[t][y][1] = work[t][y][NT+1];
+    }
+  }
 
 
 }
@@ -310,8 +250,8 @@ void proceed_thread(int xo) {
 
 void solve(){
 
-  sim_t_1=-1, sim_t_2=-1;
-  wct_1=-1, wct_2=-1;
+   sim_t_1=-1, sim_t_2=-1;
+   wct_1=-1, wct_2=-1;
 
 
   for (int yo=0;yo<NTO;yo++) {
@@ -333,14 +273,14 @@ void solve(){
     }
   }
 
-#pragma omp parallel
+  #pragma omp parallel
   {
     for (;;){
 
       //int nth = omp_get_num_threads();
       //int tid = omp_get_thread_num();
 
-#pragma omp for
+      #pragma omp for
       for(int xo2=0;xo2<NTO;xo2++) {
         int xo = xo2;
         if(thread_speed_flag[xo]>0) {
@@ -348,7 +288,7 @@ void solve(){
         }
       }
 
-#pragma omp barrier
+      #pragma omp barrier
 
       bool flag=true;
       for(int xo=0;xo<NTO;xo++) {

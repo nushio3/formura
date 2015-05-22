@@ -51,7 +51,7 @@ main = do
 smallExperiments :: [Experiment]
 smallExperiments =
   defaultExperiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = 256, nt = 64} :
-  defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHPar", nx = 256, nt = 64, nthre=16} :
+--   defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHPar", nx = 256, nt = 64, nthre=16} :
   defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = 256, nt = 0} :
   []
 
