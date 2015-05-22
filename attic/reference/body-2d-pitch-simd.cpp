@@ -23,8 +23,8 @@ double kabe_y[NTO][NTO][N_KABE][2][NT+2];
 double kabe_x[NTO][NTO][N_KABE][NT+2][2];
 
 typedef double work_t[NT+2][NT+2];
-static __thread work_t work_a_hontai;
-static __thread work_t work_b_hontai;
+typedef double work_slice_t[NT+2];
+static __thread work_t work_hontai[2];
 
 
 
@@ -38,9 +38,8 @@ void pitch_kernel
  double yuka_in[1][NT+2][NT+2], double kabe_y_in[N_KABE][2][NT+2], double kabe_x_in[N_KABE][NT+2][2],
  double yuka_out[1][NT+2][NT+2], double kabe_y_out[N_KABE][2][NT+2], double kabe_x_out[N_KABE][NT+2][2])
 {
-  work_t &work = work_a_hontai;
-  work_t &work_prev = work_b_hontai;
-
+  work_slice_t *work = work_hontai[0];
+  work_slice_t *work_prev = work_hontai[1];
 
   // iter 1
   const int t_boundary_1 = NT/2+2;
