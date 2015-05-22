@@ -66,7 +66,7 @@ testExperiments =
 
 allExperiments :: [Experiment]
 allExperiments = sort $ nub $ do
-  nx0 <- [2^n | n <- [12]]
+  nx0 <- [2^n | n <- [4..12]]
   nt0 <- [2^n | n <- [3..8]]
   nthre0 <- [1,2,4,8,16,32]
   guard (nx0 > nt0)
@@ -76,7 +76,7 @@ allExperiments = sort $ nub $ do
                        nice= 1} :
     defaultExperiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
     defaultExperiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = nx0, nt = nt0} :
-    defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHPar",
+    defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHDB",
                        nx = nx0, nt = nt0, nthre=nthre0, nice = -1-1e-10*fromIntegral nt0} :
     []
 
