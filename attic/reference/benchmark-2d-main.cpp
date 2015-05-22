@@ -105,7 +105,10 @@ int main (int argc, char** argv)
       cerr << t2 << " " << t1 << endl;
       if (time_iteration_scaling==1) leave_dump();
       if(t2-t1>0.1) {
-        if(t2-t1<10)time_iteration_scaling *= 3;
+        if(t2-t1<10)
+          time_iteration_scaling *= 3;
+        else
+          time_iteration_scaling *= 2;
         break;
       }
     }
