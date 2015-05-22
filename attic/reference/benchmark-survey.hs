@@ -3,7 +3,7 @@
 
 import Control.Monad
 import Data.Char
-import Data.List (nub, isInfixOf, intercalate)
+import Data.List (nub, isInfixOf, intercalate,sort)
 import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -20,7 +20,8 @@ replaceIf p x xs = map (\y -> if p y then x else y) xs
 
 data Experiment =
   Experiment
-  { bodyFileName :: FilePath
+  { nice :: Double
+  , bodyFileName :: FilePath
   , algorithmName :: String
   , nx :: Int
   , nt :: Int
@@ -33,7 +34,7 @@ data Experiment =
 
 defaultExperiment =
   Experiment
-  {bodyFileName = "/dev/null/null.cpp", algorithmName = "", nx = 256, nt = 64, nthre=1}
+  {bodyFileName = "/dev/null/null.cpp", algorithmName = "", nx = 256, nt = 64, nthre=1, nice=0}
 
 main :: IO ()
 main = do
@@ -64,18 +65,19 @@ testExperiments =
 
 
 allExperiments :: [Experiment]
-allExperiments = nub $ do
-  nx0 <- [2^n | n <- [4..12]]
+allExperiments = sort $ nub $ do
+  nx0 <- [2^n | n <- [12]]
   nt0 <- [2^n | n <- [3..8]]
   nthre0 <- [1,2,4,8,16,32]
   guard (nx0 > nt0)
   guard (nx0 `div` nt0 >= nthre0)
   id $
---    defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0} :
+    defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = nx0, nt = 0,
+                       nice= 1} :
     defaultExperiment {bodyFileName = "body-2d-pitch.cpp", algorithmName = "PiTCH", nx = nx0, nt = nt0} :
     defaultExperiment {bodyFileName = "body-2d-pitch-opt.cpp", algorithmName = "PiTCHOpt", nx = nx0, nt = nt0} :
     defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHPar",
-                       nx = nx0, nt = nt0, nthre=nthre0} :
+                       nx = nx0, nt = nt0, nthre=nthre0, nice = -1-1e-10*fromIntegral nt0} :
     []
 
 

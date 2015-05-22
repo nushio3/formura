@@ -104,10 +104,12 @@ int main (int argc, char** argv)
       double t2 = second();
       cerr << t2 << " " << t1 << endl;
       if (time_iteration_scaling==1) leave_dump();
-      if(t2-t1>0.1) break;
+      if(t2-t1>0.1) {
+        if(t2-t1<10)time_iteration_scaling *= 3;
+        break;
+      }
     }
   }
-  time_iteration_scaling *= 3;
   cerr << "scale: " << time_iteration_scaling << endl;
 
   string benchmark_fn = string("") +
