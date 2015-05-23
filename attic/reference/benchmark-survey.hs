@@ -66,8 +66,8 @@ testExperiments =
 
 allExperiments :: [Experiment]
 allExperiments = sort $ nub $ do
-  nx0 <- [2^n | n <- [4..12]]
-  nt0 <- [2^n | n <- [3..8]]
+  nx0 <- [2^n | n <- [11..12]]
+  nt0 <- [2^n | n <- [4..8]]
   nthre0 <- [1,2,4,8,16,32]
   guard (nx0 > nt0)
   guard (nx0 `div` nt0 >= nthre0)
