@@ -103,8 +103,8 @@ void pitch_kernel
         work[1][x] = kabe_y_in[t+NT/4][1][x];
       }
 
-      for(int y=2; y<NT+2; y+=4) {
-        for(int x=2; x<NT+2; x+=4) {
+      for(int y=2; y<NT+2; y+=1) {
+        for(int x=2; x<NT+2; x+=16) {
 
           asm volatile("#central kernel begin");
           const v4df imm05 = {0.5, 0.5, 0.5, 0.5};
@@ -119,21 +119,39 @@ void pitch_kernel
 	    d = (v4df*)&(work_prev[y-1][x]   );
 	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
 	  }
-	  /*
 	  {
 	    const int shyft=4;
-	    v4df *ret, *o, *a, *b, *c, *d;
 	    ret = (v4df*)&(work[y][shyft+x]);
 	    o = (v4df*)&(work_prev[y-1][shyft+x-1] );
 	    a = (v4df*)&(work_prev[y-2][shyft+x-1] );
 	    b = (v4df*)&(work_prev[y][shyft+x-1]   );
 	    c = (v4df*)&(work_prev[y-1][shyft+x-2] );
 	    d = (v4df*)&(work_prev[y-1][shyft+x]   );
-	  *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-	  }*/
-
+	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
+	  }
 	  {
-	    const int shyft=2;
+	    const int shyft=8;
+	    ret = (v4df*)&(work[y][shyft+x]);
+	    o = (v4df*)&(work_prev[y-1][shyft+x-1] );
+	    a = (v4df*)&(work_prev[y-2][shyft+x-1] );
+	    b = (v4df*)&(work_prev[y][shyft+x-1]   );
+	    c = (v4df*)&(work_prev[y-1][shyft+x-2] );
+	    d = (v4df*)&(work_prev[y-1][shyft+x]   );
+	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
+	  }
+	  {
+	    const int shyft=12;
+	    ret = (v4df*)&(work[y][shyft+x]);
+	    o = (v4df*)&(work_prev[y-1][shyft+x-1] );
+	    a = (v4df*)&(work_prev[y-2][shyft+x-1] );
+	    b = (v4df*)&(work_prev[y][shyft+x-1]   );
+	    c = (v4df*)&(work_prev[y-1][shyft+x-2] );
+	    d = (v4df*)&(work_prev[y-1][shyft+x]   );
+	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
+	  }
+	  /*
+	  {
+	    const int shyft=1;
 	    ret = (v4df*)&(work[y+shyft][x]);
 	    o = (v4df*)&(work_prev[y-1+shyft][x-1] );
 	    a = (v4df*)&(work_prev[y-2+shyft][x-1] );
@@ -159,7 +177,7 @@ void pitch_kernel
 	    c = (v4df*)&(work_prev[y-1+shyft][x-2] );
 	    d = (v4df*)&(work_prev[y-1+shyft][x]   );
 	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-          }
+	    }*/
 
           asm volatile("#central kernel end");
         }
