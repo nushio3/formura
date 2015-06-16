@@ -80,7 +80,7 @@ int benchmark_self_reported_delta_t;
 
 #include "body-2d-fujitsu.cpp"
 
-bool debug_mode = false;
+bool debug_mode = true;
 
 int time_iteration_scaling;
 
