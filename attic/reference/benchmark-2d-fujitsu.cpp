@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cassert>
 #include <climits>
+#include <fjcoll.h>
 #include <cstdlib>
 #include <sys/time.h>
 #include <iostream>
@@ -8,6 +9,8 @@
 #include <cstdlib>
 #include <sstream>
 #include <omp.h>
+
+
 
 
 using namespace std;
@@ -138,7 +141,10 @@ int main (int argc, char** argv)
       "\tNX: " << NX << "\t"  ;
     T_FINAL = NX*time_iteration_scaling;
     initialize();
+
+    start_collection("PiTCH_solver");
     solve();
+    stop_collection("PiTCH_solver");
     double n_flop=6.0*NX*NX*double(benchmark_self_reported_delta_t);
     double wct = benchmark_self_reported_wct;
     msg << n_flop << " flop\t" << wct << " second\t" ;
