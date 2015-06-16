@@ -96,7 +96,7 @@ void leave_dump () {
 int main (int argc, char** argv)
 {
   if (debug_mode) {
-    time_iteration_scaling = 1;
+    time_iteration_scaling = 3;
   } else {
     cerr << "calibrating..." << endl;
     for(time_iteration_scaling=1;;time_iteration_scaling*=2){
@@ -119,7 +119,7 @@ int main (int argc, char** argv)
   cerr << "scale: " << time_iteration_scaling << endl;
 
   string benchmark_fn = string("") +
-    "result/" +
+    "result-" +
     (argc>1 ? argv[1] : "") +
     "-benchmark.txt";
 
@@ -142,9 +142,8 @@ int main (int argc, char** argv)
     T_FINAL = NX*time_iteration_scaling;
     initialize();
 
-    start_collection("PiTCH_solver");
     solve();
-    stop_collection("PiTCH_solver");
+
     double n_flop=6.0*NX*NX*double(benchmark_self_reported_delta_t);
     double wct = benchmark_self_reported_wct;
     msg << n_flop << " flop\t" << wct << " second\t" ;
