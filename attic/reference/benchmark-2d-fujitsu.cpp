@@ -15,7 +15,7 @@
 
 using namespace std;
 
-const int NX=1024;
+const int NX=4096;
 const int NY=NX;
 int T_FINAL;
 
