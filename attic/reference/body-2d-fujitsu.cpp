@@ -2,8 +2,6 @@
 #include <algorithm>
 string algorithm_tag_str = "PiTCH-SIMD";
 
-typedef double v4df __attribute__((vector_size(32)));
-
 const int NT = 32;
 const int NTO = NX/NT;
 const int NF = NX/4;
@@ -329,9 +327,11 @@ void solve(){
         }
       }
 
+      bool flag;
+      
 #pragma omp barrier
+      flag=true;
 
-      bool flag=true;
       for(int xo=0;xo<NTO;xo++) {
         if(thread_speed_flag[xo]>0) flag=false;
       }
