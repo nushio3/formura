@@ -50,6 +50,7 @@ main = do
 
 smallExperiments :: [Experiment]
 smallExperiments =
+  defaultExperiment {bodyFileName = "body-2d-notb.cpp", algorithmName = "NoTB", nx = 64, nt = 0} :
   defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHNU", nx = 256, nt = 64, nthre=16} :
   defaultExperiment {bodyFileName = "body-2d-pitch-simd.cpp", algorithmName = "PiTCHNU", nx = 4096, nt = 64, nthre=32} :
   []
@@ -124,8 +125,10 @@ doExperiment really xp = do
   system "rm gen/bench.out"
   mapM_ putStrLn compileCommands
   mapM_ system compileCommands
+  let systemStr =  "OMP_NUM_THREADS=" ++ (show $ nthre xp) ++ " gen/bench.out " ++ cpustr
+  putStrLn systemStr
   when really $ do
-    system $ "OMP_NUM_THREADS=" ++ (show $ nthre xp) ++ " gen/bench.out " ++ cpustr
+    system systemStr
     return ()
   return ()
 
