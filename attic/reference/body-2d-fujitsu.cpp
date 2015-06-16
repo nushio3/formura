@@ -1,8 +1,9 @@
 #include <omp.h>
 #include <algorithm>
+#include "mxintrin.h"
 string algorithm_tag_str = "PiTCH-SIMD";
 
-const int NT = 32;
+const int NT = 64;
 const int NTO = NX/NT;
 const int NF = NX/4;
 
@@ -105,10 +106,19 @@ void pitch_kernel
         for(int x=2; x<NT+2; ++x) {
 
           asm volatile("#central kernel begin");
+	  
+	  const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);
+	  const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);
+	  const __m256d o = _fjsp_load_v4r8(&(work_prev[y-1][x-1]));
+	  const __m256d a = _fjsp_load_v4r8(&(work_prev[y-2][x-1] ));
+	  const __m256d b = _fjsp_load_v4r8(&(work_prev[y][x-1] )); 
+	  const __m256d c = _fjsp_load_v4r8(&(work_prev[y-1][x-2] ));  
+	  const __m256d d = _fjsp_load_v4r8(&(work_prev[y-1][x] ));
+	  	  
+	  const __m256d sum = _fjsp_add_v4r8(_fjsp_add_v4r8(a,b),_fjsp_add_v4r8(c,d));
+	  const __m256d ret = _fjsp_madd_v4r8(imm05, o, _fjsp_mul_v4r8(imm0125,sum));
 
-	  double ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
-          work[y][x] = ret;
-
+          _fjsp_store_v4r8(&(work[y][x]), ret);
 
           asm volatile("#central kernel end");
         }
