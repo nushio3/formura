@@ -312,6 +312,9 @@ void solve(){
     }
   }
 
+
+  start_collection("PiTCH_solver");
+
 #pragma omp parallel
   {
     for (;;){
@@ -339,6 +342,7 @@ void solve(){
 
     }
   }
+  stop_collection("PiTCH_solver");
 
 
   assert( sim_t_1 != -1 && sim_t_2 != -1 &&
