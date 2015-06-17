@@ -3,7 +3,7 @@
 #include "mxintrin.h"
 string algorithm_tag_str = "PiTCH-SIMD";
 
-const int NT = 64;
+const int NT = 32;
 const int NTO = NX/NT;
 const int NF = NX/4;
 
@@ -102,27 +102,40 @@ void pitch_kernel
         work[1][x] = kabe_y_in[t+NT/4][1][x];
       }
 
+#define dojob(x) {							\
+	o = _fjsp_load_v4r8(&(work_prev[y-1][x-1]));			\
+	a = _fjsp_load_v4r8(&(work_prev[y-2][x-1] ));			\
+	b = _fjsp_load_v4r8(&(work_prev[y][x-1] ));			\
+	c = _fjsp_load_v4r8(&(work_prev[y-1][x-2] ));			\
+	d = _fjsp_load_v4r8(&(work_prev[y-1][x] ));			\
+									\
+	const __m256d sum = _fjsp_add_v4r8(_fjsp_add_v4r8(a,b),_fjsp_add_v4r8(c,d)); \
+	const __m256d ret = _fjsp_madd_v4r8(imm05, o, _fjsp_mul_v4r8(imm0125,sum)); \
+									\
+	_fjsp_store_v4r8(&(work[y][x]), ret);				\
+      } 
+
       for(int y=2; y<NT+2; ++y) {
-        for(int x=2; x<NT+2; ++x) {
+        //for(int x=2; x<NT+2; x+=4) {
+	  asm volatile("#central kernel begin");
+      
+	  const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);		
+	  const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);	
+	  __m256d o,a,b,c,d;
+	  // double ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
+          // work[y][x] = ret; 
 
-          asm volatile("#central kernel begin");
-	  
-	  const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);
-	  const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);
-	  const __m256d o = _fjsp_load_v4r8(&(work_prev[y-1][x-1]));
-	  const __m256d a = _fjsp_load_v4r8(&(work_prev[y-2][x-1] ));
-	  const __m256d b = _fjsp_load_v4r8(&(work_prev[y][x-1] )); 
-	  const __m256d c = _fjsp_load_v4r8(&(work_prev[y-1][x-2] ));  
-	  const __m256d d = _fjsp_load_v4r8(&(work_prev[y-1][x] ));
-	  	  
-	  const __m256d sum = _fjsp_add_v4r8(_fjsp_add_v4r8(a,b),_fjsp_add_v4r8(c,d));
-	  const __m256d ret = _fjsp_madd_v4r8(imm05, o, _fjsp_mul_v4r8(imm0125,sum));
+	  //dojob(x);
 
-          _fjsp_store_v4r8(&(work[y][x]), ret);
 
-          asm volatile("#central kernel end");
-        }
+	  dojob( 2); dojob( 6); dojob(10); dojob(14); dojob(18); dojob(22); dojob(26); dojob(30);
+	  //dojob(34); dojob(38); dojob(42); dojob(46); dojob(50); dojob(54); dojob(58); dojob(62); 
+
+
+	  asm volatile("#central kernel end");
+	  //}
       }
+
       for(int x=0; x<NT+2; ++x) {
         kabe_y_out[t][0][x] = work[NT+0][x];
         kabe_y_out[t][1][x] = work[NT+1][x];
@@ -299,6 +312,9 @@ void proceed_thread(int xo) {
 
 void solve(){
 
+  _fjsp_simd_mode_4();
+  cerr << "enter simd4 mode" <<endl;
+
   sim_t_1=-1, sim_t_2=-1;
   wct_1=-1, wct_2=-1;
 
@@ -322,7 +338,7 @@ void solve(){
     }
   }
 
-
+  cerr << "start bench" <<endl;
   start_collection("PiTCH_solver");
 
 #pragma omp parallel
@@ -360,5 +376,7 @@ void solve(){
 
   benchmark_self_reported_wct = wct_2 - wct_1;
   benchmark_self_reported_delta_t = sim_t_2 - sim_t_1;
+  cerr << "exit simd4 mode" <<endl;
+  _fjsp_simd_mode_2();
 
 }
