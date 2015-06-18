@@ -116,24 +116,25 @@ void pitch_kernel
       } 
 
       for(int y=2; y<NT+2; ++y) {
-        //for(int x=2; x<NT+2; x+=4) {
+#pragma loop unroll full
+#pragma loop noalias
+#pragma loop simd
+        for(int x=2; x<NT+2; x+=4) {
 	  asm volatile("#central kernel begin");
       
-	  const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);		
-	  const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);	
-	  __m256d o,a,b,c,d;
-	  // double ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
-          // work[y][x] = ret; 
+	  // const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);		
+	  // const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);	
+	  // __m256d o,a,b,c,d;
+	  double ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
+	  work[y][x] = ret; 
 
 	  //dojob(x);
-
-
-	  dojob( 2); dojob( 6); dojob(10); dojob(14); dojob(18); dojob(22); dojob(26); dojob(30);
+	  //dojob( 2); dojob( 6); dojob(10); dojob(14); dojob(18); dojob(22); dojob(26); dojob(30);
 	  //dojob(34); dojob(38); dojob(42); dojob(46); dojob(50); dojob(54); dojob(58); dojob(62); 
 
 
 	  asm volatile("#central kernel end");
-	  //}
+	}
       }
 
       for(int x=0; x<NT+2; ++x) {
