@@ -21,7 +21,6 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
 
-
 The code of parser and pretty-printer for Formura is based on codes of
 `syntax`, `semi-iso` and their derived packages by Paweł Nowak under following license.
 
