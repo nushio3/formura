@@ -1,5 +1,5 @@
 // compile with
-// FCCpx -Kfast,openmp,simd,parallel benchmark-2d-fujitsu.cpp -Koptmsg=2 -Nlst_out=log -S -o benchmark-2d-fujitsu.s
+// FCCpx -Kfast,openmp,simd,parallel,ocl benchmark-2d-fujitsu.cpp -Koptmsg=2 -Nlst_out=log -S -o benchmark-2d-fujitsu.s
 
 
 #include <algorithm>
