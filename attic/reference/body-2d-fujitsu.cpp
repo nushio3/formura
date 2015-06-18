@@ -116,9 +116,9 @@ void pitch_kernel
       } 
 
       for(int y=2; y<NT+2; ++y) {
-#pragma loop unroll full
 #pragma loop noalias
 #pragma loop simd
+#pragma loop unroll full
         for(int x=2; x<NT+2; x+=4) {
 	  asm volatile("#central kernel begin");
       
