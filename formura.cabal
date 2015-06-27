@@ -23,6 +23,7 @@ source-repository head
 
 library
   exposed-modules:
+    Language.IR.Node
     Language.Formura.AST
     Language.Formura.Core
     Language.Formura.Parser
@@ -37,6 +38,7 @@ library
               , bifunctors
               , bytestring
               , containers
+              , hoopl
               , lens
               , parsers
               , scientific
