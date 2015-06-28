@@ -23,7 +23,7 @@ source-repository head
 
 library
   exposed-modules:
-    Language.IR.Node
+    Language.IR.Frontend
     Language.Formura.AST
     Language.Formura.Core
     Language.Formura.Parser
