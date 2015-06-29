@@ -23,6 +23,7 @@ source-repository head
 
 library
   exposed-modules:
+                  Language.IR.Back2Code
                   Language.IR.Backend
                   Language.IR.Front2Back
                   Language.IR.Frontend
@@ -43,6 +44,7 @@ library
               , hoopl
               , lens
               , parsers
+              , process
               , scientific
               , split
               , text

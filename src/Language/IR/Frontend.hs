@@ -34,7 +34,7 @@ data RExpr
   deriving (Eq, Show)
 
 
-data Proc = Proc { name :: String, body :: Graph (Insn ()) C C }
+data Function = Function { name :: String, body :: Graph (Insn ()) C C }
 
 data Insn a e x where
   Entry   :: a -> [VarDecl]              -> Insn a C O
