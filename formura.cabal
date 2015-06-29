@@ -23,12 +23,14 @@ source-repository head
 
 library
   exposed-modules:
-    Language.IR.Frontend
-    Language.Formura.AST
-    Language.Formura.Core
-    Language.Formura.Parser
-    Language.Formura.Enforest
-    Language.Formura.Tree
+                  Language.IR.Backend
+                  Language.IR.Front2Back
+                  Language.IR.Frontend
+                  Language.Formura.AST
+                  Language.Formura.Core
+                  Language.Formura.Parser
+                  Language.Formura.Enforest
+                  Language.Formura.Tree
 
   -- other-modules:
   -- other-extensions:
