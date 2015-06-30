@@ -8,18 +8,32 @@ import Control.Lens
 
 import Language.IR.Frontend
   (VarName, Uniop, Binop, Triop, onlyOneLabel)
+import qualified Language.IR.Frontend as F
 
 type Offset = [Int]
 data VarDecl = VarDecl {varType :: String, varHalo :: (Offset,Offset), varName :: String}
            deriving (Eq, Show)
 
 data Expr = Lit Rational
-          | Load VarName
-          | Shift Offset Expr
+          | Load VarName Offset
           | Uniop Uniop Expr
           | Binop Binop Expr Expr
           | Triop Triop Expr Expr Expr
                    deriving (Eq, Show)
+
+instance Num Expr where
+  a+b = Binop F.Add a b
+  a-b = Binop F.Sub a b
+  a*b = Binop F.Mul a b
+  negate = Uniop F.Neg
+  fromInteger = Lit . fromInteger
+  abs = error "no abs for Expr"
+  signum = error "no signum for Expr"
+
+instance Fractional Expr where
+  a/b = Binop F.Div a b
+  fromRational = Lit
+
 
 data RExpr = RLoad VarName
   deriving (Eq, Show)

@@ -15,7 +15,7 @@ data VarDecl = VarDecl {varType :: String, varOffset :: Offset, varName :: Strin
 
 data Uniop = Neg
                    deriving (Eq, Show)
-data Binop = Add | Mul
+data Binop = Add | Mul | Sub | Div
                    deriving (Eq, Show)
 data Triop = FMA
                    deriving (Eq, Show)
