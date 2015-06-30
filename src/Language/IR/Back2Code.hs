@@ -6,3 +6,4 @@ import System.Process
 generate :: FilePath -> Function -> IO ()
 generate dirName func = do
   system $ "mkdir -p " ++ dirName
+  return ()

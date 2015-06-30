@@ -52,13 +52,13 @@ library
 
   hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:         -O2 -Wall
+  ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
 
 
 executable test-parser
   hs-source-dirs: exe-src
   main-is: test-parser.hs
-  ghc-options:         -O2 -Wall
+  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
   build-depends:
      base >=4.7 && <4.8
      , ansi-wl-pprint
@@ -71,3 +71,13 @@ executable test-parser
      ,text
      ,trifecta
      ,vector
+
+
+executable test-generator
+  hs-source-dirs: exe-src
+  main-is: test-generator.hs
+  ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
+  build-depends:
+                base >=4.7 && <4.8
+              , formura
+              , hoopl

@@ -24,7 +24,10 @@ data Expr = Lit Rational
 data RExpr = RLoad VarName
   deriving (Eq, Show)
 
-data Function = Function { name :: String, decls :: [VarDecl], body :: Graph (Insn ()) C C }
+data Function = Function { name :: String,
+                           entryDecls :: [VarDecl],
+                           middleDecls :: [VarDecl],
+                           body :: Graph (Insn ()) C C }
 
 data Insn a e x where
   Entry  :: a -> [VarName]              -> Insn a C O
