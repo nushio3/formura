@@ -12,16 +12,11 @@ prog1 = Function
     middleDecls = [VarDecl "double" ([0,-1],[0,1]) "dens_x"],
     body = graph1}
 
-graph1 :: Graph (Insn ()) C C
-graph1 = mkFirst (Entry () ["dens"])
-         <*> mkMiddles
-         [
-           Assign () (RLoad "dens_x") $ (1/3) * ((Load "dens" [-1,0]) + (Load "dens" [0,0]) + (Load "dens" [1,0]))
+graph1 :: Graph (Insn ()) O O
+graph1 =  mkMiddles
+         [ Assign () (RLoad "dens_x") $ (1/3) * ((Load "dens" [-1,0]) + (Load "dens" [0,0]) + (Load "dens" [1,0]))
+         , Assign () (RLoad "dens_next") $ (1/3) * ((Load "dens_x" [0,1]) + (Load "dens_x" [0,0]) + (Load "dens_x" [0,1]))
          ]
-         <*> mkLast (Return ()
-                     [
-                       (1/3) * ((Load "dens_x" [0,1]) + (Load "dens_x" [0,0]) + (Load "dens_x" [0,1]))
-                     ])
 
 main :: IO ()
 main = do
