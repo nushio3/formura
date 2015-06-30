@@ -36,16 +36,14 @@ library
   -- other-modules:
   -- other-extensions:
   build-depends:
-                base >=4.7 && <4.8
+                base == 4.*
               , ansi-wl-pprint
-              , bifunctors
               , bytestring
               , containers
-              , hoopl
+              , hoopl >= 3.10.1
               , lens
               , parsers
               , process
-              , scientific
               , split
               , text
               , trifecta
@@ -60,17 +58,15 @@ executable test-parser
   main-is: test-parser.hs
   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
   build-depends:
-     base >=4.7 && <4.8
-     , ansi-wl-pprint
-     ,bytestring
-     , containers
-     ,formura
-     ,lens
-     ,scientific
-     ,syntax
-     ,text
-     ,trifecta
-     ,vector
+                base == 4.*
+              , ansi-wl-pprint
+              , bytestring
+              , containers
+              , formura
+              , lens
+              , text
+              , trifecta
+              , vector
 
 
 executable test-generator
@@ -78,6 +74,6 @@ executable test-generator
   main-is: test-generator.hs
   ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
   build-depends:
-                base >=4.7 && <4.8
+                base == 4.*
               , formura
               , hoopl

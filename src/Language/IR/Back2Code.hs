@@ -16,4 +16,4 @@ class ToCode a where
 
 instance ToCode Expr where
   toCode (Lit x) = T.pack $ show (fromRational x :: Double)
-  toCode (Load var off) =
+  toCode (Load var off) = undefined
