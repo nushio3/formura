@@ -192,11 +192,11 @@ void pitch_kernel
 
       asm volatile("#central kernel begin");
 
-      for(int y=2; y<34; ++y) {
-#pragma loop unroll 32
+      for(int y=2; y<NT+2; ++y) {
+#pragma loop unroll 
 #pragma loop noalias
 #pragma loop simd
-        for(int x=2; x<34; ++x) {
+        for(int x=2; x<NT+2; ++x) {
 	  double ret = 0.5*work_prev[y-1][x-1]+0.125*
 	    (work_prev[y-2][x-1]+work_prev[y][x-1]+work_prev[y-1][x-2]+work_prev[y-1][x]);
 	  work[y][x] = ret; 
@@ -384,22 +384,25 @@ void solve(){
   sim_t_1=-1, sim_t_2=-1;
   wct_1=-1, wct_2=-1;
 
-
-  for (int yo=0;yo<NTO;yo++) {
-    for (int xo=0;xo<NTO;xo++) {
+#pragma omp for
+  for (int xo=0;xo<NTO;xo++) {
+    for (int yo=0;yo<NTO;yo++) {
       yuka     [yo][xo] = yuka_hontai     [yo][xo];
       yuka_next[yo][xo] = yuka_next_hontai[yo][xo];
     }
   }
 
+#pragma omp for
   for (int xo=0;xo<NTO;xo++) {
     thread_local_t[xo] = -NX;
     thread_local_yo[xo] = 0;
     thread_speed_flag[xo] = 1;
   }
 
+
   for(int yo=0;yo<NTO;yo++) {
-    for (int xo=0;xo<NTO-yo-1;xo++) {
+#pragma omp for
+  for (int xo=0;xo<NTO-yo-1;xo++) {
       proceed_thread(xo);
     }
   }
