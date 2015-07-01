@@ -19,7 +19,7 @@ main-2d-simd.out: body-2d-pitch-simd.cpp benchmark-2d-main.cpp
 
 
 benchmark-2d-fujitsu.out: benchmark-2d-fujitsu.cpp 
-	FCCpx -Kfast,parallel,ocl,optmsg=2  -Nsrc,sta,lst=t benchmark-2d-fujitsu.cpp  -S  -o benchmark-2d-fujitsu.s
+	FCCpx -Kfast,openmp,parallel,ocl,optmsg=2  -Nsrc,sta,lst=t benchmark-2d-fujitsu.cpp  -S  -o benchmark-2d-fujitsu.s
 	FCCpx -Kfast,openmp,parallel benchmark-2d-fujitsu.s -o benchmark-2d-fujitsu.out
 
 

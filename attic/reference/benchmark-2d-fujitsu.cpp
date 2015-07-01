@@ -22,7 +22,6 @@ int T_FINAL;
 
 const int X_MASK = NX-1, Y_MASK=NY-1;
 
-
 double dens_initial[NX][NX];
 double dens_final[NX][NX];
 
@@ -426,7 +425,7 @@ void solve(){
       }
 
       bool flag;
-      
+
 #pragma omp barrier
       flag=true;
 

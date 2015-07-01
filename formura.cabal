@@ -23,45 +23,58 @@ source-repository head
 
 library
   exposed-modules:
-    Language.Formura.AST
-    Language.Formura.Core
-    Language.Formura.Parser
-    Language.Formura.Enforest
-    Language.Formura.Tree
+                  Language.IR.Back2Code
+                  Language.IR.Backend
+                  Language.IR.Configuration
+                  Language.IR.Front2Back
+                  Language.IR.Frontend
+                  Language.Formura.AST
+                  Language.Formura.Core
+                  Language.Formura.Parser
+                  Language.Formura.Enforest
+                  Language.Formura.Tree
 
   -- other-modules:
   -- other-extensions:
   build-depends:
-                base >=4.7 && <4.8
+                base == 4.*
               , ansi-wl-pprint
-              , bifunctors
               , bytestring
               , containers
+              , hoopl >= 3.10.1
               , lens
               , parsers
-              , scientific
+              , process
               , split
               , text
               , trifecta
 
   hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:         -O2 -Wall
+  ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
 
 
 executable test-parser
   hs-source-dirs: exe-src
   main-is: test-parser.hs
-  ghc-options:         -O2 -Wall
+  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
   build-depends:
-     base >=4.7 && <4.8
-     , ansi-wl-pprint
-     ,bytestring
-     , containers
-     ,formura
-     ,lens
-     ,scientific
-     ,syntax
-     ,text
-     ,trifecta
-     ,vector
+                base == 4.*
+              , ansi-wl-pprint
+              , bytestring
+              , containers
+              , formura
+              , lens
+              , text
+              , trifecta
+              , vector
+
+
+executable test-generator
+  hs-source-dirs: exe-src
+  main-is: test-generator.hs
+  ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
+  build-depends:
+                base == 4.*
+              , formura
+              , hoopl
