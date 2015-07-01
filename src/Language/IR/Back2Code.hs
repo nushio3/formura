@@ -12,9 +12,14 @@ import Text.Printf
 
 generate :: FilePath -> Function -> IO ()
 generate dirName func = do
+  templ <- T.readFile "resource/template-2d-notb.cpp"
   system $ "mkdir -p " ++ dirName
-  T.writeFile (dirName ++ "/main.cpp") $ toCode func
-
+  let mainFn = dirName ++ "/main.cpp"
+  T.writeFile mainFn $
+    T.replace "//BUFFER UPDATES" (toCode func) $
+    T.replace "//BUFFER SWAPS" (swapCode func) $
+    templ
+  system $ "indent " ++ mainFn
   return ()
 
 class ToCode a where
@@ -43,3 +48,10 @@ offset2Code :: [Int] -> T.Text
 offset2Code is = T.pack $ printf "[j+%d][i+%d]" (is' !! 0) (is' !! 1)
   where
     is' = is ++ repeat 0
+
+
+swapCode :: Function -> T.Text
+swapCode func =
+  T.unlines $
+  map T.pack $
+  [printf "swap(%s, %s_next);" vn vn | v<-entryDecls func, let vn = varName v]
