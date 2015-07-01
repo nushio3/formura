@@ -1,11 +1,9 @@
 // compile with
 // FCCpx -Kfast,openmp,simd,parallel,ocl benchmark-2d-fujitsu.cpp -Koptmsg=2 -Nlst_out=log -S -o benchmark-2d-fujitsu.s
-
-
+#include <fjcoll.h>
 #include <algorithm>
 #include <cassert>
 #include <climits>
-#include <fjcoll.h>
 #include <cstdlib>
 #include <sys/time.h>
 #include <iostream>
@@ -13,7 +11,6 @@
 #include <cstdlib>
 #include <sstream>
 #include <omp.h>
-
 
 
 
@@ -88,7 +85,6 @@ int benchmark_self_reported_delta_t;
 
 #include <omp.h>
 #include <algorithm>
-#include "mxintrin.h"
 string algorithm_tag_str = "PiTCH-SIMD";
 
 const int NT = 32;
@@ -119,12 +115,15 @@ int sim_t_1=-1, sim_t_2=-1;
 double wct_1=-1, wct_2=-1;
 
 
-template <bool near_initial, bool near_final>
+// template <bool near_initial, bool near_final>
 void pitch_kernel
 (int t_orig, int y_orig, int x_orig,
  double yuka_in[1][NT+2][NT+2], double kabe_y_in[N_KABE][2][NT+2], double kabe_x_in[N_KABE][NT+2][2],
  double yuka_out[1][NT+2][NT+2], double kabe_y_out[N_KABE][2][NT+2], double kabe_x_out[N_KABE][NT+2][2])
 {
+  const bool near_initial=false,  near_final=false;
+
+
   work_slice_t *work = work_hontai[0];
   work_slice_t *work_prev = work_hontai[1];
 
@@ -190,18 +189,6 @@ void pitch_kernel
         work[1][x] = kabe_y_in[t+NT/4][1][x];
       }
 
-#define dojob(x) {							\
-	o = _fjsp_load_v4r8(&(work_prev[y-1][x-1]));			\
-	a = _fjsp_load_v4r8(&(work_prev[y-2][x-1] ));			\
-	b = _fjsp_load_v4r8(&(work_prev[y][x-1] ));			\
-	c = _fjsp_load_v4r8(&(work_prev[y-1][x-2] ));			\
-	d = _fjsp_load_v4r8(&(work_prev[y-1][x] ));			\
-									\
-	const __m256d sum = _fjsp_add_v4r8(_fjsp_add_v4r8(a,b),_fjsp_add_v4r8(c,d)); \
-	const __m256d ret = _fjsp_madd_v4r8(imm05, o, _fjsp_mul_v4r8(imm0125,sum)); \
-									\
-	_fjsp_store_v4r8(&(work[y][x]), ret);				\
-      } 
 
       asm volatile("#central kernel begin");
 
@@ -210,22 +197,9 @@ void pitch_kernel
 #pragma loop noalias
 #pragma loop simd
         for(int x=2; x<34; ++x) {
-      
-	  // const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);		
-	  // const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);	
-	  // __m256d o,a,b,c,d;
-	  //double ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
-
 	  double ret = 0.5*work_prev[y-1][x-1]+0.125*
 	    (work_prev[y-2][x-1]+work_prev[y][x-1]+work_prev[y-1][x-2]+work_prev[y-1][x]);
 	  work[y][x] = ret; 
-
-	  //dojob(x);
-	  //dojob( 2); dojob( 6); dojob(10); dojob(14); dojob(18); dojob(22); dojob(26); dojob(30);
-	  //dojob(34); dojob(38); dojob(42); dojob(46); dojob(50); dojob(54); dojob(58); dojob(62); 
-
-
-	  //asm volatile("#central kernel end");
 	}
       }
 
@@ -353,7 +327,7 @@ void proceed_thread(int xo) {
   int x_orig = -t_orig;
 
   if(near_initial && near_final) {
-    pitch_kernel<true, true>
+    pitch_kernel //<true, true>
       (t_orig+(dx+dy)/4,
        y_orig+(3*dy-dx)/4,
        x_orig+(3*dx-dy)/4,
@@ -361,7 +335,7 @@ void proceed_thread(int xo) {
        yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
 
   }else if(near_initial) {
-    pitch_kernel<true, false>
+    pitch_kernel //<true, false>
       (t_orig+(dx+dy)/4,
        y_orig+(3*dy-dx)/4,
        x_orig+(3*dx-dy)/4,
@@ -375,7 +349,7 @@ void proceed_thread(int xo) {
       wct_2 = second();
     }
     int dy = yo*NT, dx = xo*NT;
-    pitch_kernel<false, true >
+    pitch_kernel //<false, true >
       (t_orig+(dx+dy)/4,
        y_orig+(3*dy-dx)/4,
        x_orig+(3*dx-dy)/4,
@@ -383,7 +357,7 @@ void proceed_thread(int xo) {
        yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
   }else {
     int dy = yo*NT, dx = xo*NT;
-    pitch_kernel<false, false>
+    pitch_kernel //<false, false>
       (t_orig+(dx+dy)/4,
        y_orig+(3*dy-dx)/4,
        x_orig+(3*dx-dy)/4,
@@ -405,7 +379,6 @@ void proceed_thread(int xo) {
 
 void solve(){
 
-  _fjsp_simd_mode_4();
   cerr << "enter simd4 mode" <<endl;
 
   sim_t_1=-1, sim_t_2=-1;
@@ -470,7 +443,6 @@ void solve(){
   benchmark_self_reported_wct = wct_2 - wct_1;
   benchmark_self_reported_delta_t = sim_t_2 - sim_t_1;
   cerr << "exit simd4 mode" <<endl;
-  _fjsp_simd_mode_2();
 
 }
 
