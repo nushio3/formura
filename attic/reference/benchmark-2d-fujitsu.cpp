@@ -200,7 +200,7 @@ void pitch_kernel
 	const __m256d ret = _fjsp_madd_v4r8(imm05, o, _fjsp_mul_v4r8(imm0125,sum)); \
 									\
 	_fjsp_store_v4r8(&(work[y][x]), ret);				\
-      } 
+      }
 
       asm volatile("#central kernel begin");
 
@@ -209,23 +209,23 @@ void pitch_kernel
 #pragma loop noalias
 #pragma loop simd
         for(int x=2; x<34; ++x) {
-      
-	  // const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);		
-	  // const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);	
+
+	  // const __m256d imm05=_fjsp_set_v4r8(0.5,0.5,0.5,0.5);
+	  // const __m256d imm0125=_fjsp_set_v4r8(0.125,0.125,0.125,0.125);
 	  // __m256d o,a,b,c,d;
 	  //double ret = stencil_function(work_prev[y-1][x-1],work_prev[y-2][x-1],work_prev[y][x-1],work_prev[y-1][x-2],work_prev[y-1][x]);
 
-	  double ret = 0.5*work_prev[y-1][x-1]+0.125*
-	    (work_prev[y-2][x-1]+work_prev[y][x-1]+work_prev[y-1][x-2]+work_prev[y-1][x]);
-	  work[y][x] = ret; 
+          double ret = 0.5*work_prev[y-1][x-1]+0.125*
+            (work_prev[y-2][x-1]+work_prev[y][x-1]+work_prev[y-1][x-2]+work_prev[y-1][x]);
+          work[y][x] = ret;
 
 	  //dojob(x);
 	  //dojob( 2); dojob( 6); dojob(10); dojob(14); dojob(18); dojob(22); dojob(26); dojob(30);
-	  //dojob(34); dojob(38); dojob(42); dojob(46); dojob(50); dojob(54); dojob(58); dojob(62); 
+	  //dojob(34); dojob(38); dojob(42); dojob(46); dojob(50); dojob(54); dojob(58); dojob(62);
 
 
 	  //asm volatile("#central kernel end");
-	}
+        }
       }
 
       for(int x=0; x<NT+2; ++x) {
@@ -449,7 +449,7 @@ void solve(){
       }
 
       bool flag;
-      
+
 #pragma omp barrier
       flag=true;
 
