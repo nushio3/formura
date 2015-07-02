@@ -16,10 +16,12 @@ generate dirName func = do
   system $ "mkdir -p " ++ dirName
   let mainFn = dirName ++ "/main.cpp"
   T.writeFile mainFn $
+    T.replace "//POINTER DECLS" (ptrDeclCode func) $
+    T.replace "//BUFFER DECLS" (declCode func) $
     T.replace "//BUFFER UPDATES" (toCode func) $
     T.replace "//BUFFER SWAPS" (swapCode func) $
     templ
-  system $ "indent " ++ mainFn
+  system $ "indent -kr " ++ mainFn
   return ()
 
 class ToCode a where
@@ -55,3 +57,29 @@ swapCode func =
   T.unlines $
   map T.pack $
   [printf "swap(%s, %s_next);" vn vn | v<-entryDecls func, let vn = varName v]
+
+declCode :: Function -> T.Text
+declCode func =
+  T.unlines $
+  map T.pack $
+  [printf "%s %s[NX][NX];" vt vn
+  | v <- hontize (entryDecls func) ++ middleDecls func
+  , let vn = varName v, let vt = varType v]
+  where
+    hontize :: [VarDecl] -> [VarDecl]
+    hontize vs = concat
+      [ [v{varName = vn ++ "_hontai"}, v{varName = vn ++ "_next_hontai"}]
+      | v <- vs, let vn = varName v]
+
+ptrDeclCode :: Function -> T.Text
+ptrDeclCode func =
+  T.unlines $
+  map T.pack $
+  [printf "%s %s[NX];" vt vn
+  | v <- hontize (entryDecls func)
+  , let vn = varName v, let vt = varType v ++ "_plane_t *"]
+  where
+    hontize :: [VarDecl] -> [VarDecl]
+    hontize vs = concat
+      [ [v{varName = vn}, v{varName = vn ++ "_next"}]
+      | v <- vs, let vn = varName v]

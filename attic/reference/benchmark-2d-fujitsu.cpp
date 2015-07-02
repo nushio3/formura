@@ -192,13 +192,13 @@ void pitch_kernel
       asm volatile("#central kernel begin");
 
       for(int y=2; y<NT+2; ++y) {
-#pragma loop unroll 
+#pragma loop unroll
 #pragma loop noalias
 #pragma loop simd
         for(int x=2; x<NT+2; ++x) {
 	  double ret = 0.5*work_prev[y-1][x-1]+0.125*
 	    (work_prev[y-2][x-1]+work_prev[y][x-1]+work_prev[y-1][x-2]+work_prev[y-1][x]);
-	  work[y][x] = ret; 
+	  work[y][x] = ret;
 	}
       }
 
@@ -355,6 +355,7 @@ void proceed_thread(int xo) {
        yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
        yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
   }else {
+    start_collection("PiTCH_central");
     int dy = yo*NT, dx = xo*NT;
     pitch_kernel //<false, false>
       (t_orig+(dx+dy)/4,
@@ -362,6 +363,7 @@ void proceed_thread(int xo) {
        x_orig+(3*dx-dy)/4,
        yuka[yo][xo],kabe_y[yo][xo],kabe_x[yo][xo],
        yuka_next[yo][xo],kabe_y[(yo+1)%NTO][xo],kabe_x[yo][(xo+1)%NTO]);
+    stop_collection("PiTCH_central");
   }
   swap(yuka[yo][xo], yuka_next[yo][xo]);
 
