@@ -1,0 +1,6 @@
+flags: {}
+packages:
+- '.'
+extra-deps:
+  - hoopl-3.10.1.0
+resolver: lts-2.16

@@ -18,6 +18,9 @@ main-2d-simd.out: body-2d-pitch-simd.cpp benchmark-2d-main.cpp
 	g++ -O2 -Wall main-2d-simd.s  -fopenmp  -mcmodel=large  -o main-2d-simd.out
 
 
+benchmark-2d-fujitsu.out: benchmark-2d-fujitsu.cpp 
+	FCCpx -Kfast,openmp,parallel,ocl,optmsg=2  -Nsrc,sta,lst=t benchmark-2d-fujitsu.cpp  -S  -o benchmark-2d-fujitsu.s
+	FCCpx -Kfast,openmp,parallel benchmark-2d-fujitsu.s -o benchmark-2d-fujitsu.out
 
 
 main.out: main.cpp proceed-region.cpp params.h
