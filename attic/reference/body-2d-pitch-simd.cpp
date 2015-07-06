@@ -104,83 +104,18 @@ void pitch_kernel
       }
 
       for(int y=2; y<NT+2; y+=1) {
-        for(int x=2; x<NT+2; x+=16) {
 
-          asm volatile("#central kernel begin");
-          const v4df imm05 = {0.5, 0.5, 0.5, 0.5};
-          const v4df imm0125 = {0.125, 0.125, 0.125, 0.125};
-	  v4df *ret, *o, *a, *b, *c, *d;
-	  { 
-	    ret = (v4df*)&(work[y][x]);
-	    o = (v4df*)&(work_prev[y-1][x-1] );
-	    a = (v4df*)&(work_prev[y-2][x-1] );
-	    b = (v4df*)&(work_prev[y][x-1]   );
-	    c = (v4df*)&(work_prev[y-1][x-2] );
-	    d = (v4df*)&(work_prev[y-1][x]   );
-	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-	  }
-	  {
-	    const int shyft=4;
-	    ret = (v4df*)&(work[y][shyft+x]);
-	    o = (v4df*)&(work_prev[y-1][shyft+x-1] );
-	    a = (v4df*)&(work_prev[y-2][shyft+x-1] );
-	    b = (v4df*)&(work_prev[y][shyft+x-1]   );
-	    c = (v4df*)&(work_prev[y-1][shyft+x-2] );
-	    d = (v4df*)&(work_prev[y-1][shyft+x]   );
-	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-	  }
-	  {
-	    const int shyft=8;
-	    ret = (v4df*)&(work[y][shyft+x]);
-	    o = (v4df*)&(work_prev[y-1][shyft+x-1] );
-	    a = (v4df*)&(work_prev[y-2][shyft+x-1] );
-	    b = (v4df*)&(work_prev[y][shyft+x-1]   );
-	    c = (v4df*)&(work_prev[y-1][shyft+x-2] );
-	    d = (v4df*)&(work_prev[y-1][shyft+x]   );
-	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-	  }
-	  {
-	    const int shyft=12;
-	    ret = (v4df*)&(work[y][shyft+x]);
-	    o = (v4df*)&(work_prev[y-1][shyft+x-1] );
-	    a = (v4df*)&(work_prev[y-2][shyft+x-1] );
-	    b = (v4df*)&(work_prev[y][shyft+x-1]   );
-	    c = (v4df*)&(work_prev[y-1][shyft+x-2] );
-	    d = (v4df*)&(work_prev[y-1][shyft+x]   );
-	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-	  }
-	  /*
-	  {
-	    const int shyft=1;
-	    ret = (v4df*)&(work[y+shyft][x]);
-	    o = (v4df*)&(work_prev[y-1+shyft][x-1] );
-	    a = (v4df*)&(work_prev[y-2+shyft][x-1] );
-	    b = (v4df*)&(work_prev[y+shyft][x-1]   );
-	    c = (v4df*)&(work_prev[y-1+shyft][x-2] );
-	    d = (v4df*)&(work_prev[y-1+shyft][x]   );
-	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-          }{
-	    const int shyft=2;
-	    ret = (v4df*)&(work[y+shyft][x]);
-	    o = (v4df*)&(work_prev[y-1+shyft][x-1] );
-	    a = (v4df*)&(work_prev[y-2+shyft][x-1] );
-	    b = (v4df*)&(work_prev[y+shyft][x-1]   );
-	    c = (v4df*)&(work_prev[y-1+shyft][x-2] );
-	    d = (v4df*)&(work_prev[y-1+shyft][x]   );
-	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-          }{
-	    const int shyft=3;
-	    ret = (v4df*)&(work[y+shyft][x]);
-	    o = (v4df*)&(work_prev[y-1+shyft][x-1] );
-	    a = (v4df*)&(work_prev[y-2+shyft][x-1] );
-	    b = (v4df*)&(work_prev[y+shyft][x-1]   );
-	    c = (v4df*)&(work_prev[y-1+shyft][x-2] );
-	    d = (v4df*)&(work_prev[y-1+shyft][x]   );
-	    *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);
-	    }*/
+#define dojob(shiftx) {  ret = (v4df*)&(work[y][shiftx]);  o = (v4df*)&(work_prev[y-1][shiftx-1] );  a = (v4df*)&(work_prev[y-2][shiftx-1] );  b = (v4df*)&(work_prev[y][shiftx-1] );  c = (v4df*)&(work_prev[y-1][shiftx-2] );  d = (v4df*)&(work_prev[y-1][shiftx] );  *ret = imm05 * (*o) + imm0125 * (*a + *b + *c + *d);  } 
 
-          asm volatile("#central kernel end");
-        }
+
+	asm volatile("#central kernel begin");
+	const v4df imm05 = {0.5, 0.5, 0.5, 0.5};
+	const v4df imm0125 = {0.125, 0.125, 0.125, 0.125};
+	v4df *ret, *o, *a, *b, *c, *d;
+
+	dojob( 2); dojob( 6); dojob(10); dojob(14); dojob(18); dojob(22); dojob(26); dojob(30);
+	dojob(34); dojob(38); dojob(42); dojob(46); dojob(50); dojob(54); dojob(58); dojob(62); 
+	asm volatile("#central kernel end");
       }
       for(int x=0; x<NT+2; ++x) {
         kabe_y_out[t][0][x] = work[NT+0][x];
