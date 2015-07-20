@@ -24,6 +24,7 @@ source-repository head
 library
   exposed-modules:
                   Language.Formura.Parser
+                  Language.Formura.Parser.Combinator
                   Language.IR.Back2Code
                   Language.IR.Backend
                   Language.IR.Configuration

@@ -1,38 +1,19 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TemplateHaskell #-}
 module Language.Formura.Parser where
 
-import Control.Applicative
-import Control.Lens
-import Control.Monad
-import Data.Char
-import qualified Data.Map as M
-import Data.Ratio
-import Text.Trifecta as T
-import Text.Trifecta.Delta
-
-newtype P a = P {internalP :: T.Parser a}
-
-deriving instance Alternative P
-deriving instance Monad P
-deriving instance Functor P
-deriving instance MonadPlus P
-deriving instance Applicative P
-deriving instance CharParsing P
-deriving instance Parsing P
-deriving instance DeltaParsing P
-deriving instance Errable P
-deriving instance MarkParsing Delta P
+import Language.Formura.Parser.Combinator
 
 
--- | The compiler metadata that provides access to the source.
-newtype Metadata = Metadata {_metadataRendering :: Rendering}
-instance Show Metadata where
-  show = const ""
 
-makeLenses ''Metadata
+term :: P F.Expr
+term = litTerm <|> symTerm
+  where
+    litTerm = F.Lit <$> rational
+    symTerm = F.Load <$> symbolName
 
-instance HasRendering Metadata where
-  rendering = iso _metadataRendering Metadata
+expr :: P F.Expr
+expr = P.buildExpressionParser [] term
 
-metadata :: P Metadata
-metadata = fmap Metadata rend
+
+----------------------------------------------------------------
+-- Parser Utilities
+----------------------------------------------------------------
