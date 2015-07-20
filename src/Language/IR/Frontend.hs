@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, GADTs, StandaloneDeriving #-}
+{-# LANGUAGE FlexibleInstances, GADTs, StandaloneDeriving, TemplateHaskell #-}
 module Language.IR.Frontend where
 
 {- The IR just after the parse. -}
@@ -7,11 +7,12 @@ import Compiler.Hoopl
 import Control.Lens
 
 
-type VarName = String
+type SymbolName = String
 type Offset = [Rational]
 
-data VarDecl = VarDecl {varType :: String, varOffset :: Offset, varName :: String}
+data VarDecl = VarDecl { _varType :: String, _varOffset :: Offset, _varName :: SymbolName}
            deriving (Eq, Show)
+makeLenses ''VarDecl
 
 data Uniop = Neg
                    deriving (Eq, Show)
@@ -21,7 +22,7 @@ data Triop = FMA
                    deriving (Eq, Show)
 
 data Expr = Lit Rational
-          | Load VarName
+          | Load SymbolName
           | Shift Offset Expr
           | Uniop Uniop Expr
           | Binop Binop Expr Expr
@@ -29,30 +30,34 @@ data Expr = Lit Rational
                    deriving (Eq, Show)
 
 data RExpr
-  = RLoad VarName
+  = RLoad SymbolName
   | RShift Offset RExpr
   deriving (Eq, Show)
 
 
-data Function = Function { name :: String, body :: Graph (Insn ()) C C }
+data Function = Function { _functionName :: String,
+                           _entryVars :: [SymbolName],
+                           _exitVars :: [SymbolName],
+                           _functionBody :: Graph (Insn ()) C C }
 
 data Insn a e x where
-  Entry   :: a -> [VarDecl]              -> Insn a C O
+  Entry   :: a                           -> Insn a C O
   Declare :: a -> VarDecl                -> Insn a O O
   Assign  :: a -> RExpr -> Expr          -> Insn a O O
-  Return  :: a -> [Expr]                 -> Insn a O C
-deriving instance (Show r) =>  Show (Insn r e x)
+  Exit    :: a                           -> Insn a O C
+
+deriving instance (Show a) =>  Show (Insn a e x)
 
 attribute :: Lens (Insn a1 e x) (Insn a2 e x) a1 a2
-attribute f (Entry a1 vs) = fmap (\a2 -> Entry a2 vs) (f a1)
+attribute f (Entry a1 ) = fmap (\a2 -> Entry a2 ) (f a1)
 attribute f (Declare a1 v) = fmap (\a2 -> Declare a2 v) (f a1)
 attribute f (Assign a1 r e) = fmap (\a2 -> Assign a2 r e) (f a1)
-attribute f (Return a1 e) = fmap (\a2 -> Return a2 e) (f a1)
+attribute f (Exit a1 ) = fmap (\a2 -> Exit a2 ) (f a1)
 
 
 instance NonLocal (Insn a) where
-  entryLabel (Entry _ _) = onlyOneLabel
-  successors (Return _ _) = []
+  entryLabel (Entry _ ) = onlyOneLabel
+  successors (Exit _ ) = []
 
 type M = SimpleFuelMonad
 

@@ -7,15 +7,15 @@ import Compiler.Hoopl
 import Control.Lens
 
 import Language.IR.Frontend
-  (VarName, Uniop, Binop, Triop, onlyOneLabel)
+  (SymbolName, Uniop, Binop, Triop, onlyOneLabel)
 import qualified Language.IR.Frontend as F
 
 type Offset = [Int]
-data VarDecl = VarDecl {varType :: String, varHalo :: (Offset,Offset), varName :: String}
+data VarDecl = VarDecl {_varType :: String, _varHalo :: (Offset,Offset), _varName :: String}
            deriving (Eq, Show)
 
 data Expr = Lit Rational
-          | Load VarName Offset
+          | Load SymbolName Offset
           | Uniop Uniop Expr
           | Binop Binop Expr Expr
           | Triop Triop Expr Expr Expr
@@ -35,13 +35,13 @@ instance Fractional Expr where
   fromRational = Lit
 
 
-data RExpr = RLoad VarName
+data RExpr = RLoad SymbolName
   deriving (Eq, Show)
 
-data Function = Function { name :: String,
-                           entryDecls :: [VarDecl],
-                           middleDecls :: [VarDecl],
-                           body :: Graph (Insn ()) O O }
+data Function = Function { _name :: SymbolName,
+                           _entryDecls :: [VarDecl],
+                           _middleDecls :: [VarDecl],
+                           _body :: Graph (Insn ()) O O }
 
 data Insn a e x where
   Assign :: a -> RExpr -> Expr          -> Insn a O O

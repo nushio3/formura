@@ -44,7 +44,7 @@ instance ToCode (Insn () e x) where
   toCode (Assign () r e) = toCode r <> "=" <> toCode e <> ";\n"
 
 instance ToCode Function where
-  toCode func = foldGraphNodes (\n code -> code <> toCode n) (body func) ""
+  toCode func = foldGraphNodes (\n code -> code <> toCode n) (_body func) ""
 
 offset2Code :: [Int] -> T.Text
 offset2Code is = T.pack $ printf "[j+%d][i+%d]" (is' !! 0) (is' !! 1)
@@ -56,30 +56,30 @@ swapCode :: Function -> T.Text
 swapCode func =
   T.unlines $
   map T.pack $
-  [printf "swap(%s, %s_next);" vn vn | v<-entryDecls func, let vn = varName v]
+  [printf "swap(%s, %s_next);" vn vn | v<- _entryDecls func, let vn = _varName v]
 
 declCode :: Function -> T.Text
 declCode func =
   T.unlines $
   map T.pack $
   [printf "%s %s[NX][NX];" vt vn
-  | v <- hontize (entryDecls func) ++ middleDecls func
-  , let vn = varName v, let vt = varType v]
+  | v <- hontize (_entryDecls func) ++ _middleDecls func
+  , let vn = _varName v, let vt = _varType v]
   where
     hontize :: [VarDecl] -> [VarDecl]
     hontize vs = concat
-      [ [v{varName = vn ++ "_hontai"}, v{varName = vn ++ "_next_hontai"}]
-      | v <- vs, let vn = varName v]
+      [ [v{_varName = vn ++ "_hontai"}, v{_varName = vn ++ "_next_hontai"}]
+      | v <- vs, let vn = _varName v]
 
 ptrDeclCode :: Function -> T.Text
 ptrDeclCode func =
   T.unlines $
   map T.pack $
   [printf "%s %s[NX];" vt vn
-  | v <- hontize (entryDecls func)
-  , let vn = varName v, let vt = varType v ++ "_plane_t *"]
+  | v <- hontize (_entryDecls func)
+  , let vn = _varName v, let vt = _varType v ++ "_plane_t *"]
   where
     hontize :: [VarDecl] -> [VarDecl]
     hontize vs = concat
-      [ [v{varName = vn}, v{varName = vn ++ "_next"}]
-      | v <- vs, let vn = varName v]
+      [ [v{_varName = vn}, v{_varName = vn ++ "_next"}]
+      | v <- vs, let vn = _varName v]

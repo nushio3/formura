@@ -7,10 +7,10 @@ import Language.IR.Backend
 
 prog1 :: Function
 prog1 = Function
-  { name = "chino",
-    entryDecls = [VarDecl "double" ([-1,-1],[1,1]) "dens"],
-    middleDecls = [VarDecl "double" ([0,-1],[0,1]) "dens_x"],
-    body = graph1}
+  { _name = "chino",
+    _entryDecls = [VarDecl "double" ([-1,-1],[1,1]) "dens"],
+    _middleDecls = [VarDecl "double" ([0,-1],[0,1]) "dens_x"],
+    _body = graph1}
 
 graph1 :: Graph (Insn ()) O O
 graph1 =  mkMiddles

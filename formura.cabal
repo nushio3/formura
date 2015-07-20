@@ -23,22 +23,17 @@ source-repository head
 
 library
   exposed-modules:
-                  Language.IR.Back2Code
-                  Language.IR.Backend
-                  Language.IR.Configuration
-                  Language.IR.Front2Back
-                  Language.IR.Frontend
-                  Language.Formura.AST
-                  Language.Formura.Core
-                  Language.Formura.Parser
-                  Language.Formura.Enforest
-                  Language.Formura.Tree
+    Language.Formura.Syntax
+    Language.IR.Back2Code
+    Language.IR.Backend
+    Language.IR.Configuration
+    Language.IR.Front2Back
+    Language.IR.Frontend
 
   -- other-modules:
   -- other-extensions:
   build-depends:
                 base == 4.*
-              , ansi-wl-pprint
               , bytestring
               , containers
               , hoopl >= 3.10.1
@@ -55,6 +50,7 @@ library
 
 
 executable test-parser
+  buildable: False
   hs-source-dirs: exe-src
   main-is: test-parser.hs
   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind

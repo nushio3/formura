@@ -81,7 +81,8 @@ enforest Nothing (t@ListTerm{_termCar="()", _termCdr=cdr}:ts) stack =
                         let inner = enforest0 cdr
                         in enforest (Just inner) ts stack
 enforest Nothing (t@ListTerm{_termCar="function", _termCdr=cdr}:ts) stack =
-                                abortCompilerAt t "function parser not implemented" [] ["nushio to implement parser"]
+             let body = readProgram t
+             in Function
 
 
 

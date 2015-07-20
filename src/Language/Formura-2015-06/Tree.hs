@@ -14,6 +14,7 @@ data Tree
   | SymbolLeaf {_treeMetadata :: Metadata, _treeSymbol :: SymbolName}
   | Unary {_treeMetadata :: Metadata, _treeCar :: Tree, _treeRhs :: Tree}
   | Binary {_treeMetadata :: Metadata, _treeCar :: Tree, _treeLhs :: Tree, _treeRhs :: Tree}
+  | Function {_treeMetadata :: Metadata, _treeStmts :: [Tree]}
 makeLenses ''Tree
 
 instance Show Tree where
@@ -21,6 +22,7 @@ instance Show Tree where
   show (SymbolLeaf _ s) = s
   show (Unary _ o r) = printf "(%s %s)" (show o) (show r)
   show (Binary _ o l r) = printf "(%s %s %s)" (show o) (show l)  (show r)
+  show (Function _ s) = printf "function %s" (map show s)
 
 instance HasRendering Tree where
   rendering = treeMetadata . metadataRendering
