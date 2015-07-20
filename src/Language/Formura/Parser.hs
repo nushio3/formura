@@ -24,8 +24,6 @@ deriving instance Errable P
 deriving instance MarkParsing Delta P
 
 
-
-
 -- | The compiler metadata that provides access to the source.
 newtype Metadata = Metadata {_metadataRendering :: Rendering}
 instance Show Metadata where
@@ -157,11 +155,6 @@ termWithMeta meta =
   SymbolLiteral meta <$> identifierString
 
   where
-    {-
-    rationalFromInteger =
-      RationalLiteral meta . fromInteger <$> integer
-    rationalFromDouble =
-      RationalLiteral meta . toRational <$> double-}
     beginEndList = do
       try $ keywordAlpha "begin"
       str <- identifierString

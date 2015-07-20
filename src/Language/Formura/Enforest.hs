@@ -80,6 +80,10 @@ enforest Nothing (SymbolLiteral m x:ts) stack = enforest (Just $ SymbolLeaf m x)
 enforest Nothing (t@ListTerm{_termCar="()", _termCdr=cdr}:ts) stack =
                         let inner = enforest0 cdr
                         in enforest (Just inner) ts stack
+enforest Nothing (t@ListTerm{_termCar="function", _termCdr=cdr}:ts) stack =
+                                abortCompilerAt t "function parser not implemented" [] ["nushio to implement parser"]
+
+
 
 enforest (Just t) (t2@SymbolLiteral{_termSymbol = s}:ts) stack@((combine,prec):stackRest) | (isBinaryOp t2) =
                        let f rhs = Binary m (SymbolLeaf m s) t rhs
@@ -99,6 +103,8 @@ enforest (Just t) (t2@ListTerm{_termMetadata = m, _termCar="[]", _termCdr=cdr}:t
 enforest (Just t) ts ((f,_):rest) = enforest (Just $ f t) ts rest
 enforest t (t2:_) [] = abortCompilerAt t2 "unexpected redundant term" [] ["end of expression"]
 enforest Nothing (t2:_) _ = abortCompilerAt t2 "unexpected head term" [] ["end of expression"]
+
+
 
 
 
