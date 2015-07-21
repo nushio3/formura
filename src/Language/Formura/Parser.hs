@@ -73,13 +73,14 @@ function = do
     }
 
 
-functionBody :: Parser F.ClosedInsnGraph
+functionBody :: Parser F.FunctionBody
 functionBody = do
   stmts <- statement `sepEndBy` statementDelimiter
   let mids = H.mkMiddles stmts
-      g01 = H.mkFirst $ F.Entry ()
-      g99 = H.mkLast  $ F.Exit ()
-  return $ g01 H.<*> mids H.<*> g99
+  return mids
+--      g01 = H.mkFirst $ F.Entry ()
+--      g99 = H.mkLast  $ F.Exit ()
+--  return $ g01 H.<*> mids H.<*> g99
 
 statementDelimiter :: Parser ()
 statementDelimiter = (newline >> spaces >> return ()) <|>(keyword ";" >> return ())

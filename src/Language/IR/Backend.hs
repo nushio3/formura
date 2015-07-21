@@ -38,10 +38,10 @@ instance Fractional Expr where
 data RExpr = RLoad IdentName
   deriving (Eq, Show)
 
-data Function = Function { _name :: IdentName,
+data Function = Function { _functionName :: IdentName,
                            _entryDecls :: [VarDecl],
                            _middleDecls :: [VarDecl],
-                           _body :: Graph (Insn ()) O O }
+                           _functionBody :: Graph (Insn ()) O O }
 
 data Insn a e x where
   Assign :: a -> RExpr -> Expr          -> Insn a O O

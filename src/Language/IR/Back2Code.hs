@@ -44,7 +44,7 @@ instance ToCode (Insn () e x) where
   toCode (Assign () r e) = toCode r <> "=" <> toCode e <> ";\n"
 
 instance ToCode Function where
-  toCode func = foldGraphNodes (\n code -> code <> toCode n) (_body func) ""
+  toCode func = foldGraphNodes (\n code -> code <> toCode n) (_functionBody func) ""
 
 offset2Code :: [Int] -> T.Text
 offset2Code is = T.pack $ printf "[j+%d][i+%d]" (is' !! 0) (is' !! 1)
