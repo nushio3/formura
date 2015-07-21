@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, GADTs, StandaloneDeriving, TemplateHaskell,RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances, GADTs, RankNTypes, StandaloneDeriving, TemplateHaskell,RecordWildCards #-}
 module Language.IR.Frontend where
 
 {- The IR just after the parse. -}
@@ -41,8 +41,18 @@ data Function = Function { _functionName :: String,
                            _exitVars :: [IdentName],
                            _functionBody :: Graph (Insn ()) C C }
 instance Show Function where
-  show (Function{..}) = printf "begin function (%s) = %s(%s)"
-    (intercalate ", " _exitVars) _functionName (intercalate ", " _entryVars)
+  show (Function{..}) = let
+    beg = printf "begin function (%s) = %s(%s)"    (intercalate ", " _exitVars) _functionName (intercalate ", " _entryVars)
+    asgs = map (\(r,l) -> printf "  %s = %s" (show r) (show l)) (assignments _functionBody)
+      in unlines $ [beg] ++ asgs ++ ["end function"]
+
+
+assignments :: Graph (Insn ()) C C -> [(RExpr, Expr)]
+assignments g = reverse $ foldGraphNodes go g []
+  where
+    go :: forall e x. Insn () e x ->  [(RExpr, Expr)] ->  [(RExpr, Expr)]
+    go (Assign _ r l) xs = (r,l):xs
+    go _ xs = xs
 
 type ClosedInsnGraph = Graph (Insn ()) C C
 

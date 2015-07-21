@@ -2,6 +2,6 @@
 
 while :
 do
-    stack build
+    nice stack build
     inotifywait -e modify -r ./src/ ./exe-src/ formura.cabal
 done

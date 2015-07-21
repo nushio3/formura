@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 module Language.Formura.Parser where
 
+import qualified Compiler.Hoopl as H
 import           Control.Applicative
 import qualified Text.Parser.Expression as X
 import           Text.Trifecta hiding (Parser)
@@ -15,6 +16,24 @@ term = parens expr<|> litTerm <|> identTerm <?> "term"
   where
     litTerm = F.Lit <$> rational
     identTerm = F.Load <$> identifierName
+
+rExpr :: Parser F.RExpr
+rExpr = do
+  t <- identTerm
+  mo <- optional offset
+  case mo of
+   Just o -> return $ F.RShift o t
+   Nothing -> return t
+  where
+    identTerm = F.RLoad <$> identifierName
+
+statement :: Parser (F.Insn () H.O H.O)
+statement = do
+  rhs <- rExpr
+  keywordSymbol "="
+  lhs <- expr
+  return $ F.Assign () rhs lhs
+
 
 expr :: Parser F.Expr
 expr = X.buildExpressionParser exprTable term <?> "expression"
@@ -35,6 +54,8 @@ function = do
   funcName <- identifierName <?> "the function name"
   inArgs <- parens $ commaSep $ identifierName
 
+  optional statementDelimiter
+
   body <- functionBody
 
   keyword "end"
@@ -44,15 +65,20 @@ function = do
     { F._functionName = funcName
     , F._entryVars = inArgs
     , F._exitVars = outArgs
-    , F._functionBody = F.emptyGraph
+    , F._functionBody = body
     }
 
 
 functionBody :: Parser F.ClosedInsnGraph
-functionBody = sepEndBy spaces statementDelimiter >> return F.emptyGraph
+functionBody = do
+  stmts <- statement `sepEndBy` statementDelimiter
+  let mids = H.mkMiddles stmts
+      g01 = H.mkFirst $ F.Entry ()
+      g99 = H.mkLast  $ F.Exit ()
+  return $ g01 H.<*> mids H.<*> g99
 
 statementDelimiter :: Parser ()
-statementDelimiter = (newline >> return ()) <|>(keyword ";" >> return ())
+statementDelimiter = (newline >> spaces >> return ()) <|>(keyword ";" >> return ())
 
 
 exprTable :: [[X.Operator Parser F.Expr]]
