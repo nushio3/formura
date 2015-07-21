@@ -1,16 +1,16 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TemplateHaskell #-}
 
+module Language.Formura.Parser.Combinator where
+
 import Control.Applicative
 import Control.Lens
 import Control.Monad
 import Data.Char
 import qualified Data.Map as M
 import Data.Ratio
-import Text.Trifecta as Trifecta
-import Text.Parser.Expression as P
-import Text.Trifecta.Delta
-
-import qualified Language.IR.Frontend as F
+import qualified Text.Trifecta as Trifecta
+import           Text.Trifecta hiding (Parser)
+import           Text.Trifecta.Delta
 
 newtype Parser a = Parser {internalP :: Trifecta.Parser a}
 
@@ -36,10 +36,10 @@ makeLenses ''Metadata
 instance HasRendering Metadata where
   rendering = iso _metadataRendering Metadata
 
-metadata :: P Metadata
+metadata :: Parser Metadata
 metadata = fmap Metadata rend
 
-instance TokenParsing P where
+instance TokenParsing Parser where
   someSpace = let
     whitespace = (satisfy $ \c -> c /= '\n' && isSpace c)
                >> return ()
@@ -76,8 +76,13 @@ isIdentifierSymbol :: Char -> Bool
 isIdentifierSymbol c = isPrint c &&
   not (isIdentifierAlphabet1 c || isSpace c ||
       c `elem` "'\"(),;[]`{}\\")
+isStandaloneIdentifierSymbol :: Char -> Bool
+isStandaloneIdentifierSymbol c =
+      c `elem` ",`\\"
 
-identifierString :: P String
+
+
+identifierString :: Parser String
 identifierString = token (a <|> s <|> s1) <?> "identifier name"
   where
     a = (:) <$> satisfy isIdentifierAlphabet0
@@ -86,17 +91,18 @@ identifierString = token (a <|> s <|> s1) <?> "identifier name"
     s1 = (:[]) <$> satisfy isStandaloneIdentifierSymbol
 
 
-keywordSymbol :: String -> P String
-keywordSymbol str = (token $ string str)
+keywordSymbol :: String -> Parser String
+keywordSymbol str =
+  token (string str <* notFollowedBy (satisfy isIdentifierSymbol))
   <?> "keyword " ++ str
 
-keyword :: String -> P String
+keyword :: String -> Parser String
 keyword str =
   token (string str <* notFollowedBy alphaNum)
   <?> "keyword " ++ str
 
 
-identifierName :: P String
+identifierName :: Parser String
 identifierName = try $ do
   ret <- identifierString
   guard $ not $ elem ret reservedWords

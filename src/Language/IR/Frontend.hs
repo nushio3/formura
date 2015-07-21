@@ -1,28 +1,29 @@
-{-# LANGUAGE FlexibleInstances, GADTs, StandaloneDeriving, TemplateHaskell #-}
+{-# LANGUAGE FlexibleInstances, GADTs, StandaloneDeriving, TemplateHaskell,RecordWildCards #-}
 module Language.IR.Frontend where
 
 {- The IR just after the parse. -}
 
 import Compiler.Hoopl
 import Control.Lens
+import Data.List (intercalate)
+import Text.Printf
 
-
-type SymbolName = String
+type IdentName = String
 type Offset = [Rational]
 
-data VarDecl = VarDecl { _varType :: String, _varOffset :: Offset, _varName :: SymbolName}
+data VarDecl = VarDecl { _varType :: String, _varOffset :: Offset, _varName :: IdentName}
            deriving (Eq, Show)
 makeLenses ''VarDecl
 
 data Uniop = Neg
                    deriving (Eq, Show)
-data Binop = Add | Mul | Sub | Div
+data Binop = Add | Mul | Sub | Div | Pow
                    deriving (Eq, Show)
 data Triop = FMA
                    deriving (Eq, Show)
 
 data Expr = Lit Rational
-          | Load SymbolName
+          | Load IdentName
           | Shift Offset Expr
           | Uniop Uniop Expr
           | Binop Binop Expr Expr
@@ -30,15 +31,23 @@ data Expr = Lit Rational
                    deriving (Eq, Show)
 
 data RExpr
-  = RLoad SymbolName
+  = RLoad IdentName
   | RShift Offset RExpr
   deriving (Eq, Show)
 
 
 data Function = Function { _functionName :: String,
-                           _entryVars :: [SymbolName],
-                           _exitVars :: [SymbolName],
+                           _entryVars :: [IdentName],
+                           _exitVars :: [IdentName],
                            _functionBody :: Graph (Insn ()) C C }
+instance Show Function where
+  show (Function{..}) = printf "begin function (%s) = %s(%s)"
+    (intercalate ", " _exitVars) _functionName (intercalate ", " _entryVars)
+
+type ClosedInsnGraph = Graph (Insn ()) C C
+
+emptyGraph :: Graph (Insn ()) C C
+emptyGraph = bodyGraph emptyBody
 
 data Insn a e x where
   Entry   :: a                           -> Insn a C O

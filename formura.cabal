@@ -67,6 +67,21 @@ executable test-parser
               , vector
 
 
+executable formura
+  hs-source-dirs: exe-src
+  main-is: formura.hs
+  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
+  build-depends:
+                base == 4.*
+              , ansi-wl-pprint
+              , containers
+              , formura
+              , lens
+              , text
+              , trifecta
+              , vector
+
+
 executable test-generator
   hs-source-dirs: exe-src
   main-is: test-generator.hs
