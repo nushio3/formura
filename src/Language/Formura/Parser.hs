@@ -39,7 +39,11 @@ expr :: Parser F.Expr
 expr = X.buildExpressionParser exprTable term <?> "expression"
 
 offset :: Parser F.Offset
-offset = brackets $ commaSep $ rational
+offset = brackets $ commaSep $ do
+  mr <- optional rationalExpr
+  case mr of
+   Just x  -> return x
+   Nothing -> return 0
 
 program :: Parser [F.Function]
 program = function `sepEndBy` statementDelimiter
@@ -99,3 +103,20 @@ exprTable =
     postfixOffset = X.Postfix $ do
       off <- offset
       return $ F.Shift off
+
+rationalExpr :: Parser Rational
+rationalExpr = X.buildExpressionParser rationalExprTable rational <?> "const rational expression"
+
+
+rationalExprTable :: [[X.Operator Parser Rational]]
+rationalExprTable =
+  [
+    [binary "*" (*) X.AssocLeft, binary "/" (/) X.AssocLeft ]
+  , [prefix "-" negate, prefix "+" id ]
+  , [binary "+" (+) X.AssocLeft, binary "-" (-) X.AssocLeft ]
+  ]
+
+  where
+    binary  name fun assoc = X.Infix (fun <$ keywordSymbol name) assoc
+    prefix  name fun       = X.Prefix (fun <$ keywordSymbol name)
+    postfix name fun       = X.Postfix (fun <$ keywordSymbol name)
