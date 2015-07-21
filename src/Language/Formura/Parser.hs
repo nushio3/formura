@@ -84,7 +84,8 @@ statementDelimiter = (newline >> spaces >> return ()) <|>(keyword ";" >> return 
 exprTable :: [[X.Operator Parser F.Expr]]
 exprTable =
   [
-    [binary "**" F.Pow X.AssocRight]
+    [postfixOffset]
+  , [binary "**" F.Pow X.AssocRight]
   , [binary "*" F.Mul X.AssocLeft, binary "/" F.Div X.AssocLeft ]
   , [prefix "-" F.Neg, prefix' "+" id ]
   , [binary "+" F.Add X.AssocLeft, binary "-" F.Sub X.AssocLeft ]
@@ -95,3 +96,6 @@ exprTable =
     prefix  name fun       = X.Prefix (F.Uniop fun <$ keywordSymbol name)
     prefix' name fun       = X.Prefix (fun <$ keywordSymbol name)
     postfix name fun       = X.Postfix (F.Uniop fun <$ keywordSymbol name)
+    postfixOffset = X.Postfix $ do
+      off <- offset
+      return $ F.Shift off

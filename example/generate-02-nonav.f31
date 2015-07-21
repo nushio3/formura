@@ -1,0 +1,4 @@
+begin function (dens_next) = update (dens)
+    dens_x = (dens[1,0] + dens + dens[1,0] ) / 3
+    dens_next = (dens_x[0,1] + dens_x + dens_x[0,1] ) / 3
+end function
