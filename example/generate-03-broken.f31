@@ -1,0 +1,3 @@
+begin function (dens_next) = update (dens)
+      this program = broken syntax
+end function

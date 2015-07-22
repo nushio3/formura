@@ -75,11 +75,13 @@ executable formura
                 base == 4.*
               , ansi-wl-pprint
               , containers
+              , either
               , formura
               , lens
               , text
               , trifecta
               , vector
+              , transformers
 
 
 executable test-generator
