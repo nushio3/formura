@@ -18,9 +18,9 @@ translateAssign r l = (br, bl)
 
     (rident, roffset) = rogo r
 
-    rogo :: RExpr -> (IdentName, Offset)
-    rogo (RLoad i)    = (i, replicate dimension 0)
-    rogo (RShift o x) = rogo x & _2 %~ zipWith (+) o
+rogo :: RExpr -> (IdentName, Offset)
+rogo (RLoad i)    = (i, replicate dimension 0)
+rogo (RShift o x) = rogo x & _2 %~ zipWith (+) o
 
 translateExpr :: F.Offset -> F.Expr -> B.Expr
 translateExpr baseOffset fe = let go = translateExpr baseOffset in case fe of
@@ -34,7 +34,17 @@ translateExpr baseOffset fe = let go = translateExpr baseOffset in case fe of
 translateFunction :: F.Function -> B.Function
 translateFunction Function{..} =
   B.Function { B._functionName = _functionName,
-               B._entryDecls = [],
-               B._middleDecls = [],
+               B._entryDecls = map toDecl _entryVars,
+               B._middleDecls = map toDecl midVars,
+               B._exitDecls = map toDecl _exitVars,
                B._functionBody = mapGraph translateInsn _functionBody
              }
+  where
+    toDecl :: IdentName -> B.VarDecl
+    toDecl n = B.VarDecl { B._varType = "float", B._varHalo = ([0,0], [0,0]), B._varName = n}
+
+    midVars = foldGraphNodes collectRHS _functionBody []
+
+    collectRHS :: F.Insn a e x -> [IdentName] -> [IdentName]
+    collectRHS (Assign _ r _ ) xs = fst (rogo r) :xs
+    collectRHS _ xs = xs

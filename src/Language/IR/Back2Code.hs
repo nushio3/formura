@@ -21,7 +21,7 @@ generate dirName func = do
     T.replace "//BUFFER UPDATES" (toCode func) $
     T.replace "//BUFFER SWAPS" (swapCode func) $
     templ
-  system $ "indent -kr " ++ mainFn
+  system $ "indent -kr -l1000 " ++ mainFn
   return ()
 
 class ToCode a where
@@ -47,7 +47,7 @@ instance ToCode Function where
   toCode func = foldGraphNodes (\n code -> code <> toCode n) (_functionBody func) ""
 
 offset2Code :: [Int] -> T.Text
-offset2Code is = T.pack $ printf "[j+%d][i+%d]" (is' !! 0) (is' !! 1)
+offset2Code is = T.pack $ printf "[mask(j+%d)][mask(i+%d)]" (is' !! 0) (is' !! 1)
   where
     is' = is ++ repeat 0
 

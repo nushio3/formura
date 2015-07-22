@@ -1,6 +1,21 @@
 const int NX=4096;
 
-type double double_plane_t [NX];
+inline int mod_floor(int x, int y) {
+    int r = x%y;
+    if ((r!=0) && ((r<0) != (y<0))) { r += y; }
+    return r;
+}
+
+inline int div_floor(int x, int y) {
+  int q = x/y;
+  int r = x%y;
+  if ((r!=0) && ((r<0) != (y<0))) --q;
+  return q;
+}
+
+inline int mask(int x) {
+  return mod_floor(x,NX);
+}
 
 //BUFFER DECLS
 
@@ -8,12 +23,12 @@ void solve() {
   double wct1 = second();
   //POINTER DECLS
   for (int t=1; t <=T_FINAL; ++t) {
-    for (int j=1;j<NX-1;++j) {
-      for (int i=1;i<NX-1;++i) {
+    for (int j=0;j<NX;++j) {
+      for (int i=0;i<NX;++i) {
         //BUFFER UPDATES
-        //BUFFER SWAPS
       }
     }
+    //BUFFER SWAPS
   }
   double wct2=second();
   benchmark_self_reported_wct = wct2-wct1;
