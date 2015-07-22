@@ -14,13 +14,22 @@ translateAssign :: F.RExpr -> F.Expr -> (B.RExpr, B.Expr)
 translateAssign r l = (br, bl)
   where
     br = B.RLoad rident
-    bl = B.Load rident (map floor roffset)
+    bl = translateExpr (map negate roffset) l
 
     (rident, roffset) = rogo r
 
     rogo :: RExpr -> (IdentName, Offset)
     rogo (RLoad i)    = (i, replicate dimension 0)
     rogo (RShift o x) = rogo x & _2 %~ zipWith (+) o
+
+translateExpr :: F.Offset -> F.Expr -> B.Expr
+translateExpr baseOffset fe = let go = translateExpr baseOffset in case fe of
+  Lit x         -> B.Lit x
+  Load x        -> B.Load x (map floor baseOffset)
+  Shift o x     -> translateExpr (zipWith (+) o baseOffset) x
+  Uniop o x     -> B.Uniop o (go x)
+  Binop o x y   -> B.Binop o (go x) (go y)
+  Triop o x y z -> B.Triop o (go x) (go y) (go z)
 
 translateFunction :: F.Function -> B.Function
 translateFunction Function{..} =
