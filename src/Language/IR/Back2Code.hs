@@ -29,7 +29,7 @@ class ToCode a where
   toCode :: a -> T.Text
 
 instance ToCode Expr where
-  toCode (Lit x) = T.pack $ show (fromRational x :: Double)
+  toCode (Lit x) = T.pack $ show (fromRational x :: Double) ++ "f"
   toCode (Load var off) = T.pack var <> offset2Code off
   toCode (Uniop F.Neg a) = "(-(" <> toCode a <> "))"
   toCode (Binop F.Add a b) = "(" <> toCode a <> "+" <> toCode b <> ")"
@@ -76,7 +76,7 @@ ptrDeclCode :: Function -> T.Text
 ptrDeclCode func =
   T.unlines $
   map T.pack $
-  [printf "%s %s;" vt vn
+  [printf "%s %s = %s_hontai;" vt vn vn
   | v <- hontize (_entryDecls func)
   , let vn = _varName v, let vt = _varType v ++ "_plane_t *"]
   where

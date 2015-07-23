@@ -1,5 +1,7 @@
 #include <iostream>
+#include <fstream>
 #include <algorithm>
+#include <cmath>
 #include <sys/time.h>
 
 using namespace std;
@@ -29,9 +31,38 @@ double  benchmark_self_reported_wct;
 double  benchmark_self_reported_delta_t;
 
 const int T_FINAL = 120;
+const int NX=1024;
 
 #include "generated.cpp"
 
 int main() {
-  cout << "hellow" << endl;
+  for (int y=0;y<NX;++y) {
+    for (int x=0;x<NX;++x) {
+      double y2 = y - 0.5*NX;
+      dens_hontai[y][x] = y2 > 0.5*NX*sin(sqrt(x + 0.03*pow(y2,2.0)));
+    }
+  }
+
+  {
+  ofstream ofs("initinal_state.txt");
+  for (int y=0;y<NX;++y) {
+    for (int x=0;x<NX;++x) {
+      ofs << x << " " << y << " " << dens_hontai[y][x] << endl;
+    }
+    ofs << endl;
+  }}
+
+  update();
+
+  {  ofstream ofs("final_state.txt");
+  for (int y=0;y<NX;++y) {
+    for (int x=0;x<NX;++x) {
+      ofs << x << " " << y << " " << dens_hontai[y][x] << endl;
+    }
+    ofs << endl;
+  }}
+
+  double meshes = benchmark_self_reported_delta_t * NX * NX;
+  cerr << "updated " << meshes << " meshes in " << benchmark_self_reported_wct << " second." << endl;
+  cerr << "performance: " << meshes / benchmark_self_reported_wct << " m/s" << endl;
 }
