@@ -1,5 +1,5 @@
-
 const int NX=4096;
+typedef float float_plane_t[NX];
 
 inline int mod_floor(int x, int y) {
     int r = x%y;

@@ -22,7 +22,7 @@ generate dirName func = do
     T.replace "//BUFFER UPDATES" (toCode func) $
     T.replace "//BUFFER SWAPS" (swapCode func) $
     templ
-  system $ "indent -kr -l1000 " ++ mainFn
+  system $ "indent -kr -i2 -nut  -l1000 " ++ mainFn
   return ()
 
 class ToCode a where
@@ -76,7 +76,7 @@ ptrDeclCode :: Function -> T.Text
 ptrDeclCode func =
   T.unlines $
   map T.pack $
-  [printf "%s %s[NX];" vt vn
+  [printf "%s %s;" vt vn
   | v <- hontize (_entryDecls func)
   , let vn = _varName v, let vt = _varType v ++ "_plane_t *"]
   where
