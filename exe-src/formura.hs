@@ -34,6 +34,7 @@ process fileName = do
   res <- liftIO $ Tri.parseFromFileEx (internalP program <* Tri.eof) fileName
   prog <- case res of
    Tri.Success prog -> do
+     liftIO $ mapM_ print prog
      return prog
    Tri.Failure doc ->
      left $ displayIO stdout $ renderPretty 0.8 80 $ doc <> linebreak
