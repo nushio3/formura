@@ -1,3 +1,4 @@
+
 const int NX=4096;
 
 inline int mod_floor(int x, int y) {
@@ -19,7 +20,7 @@ inline int mask(int x) {
 
 //BUFFER DECLS
 
-void solve() {
+void FUNCTION_NAME() {
   double wct1 = second();
   //POINTER DECLS
   for (int t=1; t <=T_FINAL; ++t) {

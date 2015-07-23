@@ -14,8 +14,9 @@ generate :: FilePath -> Function -> IO ()
 generate dirName func = do
   templ <- T.readFile "resource/template-2d-notb.cpp"
   system $ "mkdir -p " ++ dirName
-  let mainFn = dirName ++ "/main.cpp"
+  let mainFn = dirName ++ "/generated.cpp"
   T.writeFile mainFn $
+    T.replace "FUNCTION_NAME" (T.pack $ _functionName func) $
     T.replace "//POINTER DECLS" (ptrDeclCode func) $
     T.replace "//BUFFER DECLS" (declCode func) $
     T.replace "//BUFFER UPDATES" (toCode func) $
