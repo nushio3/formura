@@ -45,7 +45,7 @@ instance TokenParsing Parser where
                >> return ()
     comment = char '#' >> many (satisfy (/='\n'))
                >> return ()
-    in skipMany (whitespace <|> comment)
+    in skipMany (try (comment <?> "comment") <|> whitespace)
 
 -- | This does NOT parses the sign; signs are to be treated as unary operators.
 rational :: TokenParsing m => m Rational
@@ -75,7 +75,7 @@ isIdentifierAlphabet1 c = isAlphaNum c || c == '_'
 isIdentifierSymbol :: Char -> Bool
 isIdentifierSymbol c = isPrint c &&
   not (isIdentifierAlphabet1 c || isSpace c ||
-      c `elem` "'\"(),;[]`{}\\")
+      c `elem` "#'\"(),;[]`{}\\")
 isStandaloneIdentifierSymbol :: Char -> Bool
 isStandaloneIdentifierSymbol c =
       c `elem` ",`\\"

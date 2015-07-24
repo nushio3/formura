@@ -58,7 +58,7 @@ function = do
   funcName <- identifierName <?> "the function name"
   inArgs <- parens $ commaSep $ identifierName
 
-  optional statementDelimiter
+  many statementDelimiter
 
   body <- functionBody
 
@@ -75,7 +75,7 @@ function = do
 
 functionBody :: Parser F.FunctionBody
 functionBody = do
-  stmts <- statement `sepEndBy` statementDelimiter
+  stmts <- statement `sepEndBy` (some statementDelimiter)
   let mids = H.mkMiddles stmts
   return mids
 --      g01 = H.mkFirst $ F.Entry ()
@@ -83,7 +83,7 @@ functionBody = do
 --  return $ g01 H.<*> mids H.<*> g99
 
 statementDelimiter :: Parser ()
-statementDelimiter = (newline >> spaces >> return ()) <|>(keyword ";" >> return ())
+statementDelimiter = (newline >> someSpace >> return ()) <|>(keyword ";" >> return ())
 
 
 exprTable :: [[X.Operator Parser F.Expr]]
