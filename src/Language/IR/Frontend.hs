@@ -14,7 +14,7 @@ dimension = 2
 type IdentName = String
 type Offset = [Rational]
 
-data VarDecl = VarDecl { _varType :: String, _varOffset :: Offset, _varName :: IdentName}
+data VarDecl = VarDecl { _varType :: TExpr, _varName :: IdentName}
            deriving (Eq, Show)
 makeLenses ''VarDecl
 
@@ -33,10 +33,28 @@ data Expr = Lit Rational
           | Triop Triop Expr Expr Expr
                    deriving (Eq, Show)
 
+class HasIdentName s where
+  identName :: Lens' s IdentName
+
+data TExpr
+  = TScalar IdentName
+  | TArray Offset IdentName
+  deriving (Eq, Show)
+
+instance HasIdentName TExpr where
+  identName f (TScalar n) = fmap TScalar (f n)
+  identName f (TArray o n) = fmap (TArray o) (f n)
+
+
 data RExpr
   = RLoad IdentName
   | RShift Offset RExpr
   deriving (Eq, Show)
+
+instance HasIdentName RExpr where
+  identName f (RLoad n) = fmap RLoad (f n)
+  identName f (RShift o rx) = fmap (RShift o) (identName f rx)
+
 
 
 data Function = Function { _functionName :: String,

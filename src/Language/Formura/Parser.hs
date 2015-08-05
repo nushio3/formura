@@ -27,6 +27,15 @@ rExpr = do
   where
     identTerm = F.RLoad <$> identifierName
 
+typeExpr :: Parser F.TExpr
+typeExpr = do
+  t <- identTerm
+  mo <- optional offset
+  case mo of
+   Just o -> return $ F.TArray o t
+   Nothing -> return $ F.TScalar t
+
+
 statement :: Parser (F.Insn () H.O H.O)
 statement = do
   rhs <- rExpr
