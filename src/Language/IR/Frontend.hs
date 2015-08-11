@@ -14,9 +14,6 @@ dimension = 2
 type IdentName = String
 type Offset = [Rational]
 
-data VarDecl = VarDecl { _varType :: TExpr, _varName :: IdentName}
-           deriving (Eq, Show)
-makeLenses ''VarDecl
 
 data Uniop = Neg
                    deriving (Eq, Show)
@@ -44,6 +41,11 @@ data TExpr
 instance HasIdentName TExpr where
   identName f (TScalar n) = fmap TScalar (f n)
   identName f (TArray o n) = fmap (TArray o) (f n)
+
+
+data VarDecl = VarDecl { _varType :: TExpr, _varName :: IdentName}
+           deriving (Eq, Show)
+makeLenses ''VarDecl
 
 
 data RExpr

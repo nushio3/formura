@@ -3,12 +3,13 @@ module Language.Formura.Parser where
 
 import qualified Compiler.Hoopl as H
 import           Control.Applicative
+import           Control.Lens
+import           Data.Maybe
 import qualified Text.Parser.Expression as X
 import           Text.Trifecta hiding (Parser)
 
 import           Language.Formura.Parser.Combinator
 import qualified Language.IR.Frontend as F
-
 
 
 term :: Parser F.Expr
@@ -29,19 +30,24 @@ rExpr = do
 
 typeExpr :: Parser F.TExpr
 typeExpr = do
-  t <- identTerm
+  t <- identifierName
   mo <- optional offset
   case mo of
    Just o -> return $ F.TArray o t
    Nothing -> return $ F.TScalar t
 
-
-statement :: Parser (F.Insn () H.O H.O)
-statement = do
-  rhs <- rExpr
-  keywordSymbol "="
-  lhs <- expr
-  return $ F.Assign () rhs lhs
+compoundStatement :: Parser [F.Insn () H.O H.O]
+compoundStatement = do
+  mType <- try $ optional $ typeExpr <* keywordSymbol "::"
+  rhs   <- rExpr
+  mLhs  <- optional $ do
+    keywordSymbol "="
+    expr
+  let typePart = [ F.Declare () (F.VarDecl typ (rhs ^. F.identName))
+                 | typ <- maybeToList mType]
+      assignPart = [F.Assign () rhs lhs
+                   | lhs <- maybeToList mLhs]
+  return $ typePart ++ assignPart
 
 
 expr :: Parser F.Expr
@@ -84,8 +90,8 @@ function = do
 
 functionBody :: Parser F.FunctionBody
 functionBody = do
-  stmts <- statement `sepEndBy` (some statementDelimiter)
-  let mids = H.mkMiddles stmts
+  stmts <- compoundStatement `sepEndBy` (some statementDelimiter)
+  let mids = H.mkMiddles $ concat stmts
   return mids
 --      g01 = H.mkFirst $ F.Entry ()
 --      g99 = H.mkLast  $ F.Exit ()

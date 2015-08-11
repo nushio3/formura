@@ -1,4 +1,5 @@
 begin function (dens_next) = update (dens)
+    float[,] :: dens_x
     dens_x = (dens[-2,] + dens[-1,] + dens + dens[1,]  + dens[2,] ) / 5
     dens_next = (dens_x[,-1] + dens_x + dens_x[,1] ) / 3
 end function
