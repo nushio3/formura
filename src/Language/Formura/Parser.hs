@@ -38,7 +38,7 @@ typeExpr = do
 
 compoundStatement :: Parser [F.Insn () H.O H.O]
 compoundStatement = do
-  mType <- try $ optional $ typeExpr <* keywordSymbol "::"
+  mType <- optional $ try $ typeExpr <* keywordSymbol "::"
   rhs   <- rExpr
   mLhs  <- optional $ do
     keywordSymbol "="

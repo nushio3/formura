@@ -68,7 +68,8 @@ instance Show Function where
   show (Function{..}) = let
     beg = printf "begin function (%s) = %s(%s)"    (intercalate ", " _exitVars) _functionName (intercalate ", " _entryVars)
     asgs = map (\(r,l) -> printf "  %s = %s" (show r) (show l)) (assignments _functionBody)
-      in unlines $ [beg] ++ asgs ++ ["end function"]
+    dcls = map (\dec -> printf "  %s :: %s" (show $ dec^.varType) (dec^.varName)) (declarations _functionBody)
+      in unlines $ [beg] ++ dcls ++ asgs ++ ["end function"]
 
 
 assignments :: Graph (Insn ()) O O -> [(RExpr, Expr)]
@@ -78,14 +79,20 @@ assignments g = reverse $ foldGraphNodes go g []
     go (Assign _ r l) xs = (r,l):xs
     go _ xs = xs
 
+declarations :: Graph (Insn ()) O O -> [VarDecl]
+declarations g = reverse $ foldGraphNodes go g []
+  where
+    go :: forall e x. Insn () e x -> [VarDecl] -> [VarDecl]
+    go (Declare _ v) xs = v:xs
+    go _ xs = xs
+
+
 type FunctionBody = Graph (Insn ()) O O
 
 
 data Insn a e x where
---  Entry   :: a                           -> Insn a C O
   Declare :: a -> VarDecl                -> Insn a O O
   Assign  :: a -> RExpr -> Expr          -> Insn a O O
---  Exit    :: a                           -> Insn a O C
 
 deriving instance (Show a) =>  Show (Insn a e x)
 
