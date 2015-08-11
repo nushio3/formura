@@ -6,9 +6,9 @@ import           Control.Lens
 import           Language.IR.Frontend as F
 import qualified Language.IR.Backend  as B
 
-translateInsn :: F.Insn a e x -> B.Insn a e x
-translateInsn (Declare _ _ ) = error "TODO: translation of declare"
-translateInsn (Assign a r l) = B.Assign a `uncurry` translateAssign r l
+translateInsn :: F.Insn a e x -> [B.Insn a O O]
+translateInsn (Declare _ _ ) = []
+translateInsn (Assign a r l) = [B.Assign a `uncurry` translateAssign r l]
 
 translateAssign :: F.RExpr -> F.Expr -> (B.RExpr, B.Expr)
 translateAssign r l = (br, bl)
@@ -37,7 +37,7 @@ translateFunction Function{..} =
                B._entryDecls = map toDecl _entryVars,
                B._middleDecls = map toDecl midVars,
                B._exitDecls = map toDecl _exitVars,
-               B._functionBody = mapGraph translateInsn _functionBody
+               B._functionBody = mkMiddles $ foldGraphNodes (\fi x -> x ++ translateInsn fi) _functionBody []
              }
   where
     toDecl :: IdentName -> B.VarDecl
