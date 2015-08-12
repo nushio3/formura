@@ -17,6 +17,7 @@ import Language.Formura.Parser (program)
 import Language.IR.Frontend (_functionName)
 import Language.IR.Front2Back (translateFunction)
 import Language.IR.Back2Code (generate)
+import CommandLineOption
 
 
 main :: IO ()

@@ -78,6 +78,7 @@ executable formura
               , either
               , formura
               , lens
+              , optparse-applicative
               , text
               , trifecta
               , vector
