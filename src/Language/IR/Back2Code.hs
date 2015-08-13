@@ -7,23 +7,19 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Language.IR.Frontend as F
 import Language.IR.Backend
-import System.Process
 import Text.Printf
 
-generate :: FilePath -> Function -> IO ()
-generate dirName func = do
+generate :: Function -> IO T.Text
+generate func = do
   templ <- T.readFile "resource/template-2d-notb.cpp"
-  system $ "mkdir -p " ++ dirName
-  let mainFn = dirName ++ "/generated.cpp"
-  T.writeFile mainFn $
+  return $
     T.replace "FUNCTION_NAME" (T.pack $ _functionName func) $
     T.replace "//POINTER DECLS" (ptrDeclCode func) $
     T.replace "//BUFFER DECLS" (declCode func) $
     T.replace "//BUFFER UPDATES" (toCode func) $
     T.replace "//BUFFER SWAPS" (swapCode func) $
     templ
-  system $ "indent -kr -i2 -nut  -l1000 " ++ mainFn
-  return ()
+
 
 class ToCode a where
   toCode :: a -> T.Text

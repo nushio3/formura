@@ -54,6 +54,7 @@ executable test-parser
   buildable: False
   hs-source-dirs: exe-src
   main-is: test-parser.hs
+  Other-Modules: CommandLineOption
   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
   build-depends:
                 base == 4.*
@@ -79,6 +80,7 @@ executable formura
               , formura
               , lens
               , optparse-applicative
+              , process
               , text
               , trifecta
               , vector
@@ -86,6 +88,7 @@ executable formura
 
 
 executable test-generator
+  buildable: False
   hs-source-dirs: exe-src
   main-is: test-generator.hs
   ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
