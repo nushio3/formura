@@ -19,7 +19,7 @@ import Language.Formura.Parser.Combinator (internalP)
 import Language.Formura.Parser (program)
 import Language.IR.Frontend (_functionName)
 import Language.IR.Front2Back (translateFunction)
-import Language.IR.Back2Code (generate)
+import Language.IR.Back2Code (generate, utilityCode)
 import CommandLineOption
 
 
@@ -34,7 +34,7 @@ main = do
 writeSrcs :: [T.Text] -> IO ()
 writeSrcs cppSrcs = do
   let mainFn = theOption ^. outputFilename
-  T.writeFile mainFn $ T.unlines cppSrcs
+  T.writeFile mainFn $ T.unlines $ utilityCode : cppSrcs
   system $ "indent -kr -i2 -nut  -l1000 " ++ mainFn
   return ()
 

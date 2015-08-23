@@ -37,6 +37,7 @@ library
                 base == 4.*
               , bytestring
               , containers
+              , file-embed
               , hoopl >= 3.10.1
               , lens
               , parsers

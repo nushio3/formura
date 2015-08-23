@@ -1,24 +1,33 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, OverloadedStrings, TemplateHaskell #-}
 module Language.IR.Back2Code where
 
 import Compiler.Hoopl
+import qualified Data.ByteString as BS
+import Data.FileEmbed (embedFile)
 import Data.Monoid
+import           Data.Text.Encoding(decodeUtf8)
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified Language.IR.Frontend as F
 import Language.IR.Backend
 import Text.Printf
 
+
+utilityCode :: T.Text
+utilityCode = decodeUtf8 $(embedFile "resource/utility.cpp")
+
+template2DCode :: T.Text
+template2DCode = decodeUtf8 $(embedFile "resource/template-2d-notb.cpp")
+
 generate :: Function -> IO T.Text
 generate func = do
-  templ <- T.readFile "resource/template-2d-notb.cpp"
   return $
     T.replace "FUNCTION_NAME" (T.pack $ _functionName func) $
     T.replace "//POINTER DECLS" (ptrDeclCode func) $
     T.replace "//BUFFER DECLS" (declCode func) $
     T.replace "//BUFFER UPDATES" (toCode func) $
     T.replace "//BUFFER SWAPS" (swapCode func) $
-    templ
+    template2DCode
 
 
 class ToCode a where
@@ -47,7 +56,6 @@ offset2Code :: [Int] -> T.Text
 offset2Code is = T.pack $ printf "[mask(j+%d)][mask(i+%d)]" (is' !! 0) (is' !! 1)
   where
     is' = is ++ repeat 0
-
 
 swapCode :: Function -> T.Text
 swapCode func =
