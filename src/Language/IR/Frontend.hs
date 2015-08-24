@@ -6,7 +6,6 @@ module Language.IR.Frontend where
 import Compiler.Hoopl
 import Control.Lens
 import Data.List (intercalate)
-import qualified Data.Map as M
 import Text.Printf
 
 dimension :: Int
@@ -89,7 +88,6 @@ declarations g = reverse $ foldGraphNodes go g []
 
 
 type FunctionBody = Graph (Insn ()) O O
-type HaloMap = M.Map IdentName (Offset, Offset)
 
 data Insn a e x where
   Declare :: a -> VarDecl                -> Insn a O O
@@ -98,17 +96,11 @@ data Insn a e x where
 deriving instance (Show a) =>  Show (Insn a e x)
 
 attribute :: Lens (Insn a1 e x) (Insn a2 e x) a1 a2
---attribute f (Entry a1 ) = fmap (\a2 -> Entry a2 ) (f a1)
 attribute f (Declare a1 v) = fmap (\a2 -> Declare a2 v) (f a1)
 attribute f (Assign a1 r e) = fmap (\a2 -> Assign a2 r e) (f a1)
---attribute f (Exit a1 ) = fmap (\a2 -> Exit a2 ) (f a1)
 
 
 instance NonLocal (Insn a) where
---   entryLabel (Entry _ ) = onlyOneLabel
---   successors (Exit _ ) = []
-
-type M = SimpleFuelMonad
 
 onlyOneLabel :: Label
-onlyOneLabel = runSimpleUniqueMonad $ runWithFuel 9999 $ (freshLabel :: M Label)
+onlyOneLabel = runSimpleUniqueMonad $ runWithFuel infiniteFuel $ (freshLabel :: SimpleFuelMonad Label)

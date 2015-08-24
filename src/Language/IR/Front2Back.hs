@@ -3,6 +3,9 @@ module Language.IR.Front2Back where
 
 import           Compiler.Hoopl
 import           Control.Lens
+import qualified Data.Map as M
+
+
 import           Language.IR.Frontend as F
 import qualified Language.IR.Backend  as B
 
@@ -49,9 +52,15 @@ translateFunction Function{..} =
     collectRHS (Assign _ r _ ) xs = fst (rogo r) :xs
     collectRHS _ xs = xs
 
-type M = SimpleFuelMonad
+    typeDict :: M.Map IdentName TExpr
+    typeDict = M.fromList $ map (\d -> (d^.varName, d^.varType)) $ declarations  _functionBody
 
-haloPass :: BwdPass M (Insn ()) Halo
+
+
+type AnalMonad = SimpleFuelMonad
+type HaloMap = M.Map IdentName (Offset, Offset)
+
+haloPass :: BwdPass AnalMonad (Insn ()) HaloMap
 haloPass = BwdPass{
   bp_lattice  = undefined,
   bp_transfer = undefined,
