@@ -65,8 +65,8 @@ type TypeMap = M.Map IdentName TExpr
 haloPass :: BwdPass AnalMonad (Insn ()) HaloMap
 haloPass = BwdPass{
   bp_lattice  = haloLattice,
-  bp_transfer = undefined,
-  bp_rewrite  = undefined
+  bp_transfer = haloTransfer,
+  bp_rewrite  = haloRewrite
                   }
 
 haloLattice :: DataflowLattice HaloMap
@@ -80,16 +80,35 @@ haloLattice = DataflowLattice
       where
         ch = changeIf (j /= old)
 
-        j = M.unionWith j1 old new
-        j1 :: Halo -> Halo -> Halo
-        j1 (lo1,hi1) (lo2, hi2)
-          | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
-              (zipWith min lo1 lo2, zipWith max hi1 hi2)
-          | otherwise = error "remain mismatch in halo inference."
-
         remain :: Rational -> Rational
         remain x = x - toRational (floor x)
 
         allIsSame [] = True
         allIsSame [ _ ] = True
         allIsSame (x:xs) = all (==x) xs
+
+joinHaloMap :: HaloMap ->  HaloMap ->  HaloMap
+joinHaloMap = M.unionWith j1 old new
+        j1 :: Halo -> Halo -> Halo
+        j1 (lo1,hi1) (lo2, hi2)
+          | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
+              (zipWith min lo1 lo2, zipWith max hi1 hi2)
+          | otherwise = error "remain mismatch in halo inference."
+
+
+haloTransfer :: BwdTransfer (Insn a) HaloMap
+haloTransfer = mkBTransfer ht
+  where
+    ht :: Insn a e x -> Fact x HaloMap -> HaloMap
+    ht (Assign _ v e) f = joinHaloMap f (traceHaloTransfer f v e)
+    ht (Declare _ _) f = f
+
+traceHaloTransfer :: HaloMap -> RExpr -> Expr -> HaloMap
+traceHaloTransfer fact rhs lhs = M.empty
+
+
+haloRewrite :: forall m . FuelMonad m => BwdRewrite m (Insn ()) HaloMap
+haloRewrite = mkBRewrite d
+  where
+    d :: Insn () e x -> Fact x HaloMap -> m (Maybe (Graph (Insn ()) e x))
+    d _ _ = return Nothing
