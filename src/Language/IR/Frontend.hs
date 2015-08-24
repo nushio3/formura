@@ -6,6 +6,7 @@ module Language.IR.Frontend where
 import Compiler.Hoopl
 import Control.Lens
 import Data.List (intercalate)
+import qualified Data.Map as M
 import Text.Printf
 
 dimension :: Int
@@ -88,7 +89,7 @@ declarations g = reverse $ foldGraphNodes go g []
 
 
 type FunctionBody = Graph (Insn ()) O O
-
+type HaloMap = M.Map IdentName (Offset, Offset)
 
 data Insn a e x where
   Declare :: a -> VarDecl                -> Insn a O O

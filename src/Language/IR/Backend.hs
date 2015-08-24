@@ -11,7 +11,7 @@ import Language.IR.Frontend
 import qualified Language.IR.Frontend as F
 
 type Offset = [Int]
-data VarDecl = VarDecl {_varType :: String, _varHalo :: (Offset,Offset), _varName :: IdentName}
+data VarDecl = VarDecl {_varType :: String, _varHalo :: Offset, _varName :: IdentName}
            deriving (Eq, Show)
 
 data Expr = Lit Rational

@@ -41,10 +41,19 @@ translateFunction Function{..} =
              }
   where
     toDecl :: IdentName -> B.VarDecl
-    toDecl n = B.VarDecl { B._varType = "float", B._varHalo = ([0,0], [0,0]), B._varName = n}
+    toDecl n = B.VarDecl { B._varType = "float", B._varHalo = [0,0], B._varName = n}
 
     midVars = foldGraphNodes collectRHS _functionBody []
 
     collectRHS :: F.Insn a e x -> [IdentName] -> [IdentName]
     collectRHS (Assign _ r _ ) xs = fst (rogo r) :xs
     collectRHS _ xs = xs
+
+type M = SimpleFuelMonad
+
+haloPass :: BwdPass M (Insn ()) Halo
+haloPass = BwdPass{
+  bp_lattice  = undefined,
+  bp_transfer = undefined,
+  bp_rewrite  = undefined
+                  }
