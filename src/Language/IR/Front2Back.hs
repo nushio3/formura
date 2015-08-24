@@ -52,17 +52,44 @@ translateFunction Function{..} =
     collectRHS (Assign _ r _ ) xs = fst (rogo r) :xs
     collectRHS _ xs = xs
 
-    typeDict :: M.Map IdentName TExpr
+    typeDict :: TypeMap
     typeDict = M.fromList $ map (\d -> (d^.varName, d^.varType)) $ declarations  _functionBody
 
 
 
 type AnalMonad = SimpleFuelMonad
-type HaloMap = M.Map IdentName (Offset, Offset)
+type Halo = (Offset, Offset)
+type HaloMap = M.Map IdentName Halo
+type TypeMap = M.Map IdentName TExpr
 
 haloPass :: BwdPass AnalMonad (Insn ()) HaloMap
 haloPass = BwdPass{
-  bp_lattice  = undefined,
+  bp_lattice  = haloLattice,
   bp_transfer = undefined,
   bp_rewrite  = undefined
                   }
+
+haloLattice :: DataflowLattice HaloMap
+haloLattice = DataflowLattice
+  { fact_name = "halo analysis"
+  , fact_bot = M.empty
+  , fact_join = join
+  }
+  where
+    join _ (OldFact old) (NewFact new) = (ch, j)
+      where
+        ch = changeIf (j /= old)
+
+        j = M.unionWith j1 old new
+        j1 :: Halo -> Halo -> Halo
+        j1 (lo1,hi1) (lo2, hi2)
+          | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
+              (zipWith min lo1 lo2, zipWith max hi1 hi2)
+          | otherwise = error "remain mismatch in halo inference."
+
+        remain :: Rational -> Rational
+        remain x = x - toRational (floor x)
+
+        allIsSame [] = True
+        allIsSame [ _ ] = True
+        allIsSame (x:xs) = all (==x) xs
