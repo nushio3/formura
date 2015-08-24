@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, RecordWildCards #-}
+{-# LANGUAGE GADTs, RankNTypes, RecordWildCards, ScopedTypeVariables #-}
 module Language.IR.Front2Back where
 
 import           Compiler.Hoopl
@@ -80,20 +80,24 @@ haloLattice = DataflowLattice
       where
         ch = changeIf (j /= old)
 
-        remain :: Rational -> Rational
-        remain x = x - toRational (floor x)
+        j = joinHaloMap old new
 
-        allIsSame [] = True
-        allIsSame [ _ ] = True
-        allIsSame (x:xs) = all (==x) xs
 
 joinHaloMap :: HaloMap ->  HaloMap ->  HaloMap
-joinHaloMap = M.unionWith j1 old new
-        j1 :: Halo -> Halo -> Halo
-        j1 (lo1,hi1) (lo2, hi2)
-          | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
-              (zipWith min lo1 lo2, zipWith max hi1 hi2)
-          | otherwise = error "remain mismatch in halo inference."
+joinHaloMap old new = M.unionWith j1 old new
+  where
+    j1 :: Halo -> Halo -> Halo
+    j1 (lo1,hi1) (lo2, hi2)
+      | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
+          (zipWith min lo1 lo2, zipWith max hi1 hi2)
+      | otherwise = error "remain mismatch in halo inference."
+
+    remain :: Rational -> Rational
+    remain x = x - toRational (floor x)
+
+    allIsSame [] = True
+    allIsSame [ _ ] = True
+    allIsSame (x:xs) = all (==x) xs
 
 
 haloTransfer :: BwdTransfer (Insn a) HaloMap
