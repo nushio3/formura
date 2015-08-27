@@ -58,9 +58,15 @@ translateFunction Function{..} =
 
 
 type AnalMonad = SimpleFuelMonad
-type Halo = (Offset, Offset)
+data Halo
+  = Empty
+  | Finite Offset Offset
+  | Infinite
+
 type HaloMap = M.Map IdentName Halo
 type TypeMap = M.Map IdentName TExpr
+
+lookupHalo i = M.findWithDefault Empty i
 
 haloPass :: BwdPass AnalMonad (Insn ()) HaloMap
 haloPass = BwdPass{
@@ -84,14 +90,18 @@ haloLattice = DataflowLattice
 
 
 joinHaloMap :: HaloMap ->  HaloMap ->  HaloMap
-joinHaloMap old new = M.unionWith j1 old new
-  where
-    j1 :: Halo -> Halo -> Halo
-    j1 (lo1,hi1) (lo2, hi2)
-      | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
-          (zipWith min lo1 lo2, zipWith max hi1 hi2)
-      | otherwise = error "remain mismatch in halo inference."
+joinHaloMap old new = M.unionWith joinHalo old new
 
+joinHalo :: Halo -> Halo -> Halo
+joinHalo Empty x = x
+joinHalo x Empty = x
+joinHalo Infinite _ = Infinite
+joinHalo _Infinite = Infinite
+joinHalo (Finite lo1 hi1) (Finite lo2 hi2)
+  | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
+      (zipWith min lo1 lo2, zipWith max hi1 hi2)
+  | otherwise = error "remain mismatch in halo inference."
+  where
     remain :: Rational -> Rational
     remain x = x - toRational (floor x)
 
@@ -108,8 +118,10 @@ haloTransfer = mkBTransfer ht
     ht (Declare _ _) f = f
 
 traceHaloTransfer :: HaloMap -> RExpr -> Expr -> HaloMap
-traceHaloTransfer fact rhs lhs = M.empty
-
+traceHaloTransfer fact rhs lhs = lookup M.empty
+  where
+    ----- todo :: handle rhs shift
+    rhsHalo = lookupHalo (rhs ^. identName) fact
 
 haloRewrite :: forall m . FuelMonad m => BwdRewrite m (Insn ()) HaloMap
 haloRewrite = mkBRewrite d

@@ -37,7 +37,6 @@ data TExpr
   = TScalar IdentName
   | TArray Offset IdentName
   deriving (Eq, Show)
-
 instance HasIdentName TExpr where
   identName f (TScalar n) = fmap TScalar (f n)
   identName f (TArray o n) = fmap (TArray o) (f n)

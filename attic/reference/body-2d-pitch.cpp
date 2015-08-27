@@ -31,6 +31,7 @@ void pitch_kernel
 
         const bool in_region = t_dash >=0 && t_dash < NF+1;
 
+
         if (in_region) {
           if (t+t_orig>0 && y>=2 && x>=2) {
             asm volatile("#kernel");
