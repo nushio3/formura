@@ -14,7 +14,6 @@ dimension = 2
 type IdentName = String
 type Offset = [Rational]
 
-
 data Uniop = Neg
                    deriving (Eq, Show)
 data Binop = Add | Mul | Sub | Div | Pow

@@ -39,14 +39,20 @@ typeExpr = do
 compoundStatement :: Parser [F.Insn () H.O H.O]
 compoundStatement = do
   mType <- optional $ try $ typeExpr <* keywordSymbol "::"
-  rhs   <- rExpr
-  mLhs  <- optional $ do
-    keywordSymbol "="
-    expr
+
+  let rhsAndMaybeLhs :: Parser (F.RExpr, Maybe F.Expr)
+      rhsAndMaybeLhs = do
+        rhs   <- rExpr
+        mLhs  <- optional (keywordSymbol "=" >> expr)
+        return (rhs, mLhs)
+  ramls <- rhsAndMaybeLhs `sepBy1` keywordSymbol ","
+
   let typePart = [ F.Declare () (F.VarDecl typ (rhs ^. F.identName))
-                 | typ <- maybeToList mType]
+                 | typ <- maybeToList mType,
+                   rhs <- map fst ramls
+                   ]
       assignPart = [F.Assign () rhs lhs
-                   | lhs <- maybeToList mLhs]
+                   | (rhs, Just lhs) <- ramls]
   return $ typePart ++ assignPart
 
 

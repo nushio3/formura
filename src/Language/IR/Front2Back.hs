@@ -62,6 +62,7 @@ data Halo
   = Empty
   | Finite Offset Offset
   | Infinite
+    deriving (Eq, Ord, Show)
 
 type HaloMap = M.Map IdentName Halo
 type TypeMap = M.Map IdentName TExpr
@@ -96,10 +97,10 @@ joinHalo :: Halo -> Halo -> Halo
 joinHalo Empty x = x
 joinHalo x Empty = x
 joinHalo Infinite _ = Infinite
-joinHalo _Infinite = Infinite
+joinHalo _ Infinite = Infinite
 joinHalo (Finite lo1 hi1) (Finite lo2 hi2)
   | allIsSame (map remain $ lo1++hi1++lo2++hi2) =
-      (zipWith min lo1 lo2, zipWith max hi1 hi2)
+      Finite (zipWith min lo1 lo2) (zipWith max hi1 hi2)
   | otherwise = error "remain mismatch in halo inference."
   where
     remain :: Rational -> Rational
@@ -118,7 +119,7 @@ haloTransfer = mkBTransfer ht
     ht (Declare _ _) f = f
 
 traceHaloTransfer :: HaloMap -> RExpr -> Expr -> HaloMap
-traceHaloTransfer fact rhs lhs = lookup M.empty
+traceHaloTransfer fact rhs lhs = M.empty -- TODO
   where
     ----- todo :: handle rhs shift
     rhsHalo = lookupHalo (rhs ^. identName) fact
