@@ -25,7 +25,6 @@ import CommandLineOption
 
 main :: IO ()
 main = do
-  print $  theOption ^. outputFilename
   eitherSrcs <- runEitherT $ forM (theOption ^. inputFiles) process
   case eitherSrcs of
    Left dispErr -> dispErr
@@ -40,14 +39,19 @@ writeSrcs cppSrcs = do
 
 process :: FilePath -> EitherT (IO ()) IO T.Text
 process fileName = do
-  liftIO $ putStrLn $ "#### Analyze: " ++ fileName
   res <- liftIO $ Tri.parseFromFileEx (internalP program <* Tri.eof) fileName
   prog <- case res of
    Tri.Success prog -> do
-     liftIO $ mapM_ print prog
+     when (theOption ^. verbose) $ liftIO $ do
+       putStrLn $ "#### Analyze: " ++ fileName
+       mapM_ print prog
      return prog
    Tri.Failure doc ->
      left $ displayIO stdout $ renderPretty 0.8 80 $ doc <> linebreak
-  cppSrcs <- liftIO $ forM prog $ \fun ->
-    generate  (translateFunction fun)
+  cppSrcs <- liftIO $ do
+    putStrLn $ "#### Translate: "
+    forM prog $ \fun -> do
+      let bFun = translateFunction fun
+      when (theOption ^. verbose) $ print bFun
+      generate bFun
   return $ T.unlines cppSrcs

@@ -10,12 +10,13 @@ import System.IO.Unsafe
 data Options = Options
                { _outputFilename :: FilePath
                , _inputFiles :: [FilePath]
+               , _verbose :: Bool
                } deriving (Eq, Show)
 makeLenses ''Options
 
 optionsP :: Parser Options
 optionsP = (<*>) helper $
-           Options <$> outputFilenameP <*> inputFilesP
+           Options <$> outputFilenameP <*> inputFilesP <*> verboseP
 
 inputFileP :: Parser FilePath
 inputFileP = strArgument $ mconcat
@@ -35,6 +36,13 @@ outputFilenameP = strOption $ mconcat
     , value "output.cpp"
     , showDefaultWith id
     ]
+
+verboseP :: Parser Bool
+verboseP = switch $ mconcat
+    [ short 'v', long "verbose"
+    , help "output the debug messages."
+    ]
+
 
 myParserInfo :: ParserInfo Options
 myParserInfo = info optionsP $ mconcat
