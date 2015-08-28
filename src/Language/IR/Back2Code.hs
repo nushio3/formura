@@ -2,6 +2,7 @@
 module Language.IR.Back2Code where
 
 import Compiler.Hoopl
+import Control.Lens
 import qualified Data.ByteString as BS
 import Data.FileEmbed (embedFile)
 import Data.Monoid
@@ -36,6 +37,7 @@ class ToCode a where
 instance ToCode Expr where
   toCode (Lit x) = T.pack $ show (fromRational x :: Double) ++ "f"
   toCode (Load var off) = T.pack var <> offset2Code off
+  toCode (LoadScalar var) = T.pack var
   toCode (Uniop F.Neg a) = "(-(" <> toCode a <> "))"
   toCode (Binop F.Add a b) = "(" <> toCode a <> "+" <> toCode b <> ")"
   toCode (Binop F.Sub a b) = "(" <> toCode a <> "-" <> toCode b <> ")"
@@ -44,7 +46,8 @@ instance ToCode Expr where
   toCode (Triop F.FMA a b c) = "(" <> toCode a <> "*" <> toCode b <> "+" <> toCode c <> ")"
 
 instance ToCode RExpr where
-  toCode (RLoad var) = T.pack var <> offset2Code []
+  toCode (RLoad var) = T.pack var <> offset2Code [0,0]
+  toCode (RLoadScalar var) = T.pack var
 
 instance ToCode (Insn () e x) where
   toCode (Assign () r e) = toCode r <> "=" <> toCode e <> ";\n"
@@ -67,14 +70,18 @@ declCode :: Function -> T.Text
 declCode func =
   T.unlines $
   map T.pack $
-  [printf "%s %s[NX][NX];" vt vn
-  | v <- hontize (_entryDecls func) ++ _middleDecls func
-  , let vn = _varName v, let vt = _varType v]
+  [decl_stmt v
+  | v <- hontize (_entryDecls func) ++ _middleDecls func]
   where
     hontize :: [VarDecl] -> [VarDecl]
     hontize vs = concat
       [ [v{_varName = vn ++ "_hontai"}, v{_varName = vn ++ "_next_hontai"}]
       | v <- vs, let vn = _varName v]
+
+    decl_stmt :: VarDecl -> String
+    decl_stmt (VarDecl t vn) = case t of
+      TScalar tn  -> printf "%s %s;" tn vn
+      TArray o tn -> printf "%s %s%s;" tn vn (concat $ map (const "[NX]") o :: String)
 
 ptrDeclCode :: Function -> T.Text
 ptrDeclCode func =
@@ -82,7 +89,7 @@ ptrDeclCode func =
   map T.pack $
   [printf "%s %s = %s_hontai;" vt vn vn
   | v <- hontize (_entryDecls func)
-  , let vn = _varName v, let vt = _varType v ++ "_plane_t *"]
+  , let vn = _varName v, let vt = (v ^. varType . F.identName) ++ "_plane_t *"]
   where
     hontize :: [VarDecl] -> [VarDecl]
     hontize vs = concat
