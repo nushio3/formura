@@ -38,7 +38,6 @@ writeSrcs cppSrcs = do
   system $ "indent -kr -i2 -nut  -l1000 " ++ mainFn
   return ()
 
-
 process :: FilePath -> EitherT (IO ()) IO T.Text
 process fileName = do
   liftIO $ putStrLn $ "#### Analyze: " ++ fileName
