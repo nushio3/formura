@@ -6,11 +6,8 @@ void FUNCTION_NAME() {
   double wct1 = second();
   //POINTER DECLS
   for (int t=1; t <=T_FINAL; ++t) {
-    for (int j=0;j<NX;++j) {
-      for (int i=0;i<NX;++i) {
-        //BUFFER UPDATES
-      }
-    }
+    //BUFFER UPDATES
+
     //BUFFER SWAPS
   }
   double wct2=second();

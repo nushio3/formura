@@ -50,8 +50,16 @@ instance ToCode RExpr where
   toCode (RLoadScalar var) = T.pack var
 
 instance ToCode (Insn () e x) where
-  toCode (Assign () r e) = toCode r <> "=" <> toCode e <> ";\n"
+  toCode (Assign () r e) =
+    let
+      headFoot :: (T.Text, T.Text)
+      headFoot = case r of
+        (RLoad _) -> ("for (int j=0;j<NX;++j) {\n for (int i=0;i<NX;++i) {\n" , "}\n}\n")
+        (RLoadScalar _ ) -> ("", "") in
 
+    fst headFoot <>
+    toCode r <> "=" <> toCode e <> ";\n" <>
+    snd headFoot
 instance ToCode Function where
   toCode func = foldGraphNodes (\n code -> code <> toCode n) (_functionBody func) ""
 
