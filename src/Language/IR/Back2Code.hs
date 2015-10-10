@@ -14,7 +14,6 @@ import qualified Language.IR.Frontend as F
 import Language.IR.Backend
 import Text.Printf
 
-
 utilityCode :: T.Text
 utilityCode = decodeUtf8 $(embedFile "resource/utility.cpp")
 
@@ -65,7 +64,7 @@ instance ToCode Function where
   toCode func = foldGraphNodes (\n code -> code <> toCode n) (_functionBody func) ""
 
 offset2Code :: [Int] -> T.Text
-offset2Code is = T.pack $ printf "[mask(j+%d)][mask(i+%d)]" (is' !! 0) (is' !! 1)
+offset2Code is = T.pack $ printf "[mask_y(j+%d)][mask_x(i+%d)]" (is' !! 0) (is' !! 1)
   where
     is' = is ++ repeat 0
 
@@ -91,7 +90,7 @@ declCode func =
     decl_stmt :: VarDecl -> String
     decl_stmt (VarDecl t vn) = case t of
       TScalar tn  -> printf "%s %s;" tn vn
-      TArray o tn -> printf "%s %s%s;" tn vn (concat $ map (const "[NX]") o :: String)
+      TArray o tn -> printf "%s %s%s;" tn vn ("[NY][NX]" {-concat $ map (const "[NX]") o-} :: String)
 
 ptrDeclCode :: Function -> T.Text
 ptrDeclCode func =

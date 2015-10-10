@@ -11,6 +11,10 @@ inline int div_floor(int x, int y) {
   return q;
 }
 
-inline int mask(int x) {
+inline int mask_y(int x) {
+  return mod_floor(x,NY);
+}
+
+inline int mask_x(int x) {
   return mod_floor(x,NX);
 }
