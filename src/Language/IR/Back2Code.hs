@@ -5,6 +5,7 @@ import Compiler.Hoopl
 import Control.Lens
 import qualified Data.ByteString as BS
 import Data.FileEmbed (embedFile)
+import Data.List (nub)
 import Data.Monoid
 import           Data.Text.Encoding(decodeUtf8)
 import qualified Data.Text as T
@@ -54,7 +55,7 @@ instance ToCode (Insn () e x) where
     let
       headFoot :: (T.Text, T.Text)
       headFoot = case r of
-        (RLoad _) -> ("for (int j=0;j<NX;++j) {\n for (int i=0;i<NX;++i) {\n" , "}\n}\n")
+        (RLoad _) -> ("for (int j=0;j<NY;++j) {\n for (int i=0;i<NX;++i) {\n" , "}\n}\n")
         (RLoadScalar _ ) -> ("", "") in
 
     fst headFoot <>
@@ -77,6 +78,7 @@ swapCode func =
 declCode :: Function -> T.Text
 declCode func =
   T.unlines $
+  nub $
   map T.pack $
   [decl_stmt v
   | v <- hontize (_entryDecls func) ++ _middleDecls func]
