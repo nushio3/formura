@@ -49,7 +49,6 @@ instance Fractional Expr where
   a/b = Binop F.Div a b
   fromRational = Lit
 
-
 data RExpr = RLoad IdentName | RLoadScalar IdentName
   deriving (Eq, Show)
 

@@ -32,7 +32,7 @@ theoremFul = do
 findP :: Predicate
 findP = do
   p1  <- sPt exists "P1"
-  return $ (to_skew p1 .== (-42,-39,9,-43))
+  return $ (to_skew p1 .== (-49,7677,3,-49))
 
 main :: IO ()
 main = do
