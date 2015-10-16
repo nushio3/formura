@@ -1,4 +1,5 @@
 typedef float float_plane_t[NX];
+typedef double double_plane_t[NX];
 
 //BUFFER DECLS
 
