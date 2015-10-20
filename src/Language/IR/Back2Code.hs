@@ -45,17 +45,17 @@ instance ToCode Expr where
   toCode (Binop F.Div a b) = "(" <> toCode a <> "/" <> toCode b <> ")"
   toCode (Triop F.FMA a b c) = "(" <> toCode a <> "*" <> toCode b <> "+" <> toCode c <> ")"
 
-instance ToCode RExpr where
-  toCode (RLoad var) = T.pack var <> offset2Code [0,0]
-  toCode (RLoadScalar var) = T.pack var
+instance ToCode LExpr where
+  toCode (LLoad var) = T.pack var <> offset2Code [0,0]
+  toCode (LLoadScalar var) = T.pack var
 
 instance ToCode (Insn () e x) where
   toCode (Assign () r e) =
     let
       headFoot :: (T.Text, T.Text)
       headFoot = case r of
-        (RLoad _) -> ("for (int j=0;j<NY;++j) {\n for (int i=0;i<NX;++i) {\n" , "}\n}\n")
-        (RLoadScalar _ ) -> ("", "") in
+        (LLoad _) -> ("for (int j=0;j<NY;++j) {\n for (int i=0;i<NX;++i) {\n" , "}\n}\n")
+        (LLoadScalar _ ) -> ("", "") in
 
     fst headFoot <>
     toCode r <> "=" <> toCode e <> ";\n" <>

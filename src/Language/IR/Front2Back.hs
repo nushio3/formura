@@ -26,19 +26,19 @@ translateInsn :: Environment -> F.Insn a e x -> [B.Insn a O O]
 translateInsn env (Declare _ _ ) = []
 translateInsn env (Assign a r l) = [B.Assign a `uncurry` translateAssign env r l]
 
-translateAssign :: Environment -> F.RExpr -> F.Expr -> (B.RExpr, B.Expr)
+translateAssign :: Environment -> F.LExpr -> F.Expr -> (B.LExpr, B.Expr)
 translateAssign env r l = (br, bl)
   where
     br = case env rident of
-          B.TScalar _ -> B.RLoadScalar rident
-          _           -> B.RLoad rident
+          B.TScalar _ -> B.LLoadScalar rident
+          _           -> B.LLoad rident
     bl = translateExpr env (map negate roffset) l
 
     (rident, roffset) = rogo r
 
-rogo :: RExpr -> (IdentName, Offset)
-rogo (RLoad i)    = (i, replicate dimension 0)
-rogo (RShift o x) = rogo x & _2 %~ zipWith (+) o
+rogo :: LExpr -> (IdentName, Offset)
+rogo (LLoad i)    = (i, replicate dimension 0)
+rogo (LShift o x) = rogo x & _2 %~ zipWith (+) o
 
 translateExpr :: Environment -> F.Offset -> F.Expr -> B.Expr
 translateExpr env baseOffset fe = let go = translateExpr env baseOffset in case fe of
@@ -137,7 +137,7 @@ haloTransfer = mkBTransfer ht
     ht (Assign _ v e) f = joinHaloMap f (traceHaloTransfer f v e)
     ht (Declare _ _) f = f
 
-traceHaloTransfer :: HaloMap -> RExpr -> Expr -> HaloMap
+traceHaloTransfer :: HaloMap -> LExpr -> Expr -> HaloMap
 traceHaloTransfer fact rhs lhs = M.empty -- TODO
   where
     ----- todo :: handle rhs shift

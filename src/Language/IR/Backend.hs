@@ -49,7 +49,7 @@ instance Fractional Expr where
   a/b = Binop F.Div a b
   fromRational = Lit
 
-data RExpr = RLoad IdentName | RLoadScalar IdentName
+data LExpr = LLoad IdentName | LLoadScalar IdentName
   deriving (Eq, Show)
 
 data Function = Function { _functionName :: IdentName,
@@ -68,14 +68,14 @@ instance Show Function where
 
 
 data Insn a e x where
-  Assign :: a -> RExpr -> Expr          -> Insn a O O
+  Assign :: a -> LExpr -> Expr          -> Insn a O O
 
 deriving instance (Show r) =>  Show (Insn r e x)
 
-assignments :: Graph (Insn ()) O O -> [(RExpr, Expr)]
+assignments :: Graph (Insn ()) O O -> [(LExpr, Expr)]
 assignments g = reverse $ foldGraphNodes go g []
   where
-    go :: forall e x. Insn () e x ->  [(RExpr, Expr)] ->  [(RExpr, Expr)]
+    go :: forall e x. Insn () e x ->  [(LExpr, Expr)] ->  [(LExpr, Expr)]
     go (Assign _ r l) xs = (r,l):xs
     go _ xs = xs
 

@@ -18,15 +18,15 @@ term = parens expr<|> litTerm <|> identTerm <?> "term"
     litTerm = F.Lit <$> rational
     identTerm = F.Load <$> identifierName
 
-rExpr :: Parser F.RExpr
-rExpr = do
+lExpr :: Parser F.LExpr
+lExpr = do
   t <- identTerm
   mo <- optional offset
   case mo of
-   Just o -> return $ F.RShift o t
+   Just o -> return $ F.LShift o t
    Nothing -> return t
   where
-    identTerm = F.RLoad <$> identifierName
+    identTerm = F.LLoad <$> identifierName
 
 typeExpr :: Parser F.TExpr
 typeExpr = do
@@ -40,9 +40,9 @@ compoundStatement :: Parser [F.Insn () H.O H.O]
 compoundStatement = do
   mType <- optional $ try $ typeExpr <* keywordSymbol "::"
 
-  let rhsAndMaybeLhs :: Parser (F.RExpr, Maybe F.Expr)
+  let rhsAndMaybeLhs :: Parser (F.LExpr, Maybe F.Expr)
       rhsAndMaybeLhs = do
-        rhs   <- rExpr
+        rhs   <- lExpr
         mLhs  <- optional (keywordSymbol "=" >> expr)
         return (rhs, mLhs)
   ramls <- rhsAndMaybeLhs `sepBy1` keywordSymbol ","

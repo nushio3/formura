@@ -17,7 +17,6 @@ import Text.PrettyPrint.ANSI.Leijen as Pretty hiding (line, (<>), (<$>), empty, 
 
 import Language.Formura.Parser.Combinator (internalP)
 import Language.Formura.Parser (program)
-import Language.IR.Frontend (_functionName)
 import Language.IR.Front2Back (translateFunction)
 import Language.IR.Back2Code (generate, utilityCode)
 import CommandLineOption

@@ -46,14 +46,14 @@ data VarDecl = VarDecl { _varType :: TExpr, _varName :: IdentName}
 makeLenses ''VarDecl
 
 
-data RExpr
-  = RLoad IdentName
-  | RShift Offset RExpr
+data LExpr
+  = LLoad IdentName
+  | LShift Offset LExpr
   deriving (Eq, Show)
 
-instance HasIdentName RExpr where
-  identName f (RLoad n) = fmap RLoad (f n)
-  identName f (RShift o rx) = fmap (RShift o) (identName f rx)
+instance HasIdentName LExpr where
+  identName f (LLoad n) = fmap LLoad (f n)
+  identName f (LShift o rx) = fmap (LShift o) (identName f rx)
 
 
 
@@ -70,10 +70,10 @@ instance Show Function where
       in unlines $ [beg] ++ dcls ++ asgs ++ ["end function"]
 
 
-assignments :: Graph (Insn ()) O O -> [(RExpr, Expr)]
+assignments :: Graph (Insn ()) O O -> [(LExpr, Expr)]
 assignments g = reverse $ foldGraphNodes go g []
   where
-    go :: forall e x. Insn () e x ->  [(RExpr, Expr)] ->  [(RExpr, Expr)]
+    go :: forall e x. Insn () e x ->  [(LExpr, Expr)] ->  [(LExpr, Expr)]
     go (Assign _ r l) xs = (r,l):xs
     go _ xs = xs
 
@@ -89,7 +89,7 @@ type FunctionBody = Graph (Insn ()) O O
 
 data Insn a e x where
   Declare :: a -> VarDecl                -> Insn a O O
-  Assign  :: a -> RExpr -> Expr          -> Insn a O O
+  Assign  :: a -> LExpr -> Expr          -> Insn a O O
 
 deriving instance (Show a) =>  Show (Insn a e x)
 
