@@ -30,7 +30,7 @@ rExpr = do
 
 typeExpr :: Parser F.TExpr
 typeExpr = do
-  t <- identifierName
+  t <- unwords <$> identifierName `sepBy1` spaces
   mo <- optional offset
   case mo of
    Just o -> return $ F.TArray o t

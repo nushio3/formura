@@ -5,7 +5,7 @@ import Compiler.Hoopl
 import Control.Lens
 import qualified Data.ByteString as BS
 import Data.FileEmbed (embedFile)
-import Data.List (nub)
+import Data.List (nub, isInfixOf)
 import Data.Monoid
 import           Data.Text.Encoding(decodeUtf8)
 import qualified Data.Text as T
@@ -85,7 +85,7 @@ declCode func =
     hontize :: [VarDecl] -> [VarDecl]
     hontize vs = concat
       [ [v{_varName = vn ++ "_hontai"}, v{_varName = vn ++ "_next_hontai"}]
-      | v <- vs, let vn = _varName v]
+      | v <- vs, let vn = _varName v, not $ "extern" `isInfixOf` (_varType v ^. F.identName)]
 
     decl_stmt :: VarDecl -> String
     decl_stmt (VarDecl t vn) = case t of
