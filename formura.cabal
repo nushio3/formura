@@ -51,23 +51,6 @@ library
   ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
 
 
-executable test-parser
-  buildable: False
-  hs-source-dirs: exe-src
-  main-is: test-parser.hs
-  Other-Modules: CommandLineOption
-  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
-  build-depends:
-                base == 4.*
-              , ansi-wl-pprint
-              , bytestring
-              , containers
-              , formura
-              , lens
-              , text
-              , trifecta
-              , vector
-
 
 executable formura
   hs-source-dirs: exe-src
@@ -87,6 +70,22 @@ executable formura
               , vector
               , transformers
 
+executable test-parser
+  buildable: False
+  hs-source-dirs: exe-src
+  main-is: test-parser.hs
+  Other-Modules: CommandLineOption
+  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
+  build-depends:
+                base == 4.*
+              , ansi-wl-pprint
+              , bytestring
+              , containers
+              , formura
+              , lens
+              , text
+              , trifecta
+              , vector
 
 executable test-generator
   buildable: False
@@ -97,3 +96,12 @@ executable test-generator
                 base == 4.*
               , formura
               , hoopl
+
+
+executable formura-list-reserved-char
+  hs-source-dirs: exe-src
+  main-is: formura-list-reserved-char.hs
+  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
+  build-depends:
+                base == 4.*
+              , formura
