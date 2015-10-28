@@ -38,7 +38,7 @@ library
               , bytestring
               , containers
               , file-embed
-              , hoopl >= 3.10.1
+              , hoopl >= 3.10
               , lens
               , parsers
               , process
