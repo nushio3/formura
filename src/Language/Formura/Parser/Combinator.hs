@@ -26,19 +26,6 @@ deriving instance Errable Parser
 deriving instance MarkParsing Delta Parser
 
 
--- | The compiler metadata that provides access to the source.
-newtype Metadata = Metadata {_metadataRendering :: Rendering}
-instance Show Metadata where
-  show = const ""
-
-makeLenses ''Metadata
-
-instance HasRendering Metadata where
-  rendering = iso _metadataRendering Metadata
-
-metadata :: Parser Metadata
-metadata = fmap Metadata rend
-
 instance TokenParsing Parser where
   someSpace = let
     whitespace = (satisfy $ \c -> c /= '\n' && isSpace c)

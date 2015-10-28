@@ -8,13 +8,16 @@ import Control.Lens
 import Data.List (intercalate)
 import Text.Printf
 
+import Language.Formura.Parser.Metadata (Metadata)
+
 dimension :: Int
 dimension = 2
 
 type IdentName = String
 type Offset = [Rational]
 
-data Uniop = Neg
+type Uniop = UniopWith Metadata
+data UniopWith m = Neg m
                    deriving (Eq, Show)
 data Binop = Add | Mul | Sub | Div | Pow
                    deriving (Eq, Show)
