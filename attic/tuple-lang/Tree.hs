@@ -23,8 +23,13 @@ pMetadata = fmap Metadata rend
 pTree :: Parser a -> Parser (TreeWith Metadata a)
 pTree pElem = pTuple <|> pLeaf
   where
-    pElem
-
+    pLeaf = Leaf <$> pMetadata <*> pElem
+    pTuple = do
+      symbolic "("
+      m <- pMetadata
+      children <- pTree `sepBy`  (symbolic ",")
+      symbolic ")"
+      return $ Tuple m children
 
 zipTreeWith :: Metadata -> (a -> b -> c) -> Tree a -> Tree b -> Either String (Tree c)
 zipTreeWith m f ta tb = case (ta,tb) of
