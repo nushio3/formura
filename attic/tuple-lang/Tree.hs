@@ -25,10 +25,10 @@ pTree pElem = pTuple <|> pLeaf
   where
     pLeaf = Leaf <$> pMetadata <*> pElem
     pTuple = do
-      symbolic "("
+      symbol "("
       m <- pMetadata
-      children <- pTree `sepBy`  (symbolic ",")
-      symbolic ")"
+      children <- pTree pElem `sepBy` (symbol ",")
+      symbol ")"
       return $ Tuple m children
 
 zipTreeWith :: Metadata -> (a -> b -> c) -> Tree a -> Tree b -> Either String (Tree c)
