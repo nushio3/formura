@@ -18,6 +18,6 @@ cabal-version:       >=1.10
 executable tuple-lang
   main-is:             Tree.hs
   -- other-modules:
-  build-depends:       base == 4.*, lens, trifecta
+  build-depends:       base == 4.*, ansi-wl-pprint, containers, lens, trifecta
   -- hs-source-dirs:
   default-language:    Haskell2010
