@@ -1,0 +1,7 @@
+flags: {}
+packages:
+- .
+extra-deps:
+  - hoopl-3.10.2.0
+resolver: lts-3.13
+# skip-ghc-check: True
