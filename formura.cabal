@@ -23,86 +23,64 @@ source-repository head
 
 library
   exposed-modules:
-                  Language.Formura.Parser
-                  Language.Formura.Parser.Combinator
-                  Language.Formura.Parser.Metadata
-                  Language.IR.Back2Code
-                  Language.IR.Backend
-                  Language.IR.Configuration
-                  Language.IR.Front2Back
-                  Language.IR.Frontend
+                  Language.Combinator
 
   -- other-modules:
   -- other-extensions:
   build-depends:
                 base == 4.*
-              , bytestring
-              , containers
-              , file-embed
-              , hoopl >= 3.10
+              , ansi-wl-pprint
+              , either
               , lens
-              , parsers
-              , process
-              , split
-              , text
               , trifecta
 
   hs-source-dirs:      src
   default-language:    Haskell2010
-  ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
+  ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
 
 
 
 executable formura
   hs-source-dirs: exe-src
   main-is: formura.hs
-  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
-  build-depends:
-                base == 4.*
-              , ansi-wl-pprint
-              , containers
-              , either
-              , formura
-              , lens
-              , optparse-applicative
-              , process
-              , text
-              , trifecta
-              , vector
-              , transformers
-
-executable test-parser
-  buildable: False
-  hs-source-dirs: exe-src
-  main-is: test-parser.hs
-  Other-Modules: CommandLineOption
-  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
-  build-depends:
-                base == 4.*
-              , ansi-wl-pprint
-              , bytestring
-              , containers
-              , formura
-              , lens
-              , text
-              , trifecta
-              , vector
-
-executable test-generator
-  buildable: False
-  hs-source-dirs: exe-src
-  main-is: test-generator.hs
-  ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
+  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
                 base == 4.*
               , formura
-              , hoopl
 
-
-executable formura-list-reserved-char
-  hs-source-dirs: exe-src
-  main-is: formura-list-reserved-char.hs
-  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
-  build-depends:
-                base == 4.*
-              , formura
+-- executable test-parser
+--   buildable: False
+--   hs-source-dirs: exe-src
+--   main-is: test-parser.hs
+--   Other-Modules: CommandLineOption
+--   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
+--   build-depends:
+--                 base == 4.*
+--               , ansi-wl-pprint
+--               , bytestring
+--               , containers
+--               , formura
+--               , lens
+--               , text
+--               , trifecta
+--               , vector
+--
+-- executable test-generator
+--   buildable: False
+--   hs-source-dirs: exe-src
+--   main-is: test-generator.hs
+--   ghc-options:         -O2 -Wall  -fno-warn-unused-do-bind
+--   build-depends:
+--                 base == 4.*
+--               , formura
+--               , hoopl
+--
+--
+-- executable formura-list-reserved-char
+--   hs-source-dirs: exe-src
+--   main-is: formura-list-reserved-char.hs
+--   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind
+--   build-depends:
+--                 base == 4.*
+--               , formura
+--
