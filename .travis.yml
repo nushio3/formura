@@ -1,0 +1,21 @@
+# https://github.com/commercialhaskell/stack/wiki/Travis
+
+sudo: false
+
+before_install:
+  # stack
+  - mkdir -p ~/.local/bin
+  - export PATH=~/.local/bin:$PATH
+  - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+  - export PATH=/opt/ghc/7.10.2/bin:$PATH
+
+addons:
+  apt:
+    sources:
+    - hvr-ghc
+    packages:
+    - ghc-7.10.2
+    - libgmp-dev
+
+script:
+  - stack --no-terminal --skip-ghc-check build
