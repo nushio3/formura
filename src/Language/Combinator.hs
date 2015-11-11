@@ -1,6 +1,6 @@
 {-|
 Module      : Language.Combinator
-Description : Short description
+Description : language combinator
 Copyright   : (c) Takayuki Muranushi, 2015
 License     : MIT
 Maintainer  : muranushi@gmail.com
