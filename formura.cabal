@@ -51,6 +51,7 @@ executable formura
   build-depends:
                 base == 4.*
               , formura
+              , QuickCheck
 
 -- executable test-parser
 --   buildable: False

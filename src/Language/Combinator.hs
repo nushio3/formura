@@ -21,9 +21,8 @@ module Language.Combinator where
 import           Control.Lens
 import           Control.Monad
 import           Data.Traversable
-import qualified  Test.QuickCheck.Gen       as Q
-import qualified  Test.QuickCheck.Arbitrary as Q
-import qualified Text.Trifecta as P hiding (string)
+import qualified Test.QuickCheck     as Q
+import qualified Text.Trifecta       as P hiding (string)
 import qualified Text.Trifecta.Delta as P
 
 -- * Sum of functors
@@ -62,10 +61,17 @@ instance Q.Arbitrary (Sum '[] x) where
   arbitrary = return Void
   shrink _ = []
 
-instance (Traversable f, Q.Arbitrary (f x), Q.Arbitrary (Sum fs x)) => Q.Arbitrary (Sum (f ': fs) x) where
+instance (Traversable f, Q.Arbitrary (f x)) => Q.Arbitrary (Sum (f ': '[]) x) where
+  arbitrary = Here <$> Q.arbitrary
+  shrink (Here x)  = map Here  $ Q.shrink x
+  shrink (There x) = map There $ Q.shrink x
+
+
+instance (Traversable f, Q.Arbitrary (f x), Q.Arbitrary (Sum (g ': fs) x)) => Q.Arbitrary (Sum (f ': g ': fs) x) where
   arbitrary = Q.oneof [Here <$> Q.arbitrary, There <$> Q.arbitrary]
   shrink (Here x)  = map Here  $ Q.shrink x
   shrink (There x) = map There $ Q.shrink x
+
 
 
 -- | The prisms for accessing the first functor in the Sum
