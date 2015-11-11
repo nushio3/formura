@@ -105,7 +105,7 @@ instance {-# OVERLAPPABLE #-} (Traversable f, Elem f gs, Subset fs gs) => Subset
 
 -- * Tools for matching
 
--- | The constraint that object @x@ can somehow be matched to functor @f@; there is a 'Prism'' from type @x@
+-- | The constraint that object @x@ can somehow be matched to functor @f@, that is, there is a 'Prism'' from type @x@
 --   to type @f (Content f x)@.
 class Matches f x where
   type Content f x :: *
