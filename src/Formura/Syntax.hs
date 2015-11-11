@@ -13,7 +13,7 @@ Components for syntatic elements of formura.
 DeriveTraversable, FlexibleContexts, FlexibleInstances,
 PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
-module Language.Formura.Syntax where
+module Formura.Syntax where
 
 import Control.Lens hiding (op)
 import Data.List (intercalate)
