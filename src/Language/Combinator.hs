@@ -18,9 +18,11 @@ UndecidableInstances, ViewPatterns #-}
 
 module Language.Combinator where
 
-import Control.Lens
-import Control.Monad
-import Data.Traversable
+import           Control.Lens
+import           Control.Monad
+import           Data.Traversable
+import qualified  Test.QuickCheck.Gen       as Q
+import qualified  Test.QuickCheck.Arbitrary as Q
 import qualified Text.Trifecta as P hiding (string)
 import qualified Text.Trifecta.Delta as P
 
@@ -55,6 +57,16 @@ instance Traversable (Sum fs) where
 instance Elem f fs => Matches f (Sum fs x) where
   type Content f (Sum fs x) = x
   match = constructor
+
+instance Q.Arbitrary (Sum '[] x) where
+  arbitrary = return Void
+  shrink _ = []
+
+instance (Traversable f, Q.Arbitrary (f x), Q.Arbitrary (Sum fs x)) => Q.Arbitrary (Sum (f ': fs) x) where
+  arbitrary = Q.oneof [Here <$> Q.arbitrary, There <$> Q.arbitrary]
+  shrink (Here x)  = map Here  $ Q.shrink x
+  shrink (There x) = map There $ Q.shrink x
+
 
 -- | The prisms for accessing the first functor in the Sum
 _Here :: Traversable f => Prism' (Sum (f ': fs) x) (f x)
@@ -142,6 +154,9 @@ instance Elem f fs => Matches f (Fix (Sum fs)) where
   type Content f (Fix (Sum fs)) = Fix (Sum fs)
   match = fix . constructor
 
+instance (Functor f, Q.Arbitrary (f (Fix f))) => Q.Arbitrary (Fix f) where
+  arbitrary       = In Nothing <$> Q.arbitrary
+  shrink (In h x) = map (In h) $ Q.shrink x
 
 
 -- | The lens that accesses the compiler metadata of the syntax tree

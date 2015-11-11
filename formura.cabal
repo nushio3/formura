@@ -35,6 +35,7 @@ library
               , either
               , lens
               , parsers
+              , QuickCheck
               , trifecta
 
   hs-source-dirs:      src
