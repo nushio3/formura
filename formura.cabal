@@ -35,6 +35,7 @@ library
               , containers
               , either
               , lens
+              , mtl
               , parsers
               , QuickCheck
               , trifecta

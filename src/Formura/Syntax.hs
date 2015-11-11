@@ -19,7 +19,7 @@ import Control.Lens hiding (op)
 import Data.List (intercalate)
 import qualified Test.QuickCheck as Q
 
-import Language.Combinator
+import Formura.Language.Combinator
 
 
 
