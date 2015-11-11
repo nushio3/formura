@@ -48,7 +48,7 @@ instance Foldable (Sum fs) where
   foldMap = foldMapDefault
 
 instance Traversable (Sum fs) where
-  traverse afb Void      = pure Void
+  traverse _   Void      = pure Void
   traverse afb (Here x)  = Here  <$> traverse afb x
   traverse afb (There x) = There <$> traverse afb x
 
@@ -112,7 +112,7 @@ class Matches f x where
   match :: Prism' x (f (Content f x))
 
 -- | The type of the  'Prism'' that matches any @x@ such that @Matches f x@.
-type MatchPrism (f :: * -> *) = Matches f x => Prism' x (f (Content f x))
+type MatchPrism (f :: * -> *) = forall x. Matches f x => Prism' x (f (Content f x))
 
 
 instance Matches f (f x) where
