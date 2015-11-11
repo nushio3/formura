@@ -10,9 +10,10 @@ import qualified Text.PrettyPrint.ANSI.Leijen as PPR
 
 import Metadata
 
+type Tree = TreeWith Metadata
 data TreeWith m a = Leaf m a | Tuple m [TreeWith m a]
                        deriving (Eq,Ord,Show,Read,Functor)
-type Tree = TreeWith Metadata
+
 
 instance HasMetadata m => HasMetadata (TreeWith m a) where
   metadata =
@@ -20,6 +21,17 @@ instance HasMetadata m => HasMetadata (TreeWith m a) where
         l f (Leaf m1 v) = fmap (\m2 -> Leaf m2 v) (f m1)
         l f (Tuple m1 v) = fmap (\m2 -> Tuple m2 v) (f m1)
     in l . metadata
+
+type Expr = ExprWith Metadata
+data ExprWith m = Add m (ExprWith m) (ExprWith m) | TreeExpr m (TreeWith m (ExprWith m))
+
+instance HasMetadata m => HasMetadata (ExprWith m) where
+  metadata =
+    let l :: Lens' (ExprWith m) m
+        l f (Add m1 u v) = fmap (\m2 -> Add m2 u v) (f m1)
+        l f (TreeExpr m1 v) = fmap (\m2 -> TreeExpr m2 v) (f m1)
+    in l . metadata
+
 
 pMetadata :: Parser Metadata
 pMetadata = fmap Metadata rend
