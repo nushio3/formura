@@ -24,6 +24,7 @@ source-repository head
 library
   exposed-modules:
                   Language.Combinator
+                  Language.Formura.Syntax
 
   -- other-modules:
   -- other-extensions:
