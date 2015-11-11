@@ -3,6 +3,7 @@
 while :
 do
     stack build
-    stack haddock
+    cabal configure --package-db=clear --package-db=global --package-db=$(stack path --snapshot-pkg-db) --package-db=$(stack path --local-pkg-db)
+    cabal haddock
     inotifywait -e modify -r ./src/ ./exe-src/ formura.cabal
 done
