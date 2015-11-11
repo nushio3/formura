@@ -16,7 +16,7 @@ PatternSynonyms, RankNTypes, ScopedTypeVariables, StandaloneDeriving,
 TemplateHaskell, TupleSections, TypeFamilies, TypeOperators,
 UndecidableInstances, ViewPatterns #-}
 
-module Language.Combinator where
+module Formura.Language.Combinator where
 
 import           Control.Lens
 import           Control.Monad

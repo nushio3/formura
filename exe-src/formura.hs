@@ -1,8 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 module Main where
 
-import Language.Combinator
-import Language.Formura.Syntax
+import Formura.Language.Combinator
+import Formura.Syntax
 
 import qualified Test.QuickCheck as Q
 

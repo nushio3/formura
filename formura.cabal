@@ -23,7 +23,8 @@ source-repository head
 
 library
   exposed-modules:
-                  Language.Combinator
+                  Formura.Language.Combinator
+                  Formura.Compiler
                   Formura.Syntax
 
   -- other-modules:

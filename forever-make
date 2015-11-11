@@ -2,9 +2,10 @@
 
 while :
 do
-    stack build
-    # http://stackoverflow.com/questions/32712775/generating-documentation-for-my-own-code-with-haddock-and-stack
-    cabal configure --package-db=clear --package-db=global --package-db=$(stack path --snapshot-pkg-db) --package-db=$(stack path --local-pkg-db)
+    stack build && \
+    cabal configure --package-db=clear --package-db=global --package-db=$(stack path --snapshot-pkg-db) --package-db=$(stack path --local-pkg-db) && \
     cabal haddock
     inotifywait -e modify -r ./src/ ./exe-src/ formura.cabal
 done
+
+# http://stackoverflow.com/questions/32712775/generating-documentation-for-my-own-code-with-haddock-and-stack
