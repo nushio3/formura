@@ -1,5 +1,7 @@
-formura
+
+formura [![Build Status](https://travis-ci.org/nushio3/formura.svg?branch=master)](https://travis-ci.org/nushio3/formura)
 =======
+
 
 
 Formura = Formula Translator - Translator + Muranushi
