@@ -126,5 +126,4 @@ type TypeExpr = Lang '[ GridAtF Rational, TupleF, VectorAtF Int, ElementalTypeF 
 
 type LExpr = Lang '[ GridAtF NPlusKPattern, TupleF, VectorAtF IdentName, IdentF ]
 
-
 type RExpr = Lang '[ TupleAtF, GridAtF NPlusKPattern, IdentF ]

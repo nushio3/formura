@@ -49,6 +49,7 @@ throw doc = do
      P.explain (P.addSpan b e $ r) $
      P.Err (Just stgDoc) [] (S.empty)
 
+
 -- | The monadic algebra, specialized to the compiler monad.
 type CAlgebra f a = f a -> M a
 

@@ -17,4 +17,4 @@ addons:
     - libgmp-dev
 
 script:
-  - stack --no-terminal --skip-ghc-check build
+  - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
