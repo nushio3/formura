@@ -24,6 +24,7 @@ import           Data.Traversable
 import qualified Test.QuickCheck     as Q
 import qualified Text.Trifecta       as P hiding (string)
 import qualified Text.Trifecta.Delta as P
+import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 
 -- * Sum of functors
 
@@ -148,6 +149,8 @@ instance Show Metadata where
 instance P.HasRendering Metadata where
   rendering = metadataRendering
 
+instance Ppr.Pretty Metadata where
+  pretty (Metadata ma b e) = undefined
 
 -- | The fix point of F-algebra, with compiler metadata information. This is the datatype we use to represent any AST.
 data Fix f where
