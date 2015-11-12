@@ -1,5 +1,7 @@
-formura
+
+formura [![Build Status](https://travis-ci.org/nushio3/formura.svg?branch=master)](https://travis-ci.org/nushio3/formura) [![Download](https://img.shields.io/github/downloads/nushio3/formura/latest/total.svg)](https://github.com/nushio3/formura/releases/download/test/formura)
 =======
+
 
 
 Formura = Formula Translator - Translator + Muranushi
