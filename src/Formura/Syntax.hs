@@ -9,7 +9,7 @@ Stability   : experimental
 Components for syntatic elements of formura.
 -}
 
-{-# LANGUAGE DeriveFunctor, DeriveFoldable,
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
 DeriveTraversable, FlexibleContexts, FlexibleInstances,
 PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
@@ -22,9 +22,13 @@ import qualified Test.QuickCheck as Q
 import Formura.Language.Combinator
 
 
+-- * Syntactical Elements
 
+-- ** Elemental types
 
--- * Identifier terms
+data ElementalTypeF x = TInt | TRational | TFloat | TDouble | TReal | TComplexFloat | TComplexDouble | TComplexReal
+
+-- ** Identifier terms
 type IdentName = String
 
 data IdentF x = IdentF IdentName
@@ -36,7 +40,7 @@ pattern Ident xs <- ((^? match) -> Just (IdentF xs)) where
 
 
 
--- * Tuple
+-- ** Tuple
 
 -- | The functor for tuple.
 data TupleF x = TupleF [x]
@@ -57,7 +61,7 @@ pattern Tuple xs <- ((^? match) -> Just (TupleF xs)) where
 
 
 
--- * Arithmetic elements
+-- ** Arithmetic elements
 
 data ArithF x = ImmF Rational
               | UniopF IdentName x
@@ -92,16 +96,35 @@ pattern Triop op a b c <- ((^? match) -> Just (TriopF op a b c)) where
 
 
 
--- * Element access expressions
+-- ** Element access expressions
 
-data GridAtF x = GridAtF x [x]
+data GridAtF y x = GridAtF [y] x
              deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
 
-pattern GridAt x args <- ((^? match) -> Just (GridAtF x args )) where
-  GridAt x args = match # GridAtF x args
+pattern GridAt args x <- ((^? match) -> Just (GridAtF args x )) where
+  GridAt args x = match # GridAtF args x
 
-data TupleAtF x = TupleAtF x [x]
+data TupleAtF x = TupleAtF [x] x
              deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
 
-pattern TupleAt x args <- ((^? match) -> Just (TupleAtF x args )) where
-  TupleAt x args = match # TupleAtF x args
+pattern TupleAt args x <- ((^? match) -> Just (TupleAtF args x )) where
+  TupleAt args x = match # TupleAtF args x
+
+data VectorAtF y x = VectorAtF y x
+                   deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+
+-- * Expressions and Program Components
+
+type ConstRationalExpr = Lang '[ ArithF ]
+
+data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
+
+data NPlusK = NPlusK IdentName Rational
+
+
+type TypeExpr = Lang '[ GridAtF Rational, TupleF, VectorAtF Int, ElementalTypeF ]
+
+type LExpr = Lang '[ GridAtF NPlusKPattern, TupleF, VectorAtF IdentName, IdentF ]
+
+
+type RExpr = Lang '[ TupleAtF, GridAtF NPlusKPattern, IdentF ]

@@ -6,10 +6,9 @@ import Formura.Syntax
 
 import qualified Test.QuickCheck as Q
 
-type ExprF = [TupleF, ArithF]
-type Expr  = Lang ExprF
+type TestExpr  = Lang '[TupleF, ArithF]
 
 main :: IO ()
 main = do
   x <- Q.generate Q.arbitrary
-  print (x :: Expr)
+  print (x :: TestExpr)

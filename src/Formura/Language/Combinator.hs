@@ -24,7 +24,6 @@ import           Data.Traversable
 import qualified Test.QuickCheck     as Q
 import qualified Text.Trifecta       as P hiding (string)
 import qualified Text.Trifecta.Delta as P
-import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 
 -- * Sum of functors
 

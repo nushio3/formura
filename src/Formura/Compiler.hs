@@ -42,12 +42,12 @@ throw doc = do
         | stg == "" = doc
         | otherwise = Ppr.text ("When " ++ stg) <> Ppr.line <> doc
   case foc of
-   Nothing -> M $ left $ stgDoc
-   Just (Metadata r b e) -> M $ left $
-                            P.explain (P.addSpan b e $ r) $
-                            P.Err (Just stgDoc) [] (S.empty)
-
-
+   Nothing ->
+     M $ left $ stgDoc
+   Just (Metadata r b e) ->
+     M $ left $
+     P.explain (P.addSpan b e $ r) $
+     P.Err (Just stgDoc) [] (S.empty)
 
 -- | The monadic algebra, specialized to the compiler monad.
 type CAlgebra f a = f a -> M a
