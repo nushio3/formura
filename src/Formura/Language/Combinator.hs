@@ -66,7 +66,6 @@ instance (Traversable f, Q.Arbitrary (f x)) => Q.Arbitrary (Sum (f ': '[]) x) wh
   shrink (Here x)  = map Here  $ Q.shrink x
   shrink (There x) = map There $ Q.shrink x
 
-
 instance (Traversable f, Q.Arbitrary (f x), Q.Arbitrary (Sum (g ': fs) x)) => Q.Arbitrary (Sum (f ': g ': fs) x) where
   arbitrary = Q.oneof [Here <$> Q.arbitrary, There <$> Q.arbitrary]
   shrink (Here x)  = map Here  $ Q.shrink x
