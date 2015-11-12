@@ -7,6 +7,8 @@ import           Control.Lens
 import           Control.Monad.Trans.Either
 import           Control.Monad.State
 import           Data.Monoid
+import qualified Data.Set as S
+import qualified Text.Trifecta as P
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 
 import Formura.Language.Combinator
@@ -36,14 +38,21 @@ throw :: CompilerError -> M a
 throw doc = do
   stg <- use compilerStage
   foc <- use compilerFocus
-  let stgDoc = Ppr.text ("When " ++ stg) <> Ppr.line
-  M $ left $ stgDoc <> doc
+  let stgDoc
+        | stg == "" = doc
+        | otherwise = Ppr.text ("When " ++ stg) <> Ppr.line <> doc
+  case foc of
+   Nothing -> M $ left $ stgDoc
+   Just (Metadata r b e) -> M $ left $
+                            P.explain (P.addSpan b e $ r) $
+                            P.Err (Just stgDoc) [] (S.empty)
+
 
 
 -- | The monadic algebra, specialized to the compiler monad.
 type CAlgebra f a = f a -> M a
 
--- | The compiler-monad-specific fold.
+-- | The compiler-monad-specific fold, that takes track of the syntax tree traversed.
 compile :: Traversable f => CAlgebra f (Lang g) -> Fix f -> M (Lang g)
 compile k (In meta x) = do
   compilerFocus %= (meta <|>)

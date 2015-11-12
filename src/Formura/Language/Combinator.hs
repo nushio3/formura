@@ -148,9 +148,6 @@ instance Show Metadata where
 instance P.HasRendering Metadata where
   rendering = metadataRendering
 
-instance Ppr.Pretty Metadata where
-  pretty (Metadata ma b e) = undefined
-
 -- | The fix point of F-algebra, with compiler metadata information. This is the datatype we use to represent any AST.
 data Fix f where
   In :: Functor f => {_metadata :: Maybe Metadata, _out :: f (Fix f)} -> Fix f
