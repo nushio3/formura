@@ -127,3 +127,23 @@ type TypeExpr = Lang '[ GridAtF Rational, TupleF, VectorAtF Int, ElementalTypeF 
 type LExpr = Lang '[ GridAtF NPlusKPattern, TupleF, VectorAtF IdentName, IdentF ]
 
 type RExpr = Lang '[ TupleAtF, GridAtF NPlusKPattern, IdentF ]
+
+data SpecialDeclaration = DimensionDeclaration Int
+                        | AxesDeclaration [IdentName]
+                        | InitialFunctionDeclaration IdentName
+                        | StepFunctionDeclaration IdentName
+
+data Statement = Substitution LExpr RExpr
+               | TypeDeclaration IdentName TypeExpr
+               | SpecialDeclaration SpecialDeclaration
+               | FunctionDefinition Function
+
+data Function =
+  Function
+  { _functionName :: IdentName
+  , _functionArgument :: LExpr
+  , _functionReturn :: RExpr
+  , _functionBody :: Program
+  }
+
+type Program = [Statement]
