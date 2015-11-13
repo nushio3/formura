@@ -94,24 +94,28 @@ pattern Binop op a b <- ((^? match) -> Just (BinopF op a b)) where
 pattern Triop op a b c <- ((^? match) -> Just (TriopF op a b c)) where
   Triop op a b c = match # TriopF op a b c
 
+-- ** Functional Application
+
+data ApplyF x = ApplyF x x
+             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+
+pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
+  Apply f x = match # ApplyF f x
 
 
 -- ** Element access expressions
 
-data GridAtF y x = GridAtF [y] x
+data GridF y x = GridF [y] x
              deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
 
-pattern GridAt args x <- ((^? match) -> Just (GridAtF args x )) where
-  GridAt args x = match # GridAtF args x
+pattern Grid args x <- ((^? match) -> Just (GridF args x )) where
+  Grid args x = match # GridF args x
 
-data TupleAtF x = TupleAtF [x] x
-             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
-
-pattern TupleAt args x <- ((^? match) -> Just (TupleAtF args x )) where
-  TupleAt args x = match # TupleAtF args x
-
-data VectorAtF y x = VectorAtF y x
+data VectorF y x = VectorF y x
                    deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+
+pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
+  Vector args x = match # VectorF args x
 
 -- * Expressions and Program Components
 
@@ -122,11 +126,11 @@ data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
 data NPlusK = NPlusK IdentName Rational
 
 
-type TypeExpr = Lang '[ GridAtF Rational, TupleF, VectorAtF Int, ElementalTypeF ]
+type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, ElementalTypeF ]
 
-type LExpr = Lang '[ GridAtF NPlusKPattern, TupleF, VectorAtF IdentName, IdentF ]
+type LExpr = Lang '[ GridF NPlusKPattern, TupleF, VectorF IdentName, IdentF ]
 
-type RExpr = Lang '[ TupleAtF, GridAtF NPlusKPattern, IdentF ]
+type RExpr = Lang '[ ApplyF, GridF NPlusKPattern, TupleF, ArithF, IdentF ]
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
