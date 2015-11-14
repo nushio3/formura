@@ -28,13 +28,13 @@ import Formura.Language.Combinator
 -- ** Elemental types
 
 data ElemTypeF x = ElemTypeF IdentName
-                      deriving (Eq, Ord, Show)
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
 
 
 data FunTypeF x = FunTypeF
-                deriving (Eq, Ord, Show)
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern FunType <- ((^? match) -> Just FunTypeF) where FunType = match # FunTypeF
 
@@ -150,7 +150,7 @@ pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
 data LetF x = LetF (BindingF x) x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
-pattern Let binds x <- ((^? match) -> Just (LetF binds x )) where
+pattern Let binds x <- ((^? match) -> Just (LetF binds x)) where
   Let binds x = match # LetF binds x
 
 -- | Lambda expression
@@ -171,18 +171,17 @@ pattern Binding xs <- ((^? match) -> Just (BindingF xs )) where
 data StatementF x
   = SubstF LExpr x
   -- ^ substitution
-  | TypeDeclF IdentName TypeExpr
+  | TypeDeclF TypeExpr LExpr
   -- ^ type declaration
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 pattern Subst l r <- ((^? match) -> Just (SubstF l r)) where
   Subst l r = match # SubstF l r
-pattern TypeDecl x t <- ((^? match) -> Just (TypeDeclF x t)) where
-  TypeDecl x t = match # TypeDeclF x t
-
+pattern TypeDecl t x <- ((^? match) -> Just (TypeDeclF t x)) where
+  TypeDecl t x = match # TypeDeclF t x
 
 -- * Program Components
 
-type ConstRationalExpr = Lang '[ OperatorF ]
+type ConstRationalExpr = Lang '[ OperatorF, ImmF ]
 
 data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
              deriving (Eq, Ord, Show)
@@ -194,15 +193,13 @@ type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemType
 
 type LExpr = Lang '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ]
 
-type RExpr = Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF ]
+type RExpr = Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF, ImmF ]
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
-                        | InitialFunctionDeclaration IdentName
-                        | StepFunctionDeclaration IdentName
              deriving (Eq, Ord, Show)
 
 data Program = Program
-               { _programSpecialDeclarations :: SpecialDeclaration
-               , _programBinding :: Lang '[BindingF]}
+               { _programSpecialDeclarations :: [SpecialDeclaration]
+               , _programBinding :: BindingF RExpr}
              deriving (Eq, Ord, Show)

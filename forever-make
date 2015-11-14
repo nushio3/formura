@@ -2,10 +2,10 @@
 
 while :
 do
-    stack build --ghc-options=-ferror-spans && \
-    stack haddock --haddock-deps && \
-    cabal configure --package-db=clear --package-db=global --package-db=$(stack path --snapshot-pkg-db) --package-db=$(stack path --local-pkg-db) && \
-    cabal haddock
+    stack build --ghc-options=-ferror-spans # && \
+    #stack haddock --haddock-deps && \
+    #cabal configure --package-db=clear --package-db=global --package-db=$(stack path --snapshot-pkg-db) --package-db=$(stack path --local-pkg-db) && \
+    #cabal haddock
     inotifywait -e modify -r ./src/ ./exe-src/ formura.cabal
 done
 
