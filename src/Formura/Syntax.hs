@@ -26,11 +26,16 @@ import Formura.Language.Combinator
 
 -- ** Elemental types
 
-data ElementalTypeF x = TInt | TRational | TFloat | TDouble | TReal | TComplexFloat | TComplexDouble | TComplexReal
+data ElemTypeF x = ElemTypeF IdentName
                       deriving (Eq, Ord, Show)
 
-data FunctionTypeF x = TFunction
-                      deriving (Eq, Ord, Show)
+pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
+
+
+data FunTypeF x = FunTypeF
+                deriving (Eq, Ord, Show)
+
+pattern FunType <- ((^? match) -> Just FunTypeF) where FunType = match # FunTypeF
 
 -- ** Identifier terms
 type IdentName = String
@@ -114,25 +119,45 @@ pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
 
 -- ** Functional Program Constituent
 
+-- | Function application
 data ApplyF x = ApplyF x x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
   Apply f x = match # ApplyF f x
 
-
+-- | Let clause
 data LetF x = LetF (BindingF x) x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
-data LambdaF x = LambdaF (LExprF x) (RExprF x)
+pattern Let binds x <- ((^? match) -> Just (LetF binds x )) where
+  Let binds x = match # LetF binds x
+
+-- | Lambda expression
+data LambdaF x = LambdaF LExpr x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
+pattern Lambda args x <- ((^? match) -> Just (LambdaF args x )) where
+  Lambda args x = match # LambdaF args x
+
+-- | Bunch of bindings
 data BindingF x = BindingF [StatementF x]
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
-data StatementF x = SubstitutionF (LExprF x) (RExprF x)
-                | TypeDeclarationF IdentName (TypeExprF x)
+pattern Binding xs <- ((^? match) -> Just (BindingF xs )) where
+  Binding xs = match # BindingF xs
+
+-- | Statement
+data StatementF x
+  = SubstF LExpr x
+  -- ^ substitution
+  | TypeDeclF IdentName TypeExpr
+  -- ^ type declaration
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+pattern Subst l r <- ((^? match) -> Just (SubstF l r)) where
+  Subst l r = match # SubstF l r
+pattern TypeDecl x t <- ((^? match) -> Just (TypeDeclF x t)) where
+  TypeDecl x t = match # TypeDeclF x t
 
 
 -- * Program Components
@@ -145,14 +170,11 @@ data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
 data NPlusK = NPlusK IdentName Rational
              deriving (Eq, Ord, Show)
 
-data TypeExprF x = TypeExpr (Lang '[ GridF Rational, TupleF, VectorF Int, FunctionTypeF , ElementalTypeF ])
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemTypeF ]
 
-data LExprF x = LExprF (Lang '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ])
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
-data RExprF x = RExprF (Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, ArithF, IdentF ])
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+type LExpr = Lang '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ]
 
+type RExpr = Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, ArithF, IdentF ]
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
