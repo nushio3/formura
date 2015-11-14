@@ -6,7 +6,7 @@ import Formura.Syntax
 
 import qualified Test.QuickCheck as Q
 
-type TestExpr  = Lang '[TupleF, ArithF]
+type TestExpr  = Lang '[ImmF , TupleF, OperatorF]
 
 main :: IO ()
 main = do

@@ -9,7 +9,7 @@ Stability   : experimental
 Components for syntatic elements of formura.
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveGeneric,
 DeriveTraversable, FlexibleContexts, FlexibleInstances,
 PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
@@ -17,6 +17,7 @@ module Formura.Syntax where
 
 import Control.Lens hiding (op)
 import Data.List (intercalate)
+import GHC.Generics
 import qualified Test.QuickCheck as Q
 
 import Formura.Language.Combinator
@@ -72,16 +73,36 @@ pattern Tuple xs <- ((^? match) -> Just (TupleF xs)) where
 
 -- ** Arithmetic elements
 
-data ArithF x = ImmF Rational
-              | UniopF IdentName x
-              | BinopF IdentName x x
-              | TriopF IdentName x x x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+-- | Rational Literal
+data ImmF x = ImmF Rational
+            deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
-instance Q.Arbitrary x => Q.Arbitrary (ArithF x) where
+pattern Imm r <- ((^? match) -> Just (ImmF r)) where
+  Imm r = match # ImmF r
+
+instance Q.Arbitrary x => Q.Arbitrary (ImmF x) where
+  arbitrary = ImmF <$> Q.arbitrary
+  shrink (ImmF x) = map ImmF $ Q.shrink x
+
+-- | Boolean Literal
+data ImmBoolF x = ImmBoolF Bool
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+pattern ImmBool r <- ((^? match) -> Just (ImmBoolF r)) where
+  ImmBool r = match # ImmBoolF r
+
+
+-- | Infix and Postfix operators
+data OperatorF x
+  = UniopF IdentName x
+  | BinopF IdentName x x
+  | TriopF IdentName x x x
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Generic)
+
+instance Q.Arbitrary x => Q.Arbitrary (OperatorF x) where
   arbitrary =
     let compounds =
-          [ ImmF <$> Q.arbitrary
+          [ UniopF "+" <$> Q.arbitrary
           , UniopF "-" <$> Q.arbitrary
           , BinopF "+" <$> Q.arbitrary <*> Q.arbitrary
           , BinopF "-" <$> Q.arbitrary <*> Q.arbitrary
@@ -89,13 +110,12 @@ instance Q.Arbitrary x => Q.Arbitrary (ArithF x) where
           , BinopF "/" <$> Q.arbitrary <*> Q.arbitrary
           ]
         go n
-          | n <= 1 = ImmF <$> Q.arbitrary
+          | n <= 1 = UniopF "+" <$> Q.arbitrary
           | otherwise = Q.oneof compounds
     in Q.sized go
+  shrink = Q.genericShrink
 
 -- | smart patterns
-pattern Imm r <- ((^? match) -> Just (ImmF r)) where
-  Imm r = match # ImmF r
 pattern Uniop op a <- ((^? match) -> Just (UniopF op a)) where
   Uniop op a = match # UniopF op a
 pattern Binop op a b <- ((^? match) -> Just (BinopF op a b)) where
@@ -162,7 +182,7 @@ pattern TypeDecl x t <- ((^? match) -> Just (TypeDeclF x t)) where
 
 -- * Program Components
 
-type ConstRationalExpr = Lang '[ ArithF ]
+type ConstRationalExpr = Lang '[ OperatorF ]
 
 data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
              deriving (Eq, Ord, Show)
@@ -174,7 +194,7 @@ type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemType
 
 type LExpr = Lang '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ]
 
-type RExpr = Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, ArithF, IdentF ]
+type RExpr = Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF ]
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
