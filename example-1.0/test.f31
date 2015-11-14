@@ -4,4 +4,4 @@ answer = 6 * 7
 fact = for (x) x * fact(x-1)
 fix = for (f) f(fix(f))
 b[i+1, j] = (a+b)[i]
-big = let a = 1; b = 2 in a + B + C
+big = let a = 1; b = 2; int :: c in A + B + C
