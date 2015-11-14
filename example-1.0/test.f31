@@ -2,3 +2,5 @@ main = 42
 answer = 6 * 7
 (x) = 3
 fact = for (x) x * fact(x-1)
+fix = for (f) f(fix(f))
+b[i+1, j] = (a+b)[i]

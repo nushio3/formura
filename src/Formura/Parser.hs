@@ -72,7 +72,7 @@ isIdentifierSymbol c = isPrint c &&
       c `elem` "\"#();[\\]{}")
 
 identName :: P IdentName
-identName = "identifier" ?> do
+identName = "identifier" ?> try $ do
   let s :: P String
       s = some $ "symbolic character" ?> satisfy isIdentifierSymbol
       a0 :: P Char
@@ -129,16 +129,17 @@ tupleOf p = "tuple" ?> {- don't parseIn here ... -} do
 gridIndicesOf :: P a -> P [a]
 gridIndicesOf parseIdx = "grid index" ?> do
   "grid opening" ?> try $ symbolic '['
-  xs <- parseIdx `sepBy` symbolic ']'
+  xs <- parseIdx `sepBy` symbolic ','
   symbolic ']'
   return xs
 
 nPlusK :: P NPlusK
 nPlusK = "n+k pattern" ?> do
   x <-  identName
-  symbolic '+'
-  n <- constRationalExpr
-  return $ NPlusK x n
+  mn <- optional $ do
+    symbolic '+'
+    constRationalExpr
+  return $ NPlusK x (maybe 0 id mn)
 
 
 
