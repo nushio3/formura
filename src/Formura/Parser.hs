@@ -117,7 +117,7 @@ funType = "function type" ?> parseIn $ keyword "function" *> pure FunType
 tupleOf :: (TupleF ∈ fs) => P (Lang fs) -> P (Lang fs)
 tupleOf p = "tuple" ?> {- don't parseIn here ... -} do
   r1 <- rend
-  try $ symbolic '('
+  "tuple opening" ?> try $ symbolic '('
   xs <- p `sepBy` symbolic ','
   symbolic ')'
   r2 <- rend
@@ -128,7 +128,7 @@ tupleOf p = "tuple" ?> {- don't parseIn here ... -} do
 
 gridIndicesOf :: P a -> P [a]
 gridIndicesOf parseIdx = "grid index" ?> do
-  try $ symbolic '['
+  "grid opening" ?> try $ symbolic '['
   xs <- parseIdx `sepBy` symbolic ']'
   symbolic ']'
   return xs
@@ -204,7 +204,7 @@ aexpr = tupleOf rExpr <|> ident <|> imm
 
 letExpr :: P RExpr
 letExpr = "let expression" ?> parseIn $ do
-  try $ keyword "let"
+  "keyword let" ?> try $ keyword "let"
   xs <- binding
   keyword "in"
   x <- rExpr
@@ -212,7 +212,7 @@ letExpr = "let expression" ?> parseIn $ do
 
 lambdaExpr :: P RExpr
 lambdaExpr = "lambda expression" ?> parseIn $ do
-  try $ keyword "for"
+  "keyword for" ?> try $ keyword "for"
   x <- lExpr
   y <- rExpr
   return $ Lambda x y
@@ -229,7 +229,7 @@ statementDelimiter = "statement delimiter" ?> some d >> return ()
 
 statementCompound :: P [StatementF RExpr]
 statementCompound = "statement" ?> do
-  maybeType <- optional $ try $ typeExpr <* keyword "::"
+  maybeType <- optional $ "statement starting by type decl" ?> try $ typeExpr <* keyword "::"
 
   let lhsAndMaybeRhs :: P (LExpr, Maybe RExpr)
       lhsAndMaybeRhs = do
@@ -254,7 +254,7 @@ lAexpr = tupleOf lExpr <|> ident
 
 vectorIndexOf :: P a -> P a
 vectorIndexOf content = do
-  try $ symbolic '('
+  "vector indexing" ?> try $ symbolic '('
   r <- content
   symbolic ')'
   return r
@@ -317,12 +317,12 @@ specialDeclaration :: P SpecialDeclaration
 specialDeclaration = dd  <|> ad
   where
     dd = do
-      try $ keyword "dimension"
+      "dimension declaration" ?> try $ keyword "dimension"
       keyword "::"
       n <- natural
       return $ DimensionDeclaration $ fromInteger n
     ad = do
-      try $ keyword "axes"
+      "axes declaration" ?> try $ keyword "axes"
       keyword "::"
       xs <- identName `sepBy` symbolic ','
       return $ AxesDeclaration xs

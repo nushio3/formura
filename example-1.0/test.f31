@@ -1,1 +1,4 @@
-main = 42;
+main = 42
+answer = 6 * 7
+(x) = 3
+fact = for (x) x * fact(x-1)
