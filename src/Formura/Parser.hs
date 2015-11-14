@@ -5,7 +5,7 @@ import Control.Applicative
 import Control.Lens
 import Control.Monad
 import Data.Char (isSpace, isLetter, isAlphaNum, isPrint)
-import Data.Either (partitionEithers)
+import Data.Either (either, partitionEithers)
 import Data.Maybe
 import qualified Data.Set as S
 import Text.Trifecta hiding (ident)
@@ -139,7 +139,7 @@ nPlusK = do
 
 imm :: (ImmF ∈ fs) => P (Lang fs)
 imm = parseIn $ do
-  x <- scientific
+  x <- constRationalExpr
   return $ Imm $ toRational x
 
 exprOf :: (OperatorF ∈ fs) => P (Lang fs) -> P (Lang fs)
@@ -300,7 +300,9 @@ rExpr :: P RExpr
 rExpr = exprOf expr10
 
 constRationalExpr :: P Rational
-constRationalExpr = toRational <$> scientific
+constRationalExpr = do
+  nos <- naturalOrScientific
+  either (toRational <$>) (toRational<$>) nos
 
 constIntExpr :: P Int
 constIntExpr = fromInteger <$> natural
