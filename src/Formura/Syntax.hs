@@ -27,13 +27,16 @@ import Formura.Language.Combinator
 -- ** Elemental types
 
 data ElementalTypeF x = TInt | TRational | TFloat | TDouble | TReal | TComplexFloat | TComplexDouble | TComplexReal
-                      deriving (Eq, Show, Ord)
+                      deriving (Eq, Ord, Show)
+
+data FunctionTypeF x = TFunction
+                      deriving (Eq, Ord, Show)
 
 -- ** Identifier terms
 type IdentName = String
 
 data IdentF x = IdentF IdentName
-             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 -- | smart pattern
 pattern Ident xs <- ((^? match) -> Just (IdentF xs)) where
@@ -68,7 +71,7 @@ data ArithF x = ImmF Rational
               | UniopF IdentName x
               | BinopF IdentName x x
               | TriopF IdentName x x x
-             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 instance Q.Arbitrary x => Q.Arbitrary (ArithF x) where
   arbitrary =
@@ -95,70 +98,69 @@ pattern Binop op a b <- ((^? match) -> Just (BinopF op a b)) where
 pattern Triop op a b c <- ((^? match) -> Just (TriopF op a b c)) where
   Triop op a b c = match # TriopF op a b c
 
--- ** Functional Application
-
-data ApplyF x = ApplyF x x
-             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
-
-pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
-  Apply f x = match # ApplyF f x
-
-
-data LetF x = LetF [Statement] x
-             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
-
-data LambdaF x = LambdaF LExpr RExpr
-             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
-
--- ** Element access expressions
+-- ** Structures and Element Access
 
 data GridF y x = GridF [y] x
-             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern Grid args x <- ((^? match) -> Just (GridF args x )) where
   Grid args x = match # GridF args x
 
 data VectorF y x = VectorF y x
-                   deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
   Vector args x = match # VectorF args x
 
--- * Expressions and Program Components
+-- ** Functional Program Constituent
+
+data ApplyF x = ApplyF x x
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
+  Apply f x = match # ApplyF f x
+
+
+data LetF x = LetF (BindingF x) x
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+data LambdaF x = LambdaF (LExprF x) (RExprF x)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+data BindingF x = BindingF [StatementF x]
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+data StatementF x = SubstitutionF (LExprF x) (RExprF x)
+                | TypeDeclarationF IdentName (TypeExprF x)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+
+-- * Program Components
 
 type ConstRationalExpr = Lang '[ ArithF ]
 
 data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
-             deriving (Eq, Show, Ord)
+             deriving (Eq, Ord, Show)
 
 data NPlusK = NPlusK IdentName Rational
-             deriving (Eq, Show, Ord)
+             deriving (Eq, Ord, Show)
 
-type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, ElementalTypeF ]
+data TypeExprF x = TypeExpr (Lang '[ GridF Rational, TupleF, VectorF Int, FunctionTypeF , ElementalTypeF ])
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
-type LExpr = Lang '[ GridF NPlusKPattern, TupleF, VectorF IdentName, IdentF ]
+data LExprF x = LExprF (Lang '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ])
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+data RExprF x = RExprF (Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, ArithF, IdentF ])
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
-type RExpr = Lang '[ ApplyF, GridF NPlusKPattern, TupleF, ArithF, IdentF ]
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
                         | InitialFunctionDeclaration IdentName
                         | StepFunctionDeclaration IdentName
-             deriving (Eq, Show, Ord)
+             deriving (Eq, Ord, Show)
 
-data Statement = Substitution LExpr RExpr
-               | TypeDeclaration IdentName TypeExpr
-               | SpecialDeclaration SpecialDeclaration
-               | FunctionDefinition Function
-             deriving (Eq, Show, Ord)
-
-data Function =
-  Function
-  { _functionName :: IdentName
-  , _functionInput :: LExpr
-  , _functionOutput :: RExpr
-  , _functionBody :: Program
-  }
-  deriving (Eq, Show, Ord)
-
-type Program = [Statement]
+data Program = Program
+               { _programSpecialDeclarations :: SpecialDeclaration
+               , _programBinding :: Lang '[BindingF]}
+             deriving (Eq, Ord, Show)
