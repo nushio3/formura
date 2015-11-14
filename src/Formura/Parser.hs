@@ -74,11 +74,11 @@ isIdentifierSymbol c = isPrint c &&
 identName :: P IdentName
 identName = "identifier" ?> do
   let s :: P String
-      s = some $ satisfy isIdentifierSymbol
+      s = some $ "symbolic character" ?> satisfy isIdentifierSymbol
       a0 :: P Char
-      a0 = satisfy isIdentifierAlphabet0
+      a0 = "identifier alphabet character" ?> satisfy isIdentifierAlphabet0
       a1 :: P Char
-      a1 = satisfy isIdentifierAlphabet1
+      a1 = "identifier alphabet character" ?> satisfy isIdentifierAlphabet1
       a :: P String
       a = (:) <$> a0 <*> some a1
   str <- s <|> a
