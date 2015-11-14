@@ -110,6 +110,9 @@ _There = let a :: Sum (f ': fs) x -> Maybe (Sum fs x)
 class Elem f fs where
   constructor :: Prism' (Sum fs x) (f x)
 
+-- | Unicode type synonym for 'Elem'
+type f ∈ fs = Elem f fs
+
 instance {-# OVERLAPPING #-} Traversable f => Elem f (f ': fs) where
   constructor = _Here
 instance {-# OVERLAPPABLE #-} (Traversable f, Traversable g, Elem f fs) => Elem f (g ': fs) where
@@ -118,6 +121,9 @@ instance {-# OVERLAPPABLE #-} (Traversable f, Traversable g, Elem f fs) => Elem 
 -- | The constraint that set of functors @fs@ is a subset of @gs@
 class Subset fs gs where
   subrep :: Prism' (Sum gs x) (Sum fs x)
+
+-- | Unicode type synonym for 'Subset'
+type fs ⊆ gs = Subset fs gs
 
 instance {-# OVERLAPPING #-} Subset '[] '[] where
   subrep = simple
@@ -256,22 +262,22 @@ mfoldout k x = foldout (join . mlift k) x
 
 -- | Promote a @Lang fs@ to @Lang gs@, when @gs@ has more constructors than @fs@.
 
-subFix :: (Subset fs gs) => Lang fs -> Lang gs
+subFix :: (fs ⊆ gs) => Lang fs -> Lang gs
 subFix = fold (review (fix . subrep))
 
 -- | Restrict a function from @Lang gs@ to that from @Lang fs@, where @fs@ has less constructors than @gs@.
 
-subOp :: (Subset fs gs) => (Lang gs -> c) -> Lang fs -> c
+subOp :: (fs ⊆ gs) => (Lang gs -> c) -> Lang fs -> c
 subOp g = g . subFix
 
 -- | An algebra that just copies what found in @Lang fs@ to @Lang gs@.
 
-transAlg :: Subset fs gs => Algebra (Sum fs) (Lang gs)
+transAlg :: (fs ⊆ gs) => Algebra (Sum fs) (Lang gs)
 transAlg = review (fix . subrep)
 
 -- | A monadic 'transAlg' .
 
-mTransAlg :: (Monad m, Subset fs gs) => AlgebraM m (Sum fs) (Lang gs)
+mTransAlg :: (Monad m, fs ⊆ gs) => AlgebraM m (Sum fs) (Lang gs)
 mTransAlg = return . transAlg
 
 -- | Cons an algebra to a 'Sum' of an algebra, to create a larger algebra.
