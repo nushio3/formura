@@ -39,8 +39,8 @@ throw doc = do
   stg <- use compilerStage
   foc <- use compilerFocus
   let stgDoc
-        | stg == "" = doc
-        | otherwise = Ppr.text ("When " ++ stg) <> Ppr.line <> doc
+        | stg == "" = Ppr.text "Error: " <> doc
+        | otherwise = Ppr.text ("Error: when " ++ stg) <> Ppr.line <> doc
   case foc of
    Nothing ->
      M $ left $ stgDoc

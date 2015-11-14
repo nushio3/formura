@@ -33,6 +33,23 @@ data Sum (fs :: [* -> *]) x where
   Here :: Traversable f => f x -> Sum (f ': fs) x
   There :: Sum fs x -> Sum (f ': fs) x
 
+instance Eq (Sum '[] x) where
+  _ == _ = True
+instance (Eq (f x), Eq (Sum fs x)) => Eq (Sum (f ': fs) x) where
+   (Here a)   == (Here b)  = a == b
+   (Here _ )  == (There _) = False
+   (There _ ) == (Here _)  = False
+   (There a)  == (There b) = a == b
+
+instance Ord (Sum '[] x) where
+  compare Void Void = EQ
+instance (Ord (f x), Ord (Sum fs x)) => Ord (Sum (f ': fs) x) where
+  compare (Here a) (Here b) = compare a b
+  compare (Here _ ) (There _) = LT
+  compare (There _ ) (Here _) = GT
+  compare (There a) (There b) = compare a b
+
+
 instance Show x => Show (Sum '[] x) where
   show Void = "∅"
 
@@ -150,6 +167,11 @@ instance P.HasRendering Metadata where
 -- | The fix point of F-algebra, with compiler metadata information. This is the datatype we use to represent any AST.
 data Fix f where
   In :: Functor f => {_metadata :: Maybe Metadata, _out :: f (Fix f)} -> Fix f
+
+instance (Eq (f (Fix f))) => Eq (Fix f) where
+  (In _ a) == (In _ b) = a == b
+instance (Ord (f (Fix f))) => Ord (Fix f) where
+  compare (In _ a) (In _ b) = compare a b
 
 instance (Show (f (Fix f))) => Show (Fix f) where
     showsPrec n (In _ x) = showsPrec n x

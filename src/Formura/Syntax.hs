@@ -27,6 +27,7 @@ import Formura.Language.Combinator
 -- ** Elemental types
 
 data ElementalTypeF x = TInt | TRational | TFloat | TDouble | TReal | TComplexFloat | TComplexDouble | TComplexReal
+                      deriving (Eq, Show, Ord)
 
 -- ** Identifier terms
 type IdentName = String
@@ -103,6 +104,12 @@ pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
   Apply f x = match # ApplyF f x
 
 
+data LetF x = LetF [Statement] x
+             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+
+data LambdaF x = LambdaF LExpr RExpr
+             deriving (Eq, Show, Ord, Functor, Foldable, Traversable)
+
 -- ** Element access expressions
 
 data GridF y x = GridF [y] x
@@ -122,9 +129,10 @@ pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
 type ConstRationalExpr = Lang '[ ArithF ]
 
 data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
+             deriving (Eq, Show, Ord)
 
 data NPlusK = NPlusK IdentName Rational
-
+             deriving (Eq, Show, Ord)
 
 type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, ElementalTypeF ]
 
@@ -136,18 +144,21 @@ data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
                         | InitialFunctionDeclaration IdentName
                         | StepFunctionDeclaration IdentName
+             deriving (Eq, Show, Ord)
 
 data Statement = Substitution LExpr RExpr
                | TypeDeclaration IdentName TypeExpr
                | SpecialDeclaration SpecialDeclaration
                | FunctionDefinition Function
+             deriving (Eq, Show, Ord)
 
 data Function =
   Function
   { _functionName :: IdentName
-  , _functionArgument :: LExpr
-  , _functionReturn :: RExpr
+  , _functionInput :: LExpr
+  , _functionOutput :: RExpr
   , _functionBody :: Program
   }
+  deriving (Eq, Show, Ord)
 
 type Program = [Statement]
