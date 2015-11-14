@@ -4,7 +4,6 @@ module Formura.Parser where
 import Control.Applicative
 import Control.Lens
 import Control.Monad
-import Control.Monad.State
 import Data.Char (isSpace, isLetter, isAlphaNum, isPrint)
 import Data.Either (partitionEithers)
 import Data.Maybe
@@ -16,14 +15,13 @@ import qualified Text.Parser.Expression as X
 import Text.Parser.LookAhead
 
 import Formura.Language.Combinator
-import Formura.Compiler
 import Formura.Syntax
 
-newtype P a = P { runP :: StateT CompilerState Parser a }
+newtype P a = P { runP :: Parser a }
             deriving (Alternative, Monad, Functor, MonadPlus, Applicative, CharParsing, LookAheadParsing, Parsing, DeltaParsing, MarkParsing Delta)
 
 instance Errable P where
-  raiseErr = P . lift . raiseErr
+  raiseErr = P . raiseErr
 
 instance TokenParsing P where
   someSpace =

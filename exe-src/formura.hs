@@ -1,6 +1,10 @@
 {-# LANGUAGE DataKinds #-}
 module Main where
 
+import           Data.Monoid
+import           System.Environment
+import           System.IO
+import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import qualified Text.Trifecta as P
 
 import Formura.Syntax
@@ -13,7 +17,7 @@ main = do
 
 process :: FilePath -> IO ()
 process fn = do
-  mprog <- P.parseFromFile P.program fn
+  mprog <- P.parseFromFileEx (P.runP P.program) fn
   case mprog of
-      Right prog -> print $ prog
-      Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
+      P.Success prog -> print $ prog
+      P.Failure doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak

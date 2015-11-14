@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                formura
-version:             31
+version:             1.0
 synopsis:            Formura is a simple language to describe stencil computation.
 -- description:
 homepage:            http://nushio3.github.io
@@ -53,8 +53,11 @@ executable formura
   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
                 base == 4.*
+              , ansi-wl-pprint
               , formura
-              , QuickCheck
+              , trifecta
+
+
 
 -- executable test-parser
 --   buildable: False
