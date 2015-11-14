@@ -188,7 +188,7 @@ fexpr = "function application chain" ?> do
   where
     findArgument :: RExpr -> P RExpr
     findArgument f = parseIn $ do
-      mx <- optional $ tupleOf aexpr
+      mx <- optional $ tupleOf rExpr
       case mx of
         Just x -> findArgument $ Apply f x
         Nothing -> do
