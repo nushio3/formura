@@ -5,7 +5,7 @@ import Control.Applicative
 import Control.Lens
 import Control.Monad
 import Data.Char (isSpace, isLetter, isAlphaNum, isPrint)
-import Data.Either (either, partitionEithers)
+import Data.Either (partitionEithers)
 import Data.Maybe
 import qualified Data.Set as S
 import Text.Trifecta hiding (ident)
@@ -35,14 +35,19 @@ instance TokenParsing P where
              <|> lineContinuation)
        >> return ()
 
+(?>) :: String -> P a -> P a
+s ?> p = p <?> s
+
+infixr 0 ?>
+
 comment :: P ()
-comment = do
+comment = "comment" ?> do
   char '#'
   manyTill anyChar (lookAhead newline)
   return ()
 
 lineContinuation :: P ()
-lineContinuation = do
+lineContinuation = "line continuation" ?> do
   char '\\'
   whiteSpace
   newline
@@ -67,7 +72,7 @@ isIdentifierSymbol c = isPrint c &&
       c `elem` "\"#();[\\]{}")
 
 identName :: P IdentName
-identName = do
+identName = "identifier" ?> do
   let s :: P String
       s = some $ satisfy isIdentifierSymbol
       a0 :: P Char
@@ -82,7 +87,7 @@ identName = do
   return str
 
 keyword :: IdentName -> P IdentName
-keyword k = do
+keyword k = "keyword " ++ k ?> do
   when (k `S.notMember` keywordSet) $
     raiseErr $ failed $
     "Please report the compiler developer: \"" ++ k ++ "\" is not in a keyword list!"
@@ -95,10 +100,10 @@ keywordSet = S.fromList
 
 
 ident :: (IdentF ∈ fs) => P (Lang fs)
-ident = parseIn $ Ident <$> identName
+ident = "identifier" ?> parseIn $ Ident <$> identName
 
 elemType :: (ElemTypeF ∈ fs) => P (Lang fs)
-elemType = parseIn $ do
+elemType = "element type" ?> parseIn $ do
   str <- identName
   guard $ str `S.member` elemTypeNames
   return $ ElemType str
@@ -106,11 +111,11 @@ elemType = parseIn $ do
       elemTypeNames = S.fromList ["int","rational","float","double","real"]
 
 funType :: (FunTypeF ∈ fs) => P (Lang fs)
-funType = parseIn $ keyword "function" *> pure FunType
+funType = "function type" ?> parseIn $ keyword "function" *> pure FunType
 
 
 tupleOf :: (TupleF ∈ fs) => P (Lang fs) -> P (Lang fs)
-tupleOf p = {- don't parseIn here ... -} do
+tupleOf p = "tuple" ?> {- don't parseIn here ... -} do
   r1 <- rend
   try $ symbolic '('
   xs <- p `sepBy` symbolic ','
@@ -122,14 +127,14 @@ tupleOf p = {- don't parseIn here ... -} do
     _   -> return $ In (Just $ Metadata r1 (delta r1) (delta r2)) $ Tuple xs
 
 gridIndicesOf :: P a -> P [a]
-gridIndicesOf parseIdx = do
+gridIndicesOf parseIdx = "grid index" ?> do
   try $ symbolic '['
   xs <- parseIdx `sepBy` symbolic ']'
   symbolic ']'
   return xs
 
 nPlusK :: P NPlusK
-nPlusK = do
+nPlusK = "n+k pattern" ?> do
   x <-  identName
   symbolic '+'
   n <- constRationalExpr
@@ -138,7 +143,7 @@ nPlusK = do
 
 
 imm :: (ImmF ∈ fs) => P (Lang fs)
-imm = parseIn $ do
+imm = "rational literal" ?> parseIn $ do
   x <- constRationalExpr
   return $ Imm $ toRational x
 
@@ -152,13 +157,13 @@ exprOf termParser = X.buildExpressionParser tbl termParser
     unary  name fun = X.Prefix (pUni name fun)
     binary name fun assoc = X.Infix (pBin name fun) assoc
 
-    pUni name fun = do
+    pUni name fun = "unary operator " ++ name ?> do
       r1 <- rend
       f <- fun <$ keyword name
       r2 <- rend
       return $ \a -> f a & metadata .~ (Just $ joinMeta r1 r2 a a)
 
-    pBin name fun = do
+    pBin name fun = "binary operator " ++ name ?> do
       r1 <- rend
       f <- fun <$ keyword name
       r2 <- rend
@@ -177,7 +182,7 @@ expr10 :: P RExpr
 expr10 = letExpr <|> lambdaExpr <|> fexpr
 
 fexpr :: P RExpr
-fexpr = do
+fexpr = "function application chain" ?> do
   f <- aexpr
   findArgument f
   where
@@ -198,7 +203,7 @@ aexpr = tupleOf rExpr <|> ident <|> imm
 
 
 letExpr :: P RExpr
-letExpr = parseIn $ do
+letExpr = "let expression" ?> parseIn $ do
   try $ keyword "let"
   xs <- binding
   keyword "in"
@@ -206,7 +211,7 @@ letExpr = parseIn $ do
   return $ Let xs x
 
 lambdaExpr :: P RExpr
-lambdaExpr = parseIn $ do
+lambdaExpr = "lambda expression" ?> parseIn $ do
   try $ keyword "for"
   x <- lExpr
   y <- rExpr
@@ -218,12 +223,12 @@ binding = do
   return $ Binding $ concat stmts
 
 statementDelimiter :: P ()
-statementDelimiter = some d >> return ()
+statementDelimiter = "statement delimiter" ?> some d >> return ()
   where
     d = (symbolic ';' >> return ()) <|> (newline >> whiteSpace)
 
 statementCompound :: P [StatementF RExpr]
-statementCompound = do
+statementCompound = "statement" ?> do
   maybeType <- optional $ try $ typeExpr <* keyword "::"
 
   let lhsAndMaybeRhs :: P (LExpr, Maybe RExpr)
@@ -302,7 +307,7 @@ rExpr = exprOf expr10
 constRationalExpr :: P Rational
 constRationalExpr = do
   nos <- naturalOrScientific
-  either (toRational <$>) (toRational<$>) nos
+  return $ either toRational toRational  nos
 
 constIntExpr :: P Int
 constIntExpr = fromInteger <$> natural
@@ -325,6 +330,6 @@ specialDeclaration = dd  <|> ad
 program :: P Program
 program = do
   ps <- choice [Left <$> specialDeclaration, Right <$> statementCompound]
-        `sepBy` statementDelimiter
+        `sepEndBy` statementDelimiter
   let (decls, stmts) = partitionEithers ps
   return $ Program decls (BindingF $ concat stmts)
