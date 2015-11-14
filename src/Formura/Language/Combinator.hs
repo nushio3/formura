@@ -182,7 +182,7 @@ instance (Ord (f (Fix f))) => Ord (Fix f) where
 instance (Show (f (Fix f))) => Show (Fix f) where
     showsPrec n (In _ x) = showsPrec n x
 
-instance Elem f fs => Matches f (Fix (Sum fs)) where
+instance (f ∈ fs) => Matches f (Fix (Sum fs)) where
   type Content f (Fix (Sum fs)) = Fix (Sum fs)
   match = fix . constructor
 
@@ -290,11 +290,21 @@ af +:: afs = affs
 
 -- | Override a specific algebra @f@ in an algebra over @fs@.
 
-(>::) :: Elem f fs => Algebra f a -> Algebra (Sum fs) a -> Algebra (Sum fs) a
+(>::) :: (f ∈ fs) => Algebrogen f a b -> Algebrogen (Sum fs) a b -> Algebrogen (Sum fs) a b
 af >:: afs= affs
   where
     affs ((^? constructor) -> Just fa) = af  fa
     affs x                             = afs x
 
+-- | Override a subset algebra @fs@ within wider algebra @gs@.
 
-infixr 5 +::, >::
+(>>::) :: (fs ⊆ gs) => Algebrogen (Sum fs) a b -> Algebrogen (Sum gs) a b -> Algebrogen (Sum gs) a b
+af >>:: afs= affs
+  where
+    affs ((^? subrep) -> Just fa) = af  fa
+    affs x                        = afs x
+
+
+
+
+infixr 5 +::, >::, >>::
