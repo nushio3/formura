@@ -80,7 +80,7 @@ identName = "identifier" ?> do
       a1 :: P Char
       a1 = "identifier alphabet character" ?> satisfy isIdentifierAlphabet1
       a :: P String
-      a = (:) <$> a0 <*> some a1
+      a = (:) <$> a0 <*> many a1
   str <- s <|> a
   guard $  str `S.notMember` keywordSet
   whiteSpace
@@ -96,7 +96,7 @@ keyword k = "keyword " ++ k ?> do
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
              ["begin", "end", "function", "let", "in", "lambda", "for", "dimension", "axes",
-              "+","-","*","/","::","="]
+              "+","-","*","/","::","=", ","]
 
 
 ident :: (IdentF ∈ fs) => P (Lang fs)
@@ -236,7 +236,15 @@ statementCompound = "statement" ?> do
         lhs   <- lExpr
         mRhs  <- optional (keyword "=" >> rExpr)
         return (lhs, mRhs)
-  lamrs <- lhsAndMaybeRhs `sepBy1` symbol ","
+  lamrs <- case maybeType of
+    -- When there is type, we allow multiple substitutions, and lhs-only terms.
+    Just _ -> lhsAndMaybeRhs `sepBy1` symbol ","
+    -- When there is no type, we allow only one substitution.
+    Nothing -> do
+      lhs <- lExpr
+      keyword "="
+      rhs <- rExpr
+      return [(lhs, Just rhs)]
 
   let typePart = [ TypeDecl typ lhs
                  | typ <- maybeToList maybeType,
@@ -250,7 +258,7 @@ statementCompound = "statement" ?> do
 
 
 lAexpr :: P LExpr
-lAexpr = tupleOf lExpr <|> ident
+lAexpr = "atomic l-expr" ?> tupleOf lExpr <|> ident
 
 vectorIndexOf :: P a -> P a
 vectorIndexOf content = do
@@ -260,23 +268,23 @@ vectorIndexOf content = do
   return r
 
 lFexpr :: P LExpr
-lFexpr = do
+lFexpr = "applied l-expr" ?> do
   f <- lAexpr
   go f
   where
     go :: LExpr -> P LExpr
     go f = parseIn $ do
-      mx <- optional $ gridIndicesOf nPlusK
+      mx <- "grid option" ?> optional $ gridIndicesOf nPlusK
       case mx of
         Just x -> go $ Grid x f
         Nothing -> do
-          mx' <- optional (vectorIndexOf identName)
+          mx' <- "grid option" ?>  optional (vectorIndexOf identName)
           case mx' of
             Just x -> go $ Vector x f
             Nothing -> return f
 
 lExpr :: P LExpr
-lExpr = lFexpr
+lExpr = "l-expr" ?> lFexpr
 
 typeExpr :: P TypeExpr
 typeExpr = typeFexpr
