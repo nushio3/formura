@@ -96,7 +96,7 @@ keyword k = "keyword " ++ k ?> do
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
              ["begin", "end", "function", "let", "in", "lambda", "for", "dimension", "axes",
-              "+","-","*","/","::","=", ","]
+              "+","-","*","/",".","::","=", ","]
 
 
 ident :: (IdentF ∈ fs) => P (Lang fs)
@@ -149,10 +149,12 @@ imm = "rational literal" ?> parseIn $ do
   x <- constRationalExpr
   return $ Imm $ toRational x
 
-exprOf :: (OperatorF ∈ fs) => P (Lang fs) -> P (Lang fs)
+exprOf :: (OperatorF ∈ fs, ApplyF  ∈ fs) => P (Lang fs) -> P (Lang fs)
 exprOf termParser = X.buildExpressionParser tbl termParser
   where
-    tbl = [[binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
+    tbl = [[binary "." Apply X.AssocRight],
+           [binary "**" (Binop "**") X.AssocLeft],
+           [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
            [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft]
           ]
@@ -181,7 +183,7 @@ exprOf termParser = X.buildExpressionParser tbl termParser
       in Metadata r1 da db
 
 expr10 :: P RExpr
-expr10 = letExpr <|> lambdaExpr <|> fexpr
+expr10 = fexpr
 
 fexpr :: P RExpr
 fexpr = "function application chain" ?> do
@@ -194,14 +196,14 @@ fexpr = "function application chain" ?> do
       case mx' of
         Just x -> findArgument $ Grid x f
         Nothing ->do
-          mx <- optional $ rExpr
+          mx <- optional $ aexpr
           case mx of
             Just x -> findArgument $ Apply f x
             Nothing ->  return f
 
 
 aexpr :: P RExpr
-aexpr = tupleOf rExpr <|> ident <|> imm
+aexpr = tupleOf rExpr <|> letExpr <|> lambdaExpr <|> ident <|> imm
 
 
 letExpr :: P RExpr

@@ -14,4 +14,4 @@ kisho'joho'shori = hawai'i
 
 d = for(j) (∂ j) * (∂ i) * p k
 # 関数適用が左結合で、ピリオドが右結合なら、ふつうにこれで行けるんじゃね？
-dvdt = SIGMA for(j) (P j) * (P i) * p j
+dvdt = SIGMA for(j) P j . P i . p j
