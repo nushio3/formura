@@ -137,8 +137,9 @@ nPlusK :: P NPlusK
 nPlusK = "n+k pattern" ?> do
   x <-  identName
   mn <- optional $ do
-    symbolic '+'
-    constRationalExpr
+    s <- symbolic '+' <|> symbolic '-'
+    n <- constRationalExpr
+    if s == '+' then return n else return (negate n)
   return $ NPlusK x (maybe 0 id mn)
 
 
@@ -219,7 +220,7 @@ lambdaExpr = "lambda expression" ?> parseIn $ do
   return $ Lambda x y
 
 binding :: P (BindingF RExpr)
-binding = do
+binding = "statements" ?> do
   stmts <- statementCompound `sepEndBy` statementDelimiter
   return $ Binding $ concat stmts
 
@@ -291,10 +292,10 @@ typeExpr :: P TypeExpr
 typeExpr = typeFexpr
 
 typeAexpr :: P TypeExpr
-typeAexpr = tupleOf typeExpr <|> elemType <|> funType
+typeAexpr = "atomic type-expression" ?> tupleOf typeExpr <|> elemType <|> funType
 
 typeFexpr :: P TypeExpr
-typeFexpr = do
+typeFexpr = "applied type-expression" ?> do
   f <- typeAexpr
   go f
   where
@@ -311,10 +312,10 @@ typeFexpr = do
 
 
 rExpr :: P RExpr
-rExpr = exprOf expr10
+rExpr = "r-expr" ?> exprOf expr10
 
 constRationalExpr :: P Rational
-constRationalExpr = do
+constRationalExpr = "const rational expression" ?> do
   nos <- naturalOrScientific
   return $ either toRational toRational  nos
 
