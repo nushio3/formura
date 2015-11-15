@@ -15,3 +15,11 @@ kisho'joho'shori = hawai'i
 d = for(j) (∂ j) * (∂ i) * p k
 # 関数適用が左結合で、ピリオドが右結合なら、ふつうにこれで行けるんじゃね？
 dvdt = SIGMA for(j) P j . P i . p j
+
+begin function y = square(x)
+    y = x ** 2
+end function
+
+begin function square(x) returns y
+    y = x ** 2
+end function

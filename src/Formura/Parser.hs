@@ -95,7 +95,7 @@ keyword k = "keyword " ++ k ?> do
 
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
-             ["begin", "end", "function", "let", "in", "lambda", "for", "dimension", "axes",
+             ["begin", "end", "function", "returns", "let", "in", "lambda", "for", "dimension", "axes",
               "+","-","*","/",".","::","=", ","]
 
 
@@ -232,8 +232,41 @@ statementDelimiter = "statement delimiter" ?> some d >> return ()
     d = (symbolic ';' >> return ()) <|> (newline >> whiteSpace)
 
 statementCompound :: P [StatementF RExpr]
-statementCompound = "statement" ?> do
-  maybeType <- optional $ "statement starting by type decl" ?> try $ typeExpr <* keyword "::"
+statementCompound = functionSyntaxSugar <|> typeValueStatements
+
+functionSyntaxSugar :: P [StatementF RExpr]
+functionSyntaxSugar = "function definition" ?> do
+  keyword "begin"
+  keyword "function"
+  (funName, inExpr, outExpr) <-
+    ("function definition using keyword returns" ?> try returnsForm) <|>
+    ("function definition using keyword =" ?> equalForm)
+  statementDelimiter
+  b <- binding
+  keyword "end"
+  keyword "function"
+  return [Subst funName $ Lambda inExpr $ Let b outExpr]
+  where
+    returnsForm :: P (LExpr, LExpr, RExpr)
+    returnsForm = do
+      fn <- ident
+      inx <- tupleOf lExpr
+      keyword "returns"
+      outx <- rExpr
+      return (fn, inx, outx)
+
+    equalForm :: P (LExpr, LExpr, RExpr)
+    equalForm = do
+      outx <- rExpr
+      keyword "="
+      fn <- ident
+      inx <- tupleOf lExpr
+      return (fn, inx, outx)
+
+
+typeValueStatements :: P [StatementF RExpr]
+typeValueStatements = "type-decl and/or substitiution statement" ?> do
+  maybeType <- optional $ "statement start by type decl" ?> try $ typeExpr <* keyword "::"
 
   let lhsAndMaybeRhs :: P (LExpr, Maybe RExpr)
       lhsAndMaybeRhs = do
