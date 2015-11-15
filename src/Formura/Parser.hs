@@ -190,14 +190,14 @@ fexpr = "function application chain" ?> do
   where
     findArgument :: RExpr -> P RExpr
     findArgument f = parseIn $ do
-      mx <- optional $ tupleOf rExpr
-      case mx of
-        Just x -> findArgument $ Apply f x
-        Nothing -> do
-          mx' <- optional $ gridIndicesOf nPlusK
-          case mx' of
-            Just x -> findArgument $ Grid x f
-            Nothing -> return f
+      mx' <- optional $ gridIndicesOf nPlusK
+      case mx' of
+        Just x -> findArgument $ Grid x f
+        Nothing ->do
+          mx <- optional $ rExpr
+          case mx of
+            Just x -> findArgument $ Apply f x
+            Nothing ->  return f
 
 
 aexpr :: P RExpr
@@ -215,7 +215,7 @@ letExpr = "let expression" ?> parseIn $ do
 lambdaExpr :: P RExpr
 lambdaExpr = "lambda expression" ?> parseIn $ do
   "keyword for" ?> try $ keyword "for"
-  x <- lExpr
+  x <- tupleOf lExpr
   y <- rExpr
   return $ Lambda x y
 

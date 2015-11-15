@@ -1,14 +1,17 @@
 main = 42
 answer = 6 * 7
 (x) = 3
-fact = for (x) x * fact(x-1)
-fix = for (f) f(fix(f))
+fact = for(x) x * fact(x-1)
+fix = for (f)  f(fix(f))
 b[i+1, j] = (a+b)[i]
 big = let a = 1; b = 2; int :: c in A + B + C
 double :: a , b = 3, c
 == = ==
-ddx = for (a) a[i-1] + a[i+1]
+ddx = for(a) a[i-1] + a[i+1]
 ∂ = (ddx,ddy,ddz)
-# dvdt = Σ for j ∂_j.∂_i.p_j
-dvdt = (Σ (for j ∂(j) (∂(i) (p(j)))))
+dvdt = Σ (for (j) ∂(j) (∂(i) (p(j))))
 kisho'joho'shori = hawai'i
+
+d = for(j) (∂ j) * (∂ i) * p k
+# 関数適用が左結合で、ピリオドが右結合なら、ふつうにこれで行けるんじゃね？
+dvdt = SIGMA for(j) (P j) * (P i) * p j
