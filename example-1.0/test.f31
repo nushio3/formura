@@ -23,3 +23,7 @@ end function
 begin function square(x) returns y
     y = x ** 2
 end function
+
+begin function wrong(x)
+    y = x ** 2
+end function

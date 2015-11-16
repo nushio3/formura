@@ -7,10 +7,12 @@ import Control.Monad
 import Data.Char (isSpace, isLetter, isAlphaNum, isPrint)
 import Data.Either (partitionEithers)
 import Data.Maybe
+import Data.Monoid
 import qualified Data.Set as S
 import Text.Trifecta hiding (ident)
 import Text.Trifecta.Delta
 import qualified Text.Parser.Expression as X
+import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 
 import Text.Parser.LookAhead
 
@@ -30,7 +32,7 @@ instance TokenParsing P where
          f x | isSpace x = True
              | otherwise = False
 
-    in some ((satisfy f >> return ())
+    in "whitespace" ?> some ((satisfy f >> return ())
              <|> comment
              <|> lineContinuation)
        >> return ()
@@ -239,8 +241,13 @@ functionSyntaxSugar = "function definition" ?> do
   keyword "begin"
   keyword "function"
   (funName, inExpr, outExpr) <-
-    ("function definition using keyword returns" ?> try returnsForm) <|>
-    ("function definition using keyword =" ?> equalForm)
+    ("returns-form" ?> try returnsForm) <|>
+    ("equal-form" ?> try equalForm) <|>
+    raiseErr (Err (Just $ Ppr.text "Malformed Function Syntax" <> Ppr.line)
+              [Ppr.text "function definition starts in one of the following forms:",
+               Ppr.text "・  begin function f(x) returns y",
+               Ppr.text "・  begin function y = f(x)"]
+              S.empty)
   statementDelimiter
   b <- binding
   keyword "end"
