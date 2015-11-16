@@ -25,6 +25,7 @@ library
   exposed-modules:
                   Formura.Language.Combinator
                   Formura.Compiler
+                  Formura.Interpreter.Grid
                   Formura.Parser
                   Formura.Syntax
 
@@ -40,6 +41,7 @@ library
               , parsers
               , QuickCheck
               , trifecta
+              , vector
 
   hs-source-dirs:      src
   default-language:    Haskell2010
@@ -50,6 +52,7 @@ library
 executable formura
   hs-source-dirs: exe-src
   main-is: formura.hs
+  default-language:    Haskell2010
   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
                 base == 4.*

@@ -24,6 +24,6 @@ begin function square(x) returns y
     y = x ** 2
 end function
 
-begin function wrong(x)
+begin function wrong(x*y) returns z
     y = x ** 2
 end function

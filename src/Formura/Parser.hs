@@ -244,7 +244,7 @@ functionSyntaxSugar = "function definition" ?> do
     ("returns-form" ?> try returnsForm) <|>
     ("equal-form" ?> try equalForm) <|>
     raiseErr (Err (Just $ Ppr.text "Malformed Function Syntax" <> Ppr.line)
-              [Ppr.text "function definition starts in one of the following forms:",
+              [Ppr.text "Please check if you are using one of the following forms:",
                Ppr.text "・  begin function f(x) returns y",
                Ppr.text "・  begin function y = f(x)"]
               S.empty)
