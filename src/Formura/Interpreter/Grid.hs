@@ -6,6 +6,8 @@ import qualified Data.Vector as V
 
 data GridValue a =
   GridValue
-  { _content :: V.Vector a
-  , _offset  :: [Rational]
+  { _gridContent :: V.Vector a
+  , _gridOffset  :: [Rational]
   }
+
+makeLenses ''GridValue
