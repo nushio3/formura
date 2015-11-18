@@ -7,10 +7,18 @@ b[i+1, j] = (a+b)[i]
 big = let a = 1; b = 2; int :: c in A + B + C
 double :: a , b = 3, c
 == = ==
-ddx = for(a) a[i-1] + a[i+1]
+
+
+ddx = for(a) (a[i+1] - a[i-1])/2
+
 ∂ = (ddx,ddy,ddz)
+
+dvdt = SIGMA for(j) ∂ j . p j
+
+
 dvdt = Σ (for (j) ∂(j) (∂(i) (p(j))))
 kisho'joho'shori = hawai'i
+
 
 d = for(j) (∂ j) * (∂ i) * p k
 # 関数適用が左結合で、ピリオドが右結合なら、ふつうにこれで行けるんじゃね？
@@ -24,6 +32,6 @@ begin function square(x) returns y
     y = x ** 2
 end function
 
-begin function wrong(x*y) returns z
+begin function wrong(x+y) returns z
     y = x ** 2
 end function

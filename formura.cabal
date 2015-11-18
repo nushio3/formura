@@ -25,6 +25,7 @@ library
   exposed-modules:
                   Formura.Language.Combinator
                   Formura.Compiler
+                  Formura.Interpreter.Environment
                   Formura.Interpreter.Grid
                   Formura.Parser
                   Formura.Syntax

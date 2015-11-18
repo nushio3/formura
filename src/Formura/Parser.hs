@@ -1,3 +1,14 @@
+{-|
+Module      : Formura.Parser
+Description : parser combinator
+Copyright   : (c) Takayuki Muranushi, 2015
+License     : MIT
+Maintainer  : muranushi@gmail.com
+Stability   : experimental
+
+This module contains combinator for writing Formura parser, and also the parsers for Formura syntax.
+-}
+
 {-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, TypeOperators #-}
 module Formura.Parser where
 
@@ -19,6 +30,9 @@ import Text.Parser.LookAhead
 import Formura.Language.Combinator
 import Formura.Syntax
 
+-- * The parser comibnator
+
+-- | The parser monad.
 newtype P a = P { runP :: Parser a }
             deriving (Alternative, Monad, Functor, MonadPlus, Applicative, CharParsing, LookAheadParsing, Parsing, DeltaParsing, MarkParsing Delta)
 
@@ -37,10 +51,26 @@ instance TokenParsing P where
              <|> lineContinuation)
        >> return ()
 
+-- | Document the parser.
 (?>) :: String -> P a -> P a
 s ?> p = p <?> s
 
 infixr 0 ?>
+
+-- | Parse a string as a keyword. Check if the keyword is indeed in a keyword list.
+keyword :: IdentName -> P IdentName
+keyword k = "keyword " ++ k ?> do
+  when (k `S.notMember` keywordSet) $
+    raiseErr $ failed $
+    "Please report the compiler developer: \"" ++ k ++ "\" is not in a keyword list!"
+  symbol k
+
+-- | The set of keywords. The string is not parsed as a identifier if it's in the keyword list.
+keywordSet :: S.Set IdentName
+keywordSet = S.fromList
+             ["begin", "end", "function", "returns", "let", "in", "lambda", "for", "dimension", "axes",
+              "+","-","*","/",".","::","=", ","]
+
 
 comment :: P ()
 comment = "comment" ?> do
@@ -55,6 +85,7 @@ lineContinuation = "line continuation" ?> do
   newline
   return ()
 
+-- | Run parser, and record the metadata for the parsed syntax component
 parseIn :: Functor f => P (Fix f) -> P (Fix f)
 parseIn p = do
   r1 <- rend
@@ -63,6 +94,8 @@ parseIn p = do
   let m2 = Just $ Metadata r1 (delta r1) (delta r2)
   return $ In (m <|> m2) x
 
+
+-- * The parser for Formura syntax
 
 isIdentifierAlphabet0 :: Char -> Bool
 isIdentifierAlphabet0 = isLetter
@@ -88,17 +121,6 @@ identName = "identifier" ?> try $ do
   whiteSpace
   return str
 
-keyword :: IdentName -> P IdentName
-keyword k = "keyword " ++ k ?> do
-  when (k `S.notMember` keywordSet) $
-    raiseErr $ failed $
-    "Please report the compiler developer: \"" ++ k ++ "\" is not in a keyword list!"
-  symbol k
-
-keywordSet :: S.Set IdentName
-keywordSet = S.fromList
-             ["begin", "end", "function", "returns", "let", "in", "lambda", "for", "dimension", "axes",
-              "+","-","*","/",".","::","=", ","]
 
 
 ident :: (IdentF ∈ fs) => P (Lang fs)
