@@ -26,6 +26,7 @@ library
                   Formura.Language.Combinator
                   Formura.Compiler
                   Formura.Interpreter.Environment
+                  Formura.Interpreter.Eval
                   Formura.Interpreter.Grid
                   Formura.Parser
                   Formura.Syntax
