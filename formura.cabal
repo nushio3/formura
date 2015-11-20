@@ -27,7 +27,7 @@ library
                   Formura.Compiler
                   Formura.Interpreter.Environment
                   Formura.Interpreter.Eval
-                  Formura.Interpreter.Grid
+                  Formura.Interpreter.Value
                   Formura.Parser
                   Formura.Syntax
 

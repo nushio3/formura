@@ -1,4 +1,4 @@
-{-|
+{- |
 Module      : Formura.Language.Combinator
 Description : language combinator
 Copyright   : (c) Takayuki Muranushi, 2015
