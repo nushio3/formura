@@ -33,6 +33,7 @@ data ElemTypeF x = ElemTypeF IdentName
 pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
 
 
+
 data FunTypeF x = FunTypeF
                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 

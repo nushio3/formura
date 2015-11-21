@@ -1,6 +1,6 @@
 {-|
-Module      : Formura.Interpreter.Grid
-Description : Haskell interpreter's grid semantics
+Module      : Formura.Interpreter.Value
+Description : Haskell interpreter's value semantics
 Copyright   : (c) Takayuki Muranushi, 2015
 License     : MIT
 Maintainer  : muranushi@gmail.com
@@ -10,20 +10,37 @@ Grid object with rational offset, to interpret Formura semantics in Haskell.
 -}
 
 
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
+DeriveTraversable, TemplateHaskell #-}
 
-
-module Formura.Interpreter.Grid where
+module Formura.Interpreter.Value where
 
 import           Control.Lens
 import qualified Data.Vector as V
 
-data GridValue a =
-  GridValue
-  { _gridContent :: V.Vector a
-  , _gridOffset  :: [Rational]
+import           Formura.Language.Combinator
+import           Formura.Syntax
+
+newtype ElemValueF x = ElemValueF Rational
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+data FunValueF x = FunValueF LExpr RExpr
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+data VectorValueF x =
+  VectorValueF
+  { _vectorContent :: V.Vector x
   }
 
-makeLenses ''GridValue
+data GridValueF x =
+  GridValueF
+  { _gridOffset  :: [Rational]
+  , _gridContent :: V.Vector x
+  }
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
--- type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemTypeF ]
+makeLenses ''GridValueF
+
+type ValueExpr = Lang '[ GridValueF, TupleF, VectorValueF,  FunValueF, ElemValueF ]
+
+type TypedValue = (ValueExpr, TypeExpr)
