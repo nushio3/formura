@@ -56,10 +56,10 @@ raiseDoc doc = P.raiseErr $ P.Err (Just doc) [] S.empty
 type CompilerAlgebra r w s f a = f a -> CompilerMonad r w s a
 
 -- | The compiler-monad-specific fold, that takes track of the syntax tree traversed.
-compile :: (Monoid w, Traversable f, HasCompilerSyntaticState s) =>
+compilerFold :: (Monoid w, Traversable f, HasCompilerSyntaticState s) =>
            CompilerAlgebra r w s f (Lang g) -> Fix f -> CompilerMonad r w s (Lang g)
-compile k (In meta x) = do
+compilerFold k (In meta x) = do
   compilerFocus %= (meta <|>)
-  r1 <- traverse (compile k) x
+  r1 <- traverse (compilerFold k) x
   r2 <- k r1
   return $ propagateMetadata meta r2
