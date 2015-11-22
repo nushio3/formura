@@ -17,8 +17,7 @@ type CompilerError = Ppr.Doc
 -- | The state of the compiler.
 data CompilerState =
   CompilerState
-  { _maybeDimension :: Maybe Int
-  , _compilerFocus :: Maybe Metadata
+  { _compilerFocus :: Maybe Metadata
   , _compilerStage :: String }
 
 makeClassy ''CompilerState
