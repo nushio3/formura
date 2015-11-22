@@ -16,6 +16,7 @@ DeriveTraversable, TemplateHaskell #-}
 module Formura.Interpreter.Value where
 
 import           Control.Lens
+import qualified Data.Map as M
 import qualified Data.Vector as V
 
 import           Formura.Language.Combinator
@@ -44,3 +45,12 @@ makeLenses ''GridValueF
 type ValueExpr = Lang '[ GridValueF, TupleF, VectorValueF,  FunValueF, ElemValueF ]
 
 type TypedValue = (ValueExpr, TypeExpr)
+
+data Environment =
+  Environment
+  { _envDimension :: Int
+  , _envExtent :: [Int]
+  , _envBinding :: M.Map IdentName TypedValue
+  }
+
+makeLenses ''Environment

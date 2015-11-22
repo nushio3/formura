@@ -25,7 +25,6 @@ library
   exposed-modules:
                   Formura.Language.Combinator
                   Formura.Compiler
-                  Formura.Interpreter.Environment
                   Formura.Interpreter.Eval
                   Formura.Interpreter.Value
                   Formura.Parser

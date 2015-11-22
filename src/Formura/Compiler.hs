@@ -5,7 +5,7 @@ module Formura.Compiler where
 import           Control.Applicative
 import           Control.Lens
 import           Control.Monad.Trans.Either
-import           Control.Monad.State
+import           Control.Monad.RWS
 import qualified Data.Set as S
 import qualified Text.Trifecta as P
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
@@ -23,11 +23,13 @@ data CompilerSyntaticState =
 makeClassy ''CompilerSyntaticState
 
 -- | The formura compiler monad.
-newtype M a = M { runM :: EitherT CompilerError (StateT CompilerSyntaticState IO) a}
-              deriving (Functor, Applicative, Monad, MonadIO, MonadState CompilerSyntaticState)
+newtype CompilerMonad r w s a = CompilerMonad
+  { runCompilerMonad :: EitherT CompilerError (RWST r w s IO) a}
+              deriving (Functor, Applicative, Monad, MonadIO,
+                        MonadReader r, MonadState s, MonadWriter w)
 
 -- | Throw an error, possibly with user-friendly diagnostics of the current compiler state.
-instance P.Errable M where
+instance (HasCompilerSyntaticState s, Monoid w) => P.Errable (CompilerMonad r w s) where
   raiseErr errMsg = do
     stg <- use compilerStage
     foc <- use compilerFocus
@@ -36,25 +38,26 @@ instance P.Errable M where
           | otherwise = errMsg & P.footnotes %~ (++ [Ppr.text ("when " ++ stg)])
     case foc of
       Nothing ->
-        M $ left $
+        CompilerMonad $ left $
         P.explain P.emptyRendering $ errMsg2
       Just (Metadata r b e) ->
-        M $ left $
+        CompilerMonad $ left $
         P.explain (P.addSpan b e $ r) $ errMsg2
 
 -- | Run the compiler and get the result.
-runCompiler :: M a -> CompilerSyntaticState -> IO (Either CompilerError a)
-runCompiler m s = flip evalStateT s $ runEitherT $ runM m
+runCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a)
+runCompiler m r s = fmap fst $ evalRWST (runEitherT $ runCompilerMonad m) r s
 
 -- | Raise doc as an error
 raiseDoc :: P.Errable m => Ppr.Doc ->  m a
 raiseDoc doc = P.raiseErr $ P.Err (Just doc) [] S.empty
 
 -- | The monadic algebra, specialized to the compiler monad.
-type CAlgebra f a = f a -> M a
+type CompilerAlgebra r w s f a = f a -> CompilerMonad r w s a
 
 -- | The compiler-monad-specific fold, that takes track of the syntax tree traversed.
-compile :: Traversable f => CAlgebra f (Lang g) -> Fix f -> M (Lang g)
+compile :: (Monoid w, Traversable f, HasCompilerSyntaticState s) =>
+           CompilerAlgebra r w s f (Lang g) -> Fix f -> CompilerMonad r w s (Lang g)
 compile k (In meta x) = do
   compilerFocus %= (meta <|>)
   r1 <- traverse (compile k) x
