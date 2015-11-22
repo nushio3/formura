@@ -15,16 +15,16 @@ import Formura.Language.Combinator
 type CompilerError = Ppr.Doc
 
 -- | The state of the compiler.
-data CompilerState =
-  CompilerState
+data CompilerSyntaticState =
+  CompilerSyntaticState
   { _compilerFocus :: Maybe Metadata
   , _compilerStage :: String }
 
-makeClassy ''CompilerState
+makeClassy ''CompilerSyntaticState
 
 -- | The formura compiler monad.
-newtype M a = M { runM :: EitherT CompilerError (StateT CompilerState IO) a}
-              deriving (Functor, Applicative, Monad, MonadIO, MonadState CompilerState)
+newtype M a = M { runM :: EitherT CompilerError (StateT CompilerSyntaticState IO) a}
+              deriving (Functor, Applicative, Monad, MonadIO, MonadState CompilerSyntaticState)
 
 -- | Throw an error, possibly with user-friendly diagnostics of the current compiler state.
 instance P.Errable M where
@@ -43,7 +43,7 @@ instance P.Errable M where
         P.explain (P.addSpan b e $ r) $ errMsg2
 
 -- | Run the compiler and get the result.
-runCompiler :: M a -> CompilerState -> IO (Either CompilerError a)
+runCompiler :: M a -> CompilerSyntaticState -> IO (Either CompilerError a)
 runCompiler m s = flip evalStateT s $ runEitherT $ runM m
 
 -- | Raise doc as an error
