@@ -50,9 +50,20 @@ library
 
 
 
-executable formura
+executable formura-parser
   hs-source-dirs: exe-src
-  main-is: formura.hs
+  main-is: formura-parser.hs
+  default-language:    Haskell2010
+  ghc-options:         -O2 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+                base == 4.*
+              , ansi-wl-pprint
+              , formura
+              , trifecta
+
+executable formura-eval
+  hs-source-dirs: exe-src
+  main-is: formura-eval.hs
   default-language:    Haskell2010
   ghc-options:         -O2 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
