@@ -8,6 +8,7 @@ import           System.IO
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import qualified Text.Trifecta as P
 
+import           Formura.Interpreter.Eval
 import qualified Formura.Parser as P
 import           Formura.Syntax
 
@@ -28,5 +29,8 @@ process fn = do
 evalStmt :: StatementF RExpr -> IO ()
 evalStmt (TypeDecl _ _) = return ()
 evalStmt (Subst l r) = do
-  print l
-  print r
+  putStrLn $ show l ++ " = " ++ show r
+  rv <- runIM $ eval r
+  case rv of
+    Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
+    Right vt -> print vt

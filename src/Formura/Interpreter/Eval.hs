@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, RankNTypes, TemplateHaskell #-}
 module Formura.Interpreter.Eval where
 
+import           Control.Applicative
 import           Control.Lens
 import           Control.Monad.RWS hiding (fix)
 import qualified Data.Map as M
@@ -56,13 +57,16 @@ instance Evalable (OperatorF TypedValue) where
   eval (UniopF "+" x) = return x
   eval (UniopF "-" x) = evalUniop negate x
   eval (BinopF "+" x y) = evalBinop (+) x y
+  eval (BinopF "-" x y) = evalBinop (-) x y
+  eval (BinopF "*" x y) = evalBinop (*) x y
+  eval (BinopF "/" x y) = evalBinop (/) x y
   eval (BinopF str _ _) = raiseErr $ failed $ "unimplemented binary operator: (" ++ str ++ ")"
   eval _ = raiseErr $ failed "unimplemented operator in eval"
 
 evalUniop :: (forall a. Num a => a -> a) -> TypedValue -> IM TypedValue
 evalUniop f (ElemValue r, t) = return $ (ElemValue (f r), t)
 
-evalBinop :: (forall a. Num a => a -> a -> a) -> TypedValue -> TypedValue -> IM TypedValue
+evalBinop :: (forall a. Fractional a => a -> a -> a) -> TypedValue -> TypedValue -> IM TypedValue
 evalBinop f (ElemValue x, tx ) (ElemValue y, ty) = return $ (ElemValue (f x y), tx)
 
 instance Evalable (TupleF TypedValue) where
@@ -89,8 +93,9 @@ instance Evalable RExpr where
 
 -- | Monadic 'fold' for twin language.
 
-mfold2 :: (Monad m, Traversable f) => AlgebraM m f (Lang g, Lang h) -> Fix f -> m (Lang g, Lang h)
+mfold2 :: Traversable f => AlgebraM IM f (Lang g, Lang h) -> Fix f -> IM (Lang g, Lang h)
 mfold2 k (In meta x) = do
+  compilerFocus %= (meta <|>)
   r1 <- traverse (mfold2 k) x
   (g2, h2) <- k r1
   return $ (propagateMetadata meta g2, propagateMetadata meta h2)
