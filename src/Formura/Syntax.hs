@@ -194,6 +194,7 @@ type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemType
 
 type LExpr = Lang '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ]
 
+type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF, ImmF ]
 type RExpr = Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF, ImmF ]
 
 data SpecialDeclaration = DimensionDeclaration Int

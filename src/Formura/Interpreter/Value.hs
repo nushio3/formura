@@ -11,7 +11,7 @@ Grid object with rational offset, to interpret Formura semantics in Haskell.
 
 
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
-DeriveTraversable, TemplateHaskell #-}
+DeriveTraversable, PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
 module Formura.Interpreter.Value where
 
@@ -21,8 +21,11 @@ import qualified Data.Vector as V
 import           Formura.Language.Combinator
 import           Formura.Syntax
 
-newtype ElemValueF x = ElemValueF Rational
+newtype ElemValueF x = ElemValueF Double
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+pattern ElemValue x <- ((^? match) -> Just (ElemValueF x)) where ElemValue x = match # ElemValueF x
+
 
 data FunValueF x = FunValueF LExpr RExpr
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
@@ -31,6 +34,7 @@ data VectorValueF x =
   VectorValueF
   { _vectorContent :: V.Vector x
   }
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 data GridValueF x =
   GridValueF
