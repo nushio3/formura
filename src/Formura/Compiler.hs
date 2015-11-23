@@ -22,6 +22,9 @@ data CompilerSyntaticState =
 
 makeClassy ''CompilerSyntaticState
 
+defaultCompilerSyntaticState :: CompilerSyntaticState
+defaultCompilerSyntaticState = CompilerSyntaticState Nothing ""
+
 -- | The formura compiler monad.
 newtype CompilerMonad r w s a = CompilerMonad
   { runCompilerMonad :: EitherT CompilerError (RWST r w s IO) a}

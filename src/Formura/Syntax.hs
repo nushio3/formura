@@ -205,3 +205,4 @@ data Program = Program
                { _programSpecialDeclarations :: [SpecialDeclaration]
                , _programBinding :: BindingF RExpr}
              deriving (Eq, Ord, Show)
+makeLenses ''Program

@@ -69,6 +69,7 @@ executable formura-eval
   build-depends:
                 base == 4.*
               , ansi-wl-pprint
+              , lens
               , formura
               , trifecta
 

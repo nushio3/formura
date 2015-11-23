@@ -23,11 +23,17 @@ data Environment =
 
 makeLenses ''Environment
 
+defaultEnvironment :: Environment
+defaultEnvironment = Environment 2 [] defaultCompilerSyntaticState{ _compilerStage = "interpretation" }
+
 instance HasCompilerSyntaticState Environment where
   compilerSyntaticState = envCS
 
 type IM = CompilerMonad Binding () Environment
 type IAlgebra f a = f a -> IM a
+
+runIM :: IM a -> IO (Either CompilerError a)
+runIM m = runCompiler m M.empty defaultEnvironment
 
 
 iFold :: (Traversable f) => IAlgebra f (Lang g) -> Fix f -> IM (Lang g)
