@@ -13,7 +13,7 @@ import qualified Language.IR.Frontend as F
 
 
 term :: Parser F.Expr
-term = parens expr<|> litTerm <|> identTerm <?> "term"
+term = parens expr <|> litTerm <|> identTerm <?> "term"
   where
     litTerm = F.Lit <$> rational
     identTerm = F.Load <$> identifierName

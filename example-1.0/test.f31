@@ -9,20 +9,13 @@ double :: a , b = 3, c
 == = ==
 
 
-ddx = for(a) (a[i+1] - a[i-1])/2
+ddx = for(a) (a[i+1,j,k] - a[i-1,j,k])/2
+ddy = for(a) (a[i,j+1,k] - a[i,j-1,k])/2
+ddz = for(a) (a[i,j,k+1] - a[i,j,k-1])/2
 
 ∂ = (ddx,ddy,ddz)
 
-dvdt = SIGMA for(j) ∂ j . p j
-
-
-dvdt = Σ (for (j) ∂(j) (∂(i) (p(j))))
-kisho'joho'shori = hawai'i
-
-
-d = for(j) (∂ j) * (∂ i) * p k
-# 関数適用が左結合で、ピリオドが右結合なら、ふつうにこれで行けるんじゃね？
-dvdt = SIGMA for(j) P j . P i . p j
+dvdt = Σ for(j) ∂j . ∂i . p j
 
 begin function y = square(x)
     y = x ** 2
