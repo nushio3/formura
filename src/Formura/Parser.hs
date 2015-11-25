@@ -318,6 +318,7 @@ typeValueStatements = "type-decl and/or substitiution statement" ?> do
                    ]
       substPart = [Subst lhs rhs
                    | (lhs, Just rhs) <- lamrs]
+  -- Type definitions always come before the values.
   return $ typePart ++ substPart
 
 
