@@ -25,7 +25,6 @@ process fn = do
       P.Success prog -> do
         let BindingF stmts = prog ^. programBinding
         mapM_ evalStmt stmts
-  putStrLn ""
 
 evalStmt :: StatementF RExpr -> IO ()
 evalStmt (TypeDecl _ _) = return ()
@@ -35,3 +34,4 @@ evalStmt (Subst l r) = do
   case rv of
     Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
     Right vt -> print vt
+  putStrLn ""
