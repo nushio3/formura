@@ -25,10 +25,13 @@ library
   exposed-modules:
                   Formura.Language.Combinator
                   Formura.Compiler
-                  Formura.Interpreter.Eval
-                  Formura.Interpreter.Value
-                  Formura.Parser
                   Formura.Syntax
+                  Formura.Parser
+                  Formura.Interpreter.Value
+                  Formura.Interpreter.Eval
+                  Formura.Codegen.OrthotopeMachine
+                  Formura.Codegen.Graph
+
 
   -- other-modules:
   -- other-extensions:
@@ -37,6 +40,7 @@ library
               , ansi-wl-pprint
               , containers
               , either
+              , fgl
               , lens
               , mtl
               , parsers
