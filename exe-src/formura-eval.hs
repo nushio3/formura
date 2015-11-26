@@ -25,6 +25,7 @@ process fn = do
       P.Success prog -> do
         let BindingF stmts = prog ^. programBinding
         mapM_ evalStmt stmts
+  putStrLn ""
 
 evalStmt :: StatementF RExpr -> IO ()
 evalStmt (TypeDecl _ _) = return ()
