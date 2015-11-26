@@ -10,9 +10,11 @@ in http://arxiv.org/abs/1204.4779 .
 
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, PatternSynonyms, ViewPatterns #-}
 
-module Formura.Codegen.OrthotopeMachine where
+module Formura.OrthotopeMachine.Instruction where
 
 import Control.Lens
+import qualified Data.IntMap as G
+
 
 import Formura.Language.Combinator
 import Formura.Syntax (IdentName, OperatorF(..), ImmF(..))
@@ -43,3 +45,5 @@ pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
 
 type OMInstF = Sum '[GridInstF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
+
+type Graph = G.IntMap (OMInstF G.Key)

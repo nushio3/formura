@@ -29,8 +29,8 @@ library
                   Formura.Parser
                   Formura.Interpreter.Value
                   Formura.Interpreter.Eval
-                  Formura.Codegen.OrthotopeMachine
-                  Formura.Codegen.Graph
+                  Formura.OrthotopeMachine.Instruction
+                  Formura.OrthotopeMachine.CodeGen
 
 
   -- other-modules:
@@ -40,7 +40,6 @@ library
               , ansi-wl-pprint
               , containers
               , either
-              , fgl
               , lens
               , mtl
               , parsers
