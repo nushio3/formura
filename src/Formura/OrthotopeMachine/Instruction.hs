@@ -17,7 +17,7 @@ import qualified Data.IntMap as G
 
 
 import Formura.Language.Combinator
-import Formura.Syntax (IdentName, OperatorF(..), ImmF(..))
+import Formura.Syntax (IdentName, OperatorF(..), ImmF(..), TypeExpr)
 
 
 -- | The functor for orthotope machine-specific instructions. Note that arithmetic operations are outsourced.
@@ -46,4 +46,4 @@ pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
 type OMInstF = Sum '[GridInstF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
 
-type Graph = G.IntMap (OMInstF G.Key)
+type Graph = G.IntMap (OMInstF G.Key, TypeExpr)

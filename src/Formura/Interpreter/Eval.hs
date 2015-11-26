@@ -20,16 +20,16 @@ data Environment =
   Environment
   { _envDimension :: Int
   , _envExtent :: [Int]
-  , _envCS :: CompilerSyntaticState
+  , _envCS :: CompilerSyntacticState
   }
 
 makeLenses ''Environment
 
 defaultEnvironment :: Environment
-defaultEnvironment = Environment 0 [] defaultCompilerSyntaticState{ _compilerStage = "interpretation" }
+defaultEnvironment = Environment 0 [] defaultCompilerSyntacticState{ _compilerStage = "interpretation" }
 
-instance HasCompilerSyntaticState Environment where
-  compilerSyntaticState = envCS
+instance HasCompilerSyntacticState Environment where
+  compilerSyntacticState = envCS
 
 type IM = CompilerMonad Binding () Environment
 type IAlgebra f a = f a -> IM a

@@ -15,15 +15,15 @@ import Formura.Language.Combinator
 type CompilerError = Ppr.Doc
 
 -- | The state of the compiler.
-data CompilerSyntaticState =
-  CompilerSyntaticState
+data CompilerSyntacticState =
+  CompilerSyntacticState
   { _compilerFocus :: Maybe Metadata
   , _compilerStage :: String }
 
-makeClassy ''CompilerSyntaticState
+makeClassy ''CompilerSyntacticState
 
-defaultCompilerSyntaticState :: CompilerSyntaticState
-defaultCompilerSyntaticState = CompilerSyntaticState Nothing ""
+defaultCompilerSyntacticState :: CompilerSyntacticState
+defaultCompilerSyntacticState = CompilerSyntacticState Nothing ""
 
 -- | The formura compiler monad.
 newtype CompilerMonad r w s a = CompilerMonad
@@ -31,7 +31,7 @@ newtype CompilerMonad r w s a = CompilerMonad
               deriving (Functor, Applicative, Monad, MonadIO,
                         MonadReader r, MonadState s, MonadWriter w)
 
-compileErrMsg :: (HasCompilerSyntaticState s, MonadState s m) => P.Err -> m P.Err
+compileErrMsg :: (HasCompilerSyntacticState s, MonadState s m) => P.Err -> m Ppr.Doc
 compileErrMsg errMsg = do
     stg <- use compilerStage
     foc <- use compilerFocus
@@ -39,16 +39,16 @@ compileErrMsg errMsg = do
           | stg == "" = errMsg
           | otherwise = errMsg & P.footnotes %~ (++ [Ppr.text ("when " ++ stg)])
     case foc of
-      Nothing -> return $ errMsg2
-      Just (Metadata r b e) -> return $ (\d -> P.Err (Just d) [] S.empty) $
+      Nothing -> return $ P.explain P.emptyRendering $ errMsg2
+      Just (Metadata r b e) -> return $
         P.explain (P.addSpan b e $ r) $ errMsg2
 
 
 -- | Throw an error, possibly with user-friendly diagnostics of the current compiler state.
-instance (HasCompilerSyntaticState s, Monoid w) => P.Errable (CompilerMonad r w s) where
+instance (HasCompilerSyntacticState s, Monoid w) => P.Errable (CompilerMonad r w s) where
   raiseErr errMsg = do
     msg2 <- compileErrMsg errMsg
-    CompilerMonad $ left $ P.explain P.emptyRendering msg2
+    CompilerMonad $ left $ msg2
 
 -- | Run the compiler and get the result.
 runCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a)
@@ -62,7 +62,7 @@ raiseDoc doc = P.raiseErr $ P.Err (Just doc) [] S.empty
 type CompilerAlgebra r w s f a = f a -> CompilerMonad r w s a
 
 -- | The compiler-monad-specific fold, that takes track of the syntax tree traversed.
-compilerFold :: (Monoid w, Traversable f, HasCompilerSyntaticState s) =>
+compilerFold :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
            CompilerAlgebra r w s f (Lang g) -> Fix f -> CompilerMonad r w s (Lang g)
 compilerFold k (In meta x) = do
   compilerFocus %= (meta <|>)
