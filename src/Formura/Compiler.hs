@@ -69,3 +69,12 @@ compilerFold k (In meta x) = do
   r1 <- traverse (compilerFold k) x
   r2 <- k r1
   return $ propagateMetadata meta r2
+
+-- | The compiler-monad-specific fold, that takes track of the syntax tree traversed and produces non-language results.
+compilerFoldout :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
+           CompilerAlgebra r w s f g -> Fix f -> CompilerMonad r w s g
+compilerFoldout k (In meta x) = do
+  compilerFocus %= (meta <|>)
+  r1 <- traverse (compilerFoldout k) x
+  r2 <- k r1
+  return $ r2

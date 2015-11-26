@@ -45,5 +45,3 @@ pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
 
 type OMInstF = Sum '[GridInstF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
-
-type Graph = G.IntMap (OMInstF G.Key, TypeExpr)
