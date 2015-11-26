@@ -29,5 +29,3 @@ end function
 # begin function wrong(x+y) returns z
 #     y = x ** 2
 # end function
-
-semiwrong = a[i+1,j+2/3]
