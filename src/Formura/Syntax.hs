@@ -9,7 +9,7 @@ Stability   : experimental
 Components for syntatic elements of formura.
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveGeneric,
+{-# LANGUAGE DataKinds, DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveGeneric,
 DeriveTraversable, FlexibleContexts, FlexibleInstances,
 PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
@@ -17,6 +17,7 @@ module Formura.Syntax where
 
 import Control.Lens hiding (op)
 import Data.List (intercalate)
+import Data.Typeable
 import GHC.Generics
 import qualified Test.QuickCheck as Q
 
@@ -28,14 +29,14 @@ import Formura.Language.Combinator
 -- ** Elemental types
 
 data ElemTypeF x = ElemTypeF IdentName
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
 
 
 
 data FunTypeF x = FunTypeF
-                deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern FunType <- ((^? match) -> Just FunTypeF) where FunType = match # FunTypeF
 
@@ -43,7 +44,7 @@ pattern FunType <- ((^? match) -> Just FunTypeF) where FunType = match # FunType
 type IdentName = String
 
 data IdentF x = IdentF IdentName
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 -- | smart pattern
 pattern Ident xs <- ((^? match) -> Just (IdentF xs)) where
@@ -55,7 +56,7 @@ pattern Ident xs <- ((^? match) -> Just (IdentF xs)) where
 
 -- | The functor for tuple.
 data TupleF x = TupleF [x]
-             deriving (Eq, Ord, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
 instance Show x => Show (TupleF x) where
   show (TupleF xs) = "(" ++ (intercalate ", " $ map show xs) ++ ")"
 
@@ -76,7 +77,7 @@ pattern Tuple xs <- ((^? match) -> Just (TupleF xs)) where
 
 -- | Rational Literal
 data ImmF x = ImmF Rational
-            deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+            deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Imm r <- ((^? match) -> Just (ImmF r)) where
   Imm r = match # ImmF r
@@ -87,7 +88,7 @@ instance Q.Arbitrary x => Q.Arbitrary (ImmF x) where
 
 -- | Boolean Literal
 data ImmBoolF x = ImmBoolF Bool
-                deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern ImmBool r <- ((^? match) -> Just (ImmBoolF r)) where
   ImmBool r = match # ImmBoolF r
@@ -98,7 +99,7 @@ data OperatorF x
   = UniopF IdentName x
   | BinopF IdentName x x
   | TriopF IdentName x x x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Generic)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Generic)
 
 instance Q.Arbitrary x => Q.Arbitrary (OperatorF x) where
   arbitrary =
@@ -127,13 +128,13 @@ pattern Triop op a b c <- ((^? match) -> Just (TriopF op a b c)) where
 -- ** Structures and Element Access
 
 data GridF y x = GridF [y] x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Grid args x <- ((^? match) -> Just (GridF args x )) where
   Grid args x = match # GridF args x
 
 data VectorF y x = VectorF y x
-                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
   Vector args x = match # VectorF args x
@@ -142,28 +143,28 @@ pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
 
 -- | Function application
 data ApplyF x = ApplyF x x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
   Apply f x = match # ApplyF f x
 
 -- | Let clause
 data LetF x = LetF (BindingF x) x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Let binds x <- ((^? match) -> Just (LetF binds x)) where
   Let binds x = match # LetF binds x
 
 -- | Lambda expression
 data LambdaF x = LambdaF LExpr x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Lambda args x <- ((^? match) -> Just (LambdaF args x )) where
   Lambda args x = match # LambdaF args x
 
 -- | Bunch of bindings
 data BindingF x = BindingF [StatementF x]
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Binding xs <- ((^? match) -> Just (BindingF xs )) where
   Binding xs = match # BindingF xs
@@ -174,7 +175,7 @@ data StatementF x
   -- ^ substitution
   | TypeDeclF TypeExpr LExpr
   -- ^ type declaration
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 pattern Subst l r <- ((^? match) -> Just (SubstF l r)) where
   Subst l r = match # SubstF l r
 pattern TypeDecl t x <- ((^? match) -> Just (TypeDeclF t x)) where

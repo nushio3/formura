@@ -10,38 +10,39 @@ Grid object with rational offset, to interpret Formura semantics in Haskell.
 -}
 
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
+{-# LANGUAGE DataKinds, DeriveDataTypeable, DeriveFunctor, DeriveFoldable,
 DeriveTraversable, PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
 module Formura.Interpreter.Value where
 
 import           Control.Lens
 import qualified Data.Vector as V
+import           Data.Typeable
 
 import           Formura.Language.Combinator
 import           Formura.Syntax
 
 newtype ElemValueF x = ElemValueF Double
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern ElemValue x <- ((^? match) -> Just (ElemValueF x)) where ElemValue x = match # ElemValueF x
 
 
 data FunValueF x = FunValueF LExpr RExpr
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 data VectorValueF x =
   VectorValueF
   { _vectorContent :: V.Vector x
   }
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 data GridValueF x =
   GridValueF
   { _gridOffset  :: [Rational]
   , _gridContent :: V.Vector x
   }
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 makeLenses ''GridValueF
 

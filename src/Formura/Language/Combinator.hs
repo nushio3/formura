@@ -7,7 +7,7 @@ Stability   : experimental
 Combinators for creating a customized language based on Modular Reifiable Matching.
 -}
 
-{-# LANGUAGE ConstraintKinds, DataKinds, DeriveFoldable, DeriveFunctor,
+{-# LANGUAGE ConstraintKinds, DataKinds,DeriveDataTypeable,  DeriveFoldable, DeriveFunctor,
 DeriveTraversable, FlexibleContexts, FlexibleInstances,
 FunctionalDependencies, GADTs, KindSignatures, MultiParamTypeClasses,
 PatternSynonyms, RankNTypes, ScopedTypeVariables, StandaloneDeriving,
@@ -19,6 +19,7 @@ module Formura.Language.Combinator where
 import           Control.Lens
 import           Control.Monad
 import           Data.Traversable
+import           Data.Typeable
 import qualified Test.QuickCheck     as Q
 import qualified Text.Trifecta       as P hiding (string)
 import qualified Text.Trifecta.Delta as P
@@ -30,6 +31,7 @@ data Sum (fs :: [* -> *]) x where
   Void :: Sum '[] x
   Here :: Traversable f => f x -> Sum (f ': fs) x
   There :: Sum fs x -> Sum (f ': fs) x
+  deriving (Typeable)
 
 instance Eq (Sum '[] x) where
   _ == _ = True
@@ -171,6 +173,7 @@ instance P.HasRendering Metadata where
 -- | The fix point of F-algebra, with compiler metadata information. This is the datatype we use to represent any AST.
 data Fix f where
   In :: Functor f => {_metadata :: Maybe Metadata, _out :: f (Fix f)} -> Fix f
+  deriving (Typeable)
 
 instance (Eq (f (Fix f))) => Eq (Fix f) where
   (In _ a) == (In _ b) = a == b
@@ -178,7 +181,7 @@ instance (Ord (f (Fix f))) => Ord (Fix f) where
   compare (In _ a) (In _ b) = compare a b
 
 instance (Show (f (Fix f))) => Show (Fix f) where
-    showsPrec n (In _ x) = showsPrec n x
+  showsPrec n (In _ x) = showsPrec n x
 
 instance (f ∈ fs) => Matches f (Fix (Sum fs)) where
   type Content f (Fix (Sum fs)) = Fix (Sum fs)
@@ -200,7 +203,6 @@ fix = iso _out go
   where
     go :: f (Fix f) -> Fix f
     go ffixf = In Nothing ffixf
-
 
 -- * Syntax tree utility
 
