@@ -18,3 +18,4 @@ addons:
 
 script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
+  - stack exec formura-eval example-1.0/test.f31
