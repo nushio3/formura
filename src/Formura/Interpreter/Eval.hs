@@ -44,8 +44,8 @@ iFold = compilerFold
 -- | Monadic 'fold' for twin language.
 mfold2 :: Traversable f => AlgebraM IM f (Lang g, Lang h) -> Fix f -> IM (Lang g, Lang h)
 mfold2 k (In meta x) = do
-  compilerFocus %= (meta <|>)
   r1 <- traverse (mfold2 k) x
+  compilerFocus %= (meta <|>)
   (g2, h2) <- k r1
   return $ (propagateMetadata meta g2, propagateMetadata meta h2)
 

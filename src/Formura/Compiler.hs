@@ -65,8 +65,8 @@ type CompilerAlgebra r w s f a = f a -> CompilerMonad r w s a
 compilerFold :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
            CompilerAlgebra r w s f (Lang g) -> Fix f -> CompilerMonad r w s (Lang g)
 compilerFold k (In meta x) = do
-  compilerFocus %= (meta <|>)
   r1 <- traverse (compilerFold k) x
+  compilerFocus %= (meta <|>)
   r2 <- k r1
   return $ propagateMetadata meta r2
 
@@ -74,7 +74,7 @@ compilerFold k (In meta x) = do
 compilerFoldout :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
            CompilerAlgebra r w s f g -> Fix f -> CompilerMonad r w s g
 compilerFoldout k (In meta x) = do
-  compilerFocus %= (meta <|>)
   r1 <- traverse (compilerFoldout k) x
+  compilerFocus %= (meta <|>)
   r2 <- k r1
   return $ r2
