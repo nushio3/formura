@@ -185,18 +185,17 @@ pattern TypeDecl t x <- ((^? match) -> Just (TypeDeclF t x)) where
 type ConstRationalExprF = Sum '[ ApplyF, OperatorF, ImmF ]
 type ConstRationalExpr  = Lang '[ ApplyF, OperatorF, ImmF ]
 
-data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
-             deriving (Eq, Ord, Show)
-
 data NPlusK = NPlusK IdentName Rational
              deriving (Eq, Ord, Show)
 
-type TypeExpr = Lang '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemTypeF ]
+type TypeExprF = Sum '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemTypeF ]
+type TypeExpr  = Fix TypeExprF
 
-type LExpr = Lang '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ]
+type LExprF = Sum '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ]
+type LExpr  = Fix LExprF
 
 type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF, ImmF ]
-type RExpr = Lang '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF, ImmF ]
+type RExpr  = Fix RExprF
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
