@@ -182,7 +182,8 @@ pattern TypeDecl t x <- ((^? match) -> Just (TypeDeclF t x)) where
 
 -- * Program Components
 
-type ConstRationalExpr = Lang '[ OperatorF, ImmF ]
+type ConstRationalExprF = Sum '[ ApplyF, OperatorF, ImmF ]
+type ConstRationalExpr  = Lang '[ ApplyF, OperatorF, ImmF ]
 
 data NPlusKPattern = NPlusKPattern IdentName ConstRationalExpr
              deriving (Eq, Ord, Show)
