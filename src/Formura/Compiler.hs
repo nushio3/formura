@@ -31,21 +31,24 @@ newtype CompilerMonad r w s a = CompilerMonad
               deriving (Functor, Applicative, Monad, MonadIO,
                         MonadReader r, MonadState s, MonadWriter w)
 
--- | Throw an error, possibly with user-friendly diagnostics of the current compiler state.
-instance (HasCompilerSyntaticState s, Monoid w) => P.Errable (CompilerMonad r w s) where
-  raiseErr errMsg = do
+compileErrMsg :: (HasCompilerSyntaticState s, MonadState s m) => P.Err -> m P.Err
+compileErrMsg errMsg = do
     stg <- use compilerStage
     foc <- use compilerFocus
     let errMsg2
           | stg == "" = errMsg
           | otherwise = errMsg & P.footnotes %~ (++ [Ppr.text ("when " ++ stg)])
     case foc of
-      Nothing ->
-        CompilerMonad $ left $
-        P.explain P.emptyRendering $ errMsg2
-      Just (Metadata r b e) ->
-        CompilerMonad $ left $
+      Nothing -> return $ errMsg2
+      Just (Metadata r b e) -> return $ (\d -> P.Err (Just d) [] S.empty) $
         P.explain (P.addSpan b e $ r) $ errMsg2
+
+
+-- | Throw an error, possibly with user-friendly diagnostics of the current compiler state.
+instance (HasCompilerSyntaticState s, Monoid w) => P.Errable (CompilerMonad r w s) where
+  raiseErr errMsg = do
+    msg2 <- compileErrMsg errMsg
+    CompilerMonad $ left $ P.explain P.emptyRendering msg2
 
 -- | Run the compiler and get the result.
 runCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a)
