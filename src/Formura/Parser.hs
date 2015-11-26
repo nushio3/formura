@@ -170,8 +170,7 @@ nPlusK = "n+k pattern" ?> do
 
 imm :: (ImmF ∈ fs) => P (Lang fs)
 imm = "rational literal" ?> parseIn $ do
-  x <- constRationalExpr
-  return $ Imm $ toRational x
+  Imm <$> constRational
 
 exprOf :: (OperatorF ∈ fs, ApplyF  ∈ fs) => P (Lang fs) -> P (Lang fs)
 exprOf termParser = X.buildExpressionParser tbl termParser
@@ -329,7 +328,7 @@ lAexpr = "atomic l-expr" ?> tupleOf lExpr <|> ident
 
 vectorIndexOf :: P a -> P a
 vectorIndexOf content = do
-  "vector indexing" ?> try $ symbolic '('
+  "vector index access" ?> try $ symbolic '('
   r <- content
   symbolic ')'
   return r
@@ -381,8 +380,24 @@ rExpr = "r-expr" ?> exprOf expr10
 
 constRationalExpr :: P Rational
 constRationalExpr = "const rational expression" ?> do
+  cre <- exprOf imm
+  mfoldout evalCRE cre
+
+evalCRE :: ConstRationalExprF Rational -> P Rational
+evalCRE (Imm x) = return x
+evalCRE (Uniop "+" x) = return x
+evalCRE (Uniop "-" x) = return $ negate x
+evalCRE (Binop "+" a b) = return $ a + b
+evalCRE (Binop "-" a b) = return $ a - b
+evalCRE (Binop "*" a b) = return $ a * b
+evalCRE (Binop "/" a b) = return $ a / b
+evalCRE _ = raiseErr $ failed "unsupported operator in const rational expression"
+
+constRational :: P Rational
+constRational = "const rational expression" ?> do
   nos <- naturalOrScientific
   return $ either toRational toRational  nos
+
 
 constIntExpr :: P Int
 constIntExpr = fromInteger <$> natural

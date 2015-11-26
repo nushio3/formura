@@ -1,10 +1,11 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, RankNTypes, TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances,  RankNTypes, TemplateHaskell #-}
 module Formura.Interpreter.Eval where
 
 import           Control.Applicative
 import           Control.Lens
 import           Control.Monad.RWS hiding (fix)
 import qualified Data.Map as M
+import qualified Data.Vector as V
 import           Text.Trifecta (failed, raiseErr)
 
 import           Formura.Interpreter.Value
@@ -36,9 +37,18 @@ type IAlgebra f a = f a -> IM a
 runIM :: IM a -> IO (Either CompilerError a)
 runIM m = runCompiler m M.empty defaultEnvironment
 
-
-iFold :: (Traversable f) => IAlgebra f (Lang g) -> Fix f -> IM (Lang g)
+-- | Monadic 'fold' specialized to the 'IM'.
+iFold :: Traversable f => IAlgebra f (Lang g) -> Fix f -> IM (Lang g)
 iFold = compilerFold
+
+-- | Monadic 'fold' for twin language.
+mfold2 :: Traversable f => AlgebraM IM f (Lang g, Lang h) -> Fix f -> IM (Lang g, Lang h)
+mfold2 k (In meta x) = do
+  compilerFocus %= (meta <|>)
+  r1 <- traverse (mfold2 k) x
+  (g2, h2) <- k r1
+  return $ (propagateMetadata meta g2, propagateMetadata meta h2)
+
 
 class Evalable a where
   eval :: a -> IM TypedValue
@@ -91,11 +101,23 @@ instance Evalable RExpr where
   eval = mfold2 (eval +:: eval +:: eval +:: eval +:: eval +:: eval +:: eval +:: eval +:: voidEval
                   :: RExprF TypedValue -> IM TypedValue)
 
--- | Monadic 'fold' for twin language.
 
-mfold2 :: Traversable f => AlgebraM IM f (Lang g, Lang h) -> Fix f -> IM (Lang g, Lang h)
-mfold2 k (In meta x) = do
-  compilerFocus %= (meta <|>)
-  r1 <- traverse (mfold2 k) x
-  (g2, h2) <- k r1
-  return $ (propagateMetadata meta g2, propagateMetadata meta h2)
+ret :: Iso' [Int] Int
+ret = iso enc dec
+  where
+    enc = product
+    dec = const []
+
+makeGridValueF :: [Rational] -> ([Rational] -> IM x) -> IM (GridValueF x)
+makeGridValueF offset fun = do
+  exts <- use envExtent
+  let idxs = map (zipWith (+) offset . map toRational) $ spanExts exts
+      spanExts []  = [[]]
+      spanExts (n:ns) = [i:js| i <- [0..n-1], js <- spanExts ns]
+  content <- mapM fun idxs
+  return $ GridValueF offset $ V.fromList content
+
+accessGridF :: GridValueF x -> [Rational] -> IM x
+accessGridF g addr = do
+  let iaddr = zipWith (-) addr (g ^.gridOffset)
+  return undefined

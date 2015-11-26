@@ -9,9 +9,9 @@ double :: a , b = 3, c
 == = ==
 
 
-ddx = for(a) (a[i+1,j,k] - a[i-1,j,k])/2
-ddy = for(a) (a[i,j+1,k] - a[i,j-1,k])/2
-ddz = for(a) (a[i,j,k+1] - a[i,j,k-1])/2
+ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
 
 ∂ = (ddx,ddy,ddz)
 
