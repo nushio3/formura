@@ -25,17 +25,13 @@ instance A.Annotated Node where
   annotation = nodeAnnot
 
 type Graph = G.IntMap Node
-type TypedInst  = (OMInstF NodeID, NodeType)
 
-data NodeValueFOf a x = NodeTypefFOf a NodeType
+data NodeValueF x = NodeValueF NodeID NodeType
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
-type NodeValueF = NodeValueFOf NodeID
 
-pattern NodeValue n t <- ((^? match) -> Just (NodeTypefFOf n t)) where NodeValue n t = match # NodeTypefFOf n t
-pattern n :. t <- ((^? match) -> Just (NodeTypefFOf n t)) where n :. t = match # NodeTypefFOf n t
+pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n t = match # NodeValueF n t
+pattern n :. t <- ((^? match) -> Just (NodeValueF n t)) where n :. t = match # NodeValueF n t
 
-type TypedInstF = NodeValueFOf (OMInstF NodeID)
-type InstLang   = Lang '[TypedInstF]
 
 data FunValueF x = FunValueF LExpr RExpr
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
@@ -69,19 +65,8 @@ freeNodeID = do
   g <- use theGraph
   return $ G.size g
 
-insert :: TypedInst -> GenM ValueExpr
-insert (inst, typ) = do
-  n0 <- freeNodeID
-  foc <- use compilerFocus
-  let a = case foc of
-        Just meta -> A.singleton meta
-        Nothing   -> A.empty
-  theGraph %= G.insert n0 (Node inst typ a)
-  return $ NodeValue n0 typ
-
-
-insert2 :: InstLang -> GenM ValueExpr
-insert2 (inst :. typ) = do
+insert :: OMInstF NodeID -> NodeType -> GenM ValueExpr
+insert inst typ = do
   n0 <- freeNodeID
   foc <- use compilerFocus
   let a = case foc of
@@ -92,17 +77,17 @@ insert2 (inst :. typ) = do
 
 
 instance Generatable (ImmF x) where
-  gen (Imm r) = insert (Imm r, ElemType "Real")
+  gen (Imm r) = insert (Imm r) (ElemType "Real")
 
 instance Generatable (OperatorF ValueExpr) where
-  gen (Uniop op (NodeValue av at)) = insert (Uniop op av,at)
-  gen (Binop op (NodeValue av at) (NodeValue bv bt)) = insert (Binop op av bv,bt)
+  gen (Uniop op (NodeValue av at)) = insert (Uniop op av) at
+  gen (Binop op (NodeValue av at) (NodeValue bv bt)) = insert (Binop op av bv) bt
   gen (Triop op (av :. at) (bv :. bt) (cv :. ct))
-    | op == "ite" && at == ElemType "bool" && bt == ct = insert (Triop op av bv cv, bt)
+    | op == "ite" && at == ElemType "bool" && bt == ct = insert (Triop op av bv cv) bt
   gen _ = raiseErr $ failed "unimplemented operator in eval"
 
 instance Generatable (IdentF x) where
-  gen (Ident n) = insert (Load n, ElemType "Real")
+  gen (Ident n) = insert (Load n) (ElemType "Real")
 
 instance Generatable (TupleF ValueExpr) where
   gen _ = raiseErr $ failed "gen of tuple unimplemented."
