@@ -26,8 +26,9 @@ library
                   Formura.Language.Combinator
                   Formura.Annotation
                   Formura.Compiler
-                  Formura.Syntax
                   Formura.Parser
+                  Formura.Syntax
+                  Formura.Vec
                   Formura.Interpreter.Value
                   Formura.Interpreter.Eval
                   Formura.OrthotopeMachine.Instruction
