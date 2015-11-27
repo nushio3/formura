@@ -6,6 +6,7 @@ module Formura.OrthotopeMachine.CodeGen where
 import           Control.Applicative
 import           Control.Lens hiding (op, at)
 import           Control.Monad
+import           Control.Monad.Reader
 import qualified Data.IntMap as G
 import qualified Data.Map as M
 import           Data.Ratio
@@ -168,13 +169,27 @@ withBindings b1 genX = do
         TypeDeclF t l -> [(l, t)]
         _             -> []
 
+      substs0 :: [(LExpr, GenM ValueExpr)]
+      substs0 = concat $ flip map stmts0 $ \x -> case x of
+        SubstF l r -> [(l, r)]
+        _             -> []
+
       nameOf :: LExpr -> IdentName
       nameOf (Ident n) = n
       nameOf (Grid _ x) = nameOf x
       nameOf (Vector _ x) = nameOf x
       nameOf _ = error "unsupported form in type decl"
 
-  genX -- TODO
+      typeDict :: M.Map IdentName TypeExpr
+      typeDict = M.fromList [(nameOf l, t) | (l,t)<- typeDecls0]
+
+  substs1 <- forM substs0 $ \(l, genV) -> do
+    v <- genV
+    -- TODO: LHS grid pattern must be taken care of.
+    -- TODO: Typecheck must take place.
+    return (nameOf l,v)
+  --  M.union prefers left-hand-side when duplicate keys are encountered
+  local (binding %~ M.union (M.fromList substs1)) genX
 
 voidGen :: a -> GenM ValueExpr
 voidGen _ = raiseErr $ failed "gen of void unimplemented"
