@@ -8,13 +8,12 @@ A virtual machine with multidimensional vector instructions that operates on str
 in http://arxiv.org/abs/1204.4779 .
 -}
 
-{-# LANGUAGE DataKinds, DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveTraversable, PatternSynonyms, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, PatternSynonyms, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Instruction where
 
 import Control.Lens
 import qualified Data.IntMap as G
-import           Data.Typeable
 
 import Formura.Language.Combinator
 import Formura.Syntax (IdentName, OperatorF(..), ImmF(..), TypeExpr)
@@ -28,7 +27,7 @@ data GridInstF x
   | LoadIndexF Int
   | LoadExtentF Int
   | ShiftF [Int] x
-  deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 
 -- | smart patterns

@@ -7,7 +7,7 @@ Stability   : experimental
 Combinators for creating a customized language based on Modular Reifiable Matching.
 -}
 
-{-# LANGUAGE ConstraintKinds, DataKinds,DeriveDataTypeable,  DeriveFoldable, DeriveFunctor,
+{-# LANGUAGE ConstraintKinds, DataKinds, DeriveFoldable, DeriveFunctor,
 DeriveTraversable, FlexibleContexts, FlexibleInstances,
 FunctionalDependencies, GADTs, KindSignatures, MultiParamTypeClasses,
 PatternSynonyms, RankNTypes, ScopedTypeVariables, StandaloneDeriving,
@@ -19,7 +19,6 @@ module Formura.Language.Combinator where
 import           Control.Lens
 import           Control.Monad
 import           Data.Traversable
-import           Data.Typeable
 import qualified Test.QuickCheck     as Q
 import qualified Text.Trifecta       as P hiding (string)
 import qualified Text.Trifecta.Delta as P
@@ -31,7 +30,6 @@ data Sum (fs :: [* -> *]) x where
   Void :: Sum '[] x
   Here :: Traversable f => f x -> Sum (f ': fs) x
   There :: Sum fs x -> Sum (f ': fs) x
-  deriving (Typeable)
 
 instance Eq (Sum '[] x) where
   _ == _ = True
@@ -163,7 +161,6 @@ instance Matches f (f x) where
 
 -- | The compiler metadata.
 data Metadata = Metadata {_metadataRendering :: P.Rendering, _metadataBegin :: P.Delta,  _metadataEnd :: P.Delta}
-                deriving (Typeable)
 makeLenses ''Metadata
 
 instance Show Metadata where
@@ -174,7 +171,6 @@ instance P.HasRendering Metadata where
 -- | The fix point of F-algebra, with compiler metadata information. This is the datatype we use to represent any AST.
 data Fix f where
   In :: Functor f => {_metadata :: Maybe Metadata, _out :: f (Fix f)} -> Fix f
-  deriving (Typeable)
 
 instance (Eq (f (Fix f))) => Eq (Fix f) where
   (In _ a) == (In _ b) = a == b
