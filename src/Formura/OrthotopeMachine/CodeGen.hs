@@ -72,7 +72,7 @@ instance Generatable (IdentF x) where
   gen (Ident n) = insert (Load n, ElemType "Real")
 
 instance Generatable (TupleF TypedValue) where
-  gen _ = raiseErr $ failed "gen of grid unimplemented."
+  gen _ = raiseErr $ failed "gen of tuple unimplemented."
 
 instance Generatable (GridF a x) where
   gen _ = raiseErr $ failed "gen of grid unimplemented."
