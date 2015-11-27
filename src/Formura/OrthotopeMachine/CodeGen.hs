@@ -61,8 +61,8 @@ instance HasCompilerSyntacticState CodeGenState where
 type GenM = CompilerMonad () Binding CodeGenState
 
 
-class Generatable a where
-  gen :: a -> GenM ValueExpr
+class Generatable f where
+  gen :: f (GenM ValueExpr) -> GenM ValueExpr
 
 freeNodeID :: GenM NodeID
 freeNodeID = do
@@ -80,57 +80,81 @@ insert inst typ = do
   return $ NodeValue n0 typ
 
 
-instance Generatable (ImmF x) where
-  gen (Imm r) = insert (Imm r) (ElemType "Rational")
+instance Generatable ImmF where
+  gen (Imm r) = do
+    insert (Imm r) (ElemType "Rational")
 
-instance Generatable (OperatorF ValueExpr) where
-  gen (Uniop op (NodeValue av at)) = insert (Uniop op av) at
-  gen (Binop op (NodeValue av at) (NodeValue bv bt)) = insert (Binop op av bv) bt
-  gen (Triop op (av :. at) (bv :. bt) (cv :. ct))
-    | op == "ite" && at == ElemType "bool" && bt == ct = insert (Triop op av bv cv) bt
-  gen _ = raiseErr $ failed "unimplemented operator in eval"
+instance Generatable OperatorF where
+  gen (Uniop op gA)       = do a <- gA                  ; goUniop op a
+  gen (Binop op gA gB)    = do a <- gA; b <- gB         ; goBinop op a b
+  gen (Triop op gA gB gC) = do a <- gA; b <- gB; c <- gC; goTriop op a b c
 
-instance Generatable (IdentF x) where
+goUniop :: IdentName -> ValueExpr -> GenM ValueExpr
+goUniop op (av :. at) = insert (Uniop op av) at
+goUniop _ _  = raiseErr $ failed $ "unimplemented path in unary operator"
+
+goBinop :: IdentName -> ValueExpr -> ValueExpr -> GenM ValueExpr
+goBinop op (av :. at) (bv :. bt)
+  | at == bt = insert (Binop op av bv) at
+  | otherwise = raiseErr $ failed "type of the both hand sides does not match"
+goBinop _ _ _  = raiseErr $ failed $ "unimplemented path in binary operator"
+
+goTriop :: IdentName -> ValueExpr -> ValueExpr -> ValueExpr -> GenM ValueExpr
+goTriop op (av :. at) (bv :. bt) (cv :. ct)
+  | op == "ite" && at == ElemType "bool" && bt == ct = insert (Triop op av bv cv) bt
+goTriop _ _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator"
+
+instance Generatable IdentF where
   gen (Ident n) = insert (Load n) (ElemType "Real")
 
-instance Generatable (TupleF ValueExpr) where
-  gen (Tuple xs) = return $ Tuple xs
+instance Generatable TupleF where
+  gen (Tuple xsGen) = do
+    xs <- sequence xsGen
+    return $ Tuple xs
 
-instance Generatable (GridF NPlusK ValueExpr) where
-  gen (Grid npks vt0@(val0 :. typ0)) = case typ0 of
-    ElemType _   -> return vt0
-    Grid offs0 etyp0 -> do
-      let
-          patK   = fmap (^. _2) (npks :: Vec NPlusK)
-          newPos = offs0 - patK
-          intOff = fmap floor newPos
-          newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
-          typ1 = Grid newOff etyp0
-      if intOff == 0
-              then return (val0 :. typ1)
-              else insert (Shift intOff val0) typ1
+instance Generatable (GridF NPlusK) where
+  gen (Grid npks gen0) = do
+    vt0@(val0 :. typ0) <- gen0
+    case typ0 of
+      ElemType _   -> return vt0
+      Grid offs0 etyp0 -> do
+        let
+            patK   = fmap (^. _2) (npks :: Vec NPlusK)
+            newPos = offs0 - patK
+            intOff = fmap floor newPos
+            newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
+            typ1 = Grid newOff etyp0
+        if intOff == 0
+                then return (val0 :. typ1)
+                else insert (Shift intOff val0) typ1
 
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
-instance Generatable (ApplyF ValueExpr) where
-  gen (Apply (Tuple xs) (Imm r)) = do
-    when (denominator r /= 1) $ raiseErr $ failed "non-integer indexing in tuple access"
-    let n = fromInteger $  numerator r
-        l = length xs
-    when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
-    return $ xs!!n
-  gen (Apply (Tuple xs) _) = raiseErr $ failed "tuple applied to non-constant integer"
-  gen _ = raiseErr $ failed "gen of apply unimplemented"
+instance Generatable ApplyF where
+  gen (Apply fgen agen) = do
+    f0 <- fgen
+    a0 <- agen
+    goApply f0 a0
 
-instance Generatable (LambdaF ValueExpr) where
+goApply :: ValueExpr -> ValueExpr -> GenM ValueExpr
+goApply (Tuple xs) (Imm r) = do
+  when (denominator r /= 1) $ raiseErr $ failed "non-integer indexing in tuple access"
+  let n = fromInteger $  numerator r
+      l = length xs
+  when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
+  return $ xs!!n
+goApply (Tuple xs) _ = raiseErr $ failed "tuple applied to non-constant integer"
+goApply  _ _ = raiseErr $ failed "unexpected combination of application"
+
+instance Generatable LambdaF where
   gen _ = raiseErr $ failed "gen of lambda unimplemented"
 
-instance Generatable (LetF ValueExpr) where
+instance Generatable LetF where
   gen _ = raiseErr $ failed "gen of let unimplemented"
 
 voidGen :: a -> GenM ValueExpr
 voidGen _ = raiseErr $ failed "gen of void unimplemented"
 
-instance Generatable RExpr where
-  gen = compilerFoldout (gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: voidGen
-               :: RExprF ValueExpr -> GenM ValueExpr)
+instance Generatable RExprF where
+  gen =  (gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: voidGen
+               :: RExprF (GenM ValueExpr) -> GenM ValueExpr)
