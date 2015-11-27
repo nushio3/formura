@@ -50,7 +50,11 @@ freeNodeID = do
 insert :: TypedInst -> GenM TypedValue
 insert (inst, typ) = do
   n0 <- freeNodeID
-  theGraph %= G.insert n0 (Node inst typ A.empty)
+  foc <- use compilerFocus
+  let a = case foc of
+        Just meta -> A.singleton meta
+        Nothing   -> A.empty
+  theGraph %= G.insert n0 (Node inst typ a)
   return (n0, typ)
 
 

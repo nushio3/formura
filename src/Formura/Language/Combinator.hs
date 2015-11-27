@@ -163,6 +163,7 @@ instance Matches f (f x) where
 
 -- | The compiler metadata.
 data Metadata = Metadata {_metadataRendering :: P.Rendering, _metadataBegin :: P.Delta,  _metadataEnd :: P.Delta}
+                deriving (Typeable)
 makeLenses ''Metadata
 
 instance Show Metadata where
