@@ -13,7 +13,6 @@ in http://arxiv.org/abs/1204.4779 .
 module Formura.OrthotopeMachine.Instruction where
 
 import Control.Lens
-import qualified Data.IntMap as G
 
 import Formura.Language.Combinator
 import Formura.Syntax (IdentName, OperatorF(..), ImmF(..), TypeExpr)

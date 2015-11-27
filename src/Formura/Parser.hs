@@ -368,11 +368,11 @@ typeFexpr = "applied type-expression" ?> do
     go f = parseIn $ do
       mx <- optional (gridIndicesOf constRationalExpr)
       case mx of
-        Just x -> go $ Grid x f
+        Just x -> go $ GridType x f
         Nothing -> do
           mx' <- optional (vectorIndexOf constIntExpr)
           case mx' of
-            Just x -> go $ Vector x f
+            Just x -> go $ VectorType x f
             Nothing -> return f
 
 
