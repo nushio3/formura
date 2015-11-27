@@ -27,10 +27,11 @@ instance A.Annotated Node where
 type Graph = G.IntMap Node
 type TypedInst  = (OMInstF NodeID, NodeType)
 
-data NodeValueF x = NodeValueF NodeID NodeType
+data NodeValueFOf a x = NodeTypedF a NodeType
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+type NodeValueF = NodeValueFOf NodeID
 
-pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n t = match # NodeValueF n t
+pattern NodeValue n t <- ((^? match) -> Just (NodeTypedF n t)) where NodeValue n t = match # NodeTypedF n t
 
 data FunValueF x = FunValueF LExpr RExpr
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
