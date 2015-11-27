@@ -10,13 +10,20 @@ import           Formura.Language.Combinator
 import           Formura.Syntax
 import           Formura.Compiler
 import           Formura.OrthotopeMachine.Instruction
+import qualified Formura.Annotation as A
 
-type Node  = G.Key
-type TypedInst = (OMInstF Node, TypeExpr)
-type Graph = G.IntMap TypedInst
+type NodeID  = G.Key
+data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: TypeExpr, _nodeAnnot :: A.Annotation}
+makeLenses ''Node
+instance A.Annotated Node where
+  annotation = nodeAnnot
 
-type TypedValue = (Node, TypeExpr)
-type Binding = M.Map IdentName TypedValue
+type Graph = G.IntMap Node
+type TypedInst  = (OMInstF NodeID, TypeExpr)
+type TypedValue = (NodeID, TypeExpr)
+
+
+type Binding = M.Map IdentName Node
 
 data CodeGenState = CodeGenState
   { _codegenSyntacticState :: CompilerSyntacticState
@@ -35,15 +42,15 @@ type GenM = CompilerMonad () Binding CodeGenState
 class Generatable a where
   gen :: a -> GenM TypedValue
 
-freeNode :: GenM Node
-freeNode = do
+freeNodeID :: GenM NodeID
+freeNodeID = do
   g <- use theGraph
   return $ G.size g
 
 insert :: TypedInst -> GenM TypedValue
 insert (inst, typ) = do
-  n0 <- freeNode
-  theGraph %= G.insert n0 (inst, typ)
+  n0 <- freeNodeID
+  theGraph %= G.insert n0 (Node inst typ A.empty)
   return (n0, typ)
 
 
