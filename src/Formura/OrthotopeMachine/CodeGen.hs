@@ -183,11 +183,18 @@ withBindings b1 genX = do
       typeDict :: M.Map IdentName TypeExpr
       typeDict = M.fromList [(nameOf l, t) | (l,t)<- typeDecls0]
 
-  substs1 <- forM substs0 $ \(l, genV) -> do
-    v <- genV
-    -- TODO: LHS grid pattern must be taken care of.
-    -- TODO: Typecheck must take place.
-    return (nameOf l,v)
+  let
+    -- Let bindings enter scope one by one, not simultaneously
+    graduallyBind :: [(LExpr, GenM ValueExpr)] -> GenM [(IdentName, ValueExpr)]
+    graduallyBind [] = return []
+    graduallyBind ((l,genV):lgvs) = do
+      v <- genV
+      -- TODO: LHS grid pattern must be taken care of.
+      -- TODO: Typecheck must take place.
+      local (binding %~ M.insert (nameOf l) v) $ graduallyBind lgvs
+  substs1 <- graduallyBind substs0
+
+
   --  M.union prefers left-hand-side when duplicate keys are encountered
   local (binding %~ M.union (M.fromList substs1)) genX
 

@@ -168,8 +168,8 @@ data LetF x = LetF (BindingF x) x
 pattern Let binds x <- ((^? match) -> Just (LetF binds x)) where
   Let binds x = match # LetF binds x
 
--- | Lambda expression
-data LambdaF x = LambdaF LExpr x
+-- | Lambda expression. Lambda expression is not to recurse into its RExpr.
+data LambdaF x = LambdaF LExpr RExpr
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Lambda args x <- ((^? match) -> Just (LambdaF args x )) where
