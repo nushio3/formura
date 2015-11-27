@@ -18,7 +18,7 @@ import           Formura.Syntax
 import           Formura.Vec
 import           Formura.OrthotopeMachine.Instruction
 
-type NodeTypeF = Sum '[ GridF Rational, ElemTypeF ]
+type NodeTypeF = Sum '[ GridTypeF, ElemTypeF ]
 type NodeType  = Fix NodeTypeF
 
 
@@ -118,18 +118,18 @@ instance Generatable TupleF where
     xs <- sequence xsGen
     return $ Tuple xs
 
-instance Generatable (GridF NPlusK) where
+instance Generatable GridF where
   gen (Grid npks gen0) = do
     vt0@(val0 :. typ0) <- gen0
     case typ0 of
       ElemType _   -> return vt0
-      Grid offs0 etyp0 -> do
+      GridType offs0 etyp0 -> do
         let
             patK   = fmap (^. _2) (npks :: Vec NPlusK)
             newPos = offs0 - patK
             intOff = fmap floor newPos
             newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
-            typ1 = Grid newOff etyp0
+            typ1 = GridType newOff etyp0
         if intOff == 0
                 then return (val0 :. typ1)
                 else insert (Shift intOff val0) typ1

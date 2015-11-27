@@ -127,17 +127,30 @@ pattern Triop op a b c <- ((^? match) -> Just (TriopF op a b c)) where
 
 -- ** Structures and Element Access
 
-data GridF y x = GridF (Vec y) x
+data GridF x = GridF (Vec NPlusK) x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Grid args x <- ((^? match) -> Just (GridF args x )) where
   Grid args x = match # GridF args x
 
-data VectorF y x = VectorF y x
+data GridTypeF x = GridTypeF (Vec Rational) x
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+
+pattern GridType args x <- ((^? match) -> Just (GridTypeF args x )) where
+  GridType args x = match # GridTypeF args x
+
+
+data VectorF x = VectorF IdentName x
                    deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
   Vector args x = match # VectorF args x
+
+data VectorTypeF x = VectorTypeF Int x
+                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+
+pattern VectorType args x <- ((^? match) -> Just (VectorTypeF args x )) where
+  VectorType args x = match # VectorTypeF args x
 
 -- ** Functional Program Constituent
 
@@ -190,7 +203,11 @@ data NPlusK = NPlusK IdentName Rational
              deriving (Eq, Ord, Show)
 instance Num NPlusK where
   fromInteger n = NPlusK "" $ fromInteger n
-
+  (+)    = error "instance Num NPlusK is only partially defined"
+  (*)    = error "instance Num NPlusK is only partially defined"
+  (-)    = error "instance Num NPlusK is only partially defined"
+  abs    = error "instance Num NPlusK is only partially defined"
+  signum = error "instance Num NPlusK is only partially defined"
 -- TODO: correctly deal with NPlusK pattern with identifier abbreviation.
 
 instance Field1 NPlusK NPlusK IdentName IdentName where
@@ -198,13 +215,13 @@ instance Field1 NPlusK NPlusK IdentName IdentName where
 instance Field2 NPlusK NPlusK Rational Rational where
   _2 = lens (\(NPlusK _ y) -> y) (\(NPlusK x _) y -> NPlusK x y)
 
-type TypeExprF = Sum '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemTypeF ]
+type TypeExprF = Sum '[ GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
 type TypeExpr  = Fix TypeExprF
 
-type LExprF = Sum '[ GridF NPlusK, TupleF, VectorF IdentName, IdentF ]
+type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
 type LExpr  = Fix LExprF
 
-type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF NPlusK, TupleF, OperatorF, IdentF, ImmF ]
+type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, ImmF ]
 type RExpr  = Fix RExprF
 
 data SpecialDeclaration = DimensionDeclaration Int

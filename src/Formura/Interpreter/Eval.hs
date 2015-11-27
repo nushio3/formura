@@ -82,7 +82,7 @@ evalBinop f (ElemValue x, tx ) (ElemValue y, ty) = return $ (ElemValue (f x y), 
 instance Evalable (TupleF TypedValue) where
   eval (Tuple xts) = return $ (Tuple $ map fst xts, Tuple $ map snd xts)
 
-instance Evalable (GridF a x) where
+instance Evalable (GridF x) where
   eval _ = raiseErr $ failed "eval of grid unimplemented."
 
 instance Evalable (ApplyF x) where
