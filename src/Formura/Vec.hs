@@ -30,10 +30,15 @@ instance Applicative Vec where
     Vec fs <*> Vec xs = Vec (zipWith id fs xs)
 
 instance Num a => Num (Vec a) where
-  a + b = (+) <$> a <*> b
-  a - b = (-) <$> a <*> b
-  a * b = (*) <$> a <*> b
+  (+) = liftA2 (+)
+  (-) = liftA2 (-)
+  (*) = liftA2 (*)
   abs   = fmap abs
   signum = fmap signum
   negate = fmap negate
   fromInteger = pure . fromInteger
+
+instance Fractional a => Fractional (Vec a) where
+  (/) = liftA2 (/)
+  recip = fmap recip
+  fromRational = pure .fromRational
