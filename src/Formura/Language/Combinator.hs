@@ -170,13 +170,7 @@ instance P.HasRendering Metadata where
 
 -- | The fix point of F-algebra, with compiler metadata information. This is the datatype we use to represent any AST.
 data Fix f where
-  In :: Functor f => {_fixMetadata :: Metadata, _out :: f (Fix f)} -> Fix f
-
--- | The 'Fix' with some of its top nodes is allowed to have no metadata.
-data FixMay f where
-  InNothing :: Functor f => f (FixMay f) -> FixMay f
-  InJust    :: Functor f => Fix f        -> FixMay f
-
+  In :: Functor f => {_metadata :: Maybe Metadata, _out :: f (Fix f)} -> Fix f
 
 instance (Eq (f (Fix f))) => Eq (Fix f) where
   (In _ a) == (In _ b) = a == b
@@ -186,12 +180,9 @@ instance (Ord (f (Fix f))) => Ord (Fix f) where
 instance (Show (f (Fix f))) => Show (Fix f) where
   showsPrec n (In _ x) = showsPrec n x
 
--- fix is not a match, since you cannot find the metadata for the top node!
-
--- | FixMay
-instance (f ∈ fs) => Matches f (FixMay (Sum fs)) where
-  type Content f (FixMay (Sum fs)) = FixMay (Sum fs)
-  match = fixMay . constructor
+instance (f ∈ fs) => Matches f (Fix (Sum fs)) where
+  type Content f (Fix (Sum fs)) = Fix (Sum fs)
+  match = fix . constructor
 
 instance (Functor f, Q.Arbitrary (f (Fix f))) => Q.Arbitrary (Fix f) where
   arbitrary       = In Nothing <$> Q.arbitrary
@@ -204,11 +195,11 @@ metadata fun (In p o) = fmap (\p' -> In p' o) (fun p)
 
 -- | The lens to convert to/from 'Fix' and its content.
 
-fixMay :: forall f. Functor f => Iso' (FixMay f) (f (FixMay f))
-fixMay = iso _out go
+fix :: forall f. Functor f => Iso' (Fix f) (f (Fix f))
+fix = iso _out go
   where
-    go :: f (FixMay f) -> FixMay f
-    go ffixf = InMay Nothing ffixf
+    go :: f (Fix f) -> Fix f
+    go ffixf = In Nothing ffixf
 
 -- * Syntax tree utility
 
@@ -217,11 +208,6 @@ fixMay = iso _out go
 -- | Languages are 'Fix' over 'Sum' of functors
 type Lang (fs :: [ * -> * ]) = Fix (Sum fs)
 
-type Lang' f = (forall x. LangLike f x => x)
-class LangLike f x where
-  langLike :: Iso' x (Lang f)
-instance LangLike f (Lang f) where
-  langLike = simple
 
 -- | An F-algebra.
 type Algebra f a = f a -> a
