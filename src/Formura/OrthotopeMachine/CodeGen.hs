@@ -150,7 +150,10 @@ instance Generatable LambdaF where
   gen _ = raiseErr $ failed "gen of lambda unimplemented"
 
 instance Generatable LetF where
-  gen _ = raiseErr $ failed "gen of let unimplemented"
+  gen (Let b genX) = withBindings b genX
+
+withBindings :: BindingF (GenM ValueExpr) -> GenM ValueExpr -> GenM ValueExpr
+withBindings b genX = genX -- TODO
 
 voidGen :: a -> GenM ValueExpr
 voidGen _ = raiseErr $ failed "gen of void unimplemented"
