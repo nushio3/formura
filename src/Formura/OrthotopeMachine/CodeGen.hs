@@ -4,8 +4,10 @@ TemplateHaskell, ViewPatterns #-}
 module Formura.OrthotopeMachine.CodeGen where
 
 import           Control.Lens hiding (op, at)
-import qualified Data.Map as M
+import           Control.Monad
 import qualified Data.IntMap as G
+import qualified Data.Map as M
+import           Data.Ratio
 import           Text.Trifecta (failed, raiseErr)
 
 import           Formura.Language.Combinator
@@ -37,7 +39,7 @@ data FunValueF x = FunValueF LExpr RExpr
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 pattern FunValue l r <- ((^? match) -> Just (FunValueF l r)) where FunValue l r = match # FunValueF l r
 
-type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF]
+type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
 type ValueExpr = Fix ValueExprF
 
 
@@ -90,22 +92,29 @@ instance Generatable (IdentF x) where
   gen (Ident n) = insert (Load n) (ElemType "Real")
 
 instance Generatable (TupleF ValueExpr) where
-  gen _ = raiseErr $ failed "gen of tuple unimplemented."
+  gen _ = raiseErr $ failed "gen of tuple unimplemented"
 
-instance Generatable (GridF a x) where
-  gen _ = raiseErr $ failed "gen of grid unimplemented."
+instance Generatable (GridF NPlusK ValueExpr) where
+  gen _ = raiseErr $ failed "gen of grid unimplemented"
 
-instance Generatable (ApplyF x) where
-  gen _ = raiseErr $ failed "gen of apply unimplemented."
+instance Generatable (ApplyF ValueExpr) where
+  gen (Apply (Tuple xs) (Imm r)) = do
+    when (denominator r /= 1) $ raiseErr $ failed "non-integer indexing in tuple access"
+    let n = fromInteger $  numerator r
+        l = length xs
+    when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
+    return $ xs!!n
+  gen (Apply (Tuple xs) _) = raiseErr $ failed "tuple applied to non-constant integer"
+  gen _ = raiseErr $ failed "gen of apply unimplemented"
 
-instance Generatable (LambdaF x) where
-  gen _ = raiseErr $ failed "gen of lambda unimplemented."
+instance Generatable (LambdaF ValueExpr) where
+  gen _ = raiseErr $ failed "gen of lambda unimplemented"
 
-instance Generatable (LetF x) where
-  gen _ = raiseErr $ failed "gen of let unimplemented."
+instance Generatable (LetF ValueExpr) where
+  gen _ = raiseErr $ failed "gen of let unimplemented"
 
 voidGen :: a -> GenM ValueExpr
-voidGen _ = raiseErr $ failed "gen of void unimplemented."
+voidGen _ = raiseErr $ failed "gen of void unimplemented"
 
 instance Generatable RExpr where
   gen = compilerFoldout (gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: voidGen
