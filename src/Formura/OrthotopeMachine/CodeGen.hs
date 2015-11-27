@@ -1,7 +1,9 @@
-{-# LANGUAGE DataKinds, FlexibleInstances, TemplateHaskell #-}
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
+DeriveTraversable, FlexibleInstances, PatternSynonyms,
+TemplateHaskell, ViewPatterns #-}
 module Formura.OrthotopeMachine.CodeGen where
 
-import           Control.Lens
+import           Control.Lens hiding (op, at)
 import qualified Data.Map as M
 import qualified Data.IntMap as G
 import           Text.Trifecta (failed, raiseErr)
@@ -24,10 +26,21 @@ instance A.Annotated Node where
 
 type Graph = G.IntMap Node
 type TypedInst  = (OMInstF NodeID, NodeType)
-type TypedValue = (NodeID, NodeType)
+
+data NodeValueF x = NodeValueF NodeID NodeType
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n t = match # NodeValueF n t
+
+data FunValueF x = FunValueF LExpr RExpr
+                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+pattern FunValue l r <- ((^? match) -> Just (FunValueF l r)) where FunValue l r = match # FunValueF l r
+
+type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF]
+type ValueExpr = Fix ValueExprF
 
 
-type Binding = M.Map IdentName Node
+type Binding = M.Map IdentName ValueExpr
 
 data CodeGenState = CodeGenState
   { _codegenSyntacticState :: CompilerSyntacticState
@@ -44,14 +57,14 @@ type GenM = CompilerMonad () Binding CodeGenState
 
 
 class Generatable a where
-  gen :: a -> GenM TypedValue
+  gen :: a -> GenM ValueExpr
 
 freeNodeID :: GenM NodeID
 freeNodeID = do
   g <- use theGraph
   return $ G.size g
 
-insert :: TypedInst -> GenM TypedValue
+insert :: TypedInst -> GenM ValueExpr
 insert (inst, typ) = do
   n0 <- freeNodeID
   foc <- use compilerFocus
@@ -59,23 +72,23 @@ insert (inst, typ) = do
         Just meta -> A.singleton meta
         Nothing   -> A.empty
   theGraph %= G.insert n0 (Node inst typ a)
-  return (n0, typ)
+  return $ NodeValue n0 typ
 
 
 instance Generatable (ImmF x) where
   gen (Imm r) = insert (Imm r, ElemType "Real")
 
-instance Generatable (OperatorF TypedValue) where
-  gen (Uniop op (av,at)) = insert (Uniop op av,at)
-  gen (Binop op (av,at) (bv,bt)) = insert (Binop op av bv,bt)
-  gen (Triop op (av, ElemType "bool") (bv,bt) (cv,ct))
-    | op == "ite" && bt == ct = insert (Triop op av bv cv, bt)
+instance Generatable (OperatorF ValueExpr) where
+  gen (Uniop op (NodeValue av at)) = insert (Uniop op av,at)
+  gen (Binop op (NodeValue av at) (NodeValue bv bt)) = insert (Binop op av bv,bt)
+  gen (Triop op (NodeValue av at) (NodeValue bv bt) (NodeValue cv ct))
+    | op == "ite" && at == ElemType "bool" && bt == ct = insert (Triop op av bv cv, bt)
   gen _ = raiseErr $ failed "unimplemented operator in eval"
 
 instance Generatable (IdentF x) where
   gen (Ident n) = insert (Load n, ElemType "Real")
 
-instance Generatable (TupleF TypedValue) where
+instance Generatable (TupleF ValueExpr) where
   gen _ = raiseErr $ failed "gen of tuple unimplemented."
 
 instance Generatable (GridF a x) where
@@ -90,9 +103,9 @@ instance Generatable (LambdaF x) where
 instance Generatable (LetF x) where
   gen _ = raiseErr $ failed "gen of let unimplemented."
 
-voidGen :: a -> GenM TypedValue
+voidGen :: a -> GenM ValueExpr
 voidGen _ = raiseErr $ failed "gen of void unimplemented."
 
 instance Generatable RExpr where
   gen = compilerFoldout (gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: voidGen
-               :: RExprF TypedValue -> GenM TypedValue)
+               :: RExprF ValueExpr -> GenM ValueExpr)

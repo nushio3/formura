@@ -29,6 +29,9 @@ pattern ElemValue x <- ((^? match) -> Just (ElemValueF x)) where ElemValue x = m
 
 data FunValueF x = FunValueF LExpr RExpr
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+pattern FunValue l r <- ((^? match) -> Just (FunValueF l r)) where FunValue l r = match # FunValueF l r
+
+
 
 data VectorValueF x =
   VectorValueF
