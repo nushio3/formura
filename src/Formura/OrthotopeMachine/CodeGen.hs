@@ -3,6 +3,7 @@ DeriveTraversable, FlexibleInstances, PatternSynonyms,
 TemplateHaskell, ViewPatterns #-}
 module Formura.OrthotopeMachine.CodeGen where
 
+import           Control.Applicative
 import           Control.Lens hiding (op, at)
 import           Control.Monad
 import qualified Data.IntMap as G
@@ -96,12 +97,19 @@ instance Generatable (TupleF ValueExpr) where
   gen (Tuple xs) = return $ Tuple xs
 
 instance Generatable (GridF NPlusK ValueExpr) where
-  gen (Grid npks (val0 :. typ0)) = case typ0 of
-    ElemType _   -> return $ val0 :. typ0
-    Grid offs0 _ -> do
-      let a = npks   :: Vec NPlusK
-          o0 = offs0 :: Vec Rational
-      undefined
+  gen (Grid npks vt0@(val0 :. typ0)) = case typ0 of
+    ElemType _   -> return vt0
+    Grid offs0 etyp0 -> do
+      let
+          patK   = fmap (^. _2) (npks :: Vec NPlusK)
+          newPos = offs0 - patK
+          intOff = fmap floor newPos
+          newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
+          typ1 = Grid newOff etyp0
+      if intOff == 0
+              then return (val0 :. typ1)
+              else insert (Shift intOff val0) typ1
+
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
 instance Generatable (ApplyF ValueExpr) where

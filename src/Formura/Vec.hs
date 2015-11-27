@@ -12,33 +12,43 @@ ZipList treated as mathematical vectors, to deal with multidimensionality in ste
 module Formura.Vec where
 
 import Control.Applicative
+import Data.Monoid
 import Text.Read
 
-newtype Vec a = Vec { getVec :: [a] }
-              deriving (Eq, Ord, Functor, Foldable, Traversable)
+data Vec a = Vec { getVec :: [a] } | PureVec a
+           deriving (Show, Read, Functor, Foldable, Traversable)
 
-instance Show a => Show (Vec a) where
-  showsPrec n (Vec xs) = showsPrec n xs
+-- | Equality of vector requires the knowledge of how to zero-fill
+instance (Num a, Eq a) => Eq (Vec a) where
+  a == b = and $ liftVec2 (==) a b
 
-instance Read a => Read (Vec a) where
-  readPrec = Vec <$> readPrec
-
-
+instance (Num a, Ord a) => Ord (Vec a) where
+  compare a b = foldr (<>) EQ $ liftVec2 compare a b
 
 instance Applicative Vec where
-    pure x = Vec (repeat x)
+    pure x = PureVec x
+    PureVec f <*> PureVec x = PureVec $ f x
+    PureVec f <*> Vec xs    = Vec $ fmap f xs
+    Vec fs <*> PureVec x    = Vec $ fmap ($x) fs
     Vec fs <*> Vec xs = Vec (zipWith id fs xs)
 
 instance Num a => Num (Vec a) where
-  (+) = liftA2 (+)
-  (-) = liftA2 (-)
-  (*) = liftA2 (*)
+  (+) = liftVec2 (+)
+  (-) = liftVec2 (-)
+  (*) = liftVec2 (*)
   abs   = fmap abs
   signum = fmap signum
   negate = fmap negate
   fromInteger = pure . fromInteger
 
 instance Fractional a => Fractional (Vec a) where
-  (/) = liftA2 (/)
+  (/) = liftVec2 (/)
   recip = fmap recip
   fromRational = pure .fromRational
+
+liftVec2 :: (Num a, Num b) => (a -> b -> c) -> Vec a -> Vec b -> Vec c
+liftVec2 f (PureVec x) (PureVec y) = PureVec $ f x y
+liftVec2 f (PureVec x) (Vec ys   ) = Vec $ fmap (f x) ys
+liftVec2 f (Vec xs   ) (PureVec y) = Vec $ fmap (flip f y) xs
+liftVec2 f (Vec xs   ) (Vec ys   ) = let n = max (length xs) (length ys) in
+  Vec $ take n $ zipWith f (xs ++ repeat 0) (ys ++ repeat 0)

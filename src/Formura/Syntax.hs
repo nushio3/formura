@@ -188,6 +188,10 @@ type ConstRationalExpr  = Lang '[ ApplyF, OperatorF, ImmF ]
 
 data NPlusK = NPlusK IdentName Rational
              deriving (Eq, Ord, Show)
+instance Num NPlusK where
+  fromInteger n = NPlusK "" $ fromInteger n
+
+-- TODO: correctly deal with NPlusK pattern with identifier abbreviation.
 
 instance Field1 NPlusK NPlusK IdentName IdentName where
   _1 = lens (\(NPlusK x _) -> x) (\(NPlusK _ y) x -> NPlusK x y)

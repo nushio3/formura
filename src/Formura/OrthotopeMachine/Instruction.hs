@@ -17,7 +17,7 @@ import qualified Data.IntMap as G
 
 import Formura.Language.Combinator
 import Formura.Syntax (IdentName, OperatorF(..), ImmF(..), TypeExpr)
-
+import Formura.Vec
 
 -- | The functor for orthotope machine-specific instructions. Note that arithmetic operations are outsourced.
 
@@ -26,7 +26,7 @@ data GridInstF x
   | StoreF IdentName x
   | LoadIndexF Int
   | LoadExtentF Int
-  | ShiftF [Int] x
+  | ShiftF (Vec Int) x
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 
