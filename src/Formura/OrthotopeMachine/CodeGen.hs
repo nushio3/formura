@@ -47,6 +47,12 @@ type ValueExpr = Fix ValueExprF
 
 type Binding = M.Map IdentName ValueExpr
 
+class HasBinding s where
+  binding :: Lens' s Binding
+
+instance HasBinding Binding where
+  binding = simple
+
 data CodeGenState = CodeGenState
   { _codegenSyntacticState :: CompilerSyntacticState
   , _theGraph :: Graph
@@ -58,7 +64,7 @@ instance HasCompilerSyntacticState CodeGenState where
 
 
 -- | the code generator monad.
-type GenM = CompilerMonad () Binding CodeGenState
+type GenM = CompilerMonad Binding () CodeGenState
 
 
 class Generatable f where
@@ -153,7 +159,22 @@ instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
 
 withBindings :: BindingF (GenM ValueExpr) -> GenM ValueExpr -> GenM ValueExpr
-withBindings b genX = genX -- TODO
+withBindings b1 genX = do
+  b0 <- view binding
+  let
+      BindingF stmts0 = b1
+      typeDecls0 :: [(LExpr, TypeExpr)]
+      typeDecls0 = concat $ flip map stmts0 $ \x -> case x of
+        TypeDeclF t l -> [(l, t)]
+        _             -> []
+
+      nameOf :: LExpr -> IdentName
+      nameOf (Ident n) = n
+      nameOf (Grid _ x) = nameOf x
+      nameOf (Vector _ x) = nameOf x
+      nameOf _ = error "unsupported form in type decl"
+
+  genX -- TODO
 
 voidGen :: a -> GenM ValueExpr
 voidGen _ = raiseErr $ failed "gen of void unimplemented"
