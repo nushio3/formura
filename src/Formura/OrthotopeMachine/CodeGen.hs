@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, TemplateHaskell #-}
+{-# LANGUAGE DataKinds, FlexibleInstances, TemplateHaskell #-}
 module Formura.OrthotopeMachine.CodeGen where
 
 import           Control.Lens
@@ -12,15 +12,19 @@ import           Formura.Compiler
 import           Formura.OrthotopeMachine.Instruction
 import qualified Formura.Annotation as A
 
+type NodeTypeF = Sum '[ GridF Rational, ElemTypeF ]
+type NodeType  = Fix NodeTypeF
+
+
 type NodeID  = G.Key
-data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: TypeExpr, _nodeAnnot :: A.Annotation}
+data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
 makeLenses ''Node
 instance A.Annotated Node where
   annotation = nodeAnnot
 
 type Graph = G.IntMap Node
-type TypedInst  = (OMInstF NodeID, TypeExpr)
-type TypedValue = (NodeID, TypeExpr)
+type TypedInst  = (OMInstF NodeID, NodeType)
+type TypedValue = (NodeID, NodeType)
 
 
 type Binding = M.Map IdentName Node
