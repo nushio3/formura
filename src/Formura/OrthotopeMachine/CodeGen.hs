@@ -99,7 +99,7 @@ instance Generatable (GridF NPlusK ValueExpr) where
     ElemType _   -> return $ val0 :. typ0
     Grid offs0 _ -> do
       let a = npks :: [NPlusK]
-          o = offs0 :: [Rational]
+          o0 = offs0 :: [Rational]
       undefined
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
