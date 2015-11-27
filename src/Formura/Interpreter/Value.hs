@@ -17,7 +17,6 @@ module Formura.Interpreter.Value where
 
 import           Control.Lens
 import qualified Data.Vector as V
-import           Data.Typeable
 
 import           Formura.Language.Combinator
 import           Formura.Syntax
