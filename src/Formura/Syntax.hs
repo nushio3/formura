@@ -10,7 +10,7 @@ Components for syntatic elements of formura.
 -}
 
 {-# LANGUAGE DataKinds, DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveGeneric,
-DeriveTraversable, FlexibleContexts, FlexibleInstances,
+DeriveTraversable, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses,
 PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
 module Formura.Syntax where
@@ -188,6 +188,11 @@ type ConstRationalExpr  = Lang '[ ApplyF, OperatorF, ImmF ]
 
 data NPlusK = NPlusK IdentName Rational
              deriving (Eq, Ord, Show)
+
+instance Field1 NPlusK NPlusK IdentName IdentName where
+  _1 = lens (\(NPlusK x _) -> x) (\(NPlusK _ y) x -> NPlusK x y)
+instance Field2 NPlusK NPlusK Rational Rational where
+  _2 = lens (\(NPlusK _ y) -> y) (\(NPlusK x _) y -> NPlusK x y)
 
 type TypeExprF = Sum '[ GridF Rational, TupleF, VectorF Int, FunTypeF , ElemTypeF ]
 type TypeExpr  = Fix TypeExprF

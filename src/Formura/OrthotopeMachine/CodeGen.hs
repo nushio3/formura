@@ -79,7 +79,7 @@ insert inst typ = do
 
 
 instance Generatable (ImmF x) where
-  gen (Imm r) = insert (Imm r) (ElemType "Real")
+  gen (Imm r) = insert (Imm r) (ElemType "Rational")
 
 instance Generatable (OperatorF ValueExpr) where
   gen (Uniop op (NodeValue av at)) = insert (Uniop op av) at
@@ -92,10 +92,16 @@ instance Generatable (IdentF x) where
   gen (Ident n) = insert (Load n) (ElemType "Real")
 
 instance Generatable (TupleF ValueExpr) where
-  gen _ = raiseErr $ failed "gen of tuple unimplemented"
+  gen (Tuple xs) = return $ Tuple xs
 
 instance Generatable (GridF NPlusK ValueExpr) where
-  gen _ = raiseErr $ failed "gen of grid unimplemented"
+  gen (Grid npks (val0 :. typ0)) = case typ0 of
+    ElemType _   -> return $ val0 :. typ0
+    Grid offs0 _ -> do
+      let a = npks :: [NPlusK]
+          o = offs0 :: [Rational]
+      undefined
+  gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
 instance Generatable (ApplyF ValueExpr) where
   gen (Apply (Tuple xs) (Imm r)) = do
