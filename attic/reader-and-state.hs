@@ -8,14 +8,14 @@ main = do
 
 prog :: ReaderT Int IO ()
 prog = do
-  ask >>= liftIO . print
+  ask >>= liftIO . print   -- 62
   local (+10) $ do
-    ask >>= liftIO . print
-  ask >>= liftIO . print
+    ask >>= liftIO . print -- 72
+  ask >>= liftIO . print   -- back to 62
 
 prog2 :: StateT Int IO ()
 prog2 = do
-  get >>= liftIO . print
+  get >>= liftIO . print   -- 62
   withStateT (+10) $ do
-    get >>= liftIO . print
-  get >>= liftIO . print
+    get >>= liftIO . print -- 72
+  get >>= liftIO . print   -- still 72!!
