@@ -22,7 +22,7 @@ import GHC.Generics
 import qualified Test.QuickCheck as Q
 
 import Formura.Language.Combinator
-
+import Formura.Vec
 
 -- * Syntactical Elements
 
@@ -127,7 +127,7 @@ pattern Triop op a b c <- ((^? match) -> Just (TriopF op a b c)) where
 
 -- ** Structures and Element Access
 
-data GridF y x = GridF [y] x
+data GridF y x = GridF (Vec y) x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 
 pattern Grid args x <- ((^? match) -> Just (GridF args x )) where

@@ -28,6 +28,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import Text.Parser.LookAhead
 
 import Formura.Language.Combinator
+import Formura.Vec
 import Formura.Syntax
 
 -- * The parser comibnator
@@ -150,12 +151,12 @@ tupleOf p = "tuple" ?> {- don't parseIn here ... -} do
     [x] -> return x
     _   -> return $ In (Just $ Metadata r1 (delta r1) (delta r2)) $ Tuple xs
 
-gridIndicesOf :: P a -> P [a]
+gridIndicesOf :: P a -> P (Vec a)
 gridIndicesOf parseIdx = "grid index" ?> do
   "grid opening" ?> try $ symbolic '['
   xs <- parseIdx `sepBy` symbolic ','
   symbolic ']'
-  return xs
+  return $ Vec xs
 
 nPlusK :: P NPlusK
 nPlusK = "n+k pattern" ?> do

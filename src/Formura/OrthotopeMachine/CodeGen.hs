@@ -11,10 +11,11 @@ import           Data.Ratio
 import           Text.Trifecta (failed, raiseErr)
 
 import           Formura.Language.Combinator
-import           Formura.Syntax
-import           Formura.Compiler
-import           Formura.OrthotopeMachine.Instruction
 import qualified Formura.Annotation as A
+import           Formura.Compiler
+import           Formura.Syntax
+import           Formura.Vec
+import           Formura.OrthotopeMachine.Instruction
 
 type NodeTypeF = Sum '[ GridF Rational, ElemTypeF ]
 type NodeType  = Fix NodeTypeF
@@ -98,8 +99,8 @@ instance Generatable (GridF NPlusK ValueExpr) where
   gen (Grid npks (val0 :. typ0)) = case typ0 of
     ElemType _   -> return $ val0 :. typ0
     Grid offs0 _ -> do
-      let a = npks :: [NPlusK]
-          o0 = offs0 :: [Rational]
+      let a = npks   :: Vec NPlusK
+          o0 = offs0 :: Vec Rational
       undefined
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
