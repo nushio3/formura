@@ -67,19 +67,28 @@ raiseDoc doc = P.raiseErr $ P.Err (Just doc) [] S.empty
 type CompilerAlgebra r w s f a = f a -> CompilerMonad r w s a
 
 -- | The compiler-monad-specific fold, that takes track of the syntax tree traversed.
-compilerFold :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
+compilerMFold :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
            CompilerAlgebra r w s f (Lang g) -> Fix f -> CompilerMonad r w s (Lang g)
-compilerFold k (In meta x) = do
-  r1 <- traverse (compilerFold k) x
+compilerMFold k (In meta x) = do
+  r1 <- traverse (compilerMFold k) x
   compilerFocus %= (meta <|>)
   r2 <- k r1
   return $ propagateMetadata meta r2
 
 -- | The compiler-monad-specific fold, that takes track of the syntax tree traversed and produces non-language results.
-compilerFoldout :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
+compilerMFoldout :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
            CompilerAlgebra r w s f g -> Fix f -> CompilerMonad r w s g
-compilerFoldout k (In meta x) = do
-  r1 <- traverse (compilerFoldout k) x
+compilerMFoldout k (In meta x) = do
+  r1 <- traverse (compilerMFoldout k) x
   compilerFocus %= (meta <|>)
   r2 <- k r1
   return $ r2
+
+-- | The compiler-monad-specific pure foldout, that takes track of the syntax tree traversed.
+compilerFoldout :: (Monoid w, Traversable f, HasCompilerSyntacticState s) =>
+           Algebra f (CompilerMonad r w s a) -> Fix f -> CompilerMonad r w s a
+compilerFoldout k (In meta x) = do
+  -- TODO: in order for this compilerFocus to work properly, the compiler state
+  -- needs to be a reader monad rather than state monad.
+  compilerFocus %= (meta <|>)
+  k $ fmap (compilerFoldout k) x

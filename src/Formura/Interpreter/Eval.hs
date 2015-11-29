@@ -37,10 +37,6 @@ type IAlgebra f a = f a -> IM a
 runIM :: IM a -> IO (Either CompilerError a)
 runIM m = runCompiler m M.empty defaultEnvironment
 
--- | Monadic 'fold' specialized to the 'IM'.
-iFold :: Traversable f => IAlgebra f (Lang g) -> Fix f -> IM (Lang g)
-iFold = compilerFold
-
 -- | Monadic 'fold' for twin language.
 mfold2 :: Traversable f => AlgebraM IM f (Lang g, Lang h) -> Fix f -> IM (Lang g, Lang h)
 mfold2 k (In meta x) = do

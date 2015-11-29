@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
-DeriveTraversable, FlexibleInstances, PatternSynonyms,
-TemplateHaskell, ViewPatterns #-}
+DeriveTraversable, FlexibleContexts, FlexibleInstances, PatternSynonyms,
+TemplateHaskell, TypeOperators, ViewPatterns #-}
 module Formura.OrthotopeMachine.CodeGen where
 
 import           Control.Applicative
@@ -171,7 +171,7 @@ instance Generatable LambdaF where
     return $ FunValue l r'
 
 resolveLex :: RXExpr -> LexGenM RXExpr
-resolveLex r = compilerFold resolveLexAlg r
+resolveLex r = compilerMFold resolveLexAlg r
 
 resolveLexAlg :: RXExprF RXExpr -> LexGenM RXExpr
 resolveLexAlg (Ident n) = do
@@ -230,9 +230,11 @@ withBindings b1 genX = do
   --  M.union prefers left-hand-side when duplicate keys are encountered
   local (binding %~ M.union (M.fromList substs1)) genX
 
-voidGen :: a -> GenM ValueExpr
-voidGen _ = raiseErr $ failed "gen of void unimplemented"
+instance Generatable (Sum '[]) where
+  gen _ =  raiseErr $ failed "impossible happened: gen of Void"
 
-instance Generatable RExprF where
-  gen =  (gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: gen +:: voidGen
-               :: RExprF (GenM ValueExpr) -> GenM ValueExpr)
+instance (Generatable f, Generatable (Sum fs)) => Generatable (Sum (f ': fs)) where
+  gen =  gen +:: gen
+
+genRhs :: RExpr -> GenM ValueExpr
+genRhs r = foldout gen r
