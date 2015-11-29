@@ -26,6 +26,10 @@ type NodeType  = Fix NodeTypeF
 
 type NodeID  = G.Key
 data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
+instance Show Node where
+  show (Node i t _) = show i ++ " :: " ++ show t
+
+
 makeLenses ''Node
 instance A.Annotated Node where
   annotation = nodeAnnot

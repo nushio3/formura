@@ -2,6 +2,7 @@
 module Main where
 
 import           Control.Lens
+import           Control.Monad
 import qualified Data.IntMap as G
 import           Data.Monoid
 import           System.Environment
@@ -36,5 +37,5 @@ genStmt (Subst l r) = do
   case ret of
     Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
     Right () -> do
-      fmap print $ G.toList s
+      mapM_ print $ G.toList (s ^. theGraph)
   putStrLn ""
