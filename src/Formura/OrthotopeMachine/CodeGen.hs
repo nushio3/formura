@@ -68,6 +68,15 @@ data CodeGenState = CodeGenState
   }
 makeClassy ''CodeGenState
 
+defaultCodeGenState :: CodeGenState
+defaultCodeGenState = CodeGenState
+  { _codegenSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "codegen"}
+  , _theGraph = G.empty
+  }
+
+defaultCodeGenRead :: Binding
+defaultCodeGenRead = M.empty
+
 instance HasCompilerSyntacticState CodeGenState where
   compilerSyntacticState = codegenSyntacticState
 
