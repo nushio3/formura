@@ -35,7 +35,7 @@ type IM = CompilerMonad Binding () Environment
 type IAlgebra f a = f a -> IM a
 
 runIM :: IM a -> IO (Either CompilerError a)
-runIM m = runCompiler m M.empty defaultEnvironment
+runIM m = evalCompiler m M.empty defaultEnvironment
 
 -- | Monadic 'fold' for twin language.
 mfold2 :: Traversable f => AlgebraM IM f (Lang g, Lang h) -> Fix f -> IM (Lang g, Lang h)

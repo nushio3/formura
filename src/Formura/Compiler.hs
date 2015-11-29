@@ -52,8 +52,13 @@ instance (HasCompilerSyntacticState s, Monoid w) => P.Errable (CompilerMonad r w
     CompilerMonad $ left $ msg2
 
 -- | Run the compiler and get the result.
-runCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a)
-runCompiler m r s = fmap fst $ evalRWST (runEitherT $ runCompilerMonad m) r s
+evalCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a)
+evalCompiler m r s = fmap fst $ evalRWST (runEitherT $ runCompilerMonad m) r s
+
+-- | Run the compiler and get the state and written results.
+--   Note that you get some partial results even when the compilation aborts.
+runCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a,s,w)
+runCompiler m r s = runRWST (runEitherT $ runCompilerMonad m) r s
 
 -- | Run compiler, changing the reader and the state.
 withCompiler :: Monoid w => (r' -> s -> (r,s)) -> CompilerMonad r w s a -> CompilerMonad r' w s a
