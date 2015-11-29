@@ -121,7 +121,13 @@ goTriop op (av :. at) (bv :. bt) (cv :. ct)
 goTriop _ _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator"
 
 instance Generatable IdentF where
-  gen (Ident n) = insert (Load n) (ElemType "Real")
+  -- you should not generate this!
+  gen (Ident n) = do
+    b <- view binding
+    case M.lookup n b of
+      Nothing -> raiseErr $ failed $ "undefined variable: " ++ n
+      Just x  -> return $ subFix x
+
 
 instance Generatable TupleF where
   gen (Tuple xsGen) = do
@@ -233,8 +239,20 @@ withBindings b1 genX = do
 instance Generatable (Sum '[]) where
   gen _ =  raiseErr $ failed "impossible happened: gen of Void"
 
+instance Generatable NodeValueF where
+  gen (NodeValue t v) = return (NodeValue t v)
+
+instance Generatable FunValueF where
+  gen (FunValue l r) = return (FunValue l r)
+
 instance (Generatable f, Generatable (Sum fs)) => Generatable (Sum (f ': fs)) where
   gen =  gen +:: gen
 
-genRhs :: RExpr -> GenM ValueExpr
-genRhs r = foldout gen r
+genRhs :: RXExpr -> GenM ValueExpr
+genRhs r = compilerFoldout gen r
+
+genMainFunction :: RExpr -> GenM ()
+genMainFunction (Lambda l r) = do
+  v <- insert (Load "init_value") (ElemType "double")
+  genRhs $ Apply (FunValue l (subFix r)) (subFix v)
+  return ()
