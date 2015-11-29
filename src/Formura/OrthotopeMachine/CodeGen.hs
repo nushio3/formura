@@ -179,6 +179,8 @@ goApply (Tuple xs) (Imm r) = do
   when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
   return $ xs!!n
 goApply (Tuple xs) _ = raiseErr $ failed "tuple applied to non-constant integer"
+goApply (FunValue l r) x = do
+  local (M.insert (nameOfLhs l) x) $ genRhs r
 goApply  _ _ = raiseErr $ failed "unexpected combination of application"
 
 instance Generatable LambdaF where
