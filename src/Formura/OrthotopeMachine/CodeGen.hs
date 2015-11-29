@@ -9,6 +9,7 @@ import           Control.Monad
 import           Control.Monad.Reader
 import qualified Data.IntMap as G
 import qualified Data.Map as M
+import qualified Data.Set as S
 import           Data.Ratio
 import           Text.Trifecta (failed, raiseErr)
 
@@ -38,15 +39,22 @@ pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n
 pattern n :. t <- ((^? match) -> Just (NodeValueF n t)) where n :. t = match # NodeValueF n t
 
 
-data FunValueF x = FunValueF LExpr RExpr
+data FunValueF x = FunValueF LExpr RXExpr
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 pattern FunValue l r <- ((^? match) -> Just (FunValueF l r)) where FunValue l r = match # FunValueF l r
 
+
+-- | RExpr extended with
+type RXExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, FunValueF, NodeValueF, ImmF ]
+type RXExpr  = Fix RXExprF
 type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
 type ValueExpr = Fix ValueExprF
+type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
+type ValueLexExpr = Fix ValueLexExprF
 
 
 type Binding = M.Map IdentName ValueExpr
+type LexBinding = M.Map IdentName ValueLexExpr
 
 class HasBinding s where
   binding :: Lens' s Binding
@@ -66,6 +74,7 @@ instance HasCompilerSyntacticState CodeGenState where
 
 -- | the code generator monad.
 type GenM = CompilerMonad Binding () CodeGenState
+type LexGenM = CompilerMonad LexBinding () CodeGenState
 
 
 class Generatable f where
@@ -154,10 +163,36 @@ goApply (Tuple xs) _ = raiseErr $ failed "tuple applied to non-constant integer"
 goApply  _ _ = raiseErr $ failed "unexpected combination of application"
 
 instance Generatable LambdaF where
-  gen _ = raiseErr $ failed "gen of lambda unimplemented"
+  -- Expand all but bound variables, in order to implement lexical scope
+  gen (Lambda l r) = do
+    let conv :: Binding -> CodeGenState -> (LexBinding, CodeGenState)
+        conv b s = (M.insert (nameOfLhs l) (Ident $ nameOfLhs l) $ M.map subFix b, s)
+    r' <- withCompiler conv $ resolveLex $ subFix r
+    return $ FunValue l r'
+
+resolveLex :: RXExpr -> LexGenM RXExpr
+resolveLex r = compilerFold resolveLexAlg r
+
+resolveLexAlg :: RXExprF RXExpr -> LexGenM RXExpr
+resolveLexAlg (Ident n) = do
+  b <- ask
+  case M.lookup n b of
+    Nothing -> raiseErr $ failed $ "undefined variable: " ++ n
+    Just x  -> return $ subFix x
+resolveLexAlg (Lambda l r) = do
+  r' <- local (M.insert (nameOfLhs l) (Ident $ nameOfLhs l)) $ resolveLex $ subFix r
+  return $ FunValue l r'
+resolveLexAlg fx = mTransAlg fx
 
 instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
+
+nameOfLhs :: LExpr -> IdentName
+nameOfLhs (Ident n) = n
+nameOfLhs (Grid _ x) = nameOfLhs x
+nameOfLhs (Vector _ x) = nameOfLhs x
+nameOfLhs _ = error "unsupported form in type decl"
+
 
 withBindings :: BindingF (GenM ValueExpr) -> GenM ValueExpr -> GenM ValueExpr
 withBindings b1 genX = do
@@ -174,14 +209,8 @@ withBindings b1 genX = do
         SubstF l r -> [(l, r)]
         _             -> []
 
-      nameOf :: LExpr -> IdentName
-      nameOf (Ident n) = n
-      nameOf (Grid _ x) = nameOf x
-      nameOf (Vector _ x) = nameOf x
-      nameOf _ = error "unsupported form in type decl"
-
       typeDict :: M.Map IdentName TypeExpr
-      typeDict = M.fromList [(nameOf l, t) | (l,t)<- typeDecls0]
+      typeDict = M.fromList [(nameOfLhs l, t) | (l,t)<- typeDecls0]
 
   let
     -- Let bindings enter scope one by one, not simultaneously
@@ -191,7 +220,7 @@ withBindings b1 genX = do
       v <- genV
       -- TODO: LHS grid pattern must be taken care of.
       -- TODO: Typecheck must take place.
-      local (binding %~ M.insert (nameOf l) v) $ graduallyBind lgvs
+      local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind lgvs
   substs1 <- graduallyBind substs0
 
 

@@ -43,6 +43,7 @@ library
               , containers
               , either
               , lens
+              , mmorph
               , mtl
               , parsers
               , QuickCheck

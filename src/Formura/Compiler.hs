@@ -5,6 +5,7 @@ module Formura.Compiler where
 import           Control.Applicative
 import           Control.Lens
 import           Control.Monad.Trans.Either
+import           Control.Monad.Morph
 import           Control.Monad.RWS
 import qualified Data.Set as S
 import qualified Text.Trifecta as P
@@ -53,6 +54,10 @@ instance (HasCompilerSyntacticState s, Monoid w) => P.Errable (CompilerMonad r w
 -- | Run the compiler and get the result.
 runCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a)
 runCompiler m r s = fmap fst $ evalRWST (runEitherT $ runCompilerMonad m) r s
+
+-- | Run compiler, changing the reader and the state.
+withCompiler :: Monoid w => (r' -> s -> (r,s)) -> CompilerMonad r w s a -> CompilerMonad r' w s a
+withCompiler f = CompilerMonad . (hoist $ withRWST f) . runCompilerMonad
 
 -- | Raise doc as an error
 raiseDoc :: P.Errable m => Ppr.Doc ->  m a
