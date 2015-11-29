@@ -36,6 +36,6 @@ genStmt (Subst l r) = do
   (ret, s, _) <- runCompiler (genMainFunction r) defaultCodeGenRead defaultCodeGenState
   case ret of
     Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
-    Right () -> do
-      mapM_ print $ G.toList (s ^. theGraph)
+    Right () -> return ()
+  mapM_ print $ G.toList (s ^. theGraph)
   putStrLn ""

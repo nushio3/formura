@@ -124,7 +124,8 @@ goUniop _ _  = raiseErr $ failed $ "unimplemented path in unary operator"
 
 goBinop :: IdentName -> ValueExpr -> ValueExpr -> GenM ValueExpr
 goBinop op (av :. at) (bv :. bt)
-  | at == bt = insert (Binop op av bv) at
+  | at == bt || True = insert (Binop op av bv) at
+                       -- TODO: Type upconvert
   | otherwise = raiseErr $ failed "type of the both hand sides does not match"
 goBinop _ _ _  = raiseErr $ failed $ "unimplemented path in binary operator"
 
@@ -138,7 +139,8 @@ instance Generatable IdentF where
   gen (Ident n) = do
     b <- view binding
     case M.lookup n b of
-      Nothing -> raiseErr $ failed $ "undefined variable: " ++ n
+      Nothing -> do
+        raiseErr $ failed $ "undefined variable: " ++ n ++ "\n Bindings:\n" ++ show b
       Just x  -> return $ subFix x
 
 
@@ -244,7 +246,8 @@ withBindings b1 genX = do
       v <- genV
       -- TODO: LHS grid pattern must be taken care of.
       -- TODO: Typecheck must take place.
-      local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind lgvs
+      b2s <- local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind lgvs
+      return ((nameOfLhs l, v) : b2s)
   substs1 <- graduallyBind substs0
 
 
