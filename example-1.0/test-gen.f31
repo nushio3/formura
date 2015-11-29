@@ -1,3 +1,4 @@
-begin function y = square(x)
-    y = x * 2
+begin function z = main(x)
+    y = x + -44
+    z = 526 + y * y
 end function
