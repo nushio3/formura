@@ -182,6 +182,9 @@ resolveLexAlg (Ident n) = do
 resolveLexAlg (Lambda l r) = do
   r' <- local (M.insert (nameOfLhs l) (Ident $ nameOfLhs l)) $ resolveLex $ subFix r
   return $ FunValue l r'
+resolveLexAlg (FunValue l r) = do
+  r' <- local (M.insert (nameOfLhs l) (Ident $ nameOfLhs l)) $ resolveLex r
+  return $ FunValue l r'
 resolveLexAlg fx = mTransAlg fx
 
 instance Generatable LetF where
