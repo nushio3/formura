@@ -261,9 +261,13 @@ withBindings b1 genX = do
     graduallyBind :: [(LExpr, GenM ValueExpr)] -> GenM [(IdentName, ValueExpr)]
     graduallyBind [] = return []
     graduallyBind ((l,genV):lgvs) = do
-      v <- genV
+      v0 <- genV
       -- TODO: LHS grid pattern must be taken care of.
       -- TODO: Typecheck must take place.
+      v <- case M.lookup (nameOfLhs l) typeDict of
+        Nothing -> return v0
+        Just t  -> castVal t v0
+
       b2s <- local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind lgvs
       return ((nameOfLhs l, v) : b2s)
   substs1 <- graduallyBind substs0
