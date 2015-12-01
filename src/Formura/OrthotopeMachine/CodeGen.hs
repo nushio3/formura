@@ -285,7 +285,6 @@ withBindings b1 genX = do
     graduallyBind ((l,genV):lgvs) = do
       v0 <- genV
       -- TODO: LHS grid pattern must be taken care of.
-      -- TODO: Typecheck must take place.
       v <- case M.lookup (nameOfLhs l) typeDict of
         Nothing -> return v0
         Just t  -> castVal t v0
