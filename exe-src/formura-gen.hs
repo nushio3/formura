@@ -10,6 +10,8 @@ import           System.IO
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import qualified Text.Trifecta as P
 
+import qualified Formura.Annotation as A
+import           Formura.Annotation.Representation
 import           Formura.OrthotopeMachine.CodeGen
 import qualified Formura.Parser as P
 import           Formura.Compiler
@@ -37,5 +39,12 @@ genStmt (Subst l r) = do
   case ret of
     Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
     Right () -> return ()
-  mapM_ print $ G.toList (s ^. theGraph)
+  mapM_ pprNode $ G.toList (s ^. theGraph)
   putStrLn ""
+
+pprNode :: (Int, Node) -> IO ()
+pprNode (i,n) = do
+  let r = case A.toMaybe (n ^. A.annotation) of
+        Just Manifest -> "M"
+        _             -> " "
+  putStrLn $ unwords [r ,show (i,n)]
