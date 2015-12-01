@@ -40,6 +40,13 @@ data FunTypeF x = FunTypeF
 
 pattern FunType <- ((^? match) -> Just FunTypeF) where FunType = match # FunTypeF
 
+
+data TopTypeF x = TopTypeF
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+
+pattern TopType <- ((^? match) -> Just TopTypeF) where TopType = match # TopTypeF
+
+
 -- ** Identifier terms
 type IdentName = String
 
@@ -215,7 +222,7 @@ instance Field1 NPlusK NPlusK IdentName IdentName where
 instance Field2 NPlusK NPlusK Rational Rational where
   _2 = lens (\(NPlusK _ y) -> y) (\(NPlusK x _) y -> NPlusK x y)
 
-type TypeExprF = Sum '[ GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
+type TypeExprF = Sum '[ TopTypeF, GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
 type TypeExpr  = Fix TypeExprF
 
 type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
