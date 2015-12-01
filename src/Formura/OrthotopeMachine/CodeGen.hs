@@ -18,6 +18,7 @@ import           Formura.Language.Combinator
 import qualified Formura.Annotation as A
 import           Formura.Compiler
 import           Formura.Syntax
+import           Formura.Type
 import           Formura.Vec
 import           Formura.OrthotopeMachine.Instruction
 
@@ -34,7 +35,7 @@ semiLatticeOfNodeType a b = case go a b of
   where
     go :: NodeType -> NodeType -> NodeType
     go a b | a == b = a
-    go (ElemType ea) (ElemType eb) = undefined
+    go (ElemType ea) (ElemType eb) = subFix (ElemType ea /\ ElemType eb :: ElementalType)
     go a@(ElemType _) b@(GridType v c) = let d = a /\ c in
            if d==TopType then TopType else GridType v d
     go (GridType v1 c1) (GridType v2 c2) = (if v1 == v2 then GridType v1 (c1 /\ c2) else TopType)
@@ -317,7 +318,7 @@ genRhs r = compilerFoldout gen r
 
 genMainFunction :: RExpr -> GenM ()
 genMainFunction (Lambda l r) = do
-  v <- insert (Load "init_value") (ElemType "double")
+  v <- insert (Load "input_value") (GridType (Vec [0]) (ElemType "double"))
   genRhs $ Apply (FunValue l (subFix r)) (subFix v)
   return ()
 genMainFunction _ = raiseErr $ failed "Please specify a function for generation"

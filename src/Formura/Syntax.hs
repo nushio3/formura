@@ -30,7 +30,9 @@ import Formura.Vec
 -- ** Elemental types
 
 data ElemTypeF x = ElemTypeF IdentName
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+                 deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
+instance Show (ElemTypeF x) where
+  show (ElemTypeF n) = n
 
 pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
 
@@ -142,7 +144,9 @@ pattern Grid args x <- ((^? match) -> Just (GridF args x )) where
   Grid args x = match # GridF args x
 
 data GridTypeF x = GridTypeF (Vec Rational) x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
+instance Show x => Show (GridTypeF x) where
+  show (GridTypeF v x) = show x ++ show v
 
 pattern GridType args x <- ((^? match) -> Just (GridTypeF args x )) where
   GridType args x = match # GridTypeF args x

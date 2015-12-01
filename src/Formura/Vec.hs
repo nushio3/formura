@@ -13,10 +13,13 @@ module Formura.Vec where
 
 import Control.Applicative
 import Data.Monoid
-import Text.Read
 
 data Vec a = Vec { getVec :: [a] } | PureVec a
-           deriving (Show, Read, Functor, Foldable, Traversable)
+           deriving (Functor, Foldable, Traversable)
+
+instance Show a => Show (Vec a) where
+  show (Vec xs) = show xs
+  show (PureVec x) = "[" ++ show x ++ "..]"
 
 -- | Equality of vector requires the knowledge of how to zero-fill
 instance (Num a, Eq a) => Eq (Vec a) where

@@ -28,6 +28,7 @@ library
                   Formura.Compiler
                   Formura.Parser
                   Formura.Syntax
+                  Formura.Type
                   Formura.Vec
                   Formura.Interpreter.Value
                   Formura.Interpreter.Eval
