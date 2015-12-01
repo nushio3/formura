@@ -299,3 +299,4 @@ genMainFunction (Lambda l r) = do
   v <- insert (Load "init_value") (ElemType "double")
   genRhs $ Apply (FunValue l (subFix r)) (subFix v)
   return ()
+genMainFunction _ = raiseErr $ failed "Please specify a function for generation"
