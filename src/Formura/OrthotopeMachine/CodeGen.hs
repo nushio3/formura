@@ -57,12 +57,6 @@ type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
 type ValueLexExpr = Fix ValueLexExprF
 
 
-typeOfVal :: ValueExpr -> TypeExpr
-typeOfVal (Imm _)         = ElemType "Rational"
-typeOfVal (NodeValue _ t) = subFix t
-typeOfVal (FunValue _ _)  = FunType
-typeOfVal (Tuple xs)      = Tuple $ map typeOfVal xs
-
 type Binding = M.Map IdentName ValueExpr
 type LexBinding = M.Map IdentName ValueLexExpr
 
@@ -113,6 +107,25 @@ insert inst typ = do
         Nothing   -> A.empty
   theGraph %= G.insert n0 (Node inst typ a)
   return $ NodeValue n0 typ
+
+
+-- | Find the type of a 'ValueExpr' .
+typeOfVal :: ValueExpr -> TypeExpr
+typeOfVal (Imm _)         = ElemType "Rational"
+typeOfVal (NodeValue _ t) = subFix t
+typeOfVal (FunValue _ _)  = FunType
+typeOfVal (Tuple xs)      = Tuple $ map typeOfVal xs
+
+
+-- | convert a value to other value, so that the result may have the given type
+castVal :: TypeExpr -> ValueExpr -> GenM ValueExpr
+castVal t1 vx = let t0 = typeOfVal vx in case (t1, t0, vx) of
+  _ | t1 == t0 -> return vx
+  (ElemType _, ElemType _, _) -> return vx
+  (GridType vec (ElemType te), ElemType _, n :. _) -> return (n :. (GridType vec (ElemType te)))
+  (GridType vec0 _, GridType vec1 _, _) | vec0 == vec1 ->  return vx
+  _ -> raiseErr $ failed $ "cannot convert type " ++ show t0 ++ " to " ++ show t1
+
 
 
 instance Generatable ImmF where
