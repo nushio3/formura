@@ -47,4 +47,7 @@ pprNode (i,n) = do
   let r = case A.toMaybe (n ^. A.annotation) of
         Just Manifest -> "M"
         _             -> " "
-  putStrLn $ unwords [r ,show (i,n)]
+      varName = case A.toMaybe (n ^. A.annotation) of
+        Just (SourceName n) -> n
+        _                   -> ""
+  putStrLn $ unwords [r , take 4 $ varName ++ repeat ' ', show (i,n)]

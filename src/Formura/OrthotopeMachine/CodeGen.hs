@@ -288,6 +288,10 @@ withBindings b1 genX = do
       v <- case M.lookup (nameOfLhs l) typeDict of
         Nothing -> return v0
         Just t  -> castVal t v0
+      case v of
+       (n :. _) -> theGraph . ix n . A.annotation %= A.set (SourceName $ nameOfLhs l)
+       _        -> return ()
+
       -- TODO: LHS grid pattern must be taken care of.
 
       b2s <- local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind restOfBinds
