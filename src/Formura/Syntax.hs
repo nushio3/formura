@@ -243,5 +243,15 @@ data Program = Program
 makeLenses ''Program
 
 instance MeetSemiLattice TypeExpr where
-  (/\) a b | a == b = a
-  (/\) _ _          = TopType
+  (/\) = semiLatticeOfTypeExpr
+
+semiLatticeOfTypeExpr :: TypeExpr -> TypeExpr -> TypeExpr
+semiLatticeOfTypeExpr a b = case go a b of
+  TopType -> go b a
+  c       -> c
+  where
+    go :: TypeExpr -> TypeExpr -> TypeExpr
+    go a b | a == b = a
+    go a@(ElemType _) b@(GridType v c) = let d = a/\c in if d==TopType then TopType else GridType v d
+    go (GridType v1 c1) (GridType v2 c2) = if v1 == v2 then GridType v1 (c1 /\ c2) else TopType
+    go _ _          = TopType
