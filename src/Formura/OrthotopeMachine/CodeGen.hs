@@ -258,7 +258,7 @@ nameOfLhs :: LExpr -> IdentName
 nameOfLhs (Ident n) = n
 nameOfLhs (Grid _ x) = nameOfLhs x
 nameOfLhs (Vector _ x) = nameOfLhs x
-nameOfLhs _ = error "unsupported form in type decl"
+nameOfLhs _ = error "tuple unsupported in type decl"
 
 withBindings :: BindingF (GenM ValueExpr) -> GenM ValueExpr -> GenM ValueExpr
 withBindings b1 genX = do
