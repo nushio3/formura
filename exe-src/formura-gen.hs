@@ -12,7 +12,8 @@ import qualified Text.Trifecta as P
 
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
-import           Formura.OrthotopeMachine.CodeGen
+import           Formura.OrthotopeMachine.Graph
+import           Formura.OrthotopeMachine.Translate
 import qualified Formura.Parser as P
 import           Formura.Compiler
 import           Formura.Syntax
@@ -35,7 +36,7 @@ genStmt :: StatementF RExpr -> IO ()
 genStmt (TypeDecl _ _) = return ()
 genStmt (Subst l r) = do
   putStrLn $ show l ++ " = " ++ show r
-  (ret, s, _) <- runCompiler (genMainFunction r) defaultCodeGenRead defaultCodeGenState
+  (ret, s, _) <- runCompiler (genMainFunction r) defaultCodegenRead defaultCodegenState
   case ret of
     Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
     Right () -> return ()

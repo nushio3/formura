@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
 DeriveTraversable, FlexibleContexts, FlexibleInstances, PatternSynonyms,
 TemplateHaskell, TypeOperators, ViewPatterns #-}
-module Formura.OrthotopeMachine.CodeGen where
+module Formura.OrthotopeMachine.Translate where
 
 import           Algebra.Lattice
 import           Control.Applicative
@@ -21,59 +21,7 @@ import           Formura.Compiler
 import           Formura.Syntax
 import           Formura.Type
 import           Formura.Vec
-import           Formura.OrthotopeMachine.Instruction
-
-type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
-type NodeType  = Fix NodeTypeF
-
-instance MeetSemiLattice NodeType where
-  (/\) = semiLatticeOfNodeType
-
-semiLatticeOfNodeType :: NodeType -> NodeType -> NodeType
-semiLatticeOfNodeType a b = case go a b of
-  TopType -> go b a
-  c       -> c
-  where
-    go :: NodeType -> NodeType -> NodeType
-    go a b | a == b = a
-    go (ElemType ea) (ElemType eb) = subFix (ElemType ea /\ ElemType eb :: ElementalType)
-    go a@(ElemType _) b@(GridType v c) = let d = a /\ c in
-           if d==TopType then TopType else GridType v d
-    go (GridType v1 c1) (GridType v2 c2) = (if v1 == v2 then GridType v1 (c1 /\ c2) else TopType)
-    go _ _          = TopType
-
-
-type NodeID  = G.Key
-data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
-instance Show Node where
-  show (Node i t _) = show i ++ " :: " ++ show t
-
-
-makeLenses ''Node
-instance A.Annotated Node where
-  annotation = nodeAnnot
-
-type Graph = G.IntMap Node
-
-data NodeValueF x = NodeValueF NodeID NodeType
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
-
-pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n t = match # NodeValueF n t
-pattern n :. t <- ((^? match) -> Just (NodeValueF n t)) where n :. t = match # NodeValueF n t
-
-
-data FunValueF x = FunValueF LExpr RXExpr
-                 deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
-pattern FunValue l r <- ((^? match) -> Just (FunValueF l r)) where FunValue l r = match # FunValueF l r
-
-
--- | RXExpr is RExpr extended with NodeValue constructors
-type RXExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, FunValueF, NodeValueF, ImmF ]
-type RXExpr  = Fix RXExprF
-type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
-type ValueExpr = Fix ValueExprF
-type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
-type ValueLexExpr = Fix ValueLexExprF
+import           Formura.OrthotopeMachine.Graph
 
 
 type Binding = M.Map IdentName ValueExpr
@@ -85,28 +33,28 @@ class HasBinding s where
 instance HasBinding Binding where
   binding = simple
 
-data CodeGenState = CodeGenState
+data CodegenState = CodegenState
   { _codegenSyntacticState :: CompilerSyntacticState
   , _theGraph :: Graph
   }
-makeClassy ''CodeGenState
+makeClassy ''CodegenState
 
-defaultCodeGenState :: CodeGenState
-defaultCodeGenState = CodeGenState
+defaultCodegenState :: CodegenState
+defaultCodegenState = CodegenState
   { _codegenSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "codegen"}
   , _theGraph = G.empty
   }
 
-defaultCodeGenRead :: Binding
-defaultCodeGenRead = M.empty
+defaultCodegenRead :: Binding
+defaultCodegenRead = M.empty
 
-instance HasCompilerSyntacticState CodeGenState where
+instance HasCompilerSyntacticState CodegenState where
   compilerSyntacticState = codegenSyntacticState
 
 
 -- | the code generator monad.
-type GenM = CompilerMonad Binding () CodeGenState
-type LexGenM = CompilerMonad LexBinding () CodeGenState
+type GenM = CompilerMonad Binding () CodegenState
+type LexGenM = CompilerMonad LexBinding () CodegenState
 
 
 class Generatable f where
@@ -230,7 +178,7 @@ goApply  _ _ = raiseErr $ failed "unexpected combination of application"
 instance Generatable LambdaF where
   -- Expand all but bound variables, in order to implement lexical scope
   gen (Lambda l r) = do
-    let conv :: Binding -> CodeGenState -> (LexBinding, CodeGenState)
+    let conv :: Binding -> CodegenState -> (LexBinding, CodegenState)
         conv b s = (M.insert (nameOfLhs l) (Ident $ nameOfLhs l) $ M.map subFix b, s)
     r' <- withCompiler conv $ resolveLex $ subFix r
     return $ FunValue l r'
