@@ -2,4 +2,5 @@ begin function z = main(x)
     double[1/2] :: y
     y[i] = x[i-1/2] + -44
     z = 526 + y * y
+    k[i] = z[i-1/2]
 end function
