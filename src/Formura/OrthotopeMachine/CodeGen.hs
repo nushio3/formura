@@ -48,7 +48,7 @@ data FunValueF x = FunValueF LExpr RXExpr
 pattern FunValue l r <- ((^? match) -> Just (FunValueF l r)) where FunValue l r = match # FunValueF l r
 
 
--- | RExpr extended with
+-- | RXExpr is RExpr extended with NodeValue constructors
 type RXExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, FunValueF, NodeValueF, ImmF ]
 type RXExpr  = Fix RXExprF
 type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
@@ -56,6 +56,12 @@ type ValueExpr = Fix ValueExprF
 type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
 type ValueLexExpr = Fix ValueLexExprF
 
+
+typeOfVal :: ValueExpr -> TypeExpr
+typeOfVal (Imm _)         = ElemType "Rational"
+typeOfVal (NodeValue _ t) = subFix t
+typeOfVal (FunValue _ _)  = FunType
+typeOfVal (Tuple xs)      = Tuple $ map typeOfVal xs
 
 type Binding = M.Map IdentName ValueExpr
 type LexBinding = M.Map IdentName ValueLexExpr
@@ -219,7 +225,6 @@ nameOfLhs (Grid _ x) = nameOfLhs x
 nameOfLhs (Vector _ x) = nameOfLhs x
 nameOfLhs _ = error "unsupported form in type decl"
 
-
 withBindings :: BindingF (GenM ValueExpr) -> GenM ValueExpr -> GenM ValueExpr
 withBindings b1 genX = do
   b0 <- view binding
@@ -253,6 +258,9 @@ withBindings b1 genX = do
 
   --  M.union prefers left-hand-side when duplicate keys are encountered
   local (binding %~ M.union (M.fromList substs1)) genX
+
+
+
 
 instance Generatable (Sum '[]) where
   gen _ =  raiseErr $ failed "impossible happened: gen of Void"
