@@ -28,7 +28,6 @@ library
                   Formura.Compiler
                   Formura.Parser
                   Formura.Syntax
-                  Formura.Type
                   Formura.Vec
                   Formura.Interpreter.Value
                   Formura.Interpreter.Eval
@@ -43,6 +42,7 @@ library
               , ansi-wl-pprint
               , containers
               , either
+              , lattices
               , lens
               , mmorph
               , mtl

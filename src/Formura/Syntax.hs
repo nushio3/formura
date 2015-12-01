@@ -15,6 +15,7 @@ PatternSynonyms, TemplateHaskell, ViewPatterns #-}
 
 module Formura.Syntax where
 
+import Algebra.Lattice
 import Control.Lens hiding (op)
 import Data.List (intercalate)
 import Data.Typeable
@@ -240,3 +241,7 @@ data Program = Program
                , _programBinding :: BindingF RExpr}
              deriving (Eq, Ord, Show)
 makeLenses ''Program
+
+instance MeetSemiLattice TypeExpr where
+  (/\) a b | a == b = a
+  (/\) _ _          = TopType
