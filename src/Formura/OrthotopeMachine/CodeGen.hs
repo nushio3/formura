@@ -5,7 +5,7 @@ module Formura.OrthotopeMachine.CodeGen where
 
 import           Algebra.Lattice
 import           Control.Applicative
-import           Control.Lens hiding (op, at)
+import           Control.Lens hiding (op)
 import           Control.Monad
 import           Control.Monad.Reader
 import qualified Data.IntMap as G
@@ -16,6 +16,7 @@ import           Text.Trifecta (failed, raiseErr)
 
 import           Formura.Language.Combinator
 import qualified Formura.Annotation as A
+import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.Syntax
 import           Formura.Type
@@ -318,6 +319,11 @@ genRhs r = compilerFoldout gen r
 genMainFunction :: RExpr -> GenM ()
 genMainFunction (Lambda l r) = do
   v <- insert (Load "input_value") (GridType (Vec [0]) (ElemType "double"))
-  genRhs $ Apply (FunValue l (subFix r)) (subFix v)
+  let (n :. _ ) = v
+  theGraph . ix n . A.annotation %= A.set Manifest
+
+  (n99 :. t99) <- genRhs $ Apply (FunValue l (subFix r)) (subFix v)
+
+  theGraph . ix n99 . A.annotation %= A.set Manifest
   return ()
 genMainFunction _ = raiseErr $ failed "Please specify a function for generation"
