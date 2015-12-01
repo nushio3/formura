@@ -282,14 +282,14 @@ withBindings b1 genX = do
     -- Let bindings enter scope one by one, not simultaneously
     graduallyBind :: [(LExpr, GenM ValueExpr)] -> GenM [(IdentName, ValueExpr)]
     graduallyBind [] = return []
-    graduallyBind ((l,genV):lgvs) = do
+    graduallyBind ((l,genV): restOfBinds) = do
       v0 <- genV
-      -- TODO: LHS grid pattern must be taken care of.
       v <- case M.lookup (nameOfLhs l) typeDict of
         Nothing -> return v0
         Just t  -> castVal t v0
+      -- TODO: LHS grid pattern must be taken care of.
 
-      b2s <- local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind lgvs
+      b2s <- local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind restOfBinds
       return ((nameOfLhs l, v) : b2s)
   substs1 <- graduallyBind substs0
 
