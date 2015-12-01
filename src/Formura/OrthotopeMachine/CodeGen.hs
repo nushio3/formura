@@ -3,6 +3,7 @@ DeriveTraversable, FlexibleContexts, FlexibleInstances, PatternSynonyms,
 TemplateHaskell, TypeOperators, ViewPatterns #-}
 module Formura.OrthotopeMachine.CodeGen where
 
+import           Algebra.Lattice
 import           Control.Applicative
 import           Control.Lens hiding (op, at)
 import           Control.Monad
@@ -20,8 +21,24 @@ import           Formura.Syntax
 import           Formura.Vec
 import           Formura.OrthotopeMachine.Instruction
 
-type NodeTypeF = Sum '[ GridTypeF, ElemTypeF ]
+type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
 type NodeType  = Fix NodeTypeF
+
+instance MeetSemiLattice NodeType where
+  (/\) = semiLatticeOfNodeType
+
+semiLatticeOfNodeType :: NodeType -> NodeType -> NodeType
+semiLatticeOfNodeType a b = case go a b of
+  TopType -> go b a
+  c       -> c
+  where
+    go :: NodeType -> NodeType -> NodeType
+    go a b | a == b = a
+    go (ElemType ea) (ElemType eb) = undefined
+    go a@(ElemType _) b@(GridType v c) = let d = a /\ c in
+           if d==TopType then TopType else GridType v d
+    go (GridType v1 c1) (GridType v2 c2) = (if v1 == v2 then GridType v1 (c1 /\ c2) else TopType)
+    go _ _          = TopType
 
 
 type NodeID  = G.Key
@@ -142,10 +159,14 @@ goUniop op (av :. at) = insert (Uniop op av) at
 goUniop _ _  = raiseErr $ failed $ "unimplemented path in unary operator"
 
 goBinop :: IdentName -> ValueExpr -> ValueExpr -> GenM ValueExpr
-goBinop op (av :. at) (bv :. bt)
-  | at == bt || True = insert (Binop op av bv) at
-                       -- TODO: Type upconvert
-  | otherwise = raiseErr $ failed "type of the both hand sides does not match"
+goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
+  TopType -> raiseErr $ failed $ unwords
+             ["there is no common type that can accomodate both hand side:", show at, op , show bt]
+  ct -> do
+    (av2 :. _) <- castVal (subFix ct) ax
+    (bv2 :. _) <- castVal (subFix ct) bx
+    insert (Binop op av2 bv2) ct
+
 goBinop _ _ _  = raiseErr $ failed $ "unimplemented path in binary operator"
 
 goTriop :: IdentName -> ValueExpr -> ValueExpr -> ValueExpr -> GenM ValueExpr
