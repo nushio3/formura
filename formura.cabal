@@ -35,6 +35,7 @@ library
                   Formura.Interpreter.Eval
                   Formura.OrthotopeMachine.Instruction
                   Formura.OrthotopeMachine.CodeGen
+                  Formura.Cxx.Translate
 
 
   -- other-modules:
