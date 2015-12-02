@@ -40,7 +40,7 @@ int main(){
   state[0] = _mm256_set_ps(0,0,0,0,0,0,0,1);
   
   inspect(state);
-  for (int t=0;t<2;++t) {
+  for (int t=0;t<4;++t) {
 #include "loop-body.cpp"
   }
   inspect(state);

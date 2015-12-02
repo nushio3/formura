@@ -166,6 +166,6 @@ makeCxxBody :: T.Text -> T.Text
 makeCxxBody core = T.unlines
   [ "for (int i = 0; i < NX_AVX; ++i) {" 
   , core
-  , "SWAP;"
   , "}"
+  , "SWAP;"
   ]
