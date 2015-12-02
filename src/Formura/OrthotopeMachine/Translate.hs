@@ -242,7 +242,9 @@ withBindings b1 genX = do
         Nothing -> return v0
         Just t  -> castVal t v0
       case v of
-       (n :. _) -> theGraph . ix n . A.annotation %= A.set (SourceName $ nameOfLhs l)
+       (n :. _) -> do
+         theGraph . ix n . A.annotation %= A.set (SourceName $ nameOfLhs l)
+         theGraph . ix n . A.annotation %= A.set Manifest
        _        -> return ()
 
       -- TODO: LHS grid pattern must be taken care of.

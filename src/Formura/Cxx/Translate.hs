@@ -65,12 +65,20 @@ lookupNode i = do
      return n
 
 
-cursorToCode :: Vec Int -> TranM T.Text
-cursorToCode cursor = do
-  ivs <- use indexVariables
-  return $ brackets (T.intercalate "," $ toList $
-                     (\i c -> i <> "+" <> showt c) <$> ivs <*> cursor)
+-- cursorToCode :: Vec Int -> TranM T.Text
+-- cursorToCode cursor = do
+--   ivs <- use indexVariables
+--   return $ brackets (T.intercalate "," $ toList $
+--                      (\i c -> i <> "+" <> showt c) <$> ivs <*> cursor)
 
+cursorToCode :: T.Text -> Vec Int -> TranM T.Text
+cursorToCode vn (PureVec 0) = return $ vn <> "[i]"
+cursorToCode vn (Vec [0]) = return $ vn <> "[i]"
+cursorToCode vn (Vec [1]) = return $ parens $
+  "i == NX_AVX-1 ? _mm256_permutevar8x32_ps(" <> vn <> "[0],permute_fwd)" <>":" <> vn <> "[i+1]"
+cursorToCode vn (Vec [-1]) = return $ parens $
+  "i == 0 ? _mm256_permutevar8x32_ps(" <> vn <> "[NX_AVX-1],permute_bwd)" <>":" <> vn <> "[i-1]"
+cursorToCode _ c = raiseErr $ failed $ "unsupported cursor position: " ++ show c
 
 rhsCodeAt :: Vec Int -> NodeID -> TranM T.Text
 rhsCodeAt cursor nid = do
@@ -78,8 +86,7 @@ rhsCodeAt cursor nid = do
   case A.viewMaybe nd of
      Just Manifest -> do
        Just (VariableName vn) <- return $ A.viewMaybe nd
-       accC <- cursorToCode cursor
-       return $ vn <> accC
+       cursorToCode vn cursor
      _  -> rhsDelayedCodeAt cursor nd
 
 rhsDelayedCodeAt :: Vec Int -> Node -> TranM T.Text
@@ -122,7 +129,7 @@ nameManifestVariables = do
       in n & A.annotation %~ A.set (VariableName newName)
 
 translate :: TranM ()
-translate = do
+translate = censor makeCxxBody $ do
   nameManifestVariables
   g <- use theGraph
   let ms = manifestNodes g
@@ -133,8 +140,8 @@ translate = do
       _ -> do
         Just (VariableName newName) <- return $ A.viewMaybe n
         rhsCode <- rhsDelayedCodeAt 0 n
-        lhsCursor <- cursorToCode $ Vec [0]
-        tell $ newName <> lhsCursor <> " = " <> rhsCode <> ";\n"
+        lhsCursor <- cursorToCode newName $ Vec [0]
+        tell $ lhsCursor <> " = " <> rhsCode <> ";\n"
 
 cxxHeader :: T.Text
 cxxHeader = T.unlines
@@ -154,3 +161,11 @@ cxxHeader = T.unlines
  , "    cout << dest[i] << \"\\t\";"
  , "  cout << endl;"
  , "}"]
+
+makeCxxBody :: T.Text -> T.Text
+makeCxxBody core = T.unlines
+  [ "for (int i = 0; i < NX_AVX; ++i) {" 
+  , core
+  , "SWAP;"
+  , "}"
+  ]

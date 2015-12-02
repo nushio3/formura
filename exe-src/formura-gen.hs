@@ -50,7 +50,8 @@ genStmt (Subst l r) = do
   case ret of
     Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
     Right () -> return ()
-  T.putStrLn cxxCode
+  T.putStrLn cxxCode    
+  T.writeFile "output.cpp" cxxCode
 
 pprNode :: (Int, Node) -> IO ()
 pprNode (i,n) = do
