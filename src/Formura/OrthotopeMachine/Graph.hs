@@ -24,7 +24,7 @@ import           Formura.Vec
 
 -- | The functor for orthotope machine-specific instructions. Note that arithmetic operations are outsourced.
 
-data GridInstF x
+data DataflowInstF x
   = LoadF IdentName
   | StoreF IdentName x
   | LoadIndexF Int
@@ -45,7 +45,7 @@ pattern LoadExtent n <- ((^? match) -> Just (LoadExtentF n)) where
 pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
   Shift v x = match # ShiftF v x
 
-type OMInstF = Sum '[GridInstF, OperatorF, ImmF]
+type OMInstF = Sum '[DataflowInstF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
 
 type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]

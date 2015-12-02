@@ -7,15 +7,28 @@ Stability   : experimental
 ZipList treated as mathematical vectors, to deal with multidimensionality in stencil computation.
 -}
 
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable #-}
+{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, TypeFamilies #-}
 
 module Formura.Vec where
 
 import Control.Applicative
+import Control.Lens
 import Data.Monoid
 
 data Vec a = Vec { getVec :: [a] } | PureVec a
            deriving (Functor, Foldable, Traversable)
+
+
+type instance Index (Vec a) = Int
+type instance IxValue (Vec a) = a
+instance Ixed (Vec a) where
+  ix i =
+       let myIso :: Iso' (Vec a) [a]
+           myIso = iso back Vec
+
+           back (PureVec x) = repeat x
+           back (Vec xs) = xs
+       in myIso . ix i
 
 instance Show a => Show (Vec a) where
   show (Vec xs) = show xs
