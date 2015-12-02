@@ -6,6 +6,7 @@ import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.RWS
+import           Data.Foldable (toList)
 import qualified Data.IntMap as G
 import           Data.Monoid
 import qualified Data.Text as T
@@ -22,12 +23,20 @@ import           Formura.Vec
 showt :: Show a => a -> T.Text
 showt = T.pack . show
 
-paren :: T.Text -> T.Text
-paren x = "(" <> x <> ")"
+parens :: T.Text -> T.Text
+parens x = "(" <> x <> ")"
+
+brackets :: T.Text -> T.Text
+brackets x = "[" <> x <> "]"
+
+newtype VariableName = VariableName T.Text
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _extent :: Vec Int }
+  , _extent :: Vec Int
+  , _indexVariables :: Vec T.Text
+  , _theGraph :: Graph
+  }
 makeClassy ''TranState
 
 instance HasCompilerSyntacticState TranState where
@@ -37,14 +46,16 @@ defaultTranState :: TranState
 defaultTranState = TranState
   { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
   , _extent = Vec [128]
+  , _indexVariables = Vec ["i"]
+  , _theGraph = G.empty
   }
 
 
-type TranM = CompilerMonad Graph T.Text TranState
+type TranM = CompilerMonad () T.Text TranState
 
 lookupNode :: NodeID -> TranM Node
 lookupNode i = do
-  g <- ask
+  g <- use theGraph
   case G.lookup i g of
    Nothing -> raiseErr $ failed $ "out-of-bound node reference: #" ++ show i
    Just n -> do
@@ -54,23 +65,39 @@ lookupNode i = do
      return n
 
 
+cursorToCode :: Vec Int -> TranM T.Text
+cursorToCode cursor = do
+  ivs <- use indexVariables
+  return $ brackets (T.intercalate "," $ toList $
+                     (\i c -> i <> "+" <> showt c) <$> ivs <*> cursor)
+
+
 rhsCodeAt :: Vec Int -> NodeID -> TranM T.Text
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
-  let Node inst0 typ0 ann0 = nd
+  case A.viewMaybe nd of
+     Just Manifest -> do
+       Just (VariableName vn) <- return $ A.viewMaybe nd
+       accC <- cursorToCode cursor
+       return $ vn <> accC
+     _  -> rhsDelayedCodeAt cursor nd
+
+rhsDelayedCodeAt :: Vec Int -> Node -> TranM T.Text
+rhsDelayedCodeAt cursor (Node inst0 typ0 ann0) = do
   case inst0 of
      Imm r -> return $ showt (realToFrac r :: Double)
      Uniop op a -> do
        a_code <- rhsCodeAt cursor a
-       return $ paren $ T.pack op <> a_code
+       return $ parens $ T.pack op <> a_code
      Binop op a b -> do
        a_code <- rhsCodeAt cursor a
        b_code <- rhsCodeAt cursor b
-       return $ paren $ b_code <> T.pack op <> b_code
-     ShiftF vi a -> rhsCodeAt (cursor + vi) a
-     LoadExtent i -> undefined
-translate :: TranM ()
-translate = tell $  T.pack "cout << \"hello world\" << endl;"
+       return $ parens $ a_code <> T.pack op <> b_code
+     Shift vi a -> rhsCodeAt (cursor + vi) a
+     LoadExtent i -> do
+       ext <- use extent
+       return $ showt (ext ^?! ix i :: Int)
+     x -> raiseErr $ failed $ "cxx codegen unimplemented for keyword: " ++ show x
 
 manifestNodes :: Graph -> [NodeID]
 manifestNodes g =
@@ -82,3 +109,29 @@ manifestNodes g =
     f (_, nd) = case A.viewMaybe nd of
       Just Manifest -> True
       _             -> False
+
+nameManifestVariables :: TranM ()
+nameManifestVariables = do
+  theGraph %= G.mapWithKey nameIt
+  where
+    nameIt :: NodeID -> Node -> Node
+    nameIt i n =
+      let newName = case A.viewMaybe n of
+                      Just (SourceName n) -> T.pack n
+                      _    -> "a_" <> showt i
+      in n & A.annotation %~ A.set (VariableName newName)
+
+translate :: TranM ()
+translate = do
+  nameManifestVariables
+  g <- use theGraph
+  let ms = manifestNodes g
+  forM_ ms $ \ mnid -> do
+    n <- lookupNode mnid
+    case n ^. nodeInst of
+      Load _ -> return ()
+      _ -> do
+        Just (VariableName newName) <- return $ A.viewMaybe n
+        rhsCode <- rhsDelayedCodeAt 0 n
+        lhsCursor <- cursorToCode $ Vec [0]
+        tell $ newName <> lhsCursor <> " = " <> rhsCode <> ";\n"

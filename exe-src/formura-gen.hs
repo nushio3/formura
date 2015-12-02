@@ -5,6 +5,8 @@ import           Control.Lens
 import           Control.Monad
 import qualified Data.IntMap as G
 import           Data.Monoid
+import qualified Data.Text as T
+import qualified Data.Text.IO as T
 import           System.Environment
 import           System.IO
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
@@ -17,6 +19,7 @@ import           Formura.OrthotopeMachine.Translate
 import qualified Formura.Parser as P
 import           Formura.Compiler
 import           Formura.Syntax
+import qualified Formura.Cxx.Translate as C
 
 main :: IO ()
 main = do
@@ -42,6 +45,12 @@ genStmt (Subst l r) = do
     Right () -> return ()
   mapM_ pprNode $ G.toList (s ^. theGraph)
   putStrLn ""
+
+  (ret, s, cxxCode) <- runCompiler C.translate () C.defaultTranState{C._theGraph = s ^. theGraph}
+  case ret of
+    Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
+    Right () -> return ()
+  T.putStrLn cxxCode
 
 pprNode :: (Int, Node) -> IO ()
 pprNode (i,n) = do

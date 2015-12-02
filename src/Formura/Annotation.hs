@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances, TypeSynonymInstances #-}
 module Formura.Annotation where
 
 import Control.Lens
@@ -12,6 +13,8 @@ type Annotation = [Dynamic]
 
 class Annotated a where
   annotation :: Lens' a Annotation
+instance Annotated Annotation where
+  annotation = simple
 
 -- | An empty collection.
 empty :: Annotation
