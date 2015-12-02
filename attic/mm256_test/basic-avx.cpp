@@ -4,6 +4,8 @@
 
 using namespace std;
 
+const __m256i p_fwd = _mm256_set_epi32(0,7,6,5,4,3,2,1);
+
 void inspect(__m256 a) {
   float dest[8];
   _mm256_storeu_ps(&dest[0], a);
