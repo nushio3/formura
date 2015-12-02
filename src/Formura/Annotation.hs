@@ -47,6 +47,12 @@ toList =  catMaybes . P.map fromDynamic
 toMaybe :: (Typeable a) => Annotation -> Maybe a
 toMaybe = msum . P.map fromDynamic
 
+-- | Extract the first annotation of the given type,
+-- if it exists.
+viewMaybe :: (Typeable a, Annotated b) => b -> Maybe a
+viewMaybe = toMaybe . (^. annotation)
+
+
 -- | Map all annotations of type @a@ to type @b@,
 -- while leaving the others untouched.
 map :: (Typeable a, Typeable b) => (a->b) -> Annotation -> Annotation
