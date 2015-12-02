@@ -1,5 +1,5 @@
-begin function rule30(b) returns b_next
-      a[i] = b[i-1]
-      c[i] = b[i+1]
-      b_next = 2*a*b*c - 2*a*b - 2*a*c - b*c +a+b+c
+begin function rule30(a) returns a_next
+      b[i] = a[i-1]
+      c[i] = a[i+1]
+      a_next = 2*b*a*c - 2*b*a - 2*b*c - a*c +b+a+c
 end function
