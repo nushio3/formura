@@ -135,3 +135,23 @@ translate = do
         rhsCode <- rhsDelayedCodeAt 0 n
         lhsCursor <- cursorToCode $ Vec [0]
         tell $ newName <> lhsCursor <> " = " <> rhsCode <> ";\n"
+
+cxxHeader :: T.Text
+cxxHeader = T.unlines
+ [ "#include <iostream>"
+ , "#include <immintrin.h>"
+ , "#include <x86intrin.h>"
+ , ""
+ , "using namespace std;"
+ , ""
+ , "const __m256i permute_fwd =  _mm256_set_epi32(0,7,6,5,4,3,2,1);"
+ , "const __m256i permute_bwd =  _mm256_set_epi32(6,5,4,3,2,1,0,7);"
+ , ""
+ , "void inspect(__m256 a) {"
+ , "  float dest[8];"
+ , "  _mm256_storeu_ps(&dest[0], a);"
+ , "  for (int i = 0; i < 8; ++i)"
+ , "    cout << dest[i] << \"\\t\";"
+ , "  cout << endl;"
+ , ""
+ , "}"]
