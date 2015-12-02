@@ -73,6 +73,11 @@ insert inst typ = do
         Just meta -> A.singleton meta
         Nothing   -> A.empty
   theGraph %= G.insert n0 (Node inst typ a)
+  mmeta <- use compilerFocus
+  case mmeta of
+       Just meta -> theGraph . ix n0 . A.annotation %= A.set meta
+       _         -> return ()
+
   return $ NodeValue n0 typ
 
 

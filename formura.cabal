@@ -51,6 +51,7 @@ library
               , mtl
               , parsers
               , QuickCheck
+              , text
               , trifecta
               , vector
 
