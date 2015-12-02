@@ -153,5 +153,4 @@ cxxHeader = T.unlines
  , "  for (int i = 0; i < 8; ++i)"
  , "    cout << dest[i] << \"\\t\";"
  , "  cout << endl;"
- , ""
  , "}"]
