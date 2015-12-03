@@ -8,13 +8,13 @@ using namespace std;
 const __m256i permute_fwd =  _mm256_set_epi32(0,7,6,5,4,3,2,1);
 const __m256i permute_bwd =  _mm256_set_epi32(6,5,4,3,2,1,0,7);
 
-const int NX_AVX = 8;
+const int NX_AVX = 1024;
 const int NX = 8 * NX_AVX;
 
 void inspect(__m256 *a) {
   float dest[8];
   for (int i = 0; i < 8; ++i){
-    for (int j = 0; j<NX_AVX; ++j){
+    for (int j = 0; j<min(8,NX_AVX); ++j){
       _mm256_storeu_ps(&dest[0], a[j]);
       cout << dest[i];
     }
@@ -40,8 +40,9 @@ int main(){
   }
   state[0] = _mm256_set_ps(0,0,0,1,0,0,0,0);
 
-  for (int t=0;t<32;++t) {
-    inspect(a_0);
+  for (int t=0;t<1024*1024;++t) {
 #include "loop-body.cpp"
   }
+    inspect(a_0);
+
 }
