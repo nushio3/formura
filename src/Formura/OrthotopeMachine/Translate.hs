@@ -18,6 +18,7 @@ import           Formura.Language.Combinator
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
 import           Formura.Compiler
+import           Formura.GlobalEnvironment
 import           Formura.Syntax
 import           Formura.Type
 import           Formura.Vec
@@ -35,26 +36,57 @@ instance HasBinding Binding where
 
 data CodegenState = CodegenState
   { _codegenSyntacticState :: CompilerSyntacticState
+  , _codegenGlobalEnvironment :: GlobalEnvironment
   , _theGraph :: Graph
   }
 makeClassy ''CodegenState
+
+instance HasGlobalEnvironment CodegenState where
+  globalEnvironment = codegenGlobalEnvironment
+
+instance HasCompilerSyntacticState CodegenState where
+  compilerSyntacticState = codegenSyntacticState
 
 defaultCodegenState :: CodegenState
 defaultCodegenState = CodegenState
   { _codegenSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "codegen"}
   , _theGraph = G.empty
+  , _codegenGlobalEnvironment = defaultGlobalEnvironment
   }
 
 defaultCodegenRead :: Binding
 defaultCodegenRead = M.empty
 
-instance HasCompilerSyntacticState CodegenState where
-  compilerSyntacticState = codegenSyntacticState
-
-
 -- | the code generator monad.
 type GenM = CompilerMonad Binding () CodegenState
 type LexGenM = CompilerMonad LexBinding () CodegenState
+
+
+-- | Set up the 'GlobalEnvironment' from the 'SpecialDeclaration' part of the the 'Program' .
+
+setupGlobalEnvironment :: Program -> GenM ()
+setupGlobalEnvironment prog = do
+  dim <- case concat $ map findDimension spDecls of
+    [n] -> return n
+    [] -> raiseErr $ failed "no dimension declaration found."
+    _  -> raiseErr $ failed "multiple dimension declaration found."
+  axs <- case concat $ map findAxesDeclaration spDecls of
+    [xs] | length xs == dim -> return xs
+    [_] -> raiseErr $ failed "number of declared axes does not match the declared dimension."
+    [] -> raiseErr $ failed "no axes declaration found."
+    _  -> raiseErr $ failed "multiple axes declaration found."
+  dimension .= dim
+  axesNames .= axs
+  where
+    spDecls = prog ^. programSpecialDeclarations
+
+    findDimension :: SpecialDeclaration -> [Int]
+    findDimension (DimensionDeclaration n) = [n]
+    findDimension _ = []
+
+    findAxesDeclaration :: SpecialDeclaration -> [[IdentName]]
+    findAxesDeclaration (AxesDeclaration xs) = [xs]
+    findAxesDeclaration _ = []
 
 
 class Generatable f where

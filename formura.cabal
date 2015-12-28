@@ -27,6 +27,7 @@ library
                   Formura.Annotation
                   Formura.Annotation.Representation
                   Formura.Compiler
+                  Formura.GlobalEnvironment
                   Formura.Parser
                   Formura.Syntax
                   Formura.Type
