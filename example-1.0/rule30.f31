@@ -1,3 +1,6 @@
+dimension :: 3
+axes :: X
+
 begin function rule30(a) returns a_next
       b[i] = a[i-1]
       c[i] = a[i+1]
