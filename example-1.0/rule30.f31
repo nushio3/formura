@@ -1,7 +1,11 @@
-dimension :: 3
+dimension :: 1
 axes :: X
 
-begin function rule30(a) returns a_next
+begin function init () returns x
+      float[] :: x
+end function
+
+begin function step(a) returns a_next
       b[i] = a[i-1]
       c[i] = a[i+1]
       a_next = 2*b*a*c - 2*b*a - 2*b*c - a*c +b+a+c
