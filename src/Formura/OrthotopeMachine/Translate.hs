@@ -307,8 +307,8 @@ instance (Generatable f, Generatable (Sum fs)) => Generatable (Sum (f ': fs)) wh
 genRhs :: RXExpr -> GenM ValueExpr
 genRhs r = compilerFoldout gen r
 
-genMainFunction :: RExpr -> GenM ()
-genMainFunction (Lambda l r) = do
+genFunction :: RExpr -> GenM ()
+genFunction (Lambda l r) = do
   v <- insert (Load "input_value") (GridType (Vec [0]) (ElemType "double"))
   let (n :. _ ) = v
   theGraph . ix n . A.annotation %= A.set Manifest
@@ -317,4 +317,31 @@ genMainFunction (Lambda l r) = do
 
   theGraph . ix n99 . A.annotation %= A.set Manifest
   return ()
-genMainFunction _ = raiseErr $ failed "Please specify a function for generation"
+genFunction _ = raiseErr $ failed "Please specify a function for generation"
+
+genFunctionNamed :: Program -> IdentName -> GenM ()
+genFunctionNamed (Program decls (BindingF stmts)) fname = case lup stmts of
+  [] -> raiseErr $ failed $ "Function `" ++ fname ++ "` not found."
+  [x] -> genFunction x
+  _  -> raiseErr $ failed $ "Multiple declaration of function `" ++ fname ++ "` found."
+  where
+    lup :: [StatementF RExpr] -> [RExpr]
+    lup [] = []
+    lup (SubstF (Ident nam) rhs : xs) | nam == fname = rhs : lup xs
+    lup (_:xs) = lup xs
+
+genProgram :: Program -> IO OMProgram
+genProgram fprog = do
+  let run g = runCompilerRight g defaultCodegenRead defaultCodegenState
+  (_, stInit, _) <- run $ do
+    setupGlobalEnvironment fprog
+    genFunctionNamed fprog "init"
+  (_, stStep, _) <- run $ do
+    setupGlobalEnvironment fprog
+    genFunctionNamed fprog "step"
+  return OMProgram
+    { _omGlobalEnvironment = stInit ^. globalEnvironment
+    , _omInitGraph = stInit ^. theGraph
+    , _omStepGraph = stStep ^. theGraph
+    , _omStateSignature = error "state signature unimplemented."
+    }

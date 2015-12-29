@@ -31,21 +31,22 @@ process fn = do
   mprog <- P.parseFromFileEx (P.runP $ P.program <* P.eof) fn
   case mprog of
       P.Failure doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
-      P.Success prog -> do
-        let BindingF stmts = prog ^. programBinding
-        mapM_ genStmt stmts
+      P.Success prog -> genStmt prog
 
-genStmt :: StatementF RExpr -> IO ()
-genStmt (TypeDecl _ _) = return ()
-genStmt (Subst l r) = do
-  putStrLn $ show l ++ " = " ++ show r
-  (_, s, _) <- runCompilerRight (genMainFunction r) defaultCodegenRead defaultCodegenState
-  mapM_ pprNode $ G.toList (s ^. theGraph)
+genStmt :: Program -> IO ()
+genStmt prog = do
+  omProg <- genProgram prog
+
+  putStrLn "## Debug print: step graph"
+  mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
   putStrLn ""
 
-  (ret, s, cxxCode) <- runCompilerRight C.translate () C.defaultTranState{C._theGraph = s ^. theGraph}
+  (ret, s, cxxCode) <- runCompilerRight C.translate () C.defaultTranState{C._theGraph = omProg ^. omStepGraph}
   T.putStrLn cxxCode
   T.writeFile "output.cpp" cxxCode
+
+
+
 
 pprNode :: (Int, Node) -> IO ()
 pprNode (i,n) = do
