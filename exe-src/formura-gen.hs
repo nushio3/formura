@@ -39,18 +39,12 @@ genStmt :: StatementF RExpr -> IO ()
 genStmt (TypeDecl _ _) = return ()
 genStmt (Subst l r) = do
   putStrLn $ show l ++ " = " ++ show r
-  (ret, s, _) <- runCompiler (genMainFunction r) defaultCodegenRead defaultCodegenState
-  case ret of
-    Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
-    Right () -> return ()
+  (_, s, _) <- runCompilerRight (genMainFunction r) defaultCodegenRead defaultCodegenState
   mapM_ pprNode $ G.toList (s ^. theGraph)
   putStrLn ""
 
-  (ret, s, cxxCode) <- runCompiler C.translate () C.defaultTranState{C._theGraph = s ^. theGraph}
-  case ret of
-    Left doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
-    Right () -> return ()
-  T.putStrLn cxxCode    
+  (ret, s, cxxCode) <- runCompilerRight C.translate () C.defaultTranState{C._theGraph = s ^. theGraph}
+  T.putStrLn cxxCode
   T.writeFile "output.cpp" cxxCode
 
 pprNode :: (Int, Node) -> IO ()

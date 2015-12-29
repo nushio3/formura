@@ -18,12 +18,12 @@ instance MeetSemiLattice ElementalType where
   _ /\ _ = TopType
 
 elementTypenameTable :: [(String,Int)]
-elementTypenameTable =
-      [("Rational", 0)
-      ,("float", 1)
-      ,("double", 2)
-      ,("real", 3)
-      ,("Real", 4)]
+elementTypenameTable = flip zip [0..]
+                       ["Rational"
+                       ,"float"
+                       ,"double"
+                       ,"real"
+                       ,"Real"]
 
 
 elementTypenameEncode :: String -> Int

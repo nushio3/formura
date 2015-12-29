@@ -8,6 +8,8 @@ import           Control.Monad.Trans.Either
 import           Control.Monad.Morph
 import           Control.Monad.RWS
 import qualified Data.Set as S
+import           System.IO
+import           System.Exit
 import qualified Text.Trifecta as P
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 
@@ -59,6 +61,18 @@ evalCompiler m r s = fmap fst $ evalRWST (runEitherT $ runCompilerMonad m) r s
 --   Note that you get some partial results even when the compilation aborts.
 runCompiler :: CompilerMonad r w s a -> r -> s -> IO (Either CompilerError a,s,w)
 runCompiler m r s = runRWST (runEitherT $ runCompilerMonad m) r s
+
+-- | Run the compiler and get the state and written results.
+--   In case of error, print out the error message and exit.
+runCompilerRight :: CompilerMonad r w s a -> r -> s -> IO (a,s,w)
+runCompilerRight m r s = do
+  (mayA, s2, w) <- runCompiler m r s
+  case mayA of
+    Left doc -> do
+      Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
+      exitFailure
+    Right a -> return (a, s2, w)
+
 
 -- | Run compiler, changing the reader and the state.
 withCompiler :: Monoid w => (r' -> s -> (r,s)) -> CompilerMonad r w s a -> CompilerMonad r' w s a

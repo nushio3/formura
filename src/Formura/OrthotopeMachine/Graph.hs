@@ -15,8 +15,9 @@ module Formura.OrthotopeMachine.Graph where
 import           Algebra.Lattice
 import           Control.Lens
 import qualified Data.IntMap as G
-
+import qualified Data.Map as M
 import qualified Formura.Annotation as A
+import           Formura.GlobalEnvironment
 import           Formura.Language.Combinator
 import           Formura.Syntax
 import           Formura.Type
@@ -99,3 +100,15 @@ type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
 type ValueExpr = Fix ValueExprF
 type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
 type ValueLexExpr = Fix ValueLexExprF
+
+data OMProgram = OMProgram
+  { _omGlobalEnvironment :: GlobalEnvironment
+  , _omInitGraph :: Graph
+  , _omStepGraph :: Graph
+  , _omStateSignature :: M.Map IdentName TypeExpr
+  }
+
+makeLenses ''OMProgram
+
+instance HasGlobalEnvironment OMProgram where
+  globalEnvironment = omGlobalEnvironment
