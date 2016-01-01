@@ -81,8 +81,6 @@ instance Q.Arbitrary x => Q.Arbitrary (TupleF x) where
 pattern Tuple xs <- ((^? match) -> Just (TupleF xs)) where
   Tuple xs = match # TupleF xs
 
-
-
 -- ** Arithmetic elements
 
 -- | Rational Literal
@@ -232,6 +230,9 @@ type TypeExpr  = Fix TypeExprF
 
 type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
 type LExpr  = Fix LExprF
+
+type TupleOfIdentsF = Sum '[ TupleF, IdentF ]
+type TupleOfIdents  = Fix TupleOfIdentsF
 
 type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, ImmF ]
 type RExpr  = Fix RExprF

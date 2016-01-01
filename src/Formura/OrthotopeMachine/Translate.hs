@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
-DeriveTraversable, FlexibleContexts, FlexibleInstances, PatternSynonyms,
+DeriveTraversable, FlexibleContexts, FlexibleInstances, GADTs,  PatternSynonyms,
 TemplateHaskell, TypeOperators, ViewPatterns #-}
 module Formura.OrthotopeMachine.Translate where
 
@@ -241,10 +241,27 @@ instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
 
 nameOfLhs :: LExpr -> IdentName
-nameOfLhs (Ident n) = n
-nameOfLhs (Grid _ x) = nameOfLhs x
-nameOfLhs (Vector _ x) = nameOfLhs x
-nameOfLhs _ = error "tuple unsupported in type decl"
+nameOfLhs = error "nameOfLhs is deprecated; use namesOfLhs"
+
+namesOfLhs :: LExpr -> TupleOfIdents
+namesOfLhs (Ident n) = Ident n
+namesOfLhs (Grid _ x) = namesOfLhs x
+namesOfLhs (Vector _ x) = namesOfLhs x
+namesOfLhs (Tuple xs) = Tuple $ map namesOfLhs xs
+
+tupleContents :: (TupleF ∈ fs) => Lang fs -> [Lang fs]
+tupleContents (Tuple xs) = concat $ map tupleContents xs
+tupleContents x          = [x]
+
+matchTupleRtoL :: (TupleF ∈ fs, TupleF ∈ gs) => Lang fs -> Lang gs -> GenM [(Lang fs, Lang gs)]
+matchTupleRtoL = go
+  where
+    go (Tuple xs) (Tuple ys) | length xs == length ys = do
+                                 ms <- zipWithM go xs ys
+                                 return $ concat ms
+    go (Tuple _) (Tuple _) = raiseErr $ failed "tuple length mismatch."
+    go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
+    go x y = return [(x,y)]
 
 withBindings :: BindingF (GenM ValueExpr) -> GenM ValueExpr -> GenM ValueExpr
 withBindings b1 genX = do
