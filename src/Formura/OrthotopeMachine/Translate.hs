@@ -209,7 +209,10 @@ goApply (Tuple xs) (Imm r) = do
   return $ xs!!n
 goApply (Tuple xs) _ = raiseErr $ failed "tuple applied to non-constant integer"
 goApply (FunValue l r) x = do
-  local (M.insert (nameOfLhs l) x) $ genRhs r
+  lrs <- matchToLhs (namesOfLhs l) x
+  let x2 :: Binding
+      x2 = M.fromList lrs
+  local (M.union x2) $ genRhs r
 goApply  _ _ = raiseErr $ failed "unexpected combination of application"
 
 instance Generatable LambdaF where
@@ -240,8 +243,8 @@ resolveLexAlg fx = mTransAlg fx
 instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
 
-nameOfLhs :: LExpr -> IdentName
-nameOfLhs = error "nameOfLhs is deprecated; use namesOfLhs"
+-- nameOfLhs :: LExpr -> IdentName
+-- nameOfLhs = error "nameOfLhs is deprecated; use namesOfLhs"
 
 namesOfLhs :: LExpr -> TupleOfIdents
 namesOfLhs (Ident n) = Ident n
@@ -252,6 +255,16 @@ namesOfLhs (Tuple xs) = Tuple $ map namesOfLhs xs
 tupleContents :: (TupleF ∈ fs) => Lang fs -> [Lang fs]
 tupleContents (Tuple xs) = concat $ map tupleContents xs
 tupleContents x          = [x]
+
+matchToLhs :: (TupleF ∈ fs) => TupleOfIdents -> Lang fs -> GenM [(IdentName, Lang fs)]
+matchToLhs = go
+  where
+    go (Tuple xs) (Tuple ys) | length xs == length ys = do
+                                 ms <- zipWithM go xs ys
+                                 return $ concat ms
+    go (Tuple _) (Tuple _) = raiseErr $ failed "tuple length mismatch."
+    go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
+    go (Ident x) y = return [(x,y)]
 
 matchTupleRtoL :: (TupleF ∈ fs, TupleF ∈ gs) => Lang fs -> Lang gs -> GenM [(Lang fs, Lang gs)]
 matchTupleRtoL = go
