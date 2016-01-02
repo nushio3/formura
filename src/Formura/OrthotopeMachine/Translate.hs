@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
 DeriveTraversable, FlexibleContexts, FlexibleInstances, GADTs,  PatternSynonyms,
+ScopedTypeVariables,
 TemplateHaskell, TypeOperators, ViewPatterns #-}
 module Formura.OrthotopeMachine.Translate where
 
@@ -209,7 +210,7 @@ goApply (Tuple xs) (Imm r) = do
   return $ xs!!n
 goApply (Tuple xs) _ = raiseErr $ failed "tuple applied to non-constant integer"
 goApply (FunValue l r) x = do
-  lrs <- matchToLhs (namesOfLhs l) x
+  lrs <- matchToLhs l x
   let x2 :: Binding
       x2 = M.fromList lrs
   local (M.union x2) $ genRhs r
@@ -219,7 +220,7 @@ instance Generatable LambdaF where
   -- Expand all but bound variables, in order to implement lexical scope
   gen (Lambda l r) = do
     let conv :: Binding -> CodegenState -> (LexBinding, CodegenState)
-        conv b s = (M.insert (nameOfLhs l) (Ident $ nameOfLhs l) $ M.map subFix b, s)
+        conv b s = (M.union (lexicalScopeHolder l) $ M.map subFix b, s)
     r' <- withCompiler conv $ resolveLex $ subFix r
     return $ FunValue l r'
 
@@ -233,18 +234,18 @@ resolveLexAlg (Ident n) = do
     Nothing -> raiseErr $ failed $ "undefined variable: " ++ n
     Just x  -> return $ subFix x
 resolveLexAlg (Lambda l r) = do
-  r' <- local (M.insert (nameOfLhs l) (Ident $ nameOfLhs l)) $ resolveLex $ subFix r
+  r' <- local (M.union (lexicalScopeHolder l)) $ resolveLex $ subFix r
   return $ FunValue l r'
 resolveLexAlg (FunValue l r) = do
-  r' <- local (M.insert (nameOfLhs l) (Ident $ nameOfLhs l)) $ resolveLex r
+  r' <- local (M.union (lexicalScopeHolder l)) $ resolveLex r
   return $ FunValue l r'
 resolveLexAlg fx = mTransAlg fx
 
 instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
 
--- nameOfLhs :: LExpr -> IdentName
--- nameOfLhs = error "nameOfLhs is deprecated; use namesOfLhs"
+-- namesOfLhs :: LExpr -> IdentName
+-- namesOfLhs = error "namesOfLhs is deprecated; use namesOfLhs"
 
 namesOfLhs :: LExpr -> TupleOfIdents
 namesOfLhs (Ident n) = Ident n
@@ -256,8 +257,11 @@ tupleContents :: (TupleF ∈ fs) => Lang fs -> [Lang fs]
 tupleContents (Tuple xs) = concat $ map tupleContents xs
 tupleContents x          = [x]
 
-matchToLhs :: (TupleF ∈ fs) => TupleOfIdents -> Lang fs -> GenM [(IdentName, Lang fs)]
-matchToLhs = go
+matchToLhs :: (TupleF ∈ fs) => LExpr -> Lang fs -> GenM [(IdentName, Lang fs)]
+matchToLhs l x = matchToIdents (namesOfLhs l) x
+
+matchToIdents :: (TupleF ∈ fs) => TupleOfIdents -> Lang fs -> GenM [(IdentName, Lang fs)]
+matchToIdents = go
   where
     go (Tuple xs) (Tuple ys) | length xs == length ys = do
                                  ms <- zipWithM go xs ys
@@ -265,6 +269,16 @@ matchToLhs = go
     go (Tuple _) (Tuple _) = raiseErr $ failed "tuple length mismatch."
     go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
     go (Ident x) y = return [(x,y)]
+
+lexicalScopeHolder :: LExpr -> LexBinding
+lexicalScopeHolder l =
+  let xs :: [TupleOfIdents]
+      xs = tupleContents $ namesOfLhs l
+      f :: TupleOfIdents -> (IdentName, ValueLexExpr)
+      f (Ident x) = (x, Ident x)
+      f _         = error "unexpected happened in creating a scopeHolder."
+  in M.fromList $ map f xs
+
 
 matchTupleRtoL :: (TupleF ∈ fs, TupleF ∈ gs) => Lang fs -> Lang gs -> GenM [(Lang fs, Lang gs)]
 matchTupleRtoL = go
@@ -291,28 +305,33 @@ withBindings b1 genX = do
         SubstF l r -> [(l, r)]
         _             -> []
 
-      typeDict :: M.Map IdentName TypeExpr
-      typeDict = M.fromList [(nameOfLhs l, t) | (l,t)<- typeDecls0]
+  let evalTypeDecl :: (LExpr, TypeExpr) -> GenM [(IdentName, TypeExpr)]
+      evalTypeDecl (l, t) = matchToLhs l t
+  (typeDict :: M.Map IdentName TypeExpr)
+    <- (M.fromList . concat) <$> mapM evalTypeDecl typeDecls0
 
   let
-    -- Let bindings enter scope one by one, not simultaneously
+    -- make bindings enter scope one by one, not simultaneously
     graduallyBind :: [(LExpr, GenM ValueExpr)] -> GenM [(IdentName, ValueExpr)]
     graduallyBind [] = return []
-    graduallyBind ((l,genV): restOfBinds) = do
+    graduallyBind ((l0,genV): restOfBinds) = do
       v0 <- genV
-      v <- case M.lookup (nameOfLhs l) typeDict of
-        Nothing -> return v0
-        Just t  -> castVal t v0
-      case v of
-       (n :. _) -> do
-         theGraph . ix n . A.annotation %= A.set (SourceName $ nameOfLhs l)
-         theGraph . ix n . A.annotation %= A.set Manifest
-       _        -> return ()
+      lvs <- matchToLhs l0 v0
+      nvs <- forM lvs $ \ (name0, v1) -> do
+        v <- case M.lookup (name0) typeDict of
+          Nothing -> return v1
+          Just t  -> castVal t v1
+        -- TODO: LHS grid pattern must be taken care of.
 
-      -- TODO: LHS grid pattern must be taken care of.
+        case v of
+           (n :. _) -> do
+             theGraph . ix n . A.annotation %= A.set (SourceName $ name0)
+             theGraph . ix n . A.annotation %= A.set Manifest
+           _        -> return ()
+        return (name0, v)
 
-      b2s <- local (binding %~ M.insert (nameOfLhs l) v) $ graduallyBind restOfBinds
-      return ((nameOfLhs l, v) : b2s)
+      nvs2 <- local (binding %~ M.union (M.fromList nvs)) $ graduallyBind restOfBinds
+      return $ nvs ++ nvs2
   substs1 <- graduallyBind substs0
 
 

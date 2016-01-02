@@ -94,12 +94,14 @@ pattern FunValue l r <- ((^? match) -> Just (FunValueF l r)) where FunValue l r 
 
 
 -- | RXExpr is RExpr extended with NodeValue constructors
-type RXExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, FunValueF, NodeValueF, ImmF ]
 type RXExpr  = Fix RXExprF
-type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
+type RXExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, FunValueF, NodeValueF, ImmF ]
+-- | 'ValueExpr' represents final forms of orthotope machine evaluation.
 type ValueExpr = Fix ValueExprF
-type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
+type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
+-- | 'ValueLexExpr' extends 'ValueExpr' with unresolved identifiers. Expressions with free variables evaluate to 'ValueLexExpr' , not 'ValueExpr' .
 type ValueLexExpr = Fix ValueLexExprF
+type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
 
 data OMProgram = OMProgram
   { _omGlobalEnvironment :: GlobalEnvironment
