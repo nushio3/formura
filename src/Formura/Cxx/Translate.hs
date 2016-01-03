@@ -65,13 +65,6 @@ lookupNode i = do
         Nothing -> return ()
      return n
 
-
--- cursorToCode :: Vec Int -> TranM T.Text
--- cursorToCode cursor = do
---   ivs <- use indexVariables
---   return $ brackets (T.intercalate "," $ toList $
---                      (\i c -> i <> "+" <> showt c) <$> ivs <*> cursor)
-
 cursorToCode :: T.Text -> Vec Int -> TranM T.Text
 cursorToCode vn (PureVec 0) = return $ vn <> "[i]"
 cursorToCode vn (Vec [0]) = return $ vn <> "[i]"
