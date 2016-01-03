@@ -363,8 +363,12 @@ toNodeType (GridType v x) = do
   return $ GridType v x2
 toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encountered in conversion to node type."
 
-genFunction :: TypeExpr -> RExpr -> GenM TypeExpr
-genFunction inputType (Lambda l r) = do
+
+-- | Generate code for a global function. This generates 'Load' and 'Store' nodes,
+--   in addition to all the usual computation nodes.
+
+genGlobalFunction :: TypeExpr -> LExpr -> RExpr -> GenM TypeExpr
+genGlobalFunction inputType outputPattern (Lambda l r) = do
   typedLhs <- matchToLhs l inputType
   liftIO $ putStrLn $ "input type: " ++ show inputType
   initBinds <- forM typedLhs $ \(name1, t1) -> do
@@ -379,19 +383,20 @@ genFunction inputType (Lambda l r) = do
     return (name1, v1)
 
   returnValueExpr <- local (M.union $ M.fromList initBinds) $ genRhs $ subFix r
-  forM_ (tupleContents returnValueExpr) $ \ rv1 ->
+
+  rvElems <- matchToLhs outputPattern returnValueExpr
+
+  forM_ rvElems $ \ (name1, rv1) -> do
     case rv1 of
-      (n99 :. _ ) -> theGraph . ix n99 . A.annotation %= A.set Manifest
-      _           -> return ()
+      (n99 :. _ ) -> do
+        (n100 :. _) <- insert (Store name1 n99) unitType
+        theGraph . ix n100 . A.annotation %= A.set Manifest
+        theGraph . ix n100 . A.annotation %= A.set (SourceName $ name1 ++ "_next")
+      _           -> raiseErr $ failed "The return type of a global function must be a tuple of grids."
 
   return $ typeExprOf returnValueExpr
 
-genFunction _ _ = raiseErr $ failed "Please specify a function for generation"
-
-genFunctionNamed :: Program -> TypeExpr -> IdentName -> GenM TypeExpr
-genFunctionNamed fprog inputType fname = do
-  x <- lookupToplevelIdents fprog fname
-  genFunction inputType x
+genGlobalFunction _ _ _ = raiseErr $ failed "Identifier specified for function generation is not of function type."
 
 lookupToplevelIdents :: Program -> IdentName -> GenM RExpr
 lookupToplevelIdents fprog name0 =  case lup stmts of
@@ -410,20 +415,23 @@ genProgram :: Program -> IO OMProgram
 genProgram fprog = do
   let run g = runCompilerRight g defaultCodegenRead defaultCodegenState
 
+  (lhsOfStep,_,_) <- run $ do
+    (Lambda l _) <- lookupToplevelIdents fprog "step"
+    return l
+
   (initType, stInit, _) <- run $ do
     setupGlobalEnvironment fprog
     initFunDef <- lookupToplevelIdents fprog "init"
-    genFunction (Tuple []) initFunDef
+    genGlobalFunction (Tuple []) lhsOfStep initFunDef
   (stateSignature0, stStep, _) <- run $ do
     stepFunDef <- lookupToplevelIdents fprog "step"
     setupGlobalEnvironment fprog
-    stepType <- genFunction initType stepFunDef
+    stepType <- genGlobalFunction initType lhsOfStep stepFunDef
     when (initType /= stepType) $ do
       raiseErr $ failed $ "the return type of step : " ++ show stepType ++ "\n" ++
         "must match the return type of init : " ++ show initType
 
-    (Lambda l _) <- return stepFunDef
-    bs99 <- matchToLhs l stepType
+    bs99 <- matchToLhs lhsOfStep stepType
     return $ M.fromList bs99
 
   return OMProgram

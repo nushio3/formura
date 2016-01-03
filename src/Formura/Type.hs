@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleInstances, TypeSynonymInstances #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, TypeOperators, TypeSynonymInstances #-}
 module Formura.Type where
 
 import Algebra.Lattice
@@ -7,6 +7,8 @@ import Data.Tuple(swap)
 import Formura.Language.Combinator
 import Formura.Syntax
 
+unitType :: (ElemTypeF ∈ fs) => Lang fs
+unitType = ElemType "void"
 
 type ElementalType = Lang '[TopTypeF, ElemTypeF]
 
@@ -19,7 +21,10 @@ instance MeetSemiLattice ElementalType where
 
 elementTypenameTable :: [(String,Int)]
 elementTypenameTable = flip zip [0..]
-                       ["Rational"
+                       ["void"
+                       ,"bool"
+                       ,"int"
+                       ,"Rational"
                        ,"float"
                        ,"double"
                        ,"real"

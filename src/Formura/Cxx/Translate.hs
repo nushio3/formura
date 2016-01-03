@@ -16,8 +16,9 @@ import           Text.Trifecta (failed, raiseErr)
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
 import           Formura.Compiler
-import           Formura.Syntax
+import           Formura.GlobalEnvironment
 import           Formura.OrthotopeMachine.Graph
+import           Formura.Syntax
 import           Formura.Vec
 
 showt :: Show a => a -> T.Text
@@ -51,7 +52,7 @@ defaultTranState = TranState
   }
 
 
-type TranM = CompilerMonad () T.Text TranState
+type TranM = CompilerMonad GlobalEnvironment T.Text TranState
 
 lookupNode :: NodeID -> TranM Node
 lookupNode i = do
@@ -104,6 +105,7 @@ rhsDelayedCodeAt cursor (Node inst0 typ0 ann0) = do
      LoadExtent i -> do
        ext <- use extent
        return $ showt (ext ^?! ix i :: Int)
+     Store _ a -> rhsCodeAt cursor a
      x -> raiseErr $ failed $ "cxx codegen unimplemented for keyword: " ++ show x
 
 manifestNodes :: Graph -> [NodeID]
@@ -130,6 +132,7 @@ nameManifestVariables = do
 
 translate :: TranM ()
 translate = censor makeCxxBody $ do
+  dim <- view dimension
   nameManifestVariables
   g <- use theGraph
   let ms = manifestNodes g
@@ -140,7 +143,7 @@ translate = censor makeCxxBody $ do
       _ -> do
         Just (VariableName newName) <- return $ A.viewMaybe n
         rhsCode <- rhsDelayedCodeAt 0 n
-        lhsCursor <- cursorToCode newName $ Vec [0]
+        lhsCursor <- cursorToCode newName $ Vec $ replicate dim 0
         tell $ lhsCursor <> " = " <> rhsCode <> ";\n"
 
 cxxHeader :: T.Text
@@ -164,7 +167,7 @@ cxxHeader = T.unlines
 
 makeCxxBody :: T.Text -> T.Text
 makeCxxBody core = T.unlines
-  [ "for (int i = 0; i < NX_AVX; ++i) {" 
+  [ "for (int i = 0; i < NX_AVX; ++i) {"
   , core
   , "}"
   , "SWAP;"

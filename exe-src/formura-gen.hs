@@ -53,7 +53,8 @@ genStmt prog = do
   mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
   putStrLn ""
 
-  (ret, s, cxxCode) <- runCompilerRight C.translate () C.defaultTranState{C._theGraph = omProg ^. omStepGraph}
+  (ret, s, cxxCode) <- runCompilerRight C.translate (omProg ^. omGlobalEnvironment)
+                       C.defaultTranState{C._theGraph = omProg ^. omStepGraph}
   T.putStrLn cxxCode
   T.writeFile "output.cpp" cxxCode
 
