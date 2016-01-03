@@ -103,6 +103,12 @@ type ValueExprF = Sum '[TupleF, FunValueF, NodeValueF, ImmF]
 type ValueLexExpr = Fix ValueLexExprF
 type ValueLexExprF = Sum '[TupleF, FunValueF, NodeValueF, IdentF, ImmF]
 
+instance Typed ValueExpr where
+  typeExprOf (Imm _) = ElemType "Rational"
+  typeExprOf (NodeValue _ t) = subFix t
+  typeExprOf (FunValue _ _) = FunType
+  typeExprOf (Tuple xs) = Tuple $ map typeExprOf xs
+
 data OMProgram = OMProgram
   { _omGlobalEnvironment :: GlobalEnvironment
   , _omInitGraph :: Graph

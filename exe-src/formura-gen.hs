@@ -37,6 +37,18 @@ genStmt :: Program -> IO ()
 genStmt prog = do
   omProg <- genProgram prog
 
+  putStrLn "## Debug print: global environment of the simulation"
+  print (omProg ^. omGlobalEnvironment)
+  putStrLn ""
+
+  putStrLn "## Debug print: simulation state"
+  print (omProg ^. omStateSignature)
+  putStrLn ""
+
+  putStrLn "## Debug print: init graph"
+  mapM_ pprNode $ G.toList (omProg ^. omInitGraph)
+  putStrLn ""
+
   putStrLn "## Debug print: step graph"
   mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
   putStrLn ""

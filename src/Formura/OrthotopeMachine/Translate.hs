@@ -363,47 +363,72 @@ toNodeType (GridType v x) = do
   return $ GridType v x2
 toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encountered in conversion to node type."
 
-genFunction :: TypeExpr -> RExpr -> GenM ()
+genFunction :: TypeExpr -> RExpr -> GenM TypeExpr
 genFunction inputType (Lambda l r) = do
   typedLhs <- matchToLhs l inputType
+  liftIO $ putStrLn $ "input type: " ++ show inputType
   initBinds <- forM typedLhs $ \(name1, t1) -> do
+
     t1d <- toNodeType t1
     v1 <- insert (Load name1) t1d
     let (n :. _ ) = v1
     theGraph . ix n . A.annotation %= A.set Manifest
+
+    liftIO $ putStrLn $ "introduce binding: " ++ name1 ++ " = " ++ show v1
+
     return (name1, v1)
 
-  (n99 :. t99) <- genRhs $ subFix r
+  returnValueExpr <- local (M.union $ M.fromList initBinds) $ genRhs $ subFix r
+  forM_ (tupleContents returnValueExpr) $ \ rv1 ->
+    case rv1 of
+      (n99 :. _ ) -> theGraph . ix n99 . A.annotation %= A.set Manifest
+      _           -> return ()
 
-  theGraph . ix n99 . A.annotation %= A.set Manifest
-  return ()
+  return $ typeExprOf returnValueExpr
+
 genFunction _ _ = raiseErr $ failed "Please specify a function for generation"
 
-genFunctionNamed :: Program -> TypeExpr -> IdentName -> GenM ()
-genFunctionNamed fprog inputType fname = case lup stmts of
-  [] -> raiseErr $ failed $ "Function `" ++ fname ++ "` not found."
-  [x] -> genFunction inputType x
-  _  -> raiseErr $ failed $ "Multiple declaration of function `" ++ fname ++ "` found."
+genFunctionNamed :: Program -> TypeExpr -> IdentName -> GenM TypeExpr
+genFunctionNamed fprog inputType fname = do
+  x <- lookupToplevelIdents fprog fname
+  genFunction inputType x
+
+lookupToplevelIdents :: Program -> IdentName -> GenM RExpr
+lookupToplevelIdents fprog name0 =  case lup stmts of
+  [] -> raiseErr $ failed $ "Identifier `" ++ name0 ++ "` not found."
+  [x] -> return x
+  _  -> raiseErr $ failed $ "Multiple declaration of identifier `" ++ name0 ++ "` found."
   where
     (Program decls (BindingF stmts)) = fprog
 
     lup :: [StatementF RExpr] -> [RExpr]
     lup [] = []
-    lup (SubstF (Ident nam) rhs : xs) | nam == fname = rhs : lup xs
+    lup (SubstF (Ident nam) rhs : xs) | nam == name0 = rhs : lup xs
     lup (_:xs) = lup xs
 
 genProgram :: Program -> IO OMProgram
 genProgram fprog = do
   let run g = runCompilerRight g defaultCodegenRead defaultCodegenState
-  (_, stInit, _) <- run $ do
+
+  (initType, stInit, _) <- run $ do
     setupGlobalEnvironment fprog
-    genFunctionNamed fprog (Tuple []) "init"
-  (_, stStep, _) <- run $ do
+    initFunDef <- lookupToplevelIdents fprog "init"
+    genFunction (Tuple []) initFunDef
+  (stateSignature0, stStep, _) <- run $ do
+    stepFunDef <- lookupToplevelIdents fprog "step"
     setupGlobalEnvironment fprog
-    genFunctionNamed fprog (Tuple []) "step"
+    stepType <- genFunction initType stepFunDef
+    when (initType /= stepType) $ do
+      raiseErr $ failed $ "the return type of step : " ++ show stepType ++ "\n" ++
+        "must match the return type of init : " ++ show initType
+
+    (Lambda l _) <- return stepFunDef
+    bs99 <- matchToLhs l stepType
+    return $ M.fromList bs99
+
   return OMProgram
     { _omGlobalEnvironment = stInit ^. globalEnvironment
     , _omInitGraph = stInit ^. theGraph
     , _omStepGraph = stStep ^. theGraph
-    , _omStateSignature = error "state signature unimplemented."
+    , _omStateSignature = stateSignature0
     }

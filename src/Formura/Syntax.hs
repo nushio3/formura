@@ -225,17 +225,17 @@ instance Field1 NPlusK NPlusK IdentName IdentName where
 instance Field2 NPlusK NPlusK Rational Rational where
   _2 = lens (\(NPlusK _ y) -> y) (\(NPlusK x _) y -> NPlusK x y)
 
-type TypeExprF = Sum '[ TopTypeF, GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
 type TypeExpr  = Fix TypeExprF
+type TypeExprF = Sum '[ TopTypeF, GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
 
-type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
 type LExpr  = Fix LExprF
+type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
 
-type TupleOfIdentsF = Sum '[ TupleF, IdentF ]
 type TupleOfIdents  = Fix TupleOfIdentsF
+type TupleOfIdentsF = Sum '[ TupleF, IdentF ]
 
-type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, ImmF ]
 type RExpr  = Fix RExprF
+type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, ImmF ]
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
@@ -260,3 +260,6 @@ semiLatticeOfTypeExpr a b = case go a b of
     go a@(ElemType _) b@(GridType v c) = let d = a/\c in if d==TopType then TopType else GridType v d
     go (GridType v1 c1) (GridType v2 c2) = if v1 == v2 then GridType v1 (c1 /\ c2) else TopType
     go _ _          = TopType
+
+class Typed a where
+  typeExprOf :: a -> TypeExpr

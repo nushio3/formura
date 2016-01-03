@@ -25,13 +25,10 @@ elementTypenameTable = flip zip [0..]
                        ,"real"
                        ,"Real"]
 
-
 elementTypenameEncode :: String -> Int
 elementTypenameEncode str = case lookup str elementTypenameTable of
   Just i -> i
   Nothing -> maxBound
-
-
 
 elementTypenameDecode :: Int -> String
 elementTypenameDecode i = case lookup i (map swap elementTypenameTable) of

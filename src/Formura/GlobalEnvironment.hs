@@ -10,6 +10,7 @@ data GlobalEnvironment = GlobalEnvironment {
   _dimension :: Int,
   _axesNames :: [IdentName]
   }
+                       deriving (Eq, Ord, Show)
 
 defaultGlobalEnvironment :: GlobalEnvironment
 defaultGlobalEnvironment = GlobalEnvironment 0 []
