@@ -356,24 +356,37 @@ instance (Generatable f, Generatable (Sum fs)) => Generatable (Sum (f ': fs)) wh
 genRhs :: RXExpr -> GenM ValueExpr
 genRhs r = compilerFoldout gen r
 
-genFunction :: RExpr -> GenM ()
-genFunction (Lambda l r) = do
-  v <- insert (Load "input_value") (GridType (Vec [0]) (ElemType "double"))
-  let (n :. _ ) = v
-  theGraph . ix n . A.annotation %= A.set Manifest
+toNodeType :: TypeExpr -> GenM NodeType
+toNodeType (ElemType x) = return $ ElemType x
+toNodeType (GridType v x) = do
+  x2 <- toNodeType x
+  return $ GridType v x2
+toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encountered in conversion to node type."
 
-  (n99 :. t99) <- genRhs $ Apply (FunValue l (subFix r)) (subFix v)
+genFunction :: TypeExpr -> RExpr -> GenM ()
+genFunction inputType (Lambda l r) = do
+  typedLhs <- matchToLhs l inputType
+  initBinds <- forM typedLhs $ \(name1, t1) -> do
+    t1d <- toNodeType t1
+    v1 <- insert (Load name1) t1d
+    let (n :. _ ) = v1
+    theGraph . ix n . A.annotation %= A.set Manifest
+    return (name1, v1)
+
+  (n99 :. t99) <- genRhs $ subFix r
 
   theGraph . ix n99 . A.annotation %= A.set Manifest
   return ()
-genFunction _ = raiseErr $ failed "Please specify a function for generation"
+genFunction _ _ = raiseErr $ failed "Please specify a function for generation"
 
-genFunctionNamed :: Program -> IdentName -> GenM ()
-genFunctionNamed (Program decls (BindingF stmts)) fname = case lup stmts of
+genFunctionNamed :: Program -> TypeExpr -> IdentName -> GenM ()
+genFunctionNamed fprog inputType fname = case lup stmts of
   [] -> raiseErr $ failed $ "Function `" ++ fname ++ "` not found."
-  [x] -> genFunction x
+  [x] -> genFunction inputType x
   _  -> raiseErr $ failed $ "Multiple declaration of function `" ++ fname ++ "` found."
   where
+    (Program decls (BindingF stmts)) = fprog
+
     lup :: [StatementF RExpr] -> [RExpr]
     lup [] = []
     lup (SubstF (Ident nam) rhs : xs) | nam == fname = rhs : lup xs
@@ -384,10 +397,10 @@ genProgram fprog = do
   let run g = runCompilerRight g defaultCodegenRead defaultCodegenState
   (_, stInit, _) <- run $ do
     setupGlobalEnvironment fprog
-    genFunctionNamed fprog "init"
+    genFunctionNamed fprog (Tuple []) "init"
   (_, stStep, _) <- run $ do
     setupGlobalEnvironment fprog
-    genFunctionNamed fprog "step"
+    genFunctionNamed fprog (Tuple []) "step"
   return OMProgram
     { _omGlobalEnvironment = stInit ^. globalEnvironment
     , _omInitGraph = stInit ^. theGraph

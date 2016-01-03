@@ -1,7 +1,7 @@
 dimension :: 1
 axes :: X
 
-begin function init (void) returns x
+begin function init () returns x
       float[] :: x
       x = 0
 end function
