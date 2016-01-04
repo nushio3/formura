@@ -3,11 +3,12 @@ module Main where
 
 import           Control.Lens
 import qualified Data.Aeson as J
-import qualified Data.ByteString.Lazy.Char8 as BS
+import qualified Data.ByteString.Char8 as BS
 import qualified Data.IntMap as G
 import           Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import qualified Data.Yaml as Y
 import           System.Environment
 import           System.IO
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
@@ -59,7 +60,7 @@ genStmt prog = do
                      C.defaultTranState{C._theGraph = omProg ^. omStepGraph}
   T.putStrLn (cxxCode :: T.Text)
   T.writeFile "output.cpp" cxxCode
-  BS.putStrLn $ J.encode $ C.defaultNumericalConfig
+  BS.putStrLn $ Y.encode $ C.defaultNumericalConfig
 
 
 
