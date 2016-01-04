@@ -6,10 +6,10 @@
 using namespace std;
 
 const int element_shape_x = 5;
-const int element_shape_y = 5;
+const int element_shape_y = 6;
 
 const int mpi_shape_x = 4;
-const int mpi_shape_y = 4;
+const int mpi_shape_y = 3;
 
 const int shape_x = element_shape_x * mpi_shape_x;
 const int shape_y = element_shape_y * mpi_shape_y;
@@ -111,7 +111,11 @@ vector<Facet> next_facets(const Region &r) {
   return ret;
 }
 
-
+int rank_assingment(const Region &r) {
+  int rx = r.x / element_shape_x;
+  int ry = r.y / element_shape_y;
+  return ry * mpi_shape_x + rx;
+}
 
 
 int main(){
@@ -148,5 +152,18 @@ int main(){
     }
   }
 
+  {
+    map<int, int> ctr;
+    for(int j=0;j<shape_y; ++j) {
+      for(int i=0;i<shape_x; ++i) {
+        Region r(0,i,j);
+        ctr[rank_assingment(r)]++;
+      }
+    }
+    for(map<int,int>::iterator it=ctr.begin(); it!=ctr.end();++it) {
+      cout << it->first << " " << it->second << endl;
+    }
+
+  }
   return 0;
 }
