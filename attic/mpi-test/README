@@ -1,0 +1,12 @@
+# produce configure.ac by so:
+
+autoscan; mv configure.scan configure.ac
+
+# run the following commands to produce ./configure ;
+
+aclocal
+autoconf
+autoheader
+automake
+
+# the rest is as usual.
