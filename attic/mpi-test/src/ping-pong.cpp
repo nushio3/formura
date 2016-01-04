@@ -1,11 +1,13 @@
-#include "mpi.h"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include "mpi.h"
+#include "pipe.h"
 #include <set>
 #include <string>
 #include <vector>
 #include <map>
+
 using namespace std;
 
 const int element_shape_x = 5;
