@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <string>
 #include <vector>
 #include <map>
 using namespace std;
@@ -87,7 +88,8 @@ Region next_region(const Facet &f) {
 
 
 vector<Facet> prev_facets(const Region &r) {
-  vector<Facet> ret(1, Facet(TP, r.t-1, r.x, r.y));
+  vector<Facet> ret;
+  if (r.t < shape_t) ret.push_back(Facet(TP, r.t - 1, r.x, r.y));
   if (r.t%2 != r.x%2) {
     ret.push_back( Facet(XP, r.t, r.x-1, r.y) );
     ret.push_back( Facet(XM, r.t, r.x+1, r.y) );
@@ -99,7 +101,8 @@ vector<Facet> prev_facets(const Region &r) {
   return ret;
 }
 vector<Facet> next_facets(const Region &r) {
-  vector<Facet> ret(1, Facet(TP, r.t, r.x, r.y));
+  vector<Facet> ret;
+  if (r.t < shape_t -1) ret.push_back(Facet(TP, r.t, r.x, r.y));
   if (r.t%2 == r.x%2) {
     ret.push_back( Facet(XP, r.t, r.x, r.y) );
     ret.push_back( Facet(XM, r.t, r.x, r.y) );
@@ -118,7 +121,7 @@ int rank_assingment(const Region &r) {
 }
 
 
-int main(){
+int test(){
   cout << "ping" << endl;
   cout << "pong" << endl;
 
@@ -166,4 +169,8 @@ int main(){
 
   }
   return 0;
+}
+
+int main(){
+  test();
 }
