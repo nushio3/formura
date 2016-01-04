@@ -1,6 +1,8 @@
+#include "mpi.h"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
 #include <map>
@@ -15,6 +17,9 @@ const int mpi_shape_y = 3;
 const int shape_x = element_shape_x * mpi_shape_x;
 const int shape_y = element_shape_y * mpi_shape_y;
 const int shape_t = 30;
+
+int mpi_rank;
+int mpi_size;
 
 int wrap_x(const int x) {
   return (x+shape_x)%shape_x;
@@ -62,7 +67,21 @@ struct Facet{
   Direction d;
   int t,x,y;
   Facet(Direction d,int t,int x,int y) : d(d), t(t), x(wrap_x(x)), y(wrap_y(y)) {}
+  bool operator<(const Facet &other) const {
+    return d<other.d || (d==other.d && (t<other.t || (t==other.t && (x<other.x || (x==other.x && y<other.y)))));
+  }
+
 };
+ostream& operator<<(ostream& ostr, const Facet& f) {
+  ostr << "("
+       << f.d << ","
+       << f.t << ","
+       << f.x << ","
+       << f.y << ")";
+  return ostr;
+}
+
+
 
 Region random_region() {
   return Region(irand(shape_t), irand(shape_x), irand(shape_y));
@@ -120,6 +139,38 @@ int rank_assingment(const Region &r) {
   return ry * mpi_shape_x + rx;
 }
 
+vector<Facet> initial_facets() {
+  vector<Facet> ret;
+
+  int rx = mpi_rank % mpi_shape_x;
+  int ry = mpi_rank % mpi_shape_y;
+  for (int j = 0; j < element_shape_y; ++j) {
+    for (int i = 0; i < element_shape_x; ++i) {
+      ret.push_back(Facet(TP,-1,rx*element_shape_x+i, ry*element_shape_y+j));
+    }
+  }
+  return ret;
+}
+
+set<Facet> facet_pool;
+
+void add_facet_event(const Facet &f) {
+  facet_pool.insert(f);
+  cout << "recv facet: " << f << endl;
+  Region r = next_region(f);
+  vector<Facet> fs = prev_facets(r);
+  bool all_found = true;
+  for (int i=0;i<fs.size();++i) {
+    set<Facet>::iterator fit = facet_pool.find(fs[i]);
+    if(fit == facet_pool.end()){
+      all_found = false;
+      break;
+    }
+  }
+  if (all_found) {
+    cout << "invoke region: " << r << endl;
+  }
+}
 
 int test(){
   cout << "ping" << endl;
@@ -171,6 +222,16 @@ int test(){
   return 0;
 }
 
-int main(){
-  test();
+int main(int argc, char **argv){
+  MPI_Init(&argc, &argv);
+  MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
+
+  vector<Facet> ifs = initial_facets();
+  for (int i=0;i<ifs.size(); ++i) {
+    add_facet_event(ifs[i]);
+  }
+
+  MPI_Finalize();
+
 }
