@@ -2,7 +2,8 @@
 module Main where
 
 import           Control.Lens
-import           Control.Monad
+import qualified Data.Aeson as J
+import qualified Data.ByteString.Lazy.Char8 as BS
 import qualified Data.IntMap as G
 import           Data.Monoid
 import qualified Data.Text as T
@@ -53,11 +54,12 @@ genStmt prog = do
   mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
   putStrLn ""
 
-  (ret, s, cxxCode) <- runCompilerRight C.translate (omProg ^. omGlobalEnvironment)
-                       C.defaultTranState{C._theGraph = omProg ^. omStepGraph}
-  T.putStrLn cxxCode
+  (_, _, cxxCode) <- runCompilerRight (C.translate C.defaultNumericalConfig)
+                     (omProg ^. omGlobalEnvironment)
+                     C.defaultTranState{C._theGraph = omProg ^. omStepGraph}
+  T.putStrLn (cxxCode :: T.Text)
   T.writeFile "output.cpp" cxxCode
-
+  BS.putStrLn $ J.encode $ C.defaultNumericalConfig
 
 
 
@@ -67,6 +69,6 @@ pprNode (i,n) = do
         Just Manifest -> "M"
         _             -> " "
       varName = case A.toMaybe (n ^. A.annotation) of
-        Just (SourceName n) -> n
+        Just (SourceName n1) -> n1
         _                   -> ""
   putStrLn $ unwords [r , take 4 $ varName ++ repeat ' ', show (i,n)]

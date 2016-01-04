@@ -43,7 +43,9 @@ library
   -- other-extensions:
   build-depends:
                 base == 4.*
+              , aeson
               , ansi-wl-pprint
+              , bytestring
               , containers
               , either
               , lattices
@@ -92,7 +94,9 @@ executable formura-gen
   ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
                 base == 4.*
+              , aeson
               , ansi-wl-pprint
+              , bytestring
               , containers
               , lens
               , formura

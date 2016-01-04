@@ -6,6 +6,8 @@ import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.RWS
+import qualified Data.Aeson.TH as J
+import           Data.Char (toLower)
 import           Data.Foldable (toList)
 import qualified Data.IntMap as G
 import           Data.Monoid
@@ -46,13 +48,32 @@ instance HasCompilerSyntacticState TranState where
 defaultTranState :: TranState
 defaultTranState = TranState
   { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
-  , _extent = Vec [128]
-  , _indexVariables = Vec ["i"]
+  , _extent = Vec []
+  , _indexVariables = Vec []
   , _theGraph = G.empty
   }
 
 
 type TranM = CompilerMonad GlobalEnvironment T.Text TranState
+
+-- * Parallel code generation
+
+-- |  Configuration for distributed parallel code generation.
+data NumericalConfig = NumericalConfig
+  { _ncSingleThreadShape :: Vec Int
+  , _ncOMPThreadShape :: Vec Int
+  , _ncMPINodeShape :: Vec Int
+  }
+J.deriveJSON J.defaultOptions{J.fieldLabelModifier = drop 3, J.constructorTagModifier = map toLower} ''NumericalConfig
+
+defaultNumericalConfig :: NumericalConfig
+defaultNumericalConfig =
+  NumericalConfig
+  { _ncSingleThreadShape = Vec [64,64]
+  , _ncOMPThreadShape = Vec [2,4]
+  , _ncMPINodeShape = Vec [5,10]
+  }
+
 
 lookupNode :: NodeID -> TranM Node
 lookupNode i = do
@@ -123,9 +144,13 @@ nameManifestVariables = do
                       _    -> "a_" <> showt i
       in n & A.annotation %~ A.set (VariableName newName)
 
-translate :: TranM ()
-translate = censor makeCxxBody $ do
+populateIndexVariables :: TranM ()
+populateIndexVariables = liftIO $ putStrLn "populate index variables!"
+
+translate :: NumericalConfig -> TranM ()
+translate nconf = censor makeCxxBody $ do
   dim <- view dimension
+  populateIndexVariables
   nameManifestVariables
   g <- use theGraph
   let ms = manifestNodes g

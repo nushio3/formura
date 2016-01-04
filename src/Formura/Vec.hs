@@ -11,13 +11,19 @@ ZipList treated as mathematical vectors, to deal with multidimensionality in ste
 
 module Formura.Vec where
 
-import Control.Applicative
-import Control.Lens
-import Data.Monoid
+import           Control.Applicative
+import           Control.Lens
+import qualified Data.Aeson as J
+import           Data.Char (toLower)
+import           Data.Monoid
 
 data Vec a = Vec { getVec :: [a] } | PureVec a
            deriving (Functor, Foldable, Traversable)
+instance J.ToJSON a => J.ToJSON (Vec a) where
+  toJSON (Vec xs) = J.toJSON xs
 
+instance J.FromJSON a => J.FromJSON (Vec a) where
+  parseJSON j = Vec <$> J.parseJSON j
 
 type instance Index (Vec a) = Int
 type instance IxValue (Vec a) = a
@@ -45,7 +51,7 @@ instance Applicative Vec where
     pure x = PureVec x
     PureVec f <*> PureVec x = PureVec $ f x
     PureVec f <*> Vec xs    = Vec $ fmap f xs
-    Vec fs <*> PureVec x    = Vec $ fmap ($x) fs
+    Vec fs <*> PureVec x    = Vec $ fmap ($ x) fs
     Vec fs <*> Vec xs = Vec (zipWith id fs xs)
 
 instance Num a => Num (Vec a) where
