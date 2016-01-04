@@ -1,0 +1,1 @@
+./configure --host=sparc64 CXX=mpiFCCpx CC=mpifccpx
