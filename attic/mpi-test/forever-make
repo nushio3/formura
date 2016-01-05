@@ -2,6 +2,15 @@
 
 while :
 do
-    make
-    inotifywait -e modify --exclude '~$' -r ./src/
+    make 2>&1 | perl -wln -M'Term::ANSIColor' -e '
+m/error/i and print "\e[1;91m", "$_", "\e[0m"
+or
+m/warning/i and print "\e[1;93m", "$_", "\e[0m"
+or
+m/linking|\.a\b/ and print "\e[1;36m", "$_", "\e[0m"
+or
+print; '
+    inotifywait -e modify --exclude '~$' -r ./src/  2>&1 | perl -wln -M'Term::ANSIColor' -e '
+print "\e[1;32m", "$_", "\e[0m"
+'
 done
