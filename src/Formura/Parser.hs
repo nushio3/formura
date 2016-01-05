@@ -28,6 +28,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import Text.Parser.LookAhead
 
 import Formura.Language.Combinator
+import Formura.Type (elementTypenames)
 import Formura.Vec
 import Formura.Syntax
 
@@ -133,10 +134,8 @@ ident = "identifier" ?> parseIn $ Ident <$> identName
 elemType :: (ElemTypeF ∈ fs) => P (Lang fs)
 elemType = "element type" ?> parseIn $ do
   str <- identName
-  guard $ str `S.member` elemTypeNames
+  guard $ str `S.member` elementTypenames
   return $ ElemType str
-    where
-      elemTypeNames = S.fromList ["int","rational","float","double","real"]
 
 funType :: (FunTypeF ∈ fs) => P (Lang fs)
 funType = "function type" ?> parseIn $ keyword "function" *> pure FunType
@@ -184,7 +183,7 @@ exprOf termParser = X.buildExpressionParser tbl termParser
            [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
            [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft],
-           [binary sym (Binop sym) X.AssocNone | sym <- words "< <= == != > >="]
+           [binary sym (Binop sym) X.AssocNone | sym <- S.toList comparisonOperatorNames]
           ]
     unary  name fun = X.Prefix (pUni name fun)
     binary name fun assoc = X.Infix (pBin name fun) assoc

@@ -57,7 +57,9 @@ instance MeetSemiLattice NodeType where
 
 semiLatticeOfNodeType :: NodeType -> NodeType -> NodeType
 semiLatticeOfNodeType a b = case go a b of
-  TopType -> go b a
+  TopType -> case go b a of
+    TopType -> TopType
+    c -> c
   c       -> c
   where
     go :: NodeType -> NodeType -> NodeType
@@ -68,6 +70,10 @@ semiLatticeOfNodeType a b = case go a b of
     go (GridType v1 c1) (GridType v2 c2) = (if v1 == v2 then GridType v1 (c1 /\ c2) else TopType)
     go _ _          = TopType
 
+mapElemType :: (IdentName -> IdentName) -> NodeType -> NodeType
+mapElemType f (ElemType t) = ElemType $ f t
+mapElemType f (GridType v t) = GridType v $ mapElemType f t
+mapElemType _ TopType = TopType
 
 type NodeID  = G.Key
 data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}

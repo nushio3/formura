@@ -2,6 +2,7 @@
 module Formura.Type where
 
 import Algebra.Lattice
+import qualified Data.Set as S
 import Data.Tuple(swap)
 
 import Formura.Language.Combinator
@@ -19,7 +20,10 @@ instance MeetSemiLattice ElementalType where
      str   -> ElemType str
   _ /\ _ = TopType
 
-elementTypenameTable :: [(String,Int)]
+elementTypenames :: S.Set IdentName
+elementTypenames = S.fromList $ map fst elementTypenameTable
+
+elementTypenameTable :: [(IdentName,Int)]
 elementTypenameTable = flip zip [0..]
                        ["void"
                        ,"bool"

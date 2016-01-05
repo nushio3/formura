@@ -151,9 +151,12 @@ goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
   TopType -> raiseErr $ failed $ unwords
              ["there is no common type that can accomodate both hand side:", show at, op , show bt]
   ct -> do
+    let typeModifier
+          | op `S.member` comparisonOperatorNames = mapElemType (const "bool")
+          | otherwise = id
     (av2 :. _) <- castVal (subFix ct) ax
     (bv2 :. _) <- castVal (subFix ct) bx
-    insert (Binop op av2 bv2) ct
+    insert (Binop op av2 bv2) (typeModifier ct)
 
 goBinop _ _ _  = raiseErr $ failed $ "unimplemented path in binary operator"
 
@@ -243,9 +246,6 @@ resolveLexAlg fx = mTransAlg fx
 
 instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
-
--- namesOfLhs :: LExpr -> IdentName
--- namesOfLhs = error "namesOfLhs is deprecated; use namesOfLhs"
 
 namesOfLhs :: LExpr -> TupleOfIdents
 namesOfLhs (Ident n) = Ident n
