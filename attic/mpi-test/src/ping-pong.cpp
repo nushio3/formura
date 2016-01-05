@@ -306,15 +306,49 @@ int test(){
   return 0;
 }
 
+void init_pipes() {
+  {
+    pipe_t* p = pipe_new(sizeof(Facet), 0);
+    inbound_facet_producer = pipe_producer_new(p);
+    inbound_facet_consumer = pipe_consumer_new(p);
+    pipe_free(p);
+  }
+  {
+    pipe_t* p = pipe_new(sizeof(Facet), 0);
+    outbound_facet_producer = pipe_producer_new(p);
+    outbound_facet_consumer = pipe_consumer_new(p);
+    pipe_free(p);
+  }
+  {
+    pipe_t* p = pipe_new(sizeof(Task), 0);
+    task_producer = pipe_producer_new(p);
+    task_consumer = pipe_consumer_new(p);
+    pipe_free(p);
+  }
+}
+
+void free_pipes() {
+  pipe_producer_free(inbound_facet_producer);
+  pipe_consumer_free(inbound_facet_consumer);
+  pipe_producer_free(outbound_facet_producer);
+  pipe_consumer_free(outbound_facet_consumer);
+  pipe_producer_free(task_producer);
+  pipe_consumer_free(task_consumer);
+}
+
 int main(int argc, char **argv){
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
+  init_pipes();
+
   vector<Facet> ifs = initial_facets();
   for (int i=0;i<ifs.size(); ++i) {
     add_facet_event(ifs[i]);
   }
+
+  free_pipes();
 
   MPI_Finalize();
 }
