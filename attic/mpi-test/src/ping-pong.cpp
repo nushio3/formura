@@ -212,12 +212,12 @@ void actually_compute_the_task (const Task &task) {
   sleep(1);
 }
 
-void thread_process_task() {
+void* thread_process_task(void* arg) {
 
   Task task;
   for(;;) {
     size_t n = pipe_pop(task_consumer, &task, 1);
-    if (n <= 0) return;
+    if (n <= 0) return NULL;
     actually_compute_the_task(task);
 
     vector<Facet> next_fs = next_facets(task.region);
@@ -230,7 +230,7 @@ void thread_process_task() {
   }
 }
 
-void thread_recv() {
+void* thread_recv(void* arg) {
   Facet f;
   MPI_Status status;
   for(;;) {
@@ -238,20 +238,20 @@ void thread_recv() {
     pipe_push(inbound_facet_producer, &f, 1);
   }
 }
-void thread_send() {
+void* thread_send(void* arg) {
   Facet f;
   for(;;) {
     size_t n = pipe_pop(outbound_facet_consumer, &f, 1);
-    if(n<=0) return;
+    if(n<=0) return NULL;
     int dest=rank_assingment(next_region(f));
     MPI_Send((void*)(&f), sizeof(Facet), MPI_CHAR, dest, 0, MPI_COMM_WORLD);
   }
 }
-void thread_create_task() {
+void* thread_create_task(void* arg) {
   Facet f;
   for(;;) {
     size_t n = pipe_pop(inbound_facet_consumer, &f, 1);
-    if(n<=0) return;
+    if(n<=0) return NULL;
     add_facet_event(f);
   }
 }
@@ -342,6 +342,12 @@ int main(int argc, char **argv){
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
 
   init_pipes();
+
+  pthread_t tid_recv; pthread_create(&tid_recv, NULL, thread_recv, NULL);
+  pthread_t tid_send; pthread_create(&tid_send, NULL, thread_send, NULL);
+  pthread_t tid_task; pthread_create(&tid_task, NULL, thread_create_task, NULL);
+  thread_process_task(NULL);
+
 
   vector<Facet> ifs = initial_facets();
   for (int i=0;i<ifs.size(); ++i) {
