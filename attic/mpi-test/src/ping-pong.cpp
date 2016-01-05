@@ -209,7 +209,7 @@ void send_facet(const Facet &f) {
 
 void actually_compute_the_task (const Task &task) {
   cerr << "rank " << mpi_rank << " computes region: " << task.region << endl;
-  usleep(100);
+  usleep(1000000);
 }
 
 void* thread_process_task(void* arg) {
@@ -234,7 +234,7 @@ void* thread_recv(void* arg) {
   Facet f;
   MPI_Status status;
   for(;;) {
-    MPI_Recv(&f, sizeof(Facet), MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    MPI_Recv(&f, sizeof(Facet), MPI_BYTE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
     pipe_push(inbound_facet_producer, &f, 1);
   }
 }
@@ -244,7 +244,7 @@ void* thread_send(void* arg) {
     size_t n = pipe_pop(outbound_facet_consumer, &f, 1);
     if(n<=0) return NULL;
     int dest=rank_assingment(next_region(f));
-    MPI_Send((void*)(&f), sizeof(Facet), MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+    MPI_Send((void*)(&f), sizeof(Facet), MPI_BYTE, dest, 0, MPI_COMM_WORLD);
   }
 }
 void* thread_create_task(void* arg) {
