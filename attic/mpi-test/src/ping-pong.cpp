@@ -208,8 +208,8 @@ void send_facet(const Facet &f) {
 }
 
 void actually_compute_the_task (const Task &task) {
-  cout << "rank " << mpi_rank << " computes region: " << task.region << endl;
-  sleep(1);
+  cerr << "rank " << mpi_rank << " computes region: " << task.region << endl;
+  usleep(100);
 }
 
 void* thread_process_task(void* arg) {
@@ -346,13 +346,14 @@ int main(int argc, char **argv){
   pthread_t tid_recv; pthread_create(&tid_recv, NULL, thread_recv, NULL);
   pthread_t tid_send; pthread_create(&tid_send, NULL, thread_send, NULL);
   pthread_t tid_task; pthread_create(&tid_task, NULL, thread_create_task, NULL);
-  thread_process_task(NULL);
-
-
   vector<Facet> ifs = initial_facets();
   for (int i=0;i<ifs.size(); ++i) {
     add_facet_event(ifs[i]);
   }
+
+  thread_process_task(NULL);
+
+
 
   free_pipes();
 
