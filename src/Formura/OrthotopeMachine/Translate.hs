@@ -160,9 +160,21 @@ goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
 
 goBinop _ _ _  = raiseErr $ failed $ "unimplemented path in binary operator"
 
+isBoolishType :: NodeType -> Bool
+isBoolishType (ElemType "bool") = True
+isBoolishType (GridType _ x) = isBoolishType x
+isBoolishType _ = False
+
 goTriop :: IdentName -> ValueExpr -> ValueExpr -> ValueExpr -> GenM ValueExpr
 goTriop op (av :. at) (bv :. bt) (cv :. ct)
-  | op == "ite" && at == ElemType "bool" && bt == ct = insert (Triop op av bv cv) bt
+  | op == "ite" = do
+      when (not $ isBoolishType at) $
+        raiseErr $ failed "the first argument of if-expr must be of type bool"
+      let bct =  bt /\ ct
+      case at /\ bct of
+        TopType -> raiseErr $ failed $ unwords $
+                   ["Type mismatch in if-then-else expr:", show at, show bt, show ct]
+        _ -> insert (Triop op av bv cv) bct
 goTriop _ _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator"
 
 instance Generatable IdentF where

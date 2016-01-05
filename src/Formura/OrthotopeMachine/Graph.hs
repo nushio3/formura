@@ -49,8 +49,9 @@ pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
 type OMInstF = Sum '[DataflowInstF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
 
-type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
 type NodeType  = Fix NodeTypeF
+type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
+
 
 instance MeetSemiLattice NodeType where
   (/\) = semiLatticeOfNodeType
