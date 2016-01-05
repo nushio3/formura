@@ -358,7 +358,7 @@ int main(int argc, char **argv){
   const int required = 2; //MPI_THREAD_MULTIPLE
   int provided;
   MPI_Init_thread(&argc, &argv, required, &provided);
-  if (provided < MPI_THREAD_MULTIPLE) {
+  if (provided < required) {
     cerr << "Uwa, hikusugi? :" << provided <<endl;
     MPI_Abort(MPI_COMM_WORLD, 42);
   }
