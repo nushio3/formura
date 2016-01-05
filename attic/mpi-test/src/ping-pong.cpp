@@ -12,15 +12,25 @@
 
 using namespace std;
 
+
 const int element_shape_x = 5;
 const int element_shape_y = 6;
 
 const int mpi_shape_x = 4;
 const int mpi_shape_y = 3;
 
+
+
+//// const int element_shape_x = 20;
+//// const int element_shape_y = 18;
+////
+//// const int mpi_shape_x = 1;
+//// const int mpi_shape_y = 1;
+
+
 const int shape_x = element_shape_x * mpi_shape_x;
 const int shape_y = element_shape_y * mpi_shape_y;
-const int shape_t = 30;
+const int shape_t = 300;
 
 int mpi_rank;
 int mpi_size;
@@ -48,7 +58,7 @@ struct Region{
   Region() {}
   Region(int t,int x,int y) : t(t), x(wrap_x(x)), y(wrap_y(y)) {}
 
-  bool operator==(const Region &other) {
+  bool operator==(const Region &other) const {
     return other.t==t && other.x==x && other.y==y;
   }
   bool operator!=(const Region &other) {
@@ -125,14 +135,21 @@ Region next_region(const Facet &f) {
 vector<Facet> prev_facets(const Region &r) {
   vector<Facet> ret;
   if (r.t < shape_t) ret.push_back(Facet(TP, r.t - 1, r.x, r.y));
-  if (r.t%2 != r.x%2) {
+  if (r.t&1 != r.x%2) {
     ret.push_back( Facet(XP, r.t, r.x-1, r.y) );
     ret.push_back( Facet(XM, r.t, r.x+1, r.y) );
   }
-  if (r.t%2 != r.y%2) {
+  if (r.t&1 != r.y%2) {
     ret.push_back( Facet(YP, r.t, r.x, r.y-1) );
     ret.push_back( Facet(YM, r.t, r.x, r.y+1) );
-  }
+  }/*
+  if (r == Region(0,6,15)) {
+    for (const auto &v : ret) {
+      cout << v << endl;
+    }
+    exit(0);
+    }*/
+
   return ret;
 }
 vector<Facet> next_facets(const Region &r) {
@@ -187,6 +204,7 @@ void add_facet_event(const Facet &f) {
   for (int i=0;i<fs.size();++i) {
     set<Facet>::iterator fit = facet_pool.find(fs[i]);
     if(fit == facet_pool.end()){
+      cerr << "for region : " << r << " missing facet:  " << (fs[i]) << endl;
       all_found = false;
       break;
     } else {
@@ -337,6 +355,7 @@ void free_pipes() {
 }
 
 int main(int argc, char **argv){
+
   int provided;
   MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   if (provided < MPI_THREAD_MULTIPLE) {
@@ -353,6 +372,7 @@ int main(int argc, char **argv){
   pthread_t tid_recv; pthread_create(&tid_recv, NULL, thread_recv, NULL);
   pthread_t tid_send; pthread_create(&tid_send, NULL, thread_send, NULL);
   pthread_t tid_task; pthread_create(&tid_task, NULL, thread_create_task, NULL);
+
   vector<Facet> ifs = initial_facets();
   for (int i=0;i<ifs.size(); ++i) {
     add_facet_event(ifs[i]);

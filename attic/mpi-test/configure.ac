@@ -13,7 +13,7 @@ if test "$CC_PATH" = NO_PATH; then
    CC="mpicc"
    CXX="mpicxx"
    CFLAGS="-std=c99"
-   CXXFLAGS="-g"
+   CXXFLAGS="-g -std=c++11"
 fi
 
 # Checks for programs.
