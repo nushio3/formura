@@ -69,8 +69,11 @@ keyword k = "keyword " ++ k ?> do
 -- | The set of keywords. The string is not parsed as a identifier if it's in the keyword list.
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
-             ["begin", "end", "function", "returns", "let", "in", "lambda", "for", "dimension", "axes",
-              "+","-","*","/",".","::","=", ","]
+             ["begin", "end", "function", "returns", "let", "in", "lambda",
+              "for", "dimension", "axes",
+              "if", "then", "else",
+              "+","-","*","/",".","::","=", ",",
+              "<", "<=", "==", "!=", ">=", ">"]
 
 
 comment :: P ()
@@ -180,7 +183,8 @@ exprOf termParser = X.buildExpressionParser tbl termParser
            [binary "**" (Binop "**") X.AssocLeft],
            [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
-           [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft]
+           [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft],
+           [binary sym (Binop sym) X.AssocNone | sym <- words "< <= == != > >="]
           ]
     unary  name fun = X.Prefix (pUni name fun)
     binary name fun assoc = X.Infix (pBin name fun) assoc
@@ -227,7 +231,7 @@ fexpr = "function application chain" ?> do
 
 
 aexpr :: P RExpr
-aexpr = tupleOf rExpr <|> letExpr <|> lambdaExpr <|> ident <|> imm
+aexpr = tupleOf rExpr <|> letExpr <|> lambdaExpr <|> ifThenElseExpr <|> ident <|> imm
 
 
 letExpr :: P RExpr
@@ -244,6 +248,17 @@ lambdaExpr = "lambda expression" ?> parseIn $ do
   x <- tupleOf lExpr
   y <- rExpr
   return $ Lambda x y
+
+ifThenElseExpr :: P RExpr
+ifThenElseExpr = "if-then-else expression" ?> parseIn $ do
+  "keyword if" ?> try $ keyword "if"
+  cond <- rExpr
+  keyword "then"
+  x <- rExpr
+  keyword "else"
+  y <- rExpr
+  return $ Triop "ite" cond x y
+
 
 binding :: P (BindingF RExpr)
 binding = "statements" ?> do
