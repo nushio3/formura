@@ -3,8 +3,10 @@
 #include <iostream>
 #include "mpi.h"
 #include "pipe.h"
+#include <pthread.h>
 #include <set>
 #include <string>
+#include "unistd.h"
 #include <vector>
 #include <map>
 
@@ -43,6 +45,7 @@ enum Direction{
 
 struct Region{
   int t,x,y;
+  Region() {}
   Region(int t,int x,int y) : t(t), x(wrap_x(x)), y(wrap_y(y)) {}
 
   bool operator==(const Region &other) {
@@ -51,7 +54,7 @@ struct Region{
   bool operator!=(const Region &other) {
     return !(*this == other);
   }
-  bool operator<(const Region &other) {
+  bool operator<(const Region &other) const {
     return t<other.t || (t==other.t && (x<other.x || (x==other.x && y<other.y)));
   }
 };
@@ -68,6 +71,7 @@ ostream& operator<<(ostream& ostr, const Region& r) {
 struct Facet{
   Direction d;
   int t,x,y;
+  Facet() {}
   Facet(Direction d,int t,int x,int y) : d(d), t(t), x(wrap_x(x)), y(wrap_y(y)) {}
   bool operator<(const Facet &other) const {
     return d<other.d || (d==other.d && (t<other.t || (t==other.t && (x<other.x || (x==other.x && y<other.y)))));
@@ -83,6 +87,15 @@ ostream& operator<<(ostream& ostr, const Facet& f) {
   return ostr;
 }
 
+struct Task {
+  Region region;
+  vector<Facet> facets;
+  Task(const Region& r) : region(r), facets() {}
+  Task(const Region& r, const vector<Facet> fs) : region(r), facets(fs) {}
+  bool operator<(const Task &other) const {
+    return region < other.region;
+  }
+};
 
 
 Region random_region() {
@@ -155,22 +168,70 @@ vector<Facet> initial_facets() {
 }
 
 set<Facet> facet_pool;
+set<Task> task_pool;
+
+pipe_producer_t* inbound_facet_producer;
+pipe_consumer_t* inbound_facet_consumer;
+pipe_producer_t* outbound_facet_producer;
+pipe_consumer_t* outbound_facet_consumer;
+pipe_producer_t* task_producer;
+pipe_consumer_t* task_consumer;
 
 void add_facet_event(const Facet &f) {
   facet_pool.insert(f);
-  cout << "recv facet: " << f << endl;
   Region r = next_region(f);
   vector<Facet> fs = prev_facets(r);
   bool all_found = true;
+  Task task(r);
   for (int i=0;i<fs.size();++i) {
     set<Facet>::iterator fit = facet_pool.find(fs[i]);
     if(fit == facet_pool.end()){
       all_found = false;
       break;
+    } else {
+      task.facets.push_back(*fit);
     }
   }
   if (all_found) {
-    cout << "invoke region: " << r << endl;
+    task_pool.insert(task);
+  }
+}
+
+void send_facet(const Facet &f) {
+  int dest = rank_assingment(next_region(f));
+  if (dest == mpi_rank) {
+    pipe_push(inbound_facet_producer, &f, 1);
+  } else {
+    pipe_push(outbound_facet_producer, &f, 1);
+  }
+}
+
+void process_task(const Task &task) {
+  sleep(1);
+  vector<Facet> next_fs = next_facets(task.region);
+  for (int i=0;i<next_fs.size();++i) {
+    send_facet(next_fs[i]);
+  }
+  for (int i=0;i<task.facets.size();++i) {
+    facet_pool.erase(task.facets[i]);
+  }
+}
+
+void thread_recv_main() {
+  Facet f;
+  MPI_Status status;
+  for(;;) {
+    MPI_Recv(&f, sizeof(Facet), MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+    pipe_push(inbound_facet_producer, &f, 1);
+  }
+}
+void thread_send_main() {
+  Facet f;
+  for(;;) {
+    size_t n = pipe_pop(outbound_facet_consumer, &f, 1);
+    if(n<=0) return;
+    int dest=rank_assingment(next_region(f));
+    MPI_Send((void*)(&f), sizeof(Facet), MPI_CHAR, dest, 0, MPI_COMM_WORLD);
   }
 }
 
