@@ -227,7 +227,7 @@ void send_facet(const Facet &f) {
 
 void actually_compute_the_task (const Task &task) {
   cerr << "rank " << mpi_rank << " computes region: " << task.region << endl;
-  usleep(10000);
+  usleep(1000000);
 }
 
 void* thread_process_task(void* arg) {
