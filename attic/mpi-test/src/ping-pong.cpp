@@ -209,7 +209,7 @@ void send_facet(const Facet &f) {
 
 void actually_compute_the_task (const Task &task) {
   cerr << "rank " << mpi_rank << " computes region: " << task.region << endl;
-  usleep(1000000);
+  usleep(10000);
 }
 
 void* thread_process_task(void* arg) {
@@ -343,6 +343,7 @@ int main(int argc, char **argv){
     cerr << "Uwa, hikusugi? :" << provided <<endl;
     MPI_Abort(MPI_COMM_WORLD, 1);
   }
+  //MPI_Init(&argc, &argv);
 
   MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
