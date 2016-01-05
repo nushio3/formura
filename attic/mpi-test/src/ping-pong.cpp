@@ -355,13 +355,14 @@ void free_pipes() {
 }
 
 int main(int argc, char **argv){
-
+  const int required = 2; //MPI_THREAD_MULTIPLE
   int provided;
-  MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  MPI_Init_thread(&argc, &argv, required, &provided);
   if (provided < MPI_THREAD_MULTIPLE) {
     cerr << "Uwa, hikusugi? :" << provided <<endl;
-    MPI_Init_thread(&argc, &argv, provided, &provided);
+    MPI_Abort(MPI_COMM_WORLD, 42);
   }
+
 
   MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
