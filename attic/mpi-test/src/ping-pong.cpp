@@ -90,6 +90,7 @@ ostream& operator<<(ostream& ostr, const Facet& f) {
 struct Task {
   Region region;
   vector<Facet> facets;
+  Task() {}
   Task(const Region& r) : region(r), facets() {}
   Task(const Region& r, const vector<Facet> fs) : region(r), facets(fs) {}
   bool operator<(const Task &other) const {
@@ -193,7 +194,7 @@ void add_facet_event(const Facet &f) {
     }
   }
   if (all_found) {
-    task_pool.insert(task);
+    pipe_push(task_producer, &task, 1);
   }
 }
 
@@ -206,14 +207,26 @@ void send_facet(const Facet &f) {
   }
 }
 
-void process_task(const Task &task) {
+void actually_compute_the_task (const Task &task) {
+  cout << "rank " << mpi_rank << " computes region: " << task.region << endl;
   sleep(1);
-  vector<Facet> next_fs = next_facets(task.region);
-  for (int i=0;i<next_fs.size();++i) {
-    send_facet(next_fs[i]);
-  }
-  for (int i=0;i<task.facets.size();++i) {
-    facet_pool.erase(task.facets[i]);
+}
+
+void thread_process_task() {
+
+  Task task;
+  for(;;) {
+    size_t n = pipe_pop(task_consumer, &task, 1);
+    if (n <= 0) return;
+    actually_compute_the_task(task);
+
+    vector<Facet> next_fs = next_facets(task.region);
+    for (int i=0;i<next_fs.size();++i) {
+      send_facet(next_fs[i]);
+    }
+    for (int i=0;i<task.facets.size();++i) {
+      facet_pool.erase(task.facets[i]);
+    }
   }
 }
 
@@ -304,5 +317,4 @@ int main(int argc, char **argv){
   }
 
   MPI_Finalize();
-
 }
