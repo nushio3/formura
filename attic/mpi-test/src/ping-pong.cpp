@@ -217,7 +217,7 @@ void process_task(const Task &task) {
   }
 }
 
-void thread_recv_main() {
+void thread_recv() {
   Facet f;
   MPI_Status status;
   for(;;) {
@@ -225,13 +225,21 @@ void thread_recv_main() {
     pipe_push(inbound_facet_producer, &f, 1);
   }
 }
-void thread_send_main() {
+void thread_send() {
   Facet f;
   for(;;) {
     size_t n = pipe_pop(outbound_facet_consumer, &f, 1);
     if(n<=0) return;
     int dest=rank_assingment(next_region(f));
     MPI_Send((void*)(&f), sizeof(Facet), MPI_CHAR, dest, 0, MPI_COMM_WORLD);
+  }
+}
+void thread_create_task() {
+  Facet f;
+  for(;;) {
+    size_t n = pipe_pop(inbound_facet_consumer, &f, 1);
+    if(n<=0) return;
+    add_facet_event(f);
   }
 }
 

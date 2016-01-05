@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 while :
 do
@@ -10,7 +10,13 @@ or
 m/linking|\.a\b/ and print "\e[1;36m", "$_", "\e[0m"
 or
 print; '
-    inotifywait -e modify --exclude '~$' -r ./src/  2>&1 | perl -wln -M'Term::ANSIColor' -e '
-print "\e[1;32m", "$_", "\e[0m"
+    if test ${PIPESTATUS[0]} -eq 0; then
+        inotifywait -e modify --exclude '~$' -r ./src/  2>&1 | perl -wln -M'Term::ANSIColor' -e '
+print "\e[0;32m", "$_", "\e[0m"
 '
+    else
+        inotifywait -e modify --exclude '~$' -r ./src/  2>&1 | perl -wln -M'Term::ANSIColor' -e '
+print "\e[0;91m", "$_", "\e[0m"
+'
+    fi
 done
