@@ -93,7 +93,9 @@ cursorToCode vn (Vec [1]) = return $ parens $
   "i == NX_AVX-1 ? _mm256_permutevar8x32_ps(" <> vn <> "[0],permute_fwd)" <>":" <> vn <> "[i+1]"
 cursorToCode vn (Vec [-1]) = return $ parens $
   "i == 0 ? _mm256_permutevar8x32_ps(" <> vn <> "[NX_AVX-1],permute_bwd)" <>":" <> vn <> "[i-1]"
+cursorToCode vn (Vec xs) = return $ vn <> showt xs
 cursorToCode _ c = raiseErr $ failed $ "unsupported cursor position: " ++ show c
+
 
 rhsCodeAt :: Vec Int -> NodeID -> TranM T.Text
 rhsCodeAt cursor nid = do
