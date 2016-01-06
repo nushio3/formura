@@ -128,14 +128,16 @@ castVal t1 vx = let t0 = typeOfVal vx in case (t1, t0, vx) of
   _ | t1 == t0 -> return vx
   (ElemType _, ElemType _, _) -> return vx
   (GridType vec (ElemType te), ElemType _, n :. _) -> return (n :. (GridType vec (ElemType te)))
+  (GridType vec (ElemType te), ElemType te0, Imm x) -> do
+     (n :. _) <- insert (Imm x) (ElemType te0)
+     return (n :. (GridType vec (ElemType te)))
   (GridType vec0 _, GridType vec1 _, _) | vec0 == vec1 ->  return vx
   _ -> raiseErr $ failed $ "cannot convert type " ++ show t0 ++ " to " ++ show t1
 
 
 
 instance Generatable ImmF where
-  gen (Imm r) = do
-    insert (Imm r) (ElemType "Rational")
+  gen (Imm r) = return $ Imm r
 
 instance Generatable OperatorF where
   gen (Uniop op gA)       = do a <- gA                  ; goUniop op a
