@@ -87,13 +87,20 @@ lookupNode i = do
      return n
 
 cursorToCode :: T.Text -> Vec Int -> TranM T.Text
-cursorToCode vn (PureVec 0) = return $ vn <> "[i]"
-cursorToCode vn (Vec [0]) = return $ vn <> "[i]"
 cursorToCode vn (Vec [1]) = return $ parens $
   "i == NX_AVX-1 ? _mm256_permutevar8x32_ps(" <> vn <> "[0],permute_fwd)" <>":" <> vn <> "[i+1]"
 cursorToCode vn (Vec [-1]) = return $ parens $
   "i == 0 ? _mm256_permutevar8x32_ps(" <> vn <> "[NX_AVX-1],permute_bwd)" <>":" <> vn <> "[i-1]"
-cursorToCode vn (Vec xs) = return $ vn <> showt xs
+cursorToCode vn (Vec xs) = do
+  let tadd :: T.Text -> Int -> T.Text
+      tadd x 0 = x
+      tadd x i | i > 0 = x <> "+" <> showt i
+      tadd x i | i < 0 = x <> showt i
+  Vec ivs <- use indexVariables
+  return $ vn <> "[" <> T.intercalate "," (zipWith tadd ivs xs) <> "]"
+cursorToCode vn (PureVec 0) = do
+  dim <- view dimension
+  cursorToCode vn (Vec $ replicate dim 0)
 cursorToCode _ c = raiseErr $ failed $ "unsupported cursor position: " ++ show c
 
 
@@ -142,14 +149,16 @@ nameManifestVariables = do
     nameIt :: NodeID -> Node -> Node
     nameIt i n =
       let newName = case A.viewMaybe n of
-                      Just (SourceName n) -> T.pack n
-                      _    -> "a_" <> showt i
+                      Just (SourceName n) -> T.pack n <> "_" <> showt i
+                      _    -> "tmp_" <> showt i <> "_" <> showt i
       in n & A.annotation %~ A.set (VariableName newName)
 
 populateIndexVariables :: TranM ()
 populateIndexVariables = do
   dim <- view dimension
-  indexVariables .= Vec (map (T.pack . return) $ take dim ['i'..])
+  indexVariables .= Vec (map (T.pack . (:[]))$ take dim ['i'..])
+  -- vaxs <- view axesNames
+  -- indexVariables .= Vec (map (T.pack . ("i_" ++ )) vaxs)
 
 translate :: NumericalConfig -> TranM ()
 translate nconf = censor makeCxxBody $ do
