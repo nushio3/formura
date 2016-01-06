@@ -28,6 +28,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import Text.Parser.LookAhead
 
 import Formura.Language.Combinator
+import Formura.Type (elementTypenames)
 import Formura.Vec
 import Formura.Syntax
 
@@ -69,8 +70,11 @@ keyword k = "keyword " ++ k ?> do
 -- | The set of keywords. The string is not parsed as a identifier if it's in the keyword list.
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
-             ["begin", "end", "function", "returns", "let", "in", "lambda", "for", "dimension", "axes",
-              "+","-","*","/",".","::","=", ","]
+             ["begin", "end", "function", "returns", "let", "in", "lambda",
+              "for", "dimension", "axes",
+              "if", "then", "else",
+              "+","-","*","/",".","::","=", ",",
+              "<", "<=", "==", "!=", ">=", ">"]
 
 
 comment :: P ()
@@ -130,10 +134,8 @@ ident = "identifier" ?> parseIn $ Ident <$> identName
 elemType :: (ElemTypeF ∈ fs) => P (Lang fs)
 elemType = "element type" ?> parseIn $ do
   str <- identName
-  guard $ str `S.member` elemTypeNames
+  guard $ str `S.member` elementTypenames
   return $ ElemType str
-    where
-      elemTypeNames = S.fromList ["int","rational","float","double","real"]
 
 funType :: (FunTypeF ∈ fs) => P (Lang fs)
 funType = "function type" ?> parseIn $ keyword "function" *> pure FunType
@@ -180,7 +182,8 @@ exprOf termParser = X.buildExpressionParser tbl termParser
            [binary "**" (Binop "**") X.AssocLeft],
            [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
-           [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft]
+           [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft],
+           [binary sym (Binop sym) X.AssocNone | sym <- S.toList comparisonOperatorNames]
           ]
     unary  name fun = X.Prefix (pUni name fun)
     binary name fun assoc = X.Infix (pBin name fun) assoc
@@ -227,7 +230,7 @@ fexpr = "function application chain" ?> do
 
 
 aexpr :: P RExpr
-aexpr = tupleOf rExpr <|> letExpr <|> lambdaExpr <|> ident <|> imm
+aexpr = tupleOf rExpr <|> letExpr <|> lambdaExpr <|> ifThenElseExpr <|> ident <|> imm
 
 
 letExpr :: P RExpr
@@ -244,6 +247,17 @@ lambdaExpr = "lambda expression" ?> parseIn $ do
   x <- tupleOf lExpr
   y <- rExpr
   return $ Lambda x y
+
+ifThenElseExpr :: P RExpr
+ifThenElseExpr = "if-then-else expression" ?> parseIn $ do
+  "keyword if" ?> try $ keyword "if"
+  cond <- rExpr
+  keyword "then"
+  x <- rExpr
+  keyword "else"
+  y <- rExpr
+  return $ Triop "ite" cond x y
+
 
 binding :: P (BindingF RExpr)
 binding = "statements" ?> do

@@ -151,15 +151,30 @@ goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
   TopType -> raiseErr $ failed $ unwords
              ["there is no common type that can accomodate both hand side:", show at, op , show bt]
   ct -> do
+    let typeModifier
+          | op `S.member` comparisonOperatorNames = mapElemType (const "bool")
+          | otherwise = id
     (av2 :. _) <- castVal (subFix ct) ax
     (bv2 :. _) <- castVal (subFix ct) bx
-    insert (Binop op av2 bv2) ct
+    insert (Binop op av2 bv2) (typeModifier ct)
 
 goBinop _ _ _  = raiseErr $ failed $ "unimplemented path in binary operator"
 
+isBoolishType :: NodeType -> Bool
+isBoolishType (ElemType "bool") = True
+isBoolishType (GridType _ x) = isBoolishType x
+isBoolishType _ = False
+
 goTriop :: IdentName -> ValueExpr -> ValueExpr -> ValueExpr -> GenM ValueExpr
 goTriop op (av :. at) (bv :. bt) (cv :. ct)
-  | op == "ite" && at == ElemType "bool" && bt == ct = insert (Triop op av bv cv) bt
+  | op == "ite" = do
+      when (not $ isBoolishType at) $
+        raiseErr $ failed "the first argument of if-expr must be of type bool"
+      let bct =  bt /\ ct
+      case at /\ bct of
+        TopType -> raiseErr $ failed $ unwords $
+                   ["Type mismatch in if-then-else expr:", show at, show bt, show ct]
+        _ -> insert (Triop op av bv cv) bct
 goTriop _ _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator"
 
 instance Generatable IdentF where
@@ -243,9 +258,6 @@ resolveLexAlg fx = mTransAlg fx
 
 instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
-
--- namesOfLhs :: LExpr -> IdentName
--- namesOfLhs = error "namesOfLhs is deprecated; use namesOfLhs"
 
 namesOfLhs :: LExpr -> TupleOfIdents
 namesOfLhs (Ident n) = Ident n

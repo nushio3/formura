@@ -18,6 +18,7 @@ module Formura.Syntax where
 import Algebra.Lattice
 import Control.Lens hiding (op)
 import Data.List (intercalate)
+import qualified Data.Set as S
 import Data.Typeable
 import GHC.Generics
 import qualified Test.QuickCheck as Q
@@ -108,6 +109,9 @@ data OperatorF x
   | BinopF IdentName x x
   | TriopF IdentName x x x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Generic)
+
+comparisonOperatorNames :: S.Set IdentName
+comparisonOperatorNames = S.fromList $ words "< <= == != > >="
 
 instance Q.Arbitrary x => Q.Arbitrary (OperatorF x) where
   arbitrary =
