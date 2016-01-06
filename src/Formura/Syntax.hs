@@ -196,6 +196,19 @@ data BindingF x = BindingF [StatementF x]
 pattern Binding xs <- ((^? match) -> Just (BindingF xs )) where
   Binding xs = match # BindingF xs
 
+-- | extract all 'TypeDecl's from the binding
+typeDecls :: BindingF x -> [(LExpr, TypeExpr)]
+typeDecls (BindingF stmts0) = concat $ flip map stmts0 $ \x -> case x of
+        TypeDeclF t l -> [(l, t)]
+        _             -> []
+
+-- | extract all the 'Subst'itutions from the binding
+substs :: BindingF x -> [(LExpr, x)]
+substs (BindingF stmts0) = concat $ flip map stmts0 $ \x -> case x of
+        SubstF l r -> [(l, r)]
+        _             -> []
+
+
 -- | Statement
 data StatementF x
   = SubstF LExpr x

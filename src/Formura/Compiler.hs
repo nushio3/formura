@@ -7,6 +7,7 @@ import           Control.Lens
 import           Control.Monad.Trans.Either
 import           Control.Monad.Morph
 import           Control.Monad.RWS
+import qualified Data.IntMap as G
 import qualified Data.Set as S
 import           System.IO
 import           System.Exit

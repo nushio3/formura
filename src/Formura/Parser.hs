@@ -73,7 +73,8 @@ keywordSet = S.fromList
              ["begin", "end", "function", "returns", "let", "in", "lambda",
               "for", "dimension", "axes",
               "if", "then", "else",
-              "+","-","*","/",".","::","=", ",",
+              "+","-","*","/",".","**",
+              "::","=", ",",
               "<", "<=", "==", "!=", ">=", ">"]
 
 

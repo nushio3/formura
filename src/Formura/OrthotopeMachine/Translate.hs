@@ -8,7 +8,7 @@ import           Algebra.Lattice
 import           Control.Applicative
 import           Control.Lens hiding (op)
 import           Control.Monad
-import           Control.Monad.Reader
+import           Control.Monad.Reader hiding (fix)
 import qualified Data.IntMap as G
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -178,7 +178,6 @@ goTriop op (av :. at) (bv :. bt) (cv :. ct)
 goTriop _ _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator"
 
 instance Generatable IdentF where
-  -- you should not generate this!
   gen (Ident n) = do
     b <- view binding
     case M.lookup n b of
@@ -223,7 +222,9 @@ goApply (Tuple xs) (Imm r) = do
       l = length xs
   when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
   return $ xs!!n
-goApply (Tuple xs) _ = raiseErr $ failed "tuple applied to non-constant integer"
+goApply (Tuple xs) arg0 = do
+  g <- use theGraph
+  raiseErr $ failed $ "tuple applied to non-constant integer: " ++ show arg0 ++ show g
 goApply (FunValue l r) x = do
   lrs <- matchToLhs l x
   let x2 :: Binding
@@ -239,22 +240,29 @@ instance Generatable LambdaF where
     r' <- withCompiler conv $ resolveLex $ subFix r
     return $ FunValue l r'
 
-resolveLex :: RXExpr -> LexGenM RXExpr
-resolveLex r = compilerMFold resolveLexAlg r
+-- resolveLex :: RXExpr -> LexGenM RXExpr
+-- resolveLex r = compilerMFold resolveLexAlg r
 
-resolveLexAlg :: RXExprF RXExpr -> LexGenM RXExpr
-resolveLexAlg (Ident n) = do
+resolveLex :: RXExpr -> LexGenM RXExpr
+resolveLex (Ident n) = do
   b <- ask
   case M.lookup n b of
-    Nothing -> raiseErr $ failed $ "undefined variable: " ++ n
+    Nothing -> raiseErr $ failed $ "undefined variable: " ++ n ++ "\nwhen resolving lexical binding."
+               ++ "\n Bindings:\n" ++ unwords (M.keys b)
     Just x  -> return $ subFix x
-resolveLexAlg (Lambda l r) = do
+resolveLex (Lambda l r) = do
   r' <- local (M.union (lexicalScopeHolder l)) $ resolveLex $ subFix r
   return $ FunValue l r'
-resolveLexAlg (FunValue l r) = do
+resolveLex (FunValue l r) = do
   r' <- local (M.union (lexicalScopeHolder l)) $ resolveLex r
   return $ FunValue l r'
-resolveLexAlg fx = mTransAlg fx
+resolveLex (Let b r) = do
+  let ls = map fst $ substs b :: [LExpr]
+  r' <- local (M.union (M.unions $ map lexicalScopeHolder ls)) $ resolveLex r
+  return $ Let b r'
+resolveLex (In meta fx) = do
+  con <- traverse resolveLex fx
+  return $ In meta con
 
 instance Generatable LetF where
   gen (Let b genX) = withBindings b genX
@@ -302,20 +310,15 @@ matchTupleRtoL = go
     go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
     go x y = return [(x,y)]
 
-withBindings :: BindingF (GenM ValueExpr) -> GenM ValueExpr -> GenM ValueExpr
+withBindings :: BindingF (GenM ValueExpr) -> GenM a -> GenM a
 withBindings b1 genX = do
   b0 <- view binding
   let
-      BindingF stmts0 = b1
       typeDecls0 :: [(LExpr, TypeExpr)]
-      typeDecls0 = concat $ flip map stmts0 $ \x -> case x of
-        TypeDeclF t l -> [(l, t)]
-        _             -> []
+      typeDecls0 = typeDecls b1
 
       substs0 :: [(LExpr, GenM ValueExpr)]
-      substs0 = concat $ flip map stmts0 $ \x -> case x of
-        SubstF l r -> [(l, r)]
-        _             -> []
+      substs0 = substs b1
 
   let evalTypeDecl :: (LExpr, TypeExpr) -> GenM [(IdentName, TypeExpr)]
       evalTypeDecl (l, t) = matchToLhs l t
@@ -379,8 +382,8 @@ toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encount
 -- | Generate code for a global function. This generates 'Load' and 'Store' nodes,
 --   in addition to all the usual computation nodes.
 
-genGlobalFunction :: TypeExpr -> LExpr -> RExpr -> GenM TypeExpr
-genGlobalFunction inputType outputPattern (Lambda l r) = do
+genGlobalFunction :: BindingF RExpr -> TypeExpr -> LExpr -> RExpr -> GenM TypeExpr
+genGlobalFunction globalBinding inputType outputPattern (Lambda l r) =  bindThemAll $ do
   typedLhs <- matchToLhs l inputType
   liftIO $ putStrLn $ "input type: " ++ show inputType
   initBinds <- forM typedLhs $ \(name1, t1) -> do
@@ -407,8 +410,9 @@ genGlobalFunction inputType outputPattern (Lambda l r) = do
       _           -> raiseErr $ failed "The return type of a global function must be a tuple of grids."
 
   return $ typeExprOf returnValueExpr
-
-genGlobalFunction _ _ _ = raiseErr $ failed "Identifier specified for function generation is not of function type."
+  where
+    bindThemAll = withBindings $ fmap (genRhs .subFix) globalBinding
+genGlobalFunction _ _ _ _ = raiseErr $ failed "Identifier specified for function generation is not of function type."
 
 lookupToplevelIdents :: Program -> IdentName -> GenM RExpr
 lookupToplevelIdents fprog name0 =  case lup stmts of
@@ -426,7 +430,7 @@ lookupToplevelIdents fprog name0 =  case lup stmts of
 genProgram :: Program -> IO OMProgram
 genProgram fprog = do
   let run g = runCompilerRight g defaultCodegenRead defaultCodegenState
-
+      gbinds = fprog ^. programBinding
   (lhsOfStep,_,_) <- run $ do
     (Lambda l _) <- lookupToplevelIdents fprog "step"
     return l
@@ -434,11 +438,11 @@ genProgram fprog = do
   (initType, stInit, _) <- run $ do
     setupGlobalEnvironment fprog
     initFunDef <- lookupToplevelIdents fprog "init"
-    genGlobalFunction (Tuple []) lhsOfStep initFunDef
+    genGlobalFunction gbinds (Tuple []) lhsOfStep initFunDef
   (stateSignature0, stStep, _) <- run $ do
     stepFunDef <- lookupToplevelIdents fprog "step"
     setupGlobalEnvironment fprog
-    stepType <- genGlobalFunction initType lhsOfStep stepFunDef
+    stepType <- genGlobalFunction gbinds initType lhsOfStep stepFunDef
     when (initType /= stepType) $ do
       raiseErr $ failed $ "the return type of step : " ++ show stepType ++ "\n" ++
         "must match the return type of init : " ++ show initType
