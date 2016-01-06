@@ -1,13 +1,19 @@
 dimension :: 3
 axes :: x, y, z
 
-ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
-ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
-ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+begin function ddx(a) returns (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+end function
+
+begin function ddy(a) returns (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+end function
+
+begin function ddz(a) returns (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+end function
 
 ∂ = (ddx,ddy,ddz)
 
-Σ = for (e) e(0) + e(1) + e(2)
+begin function Σ(e) returns e(0) + e(1) + e(2)
+end function
 
 begin function init() returns dens_init
       float [] :: dens_init = 0

@@ -147,7 +147,9 @@ nameManifestVariables = do
       in n & A.annotation %~ A.set (VariableName newName)
 
 populateIndexVariables :: TranM ()
-populateIndexVariables = liftIO $ putStrLn "populate index variables!"
+populateIndexVariables = do
+  dim <- view dimension
+  indexVariables .= Vec (map (T.pack . return) $ take dim ['i'..])
 
 translate :: NumericalConfig -> TranM ()
 translate nconf = censor makeCxxBody $ do
