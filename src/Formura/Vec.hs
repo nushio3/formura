@@ -17,6 +17,9 @@ import qualified Data.Aeson as J
 import           Data.Char (toLower)
 import           Data.Monoid
 
+formuraMaxDimension :: Int
+formuraMaxDimension = 26
+
 data Vec a = Vec { getVec :: [a] } | PureVec a
            deriving (Functor, Foldable, Traversable)
 instance J.ToJSON a => J.ToJSON (Vec a) where
@@ -32,7 +35,7 @@ instance Ixed (Vec a) where
        let myIso :: Iso' (Vec a) [a]
            myIso = iso back Vec
 
-           back (PureVec x) = repeat x
+           back (PureVec x) = replicate formuraMaxDimension x
            back (Vec xs) = xs
        in myIso . ix i
 
@@ -73,4 +76,4 @@ liftVec2 f (PureVec x) (PureVec y) = PureVec $ f x y
 liftVec2 f (PureVec x) (Vec ys   ) = Vec $ fmap (f x) ys
 liftVec2 f (Vec xs   ) (PureVec y) = Vec $ fmap (flip f y) xs
 liftVec2 f (Vec xs   ) (Vec ys   ) = let n = max (length xs) (length ys) in
-  Vec $ take n $ zipWith f (xs ++ repeat 0) (ys ++ repeat 0)
+  Vec $ take n $ zipWith f (xs ++ replicate formuraMaxDimension 0) (ys ++ replicate formuraMaxDimension 0)
