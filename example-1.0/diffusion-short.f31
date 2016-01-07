@@ -1,0 +1,21 @@
+dimension :: 3
+axes :: x, y, z
+
+ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+
+∂ = (ddx,ddy,ddz)
+
+Σ = for (e) e(0) + e(1) + e(2)
+
+begin function init() returns dens_init
+      float [] :: dens_init = 0
+end function
+
+begin function dens_next = step(dens)
+  float :: Dx, Dt
+  Dx = 4.2
+  Dt = 0.1
+  dens_next = dens + Dx**2/Dt * Σ for(i) ∂ i . ∂ i dens
+end function

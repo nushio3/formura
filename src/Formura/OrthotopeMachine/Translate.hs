@@ -128,16 +128,13 @@ castVal t1 vx = let t0 = typeOfVal vx in case (t1, t0, vx) of
   _ | t1 == t0 -> return vx
   (ElemType _, ElemType _, _) -> return vx
   (GridType vec (ElemType te), ElemType _, n :. _) -> return (n :. (GridType vec (ElemType te)))
-  (GridType vec (ElemType te), ElemType te0, Imm x) -> do
-     (n :. _) <- insert (Imm x) (ElemType te0)
-     return (n :. (GridType vec (ElemType te)))
   (GridType vec0 _, GridType vec1 _, _) | vec0 == vec1 ->  return vx
   _ -> raiseErr $ failed $ "cannot convert type " ++ show t0 ++ " to " ++ show t1
 
 
 
 instance Generatable ImmF where
-  gen (Imm r) = return $ Imm r
+  gen (Imm r) = insert (Imm r) (ElemType "Rational")
 
 instance Generatable OperatorF where
   gen (Uniop op gA)       = do a <- gA                  ; goUniop op a
@@ -218,6 +215,15 @@ instance Generatable ApplyF where
     a0 <- agen
     goApply f0 a0
 
+evalToImm :: ValueExpr -> GenM (Maybe Rational)
+evalToImm x = do
+  g <- use theGraph
+  case x of
+    Imm r -> return $ Just r
+    n :. _ -> case G.lookup n g of
+      Just (Node (Imm r) _ _) -> return $ Just r
+    _ -> return Nothing
+
 goApply :: ValueExpr -> ValueExpr -> GenM ValueExpr
 goApply (Tuple xs) (Imm r) = do
   when (denominator r /= 1) $ raiseErr $ failed "non-integer indexing in tuple access"
@@ -225,9 +231,13 @@ goApply (Tuple xs) (Imm r) = do
       l = length xs
   when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
   return $ xs!!n
-goApply (Tuple xs) arg0 = do
-  g <- use theGraph
-  raiseErr $ failed $ "tuple applied to non-constant integer: " ++ show arg0 ++ show g
+goApply x@(Tuple xs) arg0 = do
+  i <- evalToImm arg0
+  case i of
+    Just r -> goApply x (Imm r)
+    _ -> do
+      g <- use theGraph
+      raiseErr $ failed $ "tuple applied to non-constant integer: " ++ show arg0 ++ show g
 goApply (FunValue l r) x = do
   lrs <- matchToLhs l x
   let x2 :: Binding
