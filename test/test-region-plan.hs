@@ -14,16 +14,6 @@ import Test.HUnit.Lang
 import Formura.Vec
 
 
-main :: IO ()
-main = defaultMain tests
-
-tests = [
-        testGroup "Test of the Plan A" [
-                testProof "sample halo matches the hand-written halo" $
-                (\ t x y z -> let p = Vec[t,x,y,z] in halo myRegion p <=> itsHalo p)
-           ]
-      ]
-
 testProof :: Provable a => String -> a -> Test
 testProof msg thm = testCase msg $ do
   result <- prove thm
@@ -52,15 +42,19 @@ type Region = Pt -> SBool
 type FacetID = (Char, Vec Int)
 type Facet  = Region
 
-data Strategy = Strategy
-  { regions :: M.Map RegionID Region
-  , facets  :: M.Map FacetID  Facet
-  , regionOrder :: M.Map RegionID Int
-  , nextR :: FacetID -> RegionID
-  , prevR :: FacetID -> RegionID
-  , nextFs :: RegionID -> [FacetID]
-  , prevFs :: RegionID -> [FacetID]
-                }
+data Plan = Plan
+  { _regions :: M.Map RegionID Region
+  , _facets  :: M.Map FacetID  Facet
+  , _regionOrder :: M.Map RegionID Int
+  , _nextR :: FacetID -> RegionID
+  , _prevR :: FacetID -> RegionID
+  , _nextFs :: RegionID -> [FacetID]
+  , _prevFs :: RegionID -> [FacetID]
+  , _initialFs :: [FacetID]
+  , _finalFs :: [FacetID]
+  }
+
+makeLenses ''Plan
 
 sFeet :: [Pt]
 sFeet = map (fmap fromInteger) feet
@@ -85,3 +79,15 @@ myRegion (Vec [t,x,y,z]) = t `range` (0,100) &&& x `range` (0,50)
 
 itsHalo :: Region
 itsHalo (Vec [t,x,y,z]) = t `range` (-1,99) &&& x `range` (-1,51)
+
+
+
+tests = [
+        testGroup "Test of the Plan A" [
+                testProof "sample halo matches the hand-written halo" $
+                (\ t x y z -> let p = Vec[t,x,y,z] in halo myRegion p <=> itsHalo p)
+           ]
+      ]
+
+main :: IO ()
+main = defaultMain tests
