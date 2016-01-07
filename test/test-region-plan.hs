@@ -42,6 +42,22 @@ type Region = Pt -> SBool
 type FacetID = (Char, Vec Int)
 type Facet  = Region
 
+move :: Pt -> Region -> Region
+move v r x = r (x - v)
+
+monitorOffset :: Pt
+monitorOffset = Vec[4,0,0,0]
+
+sameset :: Region -> Region -> Symbolic SBool
+sameset a b = do
+  t <- forall "t"
+  x <- forall "x"
+  y <- forall "y"
+  z <- forall "z"
+  let p = Vec [t,x,y,z]
+  return $ a p <=> b p
+
+
 data Plan = Plan
   { _regions :: M.Map RegionID Region
   , _facets  :: M.Map FacetID  Facet
@@ -50,11 +66,19 @@ data Plan = Plan
   , _prevR :: FacetID -> RegionID
   , _nextFs :: RegionID -> [FacetID]
   , _prevFs :: RegionID -> [FacetID]
-  , _initialFs :: [FacetID]
-  , _finalFs :: [FacetID]
+  , _initialFs :: [Facet]
+  , _finalFs :: [Facet]
   }
 
+
+
 makeLenses ''Plan
+
+thePlan = Plan{}
+          & initialFs .~ [myRegion]
+          & finalFs .~ [myRegion4]
+
+
 
 sFeet :: [Pt]
 sFeet = map (fmap fromInteger) feet
@@ -77,17 +101,27 @@ range x (a,b)= a .<= x &&& x .< b
 myRegion :: Region
 myRegion (Vec [t,x,y,z]) = t `range` (0,100) &&& x `range` (0,50)
 
+myRegion4 :: Region
+myRegion4 (Vec [t,x,y,z]) = t `range` (4,104) &&& x `range` (0,50)
+
 itsHalo :: Region
 itsHalo (Vec [t,x,y,z]) = t `range` (-1,99) &&& x `range` (-1,51)
 
 
 
-tests = [
-        testGroup "Test of the Plan A" [
-                testProof "sample halo matches the hand-written halo" $
-                (\ t x y z -> let p = Vec[t,x,y,z] in halo myRegion p <=> itsHalo p)
-           ]
-      ]
+tests = [ testGroup " The Plan "
+  [ testProperty "has same numbers of initial and final facets" $
+    length (thePlan ^. initialFs) == length (thePlan ^. finalFs)
+  ,
+    testProof "sample halo matches the hand-written halo" $
+    (\ t x y z -> let p = Vec[t,x,y,z] in halo myRegion p <=> itsHalo p)
+  ,
+    let
+        t :: Int -> Facet -> Facet -> Test
+        t i fi ff  = testProof ("true for facet #" ++ show i) $ move monitorOffset fi `sameset` ff in
+    testGroup "The final facets are exactly moved by monitoring offsets" $
+    zipWith3 t [0..] (thePlan ^. initialFs) (thePlan ^. finalFs)
+  ]]
 
 main :: IO ()
 main = defaultMain tests
