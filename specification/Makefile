@@ -1,4 +1,4 @@
-TARGET=spec-main
+TARGET=formura-specification
 
 all:
 	platex --shell-escape $(TARGET).tex
