@@ -106,9 +106,10 @@ executable formura-gen
 
 
 
-executable region-planner
-  hs-source-dirs: exe-src
-  main-is: region-planner.hs
+test-suite test-region-plan
+  type:         exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: test-region-plan.hs
   default-language:    Haskell2010
   ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
@@ -116,4 +117,9 @@ executable region-planner
               , containers
               , lens
               , formura
+              , test-framework
+              , test-framework-quickcheck2
+              , test-framework-hunit
+              , HUnit
+              , QuickCheck
               , sbv >= 5.9

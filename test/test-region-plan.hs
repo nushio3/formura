@@ -3,8 +3,43 @@
 import Control.Lens
 import qualified Data.Map as M
 import Data.SBV
+import Test.Framework (defaultMain, testGroup)
+import Test.Framework.Providers.QuickCheck2 (testProperty)
+import Test.Framework.Providers.HUnit (testCase)
+import Test.Framework.Providers.API (Test)
+import Test.QuickCheck hiding ((==>))
+import Test.HUnit.Lang
+
 
 import Formura.Vec
+
+
+main :: IO ()
+main = defaultMain tests
+
+tests = [
+        testGroup "Test of the Plan A" [
+                testProof "sample halo matches the hand-written halo" $
+                (\ t x y z -> let p = Vec[t,x,y,z] in halo myRegion p <=> itsHalo p)
+           ]
+      ]
+
+testProof :: Provable a => String -> a -> Test
+testProof msg thm = testCase msg $ do
+  result <- prove thm
+  if (not $ modelExists result)
+    then return()
+    else assertFailure $ show result
+
+testDisproof :: Provable a => String -> a -> Test
+testDisproof msg thm = testCase msg $ do
+  result <- prove thm
+  if (not $ modelExists result)
+    then assertFailure $ show result
+    else return ()
+
+
+
 
 dimension = 3
 nS = 1
@@ -50,14 +85,3 @@ myRegion (Vec [t,x,y,z]) = t `range` (0,100) &&& x `range` (0,50)
 
 itsHalo :: Region
 itsHalo (Vec [t,x,y,z]) = t `range` (-1,99) &&& x `range` (-1,51)
-
-main :: IO ()
-main = do
-  ret <- prove $ \ t x y z ->
-                  let p = Vec [t,x,y,z] in
-                   halo myRegion p <=> itsHalo p
-  print ret
-  let p0 = Vec [98,0,0,0]
-  print $ naiveHalo myRegion p0
-  print $ myRegion $ p0 + Vec [1,0,0,0]
-  print $ itsHalo  p0
