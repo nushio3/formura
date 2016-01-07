@@ -1,14 +1,31 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 import Control.Lens
+import qualified Data.Map as M
 import Data.SBV
 
 import Formura.Vec
 
 dimension = 3
 nS = 1
+type SInt = SInt32
 
-type Pt = Vec SInt32
+type Pt = Vec SInt
 
+type RegionID = Vec Int
 type Region = Pt -> SBool
+type FacetID = (Char, Vec Int)
+type Facet  = Region
+
+data Strategy = Strategy
+  { regions :: M.Map RegionID Region
+  , facets  :: M.Map FacetID  Facet
+  , regionOrder :: M.Map RegionID Int
+  , nextR :: FacetID -> RegionID
+  , prevR :: FacetID -> RegionID
+  , nextFs :: RegionID -> [FacetID]
+  , prevFs :: RegionID -> [FacetID]
+                }
 
 sFeet :: [Pt]
 sFeet = map (fmap fromInteger) feet
@@ -25,12 +42,14 @@ spatialVecs =
 naiveHalo :: Region -> Region
 naiveHalo r x = foldr1 (|||) [r $ x + v| v <- sFeet]
 
+range :: SInt -> (SInt, SInt) -> SBool
+range x (a,b)= a .<= x &&& x .< b
 
 myRegion :: Region
-myRegion (Vec [t,x,y,z]) = 0 .<= t &&& t .< 100 &&& 0 .<= x &&& x .< 50
+myRegion (Vec [t,x,y,z]) = t `range` (0,100) &&& x `range` (0,50)
 
 itsHalo :: Region
-itsHalo (Vec [t,x,y,z]) = -1 .<= t &&& t .< 99 &&& -1 .<= x &&& x .< 51
+itsHalo (Vec [t,x,y,z]) = t `range` (-1,99) &&& x `range` (-1,51)
 
 main :: IO ()
 main = do
@@ -38,7 +57,7 @@ main = do
                   let p = Vec [t,x,y,z] in
                    naiveHalo myRegion p <=> itsHalo p
   print ret
-  let p0 = Vec [99,0,0,0]
+  let p0 = Vec [98,0,0,0]
   print $ naiveHalo myRegion p0
   print $ myRegion $ p0 + Vec [1,0,0,0]
   print $ itsHalo  p0
