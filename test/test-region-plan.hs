@@ -48,6 +48,28 @@ move v r x = r (x - v)
 monitorOffset :: Pt
 monitorOffset = Vec[4,0,0,0]
 
+
+sFeet :: [Pt]
+sFeet = map (fmap fromInteger) feet
+
+feet :: [Vec Integer]
+feet = map ((Vec $ 1 : replicate dimension 0) + ) $
+  (Vec $ replicate (dimension+1) 0) : concat [[v, negate v] | v <- spatialVecs]
+
+spatialVecs :: [Vec Integer]
+spatialVecs =
+  [Vec $ replicate (dimension+1) 0 & ix i .~ 1 | i <- [1..dimension]]
+
+
+halo :: Region -> Region
+halo r x = foldr1 (|||) [r $ x + v| v <- sFeet]
+
+range :: SInt -> (SInt, SInt) -> SBool
+range x (a,b)= a .<= x &&& x .< b
+
+orthotope :: [(SInt, SInt)] -> Region
+orthotope bounds (Vec xs) = bAnd $ zipWith range xs bounds
+
 sameset :: Region -> Region -> Symbolic SBool
 sameset a b = do
   t <- forall "t"
@@ -71,32 +93,17 @@ data Plan = Plan
   }
 
 
-
 makeLenses ''Plan
 
 thePlan = Plan{}
-          & initialFs .~ [myRegion]
-          & finalFs .~ [myRegion4]
+          & initialFs .~ [orthotope[(0,1),(0,48),(0,48),(0,48)],
+                          orthotope[(0,1),(0,48),(0,48),(0,48)] ]
+          & finalFs .~   [orthotope[(4,5),(0,48),(0,48),(0,48)],
+                          orthotope[(4,5),(0,48),(0,48),(0,47)]]
 
 
 
-sFeet :: [Pt]
-sFeet = map (fmap fromInteger) feet
 
-feet :: [Vec Integer]
-feet = map ((Vec $ 1 : replicate dimension 0) + ) $
-  (Vec $ replicate (dimension+1) 0) : concat [[v, negate v] | v <- spatialVecs]
-
-spatialVecs :: [Vec Integer]
-spatialVecs =
-  [Vec $ replicate (dimension+1) 0 & ix i .~ 1 | i <- [1..dimension]]
-
-
-halo :: Region -> Region
-halo r x = foldr1 (|||) [r $ x + v| v <- sFeet]
-
-range :: SInt -> (SInt, SInt) -> SBool
-range x (a,b)= a .<= x &&& x .< b
 
 myRegion :: Region
 myRegion (Vec [t,x,y,z]) = t `range` (0,100) &&& x `range` (0,50)
