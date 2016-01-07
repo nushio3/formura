@@ -39,8 +39,11 @@ type Pt = Vec SInt
 type Body = Pt -> SBool
 
 
-type RegionID = Vec Int
-type FacetID = (String, Vec Int)
+newtype RegionID = Region (Vec Int) deriving (Eq, Ord, Show)
+data FacetID  = Facet String (Vec Int) deriving (Eq, Ord, Show)
+
+facet :: String -> [Int] -> FacetID
+facet d xs = Facet d (Vec xs)
 
 move :: Pt -> Body -> Body
 move v r x = r (x - v)
@@ -79,6 +82,16 @@ sameset a b = do
   let p = Vec [t,x,y,z]
   return $ a p <=> b p
 
+subset :: Body -> Body -> Symbolic SBool
+subset a b = do
+  t <- forall "t"
+  x <- forall "x"
+  y <- forall "y"
+  z <- forall "z"
+  let p = Vec [t,x,y,z]
+  return $ a p ==> b p
+
+
 
 data Plan = Plan
   { _regions :: M.Map RegionID Body
@@ -93,35 +106,36 @@ data Plan = Plan
   }
 makeLenses ''Plan
 
-embed :: (?plan :: Plan) => RegionID -> Body
-embed r = fromMaybe (error $ "regionID not found:" ++ show r) $ M.lookup r $ ?plan ^. regions
+class HasEmbody a where
+  embody :: (?plan :: Plan) => a -> Body
 
-embedf :: (?plan :: Plan) => FacetID -> Body
-embedf r = fromMaybe (error $ "facetID not found:" ++ show r) $ M.lookup r $ ?plan ^. facets
+instance HasEmbody RegionID where
+  embody r = fromMaybe (error $ "regionID not found:" ++ show r) $ M.lookup r $ ?plan ^. regions
+
+instance HasEmbody FacetID where
+  embody f = fromMaybe (error $ "facetID not found:" ++ show f) $ M.lookup f $ ?plan ^. facets
 
 
 
 thePlan = Plan{}
-          & initialFs .~ [("T+",Vec [0,0,0,0])]
-          & finalFs   .~ [("T+",Vec [4,0,0,0])]
-          & facets .~ M.empty
---          & initialFs .~ [orthotope[(0,1),(0,48),(0,48),(0,48)],
---                          orthotope[(0,1),(0,48),(0,48),(0,48)] ]
---          & finalFs .~   [orthotope[(4,5),(0,48),(0,48),(0,48)],
---                          orthotope[(4,5),(0,48),(0,48),(0,48)]]
+          & initialFs .~ [facet "T+" [0,0,0,0]]
+          & finalFs   .~ [facet "T+" [4,0,0,0]]
+          & facets    .~ M.fromList
+          [(facet "T+" [0,0,0,0], orthotope [(0,1),(0,48),(0,48),(0,48)]),
+           (facet "T+" [4,0,0,0], orthotope [(4,5),(0,48),(0,48),(0,48)])]
 
 
 
 
 
 myBody :: Body
-myBody (Vec [t,x,y,z]) = t `range` (0,100) &&& x `range` (0,50)
+myBody = orthotope [(0,100), (1,23), (4,56), (7,89)]
 
 myBody4 :: Body
-myBody4 (Vec [t,x,y,z]) = t `range` (4,104) &&& x `range` (0,50)
+myBody4= orthotope [(4,104), (1,23), (4,56), (7,89)]
 
 itsHalo :: Body
-itsHalo (Vec [t,x,y,z]) = t `range` (-1,99) &&& x `range` (-1,51)
+itsHalo = orthotope [(-1,99), (0,24), (3,57), (6,90)]
 
 
 
@@ -130,12 +144,12 @@ tests = let ?plan = thePlan in  [ testGroup " The Plan "
     length (thePlan ^. initialFs) == length (thePlan ^. finalFs)
   ,
     testProof "sample halo matches the hand-written halo" $
-    (\ t x y z -> let p = Vec[t,x,y,z] in halo myBody p <=> itsHalo p)
+    halo myBody `subset` itsHalo
   ,
     let
         t :: Int -> FacetID -> FacetID -> Test
         t i fi ff  = testProof ("true for facet #" ++ show i) $
-                     move monitorOffset (embedf fi) `sameset` embedf ff in
+                     move monitorOffset (embody fi) `sameset` embody ff in
     testGroup "The final facets are exactly the initial facets moved by the monitoring offset" $
     zipWith3 t [0 ..] (thePlan ^. initialFs) (thePlan ^. finalFs)
   ]]
