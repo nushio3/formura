@@ -4,8 +4,10 @@ packages:
 extra-deps:
   - hoopl-3.10.2.0
   - lattices-1.4.1
+  - sbv-5.9
   - universe-base-1.0.2.1
   - universe-instances-base-1.0
   - universe-reverse-instances-1.0
+
 resolver: lts-3.20
 # skip-ghc-check: True
