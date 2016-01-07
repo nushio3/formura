@@ -39,8 +39,8 @@ spatialVecs =
   [Vec $ replicate (dimension+1) 0 & ix i .~ 1 | i <- [1..dimension]]
 
 
-naiveHalo :: Region -> Region
-naiveHalo r x = foldr1 (|||) [r $ x + v| v <- sFeet]
+halo :: Region -> Region
+halo r x = foldr1 (|||) [r $ x + v| v <- sFeet]
 
 range :: SInt -> (SInt, SInt) -> SBool
 range x (a,b)= a .<= x &&& x .< b
@@ -55,7 +55,7 @@ main :: IO ()
 main = do
   ret <- prove $ \ t x y z ->
                   let p = Vec [t,x,y,z] in
-                   naiveHalo myRegion p <=> itsHalo p
+                   halo myRegion p <=> itsHalo p
   print ret
   let p0 = Vec [98,0,0,0]
   print $ naiveHalo myRegion p0
