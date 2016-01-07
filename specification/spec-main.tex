@@ -1,0 +1,938 @@
+\documentclass{jsarticle}
+\usepackage{atbegshi}
+\ifnum 42146=\euc"A4A2
+  \AtBeginShipoutFirst{\special{pdf:tounicode EUC-UCS2}}
+\else
+  \AtBeginShipoutFirst{\special{pdf:tounicode 90ms-RKSJ-UCS2}}
+\fi
+\usepackage[utf8]{inputenc}
+\usepackage{listings,jlisting}
+\usepackage{natbib}
+\usepackage{colortbl}
+\usepackage{ulem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{syntax}
+\usepackage[dvipdfmx]{hyperref}
+\usepackage[dvipdfmx]{graphicx}
+
+
+%\def\dtime{\frac{\partial}{\partial t}}
+\def\dtime{\partial_t}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbZ}{\mathbb{Z}}
+
+\newcommand{\checkpoint}[1]{\uline{{\huge\makebox[0pt][l]{$\square$}\raisebox{.15ex}{\hspace{0.1em}$\checkmark$}} #1}}
+
+\lstset{language=Ruby, frame=single,morekeywords={
+    define,
+    function,
+    out,
+    complex_float, complex_double,
+    dimension,axes,
+    initial_function,
+    step_function
+}}
+
+% grammar settings
+\setlength{\grammarparsep}{20pt plus 1pt minus 1pt} % increase separation between rules
+\setlength{\grammarindent}{12em} % increase separation between LHS/RHS
+\renewcommand{\grammarlabel}[2]{\makebox[11.5em][r]{\synt{#1} #2}} % right align symbol names.
+%\shortverb{\|}
+\def\<#1>{\synt{#1}}
+
+\makeindex
+
+\begin{document}
+
+\title{Formura文法仕様書}
+
+\author{構造格子サブワーキンググループ}
+
+\maketitle
+
+
+\begin{abstract}
+  私達は、ステンシル計算用のドメイン特化言語
+  Formura\citep{latticesubwg2015formura}の開発を進めています。
+  これまで、実装の端緒となるFormuraコア文法を策定し、
+  その後2015年10月にかけて、気象チームのご協力で
+  2次元流体アプリを実装してシミュレーションを行わせてみる
+  などの実地調査を行なってきました。その結果、
+  当初議論していたテンソルやマクロなどのかっこいい機能がない
+  コンパクトなコア言語仕様のままでも、「短いコードでHPCプログラムが書ける」という当初の目的を十分達成
+  できることがわかってきました。
+  また、ユーザーの要望や皆様の洞察をもりこみ、コア文法は当初文書化したものから
+  進歩したものになってきました。
+
+  そこで、この文書では、今後Formuraユーザーの便宜のため、
+  またFormura仕様を満たした最適な計算コードを生成することに注力できるようにするため、
+  現時点でFormuraコア文法と意味論を改めて明示的に定式化することにしました。
+
+\end{abstract}
+
+
+\newpage
+
+\tableofcontents
+
+
+\newpage
+
+
+\section{この仕様書で用いるBNFについて}
+
+この仕様書では文法を定義するのに、例文とあわせて
+BNF (Backus-Naur form,バッカス・ナウア記法) を用います。そこで、Formura文法の説明をはじめる前にBNFについて導入的な説明を行います。
+
+
+BNFとは、言語の文法を厳密に定義するのに用いられる記法の一つです。BNFでは、終端記号から出発して、さまざまな
+非終端記号を定義してゆくことで文法を構築します。
+
+\lit{a}
+\lit{b}のように、一重引用符でくくられ等幅フォントで印字される項は
+終端記号(terminal)であり、その文字列そのものを指します。
+これに対し、
+\<a>や\<b>のように、山括弧でくくられたイタリック印字の項は非終端記号(non-terminal)と呼ばれ、
+\<a>や\<b>という名前が何を指すのかは
+他所で定義されていることを示します。
+定義には、BNFを用いることもありますが、自然言語で説明することもあります。
+
+BNFにおいて、左辺を右辺で定義するのには記号 {\tt ::=} を用います。
+左辺には常にひとつの非終端記号が来ます。
+右辺において、項をスペース区切りで連ねると、それらの項を並べた文法を意味し、
+また、縦棒$\left|\right.$ は複数の形式からいずれか1つ選ぶことを意味します。
+
+例えば、次の例において、\<digit-nonzero>は0以外の数字1文字を表し、
+\<digit>は0を含む10種類の数字を表します。
+
+\begin{grammar}
+  <digit-nonzero> ::= `1' |  `2' |  `3' |  `4' |  `5' |  `6' |  `7' |  `8' |  `9'
+
+  <digit> ::= `0' | <digit-nonzero>
+\end{grammar}
+
+また、次のBNFでは、
+\<function-definition>を、\lit{function}、 \<argument-list>、 \<function-body>、 \lit{end}を並べたものとして定義しています。
+
+\begin{grammar}
+<function-definition> ::= `function' <argument-list> <function-body>  `end'
+\end{grammar}
+
+次に、広く用いられている拡張BNFとして、
+\{ \} と
+ [ ] という２種類の括弧があります。
+\{\<a>\}は、\<a>の0回以上の繰り返しを表します。
+いっぽう[\<a>]は、\<a>の0回または1回の繰り返し（\<a>を省略してもよいこと）を表します。
+
+例えば、以下の例では\<natural-number>（正の整数）を、0でない数字で始まり、その後いくつでも数字が連なるもの、として定義しています。
+
+\begin{grammar}
+  <natural-number> ::= <digit-nonzero> \{ <digit> \}
+\end{grammar}
+
+さらに、以下の例では、省略可能を示す括弧
+ [ ] も使って
+ 整数全体を表す文法を定義しています。
+具体的には、整数とは
+ \lit{0}、または、
+\<natural-number>、または
+\lit{-} \<natural-number>
+である、と定義されています。それぞれの形式は0、正、負の整数に対応しています。
+
+
+\begin{grammar}
+  <integer> ::= `0' | [`-'] <natural-number>
+\end{grammar}
+
+
+最後に、本仕様書独自の記法として、三点リーダー
+(...)を前二項に作用する繰り返し記法とします。
+\<a> \<b> {...} という並びで
+\<a-separated-by-b>、つまり、
+\<b>で区切られた一つ以上の
+\<a>の繰り返しを表すことにします。
+
+
+\begin{grammar}
+  <a-separated-by-b> ::= <a>
+  \alt   <a> <b> <a-separated-by-b>
+\end{grammar}
+
+
+たとえば、次の文法は、丸括弧で全体をくくられ、\lit{,}で区切られた、1個以上の\<term>のリストを表しています。
+
+\begin{grammar}
+  <comma-separated-list> ::= `(' <term> `,' ... `)'
+\end{grammar}
+
+上記の文法は、通常の拡張BNFを用いれば以下のようにも表せます。
+
+\begin{grammar}
+  <comma-separated-list> ::= `(' <term> \{ `,' <term> \} `)'
+\end{grammar}
+
+応用例として、
+丸括弧で全体をくくられ、\lit{,}で区切られた、{\em 0}個以上の\<term>のリストは次の記法で表せます。
+
+\begin{grammar}
+  <comma-separated-list> ::= `(' [ <term> `,' ...  ] `)'
+\end{grammar}
+
+
+
+\section{Formuraコア文法}
+
+\subsection{文字}
+
+\definecolor{alphabetcolor}{rgb}{1,0.8,0.8}
+\definecolor{alphabetoidcolor}{rgb}{1,0.5,0.5}
+\definecolor{symbolcolor}{rgb}{0.8,0.8,1}
+\definecolor{symboliccolor}{rgb}{0.8,0.8,1}
+\definecolor{othercharcolor}{rgb}{0.8,0.8,0.8}
+\begin{table}
+  \centering
+  \begin{tabular}{cl}
+    \cellcolor{alphabetcolor} &アルファベットで始まる識別子名に使える文字 \\
+    \cellcolor{alphabetoidcolor} &アルファベットで始まる識別子名の2文字目以降に使える文字 \\
+    \cellcolor{symbolcolor} & 記号文字で始まる識別子名に使える文字 \\
+  \end{tabular}
+
+  \texttt{
+    \input{char-tbl.tex}
+  }
+  \caption {Formuraにおける7バイトASCII文字の分類。}\label{tbl:character}
+\end{table}
+
+FormuraのソースコードはUTF-8でエンコードされている必要があります。Formuraでは以下の文字種別を定義します：空白文字\<space-character>、アルファベット\<alphabet-character>、数字\<digit-character>、記号文字\<other-character>、文区切り文字\<punctuation-character>。
+
+空白文字は、ユニコード空白文字のうち、改行文字{\tt $\backslash$n}を除いたものです。
+また、\lit{\#}から改行の直前までの文字列はコメントであり、字句解析上は空白文字とみなされます。
+
+アルファベットはユニコードのアルファベットとアンダースコア{\tt \_}からなります。アルファベットは、UnicodeのGeneral\_Category値がLetterである文字であり、英語の大小文字のほか、ひらがな、カタカナ、漢字、ハングルなどもアルファベットに含まれます。General\_Category値の詳細については以下のURLを参照してください。
+
+\href
+{http://www.unicode.org/reports/tr44/tr44-14.html#GC_Values_Table}
+{http://www.unicode.org/reports/tr44/tr44-14.html\%23GC\_Values\_Table}
+
+
+記号文字は、ユニコードの印刷可能文字のうちアルファベットと空白文字でないもの全てから、Formuraで特殊な意味を割り当てられている、以下の記号を除いたものです。{\tt '"$\backslash$(),;[]{}\#}
+
+例として、7Bit ASCIIの範囲内の文字の分類については表\ref{tbl:character}を参照してください。
+
+\subsection{字句解析}
+
+Formuraの字句は、空白、数値および文字列リテラル、識別子名、各種括弧からなります。
+
+空白は、空白文字を並べたものです。
+空白は、字句を区切る以外の用途をもたず、単語区切りにはいくつあっても構いません。特に、Formuraはインデントに依存した文法を持ちません。
+
+数値リテラルは一般的な浮動小数点記法に準じます(TODO: 詳しく)。Formuraの数値リテラルはデフォルトで、任意精度有理数型と解釈されます。
+
+文字列リテラルは二重引用符\lit{"}で囲まれた任意の文字列です(TODO: 詳しく)。
+
+
+Formuraの識別子名\<identifier-name>は、ユーザーが変数名、演算子名などとして自由に使える文字列です。識別子名を作る方法は２通りあります：
+\begin{itemize}
+\item アルファベットから始まり、0個以上のアルファベットと数字からなる列が続くものは識別子名です。
+\item 1個以上の記号文字からなる文字列は識別子名です。
+\end{itemize}
+
+\begin{grammar}
+  <identifier-name> ::= <alphabet-character> \{<alphabet-character> | <digit-character>\}
+  \alt <other-character> \{<other-character>\}
+\end{grammar}
+
+Formuraの標準ライブラリでは、主に変数名や関数名にはアルファベット文字列、
+中置演算子名には記号文字列を用いていますが、
+Formuraの文法において変数名と演算子名との扱いが異なるわけではありません。
+したがって変数名に記号を用いたり、アルファベットからなる中置演算子を定義することができます。
+ただし、アルファベットと記号文字を混在させたシンボルは許されないことにしています。
+これは、{\tt a+b}のような式が、間にスペースがない場合に、ひとつのシンボル\lit{a+b}としてではなく、
+加算式$a+b$として解釈されるようにするためです。
+
+次の各行の文字列はFormuraの識別子名です。
+\begin{lstlisting}
+  alpha_beta_gamma
+  sanma398
+  HoNU
+  @
+  -.-
+  @*@-
+  !@$%^&*+=-/<>~.
+\end{lstlisting}
+
+次の各行の文字列は識別子名ではありません。
+\begin{lstlisting}[mathescape]
+  call/cc
+  solve-problem-life-matter-universe
+  398san
+  @kemi
+  #
+  $\backslash$(^o^)/
+\end{lstlisting}
+
+
+
+\subsection{文}
+
+Formuraのプログラムは複数の文\<statement>を文区切り\<statement-delimiter>で区切ったものです。
+Formuraの文は、セミコロンもしくは改行で区切られます。
+
+\begin{grammar}
+  <formura-program> ::= <statement> <statement-delimiter> ...
+
+  <statement-delimiter> ::= `;'
+  \alt <newline>
+\end{grammar}
+
+以下に、Formuraの文と区切り文字の例を示します。
+
+\begin{lstlisting}[mathescape]
+  a = b; c = d
+  a[i] = b[i]
+  a[i] = b[i];;
+\end{lstlisting}
+
+
+Formuraの文には、代入文\<substitution-statement>、
+型宣言文\<type-declaration> 、
+特殊宣言文\<special-declaration>、
+関数定義\<function-definition>があります。
+また、何もない空文\<empty>も許されます。
+
+代入文は、\<左辺パターン> {\tt =} \<式>の形です。
+型宣言文と特殊宣言文は類似した文法をもっていて、それぞれ\<型名> {\tt ::} \<変数名>
+および\<特殊宣言名> {\tt ::} \<変数名>の形をとります。
+関数定義の形式については後述します。
+
+宣言文の右辺には、カンマ区切りで複数の変数名を書くことができます。
+
+\begin{grammar}
+  <statement> ::= <substitution-statement> |
+  <type-declaration> |
+  <compound-statement> |
+  <special-declaration> |
+  <function-definition> |
+ <empty>
+
+ <substitution-statement> ::= <left-hand-side-pattern> `=' <expression>
+
+ <type-declaration> ::= <type-name> `::' <variable-name-list>
+
+ <special-declaration> ::= <special-declaration-name> `::' <variable-name-list>
+ \alt <dimension-declaration>
+
+ <variable-name-list> ::= <variable-name> `,' ...
+\end{grammar}
+
+\subsubsection{特殊宣言文}
+
+特殊宣言文には、空間次元宣言文\lit{dimension}、座標軸名宣言文\lit{axes}、初期化関数宣言文\lit{initial_function}、更新関数宣言文\lit{step_function}があります。
+
+空間次元宣言文はステンシル計算に用いる空間グリッドの次元を宣言します。座標軸名宣言文は各座標にわりあてる名前を
+宣言します。これらの軸名の先頭に\lit{N}をつけた変数名が、Formuraが生成するコードにおいて、各空間次元のサイズとして使われます。
+
+\lit{initial_function}で指定する関数は引数をとらず、グリッド型の値、またはいくつかのグリッドを含むタプルを返すような関数でなくてはなりません。
+\lit{step_function}で指定する関数は、\lit{initial_function}関数が返す型を受け取り、同じ型を返す関数である必要があります。
+
+
+例えば次の例では3次元の格子を初期化する関数を指定しています。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 3
+  axes :: X, Y, Z
+
+  initial_function :: init
+  step_function :: update
+
+  begin function dens = init()
+    Real [,,] :: dens
+    dens[i,j,k]  = sin(i) * j + k
+    dens[0,,]    = 0
+    dens[NX-1,,] = 0
+  end function
+\end{lstlisting}
+
+
+
+
+
+\subsubsection{関数定義文}
+
+関数定義の文法を次に示します。
+
+\begin{grammar}
+<function-definition> ::=
+  `begin' `function' <return-value> `=' <function-name> <arguments-pattern> \\
+\hspace{2em}<statement> <statement-delimiter> ...  \\
+    `end' `function'
+
+<return-value> ::= <expression>
+
+<arguments-pattern>     ::= <variable-name>
+                         \alt  `('<arguments-pattern>  `,' ... `)'
+\end{grammar}
+
+関数定義は\syntax{`begin' `function'}で始まり、返値、関数名、引数の指定が続き、その後に関数の本文があって、
+\syntax{`end' `function'}で終わります。
+
+関数は0個以上の引数と0個以上の帰値をもつことができ、それぞれ
+\<return-values-pattern> および
+\<arguments-pattern>に従って、タプルで表します。
+これは、関数が任意個数の入力と任意個数の出力を取れるようにするための仕様です。
+
+関数の入力\<arguments-pattern>、返値、および関数内部で登場する変数名については、すべて関数内で型宣言されている必要があります。
+(TODO:将来的には型推論を入れよう。)
+
+\subsubsection{複文}
+
+Formuraでは、型宣言文および複数の代入文を複合させて簡潔に記述することができます。
+この形式を複文と呼びます。
+
+\begin{grammar}
+ <compound-statement> ::= <type-name> `::' (<variable-name> | <substitution-statement>)  `,' ...
+\end{grammar}
+
+複文で宣言されるすべての変数の型は同じです。
+複文の例を以下に示します。
+
+\begin{lstlisting}[mathescape]
+  double :: c = 3, d, e = 6
+\end{lstlisting}
+
+これは次の文と同じです。
+
+\begin{lstlisting}[mathescape]
+  double :: c = 3
+  double :: d
+  double :: e = 6
+\end{lstlisting}
+
+
+
+\subsubsection{プログラム例}
+
+以下に代入文、型宣言文、特殊宣言文、関数定義文の例を示します。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 2
+  axes :: X,Z
+
+  a = b
+
+  complex_double :: c, d, e, f
+
+  begin function y = sin(x)
+  　double :: y, x
+    y = x - x**3 / 6 + x**5 / 120 - x**7 / 5040
+  end function
+
+  begin function (next_x, next_y) = update(x,y)
+  　double[,] :: y, x, next_x, next_y
+    next_x =  x * y
+    next_y =  x + y
+  end function
+\end{lstlisting}
+
+
+
+
+
+
+
+\subsection{型}
+
+\begin{table}
+  \begin{center}
+\begin{tabular}{c|c}
+  \hline
+  型名 & 意味 \\
+  \hline
+  \lit{ integer} & 整数 \\
+  \lit{ rational} & 無限精度有理数\\
+  \lit{ float} & 単精度実数\\
+  \lit{ double} & 倍精度実数\\
+  \lit{ Real} & ユーザー定義型の実数\\
+  \lit{ complex_float} & 単精度複素数\\
+  \lit{ complex_double} & 倍精度複素数\\
+  \lit{ Complex} & ユーザー定義型の複素数\\
+  \lit{ string} & 文字列型\\
+  \hline
+\end{tabular}
+\caption{要素型 \<element-type-name> に含まれる名前とその意味}
+\label{tbl:scalar-type}
+  \end{center}
+\end{table}
+
+
+Formuraの型は、要素型、および型のグリッド(格子)、型のタプル(組)、型のベクトル(ランダムアクセス可能な配列)からなります。
+
+要素型の一覧については
+表\ref{tbl:scalar-type}を参照してください。グリッドは、ステンシル計算の格子を表現するデータ型です。これに対しベクトルは、
+通常の意味でのランダムアクセス可能な配列です。また、タプルは複数の(異なってもよい)型の組です。
+
+\begin{grammar}
+<type-name> ::= <element-type-name>                  \hfill {(要素型)}
+\alt <type-name> `[' <offset-expression> `,' ... `]' \hfill {(グリッド)}
+\alt `(' <type-name> `,' .. `)'                      \hfill {(タプル)}
+\alt <type-name> `(' <vector-size> `,' ... `)'                   \hfill {(ベクトル)}
+
+<element-type-name> ::= `integer' | `rational' | `float' | `double'
+| `complex_float' | `complex_double'
+| `Real' | `Complex' | `string'
+\end{grammar}
+
+以下に要素型、グリッド、タプル、ベクトルを定義する例を示します。
+\<offset-expression> の値が0のときは省略できる仕様です。
+また、グリッドのタプルのベクトルの…といった複雑な型を作る場合、型コンストラクタは左から順に結合することに注意してください。
+
+グリッド、ベクトルはいずれも多次元にすることができます。ただし、グリッドの次元は\lit{dimension}宣言で指定したのと同じでなくてはなりません。また、2重以上のグリッド(グリッドのグリッド等)はサポートされません。
+
+\begin{lstlisting}[mathescape]
+  Real :: a
+  Real[1/2,0] :: b
+  Real[1/2,]  :: b2
+  (Real, Real, Real)[,] :: velocity
+  Real(3)[,] :: velocity_as_array_of_structure
+  Real[,](3) :: velocity_as_structure_of_array
+\end{lstlisting}
+
+Formuraにおいて、$n$次元のベクトルは$n$重のベクトルと等価であり、さらに$m$要素の一次元ベクトルは同じ型を$m$個要素にもつ$m$-タプルと等価です。例えば以下の文において、4つの変数\lit{t1} ... \lit{t4}はすべて同じ型です。
+
+\begin{lstlisting}[mathescape]
+  Real(3,2) :: t1
+  Real(3)(2) :: t2
+  (Real, Real, Real)(2) :: t3
+  ((Real, Real, Real),(Real, Real, Real)) :: t4
+
+  t4(i,j) = t1(i,j)
+  t3(i)   = t2(i)
+\end{lstlisting}
+
+
+
+\subsection{式}
+
+
+
+
+Formuraの式は、
+即値               \<literal>
+、変数名           \<variable-name>
+、二項演算子式     \<binary-operator-expression>
+、単項演算子式     \<unary-operator-expression>
+、if文             \<if-then-else-expression>
+、括弧式           \<parenthesis-expression>
+、格子アクセス式   \<grid-access-expression>
+、要素アクセス式   \<projection-expression>
+、関数呼び出し     \<function-call-expression>
+から構成されます。
+\<literal>には数字リテラルと文字列リテラルとがあり、
+\<variable-name>の文法は\<identifier-name>と同一です。
+それ以外の式の文法は以下のとおりです。
+
+
+\begin{grammar}
+  <expression> ::= <literal> | <variable-name> |
+<binary-operator-expression> |
+<unary-operator-expression>  |
+<if-then-else-expression>    |
+<parenthesis-expression>     |
+<grid-access-expression>    |
+<projection-expression>    |
+<function-call-expression>
+
+<binary-operator-expression> ::= <expression> <binary-operator> <expression>
+
+<unary-operator-expression>  ::= <unary-operator> <expression>
+
+<if-then-else-expression>    ::= `if' <expression> `then' <expression> `else' <expression>
+
+<parenthesis-expression>     ::= `('  <expression>  `)'
+
+<offset-expression>          ::= <variable-name> `[' <offset-expression> `,' ... `]'
+
+<grid-access-expression>     ::= <variable-name> `[' <cursor-expression> `,' ... `]'
+
+<projection-expression>      ::= <variable-name> `(' <expression> `)'
+
+<function-call-expression>   ::= <function-name> `(' [ <expression> `,' ... ] `)'
+\end{grammar}
+
+
+
+\subsection{演算子と優先順位}
+
+\begin{table}
+  \begin{center}
+    \begin{tabular}{cc|c|c}
+  \hline
+  \<binary-operator>                                          & (結合性) & \<unary-operator> & 意味 \\
+  \hline
+  \lit{} (併置) & 左結合& &  関数呼び出し、配列アクセス等 \\
+  \lit{.}  & 右結合& &  関数合成 \\
+  \lit{ **}                                                  & 右結合 & & 冪乗\\
+  \lit{ *}, \lit{ /}                                         & 左結合 & & 乗除算\\
+  \lit{ +}, \lit{ -}                                         & 左結合& \lit{ +}, \lit{ -} & 加減算、符号 \\
+    \lit{<}, \lit{<=}, \lit{==}, \lit{!=},\lit{>=}, \lit{>}  & 多結合 & & 比較演算子\\
+                                                             &  &\lit{!}, \lit{not} & 論理否定 (not)\\
+    \lit{\&\&}, \lit{and}                                    & 左結合 & &  論理積 (and)\\
+    \lit{||}, \lit{or}                                       & 左結合 &  & 論理和 (or)\\
+    \lit{|}                                                  & 右結合  & & 格子定義域の拡張\\
+    \lit{,}                                                  & 多結合 &  & カンマ区切りリスト\\
+  \hline
+\end{tabular}
+\caption{演算子と優先順位}\label{tbl:operator}
+\end{center}
+\end{table}
+
+
+
+演算子のあいだには優先順位と結合性が定義されています。
+表\ref{tbl:operator}を参照してください。
+
+
+
+優先順位が高い演算子ほど強く結合します。例えば{\tt a+b*c}は
+{\tt a+(b*c)}の意味に、
+{\tt -b*c}は
+{\tt -(b*c)}の意味に、
+{\tt -b<c}は
+{\tt (-b) < c}の意味になります。
+
+
+結合性は、優先順位が同じ演算子どうしが連続した場合の解釈のしかたを決めます。例えば
+\lit{**}は右結合なので、{\tt 3**3**3}は {\tt 3**(3**3)}の意味になりますが、
+\lit{-}は左結合なので、{\tt 3-4-5}は {\tt (3-4)-5}の意味になります。
+
+多結合演算子は、連続して登場した場合には一塊として解釈されます。
+例えば、Formuraにおいて{\tt 3<a<5}は{\tt (3<a)\&\&(a<5)}を意味します。
+
+
+\subsection{式の左辺}
+
+Formuraの代入文の左辺に来る
+\<left-hand-side-pattern>については、変数名、タプルのパターンマッチ、格子変数へのアクセスが書けます。
+
+\begin{grammar}
+  <left-hand-side-pattern> ::= <variable-name>
+  \alt <left-hand-side-pattern> `[' <cursor-expression> `,' ... `]'
+  \alt `(' <left-hand-side-pattern> `,' .. `)'
+\end{grammar}
+
+以下に、いくつかの代入文を示します。以下の例に示すように、
+代入文の左辺にスカラー変数が来る場合には変数名パターンが利用でき、
+グリッド変数が来る場合には変数パターンおよび、
+その次元数に対応したカーソルパターンを用いた左辺パターンが利用できます。
+タプルやベクトル変数は、\lit{()}によって添字アクセスします。
+
+\begin{lstlisting}[mathescape]
+  double :: a, b
+  double[0,0] :: c, d, e ,f
+  (double, int) :: g
+  int :: n
+
+  a = b
+  c[i,j] = d[i,j+1]
+  e = f
+  (a,n) = g
+  n = g(1)
+\end{lstlisting}
+
+
+
+\newpage
+
+\subsection{Formuraコア文法の全定義}
+
+\begin{grammar}
+<formura-program> ::= <statement> <statement-delimiter> ...
+
+<statement-delimiter> ::= `;' | <newline>
+
+  <statement> ::= <substitution-statement> \alt
+  <type-declaration> \alt
+  <compound-statement> \alt
+  <special-declaration> \alt
+  <function-definition> \alt
+ <empty>
+
+ <substitution-statement> ::= <left-hand-side-pattern> `=' <expression>
+
+ <type-declaration> ::= <type-name> `::' <variable-name-list>
+
+ <special-declaration> ::= <special-declaration-name> `::' <variable-name-list>
+ \alt <dimension-declaration>
+
+ <variable-name-list> ::= <variable-name> `,' ...
+
+<type-name> ::= <element-type-name>                  \hfill {(要素型)}
+\alt <type-name> `[' <offset-expression> `,' ... `]' \hfill {(グリッド)}
+\alt `(' <type-name> `,' .. `)'                      \hfill {(タプル)}
+\alt <type-name> `(' <vector-size> `,' ... `)'                   \hfill {(ベクトル)}
+
+<element-type-name> ::= `integer' | `rational' | `float' | `double'
+| `complex_float' | `complex_double'
+| `Real' | `Complex' | `string'
+
+<special-declaration> ::= `dimension' | `axes'| `initial_function' |  `step_function'
+
+<function-definition> ::=
+  `begin' `function' <return-value> `=' <function-name> <arguments-pattern> \\
+\hspace{2em}<statement> <statement-delimiter> ...  \\
+    `end' `function'
+
+<return-value> ::= <expression>
+
+<arguments-pattern>     ::= <variable-name>
+                         \alt  `('<arguments-pattern>  `,' ... `)'
+
+
+<expression> ::= <literal> | <variable-name>
+\alt <expression> <binary-operator> <expression>
+\alt <unary-operator> <expression>
+\alt `if' <expression> `then' <expression> `else' <expression>
+\alt  `('  <expression>  `)'
+\alt <variable-name> `[' <expression> `,' ... `]'
+\alt <function-name> `(' [ <expression> `,' ... ] `)'
+
+
+  <left-hand-side-pattern> ::= <variable-name>
+  \alt <left-hand-side-pattern> `[' <cursor-expression> `,' ... `]'
+  \alt `(' <left-hand-side-pattern> `,' .. `)'
+
+<variable-name> ::= <identifier-name>
+
+<function-name> ::= <identifier-name>
+
+<identifier-name> ::= <alphabet-character> \{<alphabet-character> | <digit-character>\}
+  \alt <other-character> \{<other-character>\}
+
+\end{grammar}
+
+\newpage
+
+
+
+\section{Formuraコア文法における演算の意味論}
+
+% \begin{grammar}
+%   <T> ::= <element-type>
+%   \alt
+%
+%   <t> ::= <literal> \\
+%   | <t> <binary-operator> <t>
+% \end{grammar}
+
+
+
+
+\subsection{Formuraの演算}
+
+Formuraの目的は全ての代入文の左辺の値を計算することです。
+Formuraの代入文は上から順番に評価されます。
+
+Formuraの代入文は静的単一代入です。これは、各行の変数を区別し、ある行の変数は前の行までの変数で定義されていると
+解釈するという意味です。たとえば、つぎのプログラムは
+
+\begin{lstlisting}
+  a[i] = sin(i)
+  a[i] = a[i-1] + a[i+1]
+  b[i] = a[i]
+\end{lstlisting}
+
+
+以下のプログラムであるかのように解釈されます。
+\begin{lstlisting}
+  a_0[i] = sin(i)
+  a_1[i] = a_0[i-1] + a_0[i+1]
+  b_2[i] = a_1[i]
+\end{lstlisting}
+
+
+これに伴い、一つの代入文で同一名の変数を複数回設定するような文はエラーとします。
+\begin{lstlisting}
+  (s,o,s) = help()
+\end{lstlisting}
+
+
+
+
+\subsection{Formuraの意味論}
+
+
+スカラー変数には、ただ1つの値が対応します。
+
+タプルは要素番号を取って値を返す関数に対応させます。ベクトルに関しては、タプルと同一視することで意味をつけます。
+
+グリッド変数はFormuraにおいてステンシル計算を表現する重要な型です。
+$d$次元のグリッド変数は、$d$個の有理数$(r_i, .. ^{i \in 0 .. d-1})$によりオフセットを指定できます。
+グリッド変数の値は、$d$次元ユークリッド空間において、整数座標から$(r_i, ..)$だけずれた格子点
+$(n_i + r_i , .. ^{\i \in 0..d-1, n_i \in \bbZ})$において定義されます。いわばグリッド変数は
+$(n_i + r_i , ..)$を受け取って値を返す関数です。
+
+Formuraにおけるグリッド変数は、必ず(オフセットされた)任意の格子点にて定義されていると解釈することに注意してください。
+たとえ境界条件があっても必ずです。このことは、PiTCH計算モデルを当てはめるうえで必要です。
+
+TODO: フォーマルな表示的意味論を整備する。
+
+
+\subsection{Formuraの暗黙の型変換}
+
+算術二項演算\lit{+}, \lit{*}, ... に渡す2つの値は、型が一致している必要があります。型が一致しない場合、Formuraは両者を共通に格納できる「大きな」型への変換を試みます。たとえば、スカラーとタプルの掛け算、スカラーとグリッドの掛け算は、それぞれスカラー値のほうの意味を拡張し、
+タプルの各要素、グリッドの各要素とそのスカラー値の掛け算を行います。
+
+より詳細に、スカラーとタプル、もしくは、タプルとスカラーの間の演算は、そのスカラーとタプルの各要素間の演算として定義します。
+また、同数の要素をもつタプルどうしの演算は、同じ位置にある要素どうしの演算として定義します。
+この定義は、多重のタプルに対しては再帰的に適用されるものとします。
+
+\begin{lstlisting}
+  z * (a, b, c) = (z*a, z*b, z*c)
+  (a, b, c) / d = (a/d, b/d, c/d)
+  (a, b) + (x, y) = (a + x, b + y)
+  (a, b) - (x, (y, z)) = (a - x, (b - y, b - z))
+\end{lstlisting}
+
+異なる要素数のタプル同士や、要素型が異なるタプル同士、オフセットが異なるグリッド同士は互換性がありません。
+このような互換性のない型の値どうしの演算はエラーとします。
+
+同様の型拡張ルールは\lit{if}式にも適用されます。\lit{if}式は三項演算子として解釈され、さらに
+
+\subsection{添字を明示した演算}
+
+
+グリッド変数に対し、左辺パターンを使って添字を明示的に指定した形の代入文を書いた場合、
+左辺のグリッド変数の各要素の値を直接、右辺式で定義する、という意味になります。
+この記法を使った代入文の例を以下に示します。
+
+\begin{lstlisting}
+  a[i,j] = sin(- i * j * lambda_z) + b[i,j] * c[i,j]
+\end{lstlisting}
+
+左辺、右辺ともに、グリッド添字変数には通常の変数と同様、任意の演算を施すことができます。
+
+ただし、グリッド添字変数を含む式をグリッド変数へのアクセスに使う場合は、
+グリッド添字変数に対して施しうる演算は、定数式の加減算のみです。
+また、左辺で$i$番目の座標軸に使われたパターン変数は、
+右辺でも同一の座標軸の添字にしか使うことができません。
+この二つのルールにより、グリッド添字にかんしてステンシル性を担保します。
+
+\begin{lstlisting}
+  double [] :: a
+  double [1/2] :: b
+  double [1/4] :: c
+  b[i+1/2] = a[i] + a[i+1] + c[i+1/4]
+\end{lstlisting}
+
+上記のように、演算したいグリッド変数どうしのオフセットが異なる場合、添字変数に有理数を加減算することでオフセットを合わせる必要があります。
+オフセットが異なるグリッド変数どうしの演算は型エラーとなります。
+
+左辺で定義されている添字変数は右辺で省略することができます。また0であるオフセット値も省略できます。添字同士の区切りである\lit{,}も省略できます。
+
+
+グリッド変数の添字の数は
+\lit{dimension}宣言で定義されているはずです。したがって0添字や\lit{,}を省略しても添字の数にかんして曖昧性は生じないことに注意してください。省略されているオフセット値はすべて0とみなします。
+
+
+\subsection{添字を省いたグリッド演算}
+
+Formuraでは、グリッド変数同士に直接加減乗除などの演算を施すことができます。
+グリッド変数同士を直接演算する場合、グリッド変数のオフセットが一致している必要があります。
+
+\begin{lstlisting}
+  double [,] :: a, b, c
+  a = b + sin(c)
+\end{lstlisting}
+
+さきほどの計算ですが、添字をとことん省略して書くと以下のようになります。
+
+\begin{lstlisting}
+  double [] :: a
+  double [1/2] :: b
+  double [1/4] :: c
+  b[1/2] = a + a[1] + c[1/4]
+\end{lstlisting}
+
+もっとも、単項\lit{+}演算子だけは省略しないほうがわかりやすいかもしれません。
+\begin{lstlisting}
+  b[+1/2] = a + a[+1] + c[+1/4]
+\end{lstlisting}
+
+上記のプログラムのまた違った解釈として、
+\lit{[+1]}を、配列を一つ左向きにずらす演算子だと思うこともできます。
+
+ただし、次のコードが意味をつけようとすると難しいのと同様、
+
+\begin{lstlisting}
+  double [0] :: a
+  a[i] = a[i+1][i+1]
+\end{lstlisting}
+
+次のようなコードも許されません。\lit{[+1]}はあくまでも、グリッド添字変数の省略形であることを忘れないでください。
+
+\begin{lstlisting}
+  double [0] :: a
+  a[i] = a[+1][+1]
+\end{lstlisting}
+
+
+\newpage
+
+\section{Formuraコア文法の利用}
+
+以上のコア構文を用いて、ステンシル計算を書いてみます。
+
+
+Formuraが最低限できる必要があるのは、シンプルなグリッド変数どうしの演算です。具体的には、
+
+\begin{enumerate}
+\item グリッドの次元とサイズをを宣言する
+\item 各グリッド点にある変数の値を計算する
+\item 差分スキームを記述する（空間的に隣接するセルの値を取ってくる）
+\item 時間積分スキームを記述する（時間的に次のセルに値を渡す）
+\end{enumerate}
+
+ことができれば足ります。
+
+以下に、Formuraコア文法だけを使って記述したプログラムを示します。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 2
+  axes :: X, Y
+
+  d = 0.1
+
+  initial_function :: init
+  step_function :: step
+
+  begin function a = init ()
+    double[,] :: a
+
+    a[i,j] = 1e4 * exp( - ((i-50)**2 + (j-50)**2) / 100)
+  end function
+
+  begin function a_next = step (a)
+    double[,] :: a, a_next
+
+    double[1/2,] :: flux_x
+    double[,1/2] :: flux_y
+    flux_x[i+1/2,j] = a[i+1,j] - a[i,j]
+    flux_y[i,j+1/2] = a[i,j+1] - a[i,j]
+
+    a_next[i,j] = a[i,j] +                          \
+      d * (flux_x[i+1/2,j]-flux_x[i-1/2,j] +        \
+           flux_y[i,j+1/2]-flux_y[i,j-1/2])
+  end function
+\end{lstlisting}
+
+タプル型の設計にあたっては\citet{pierce2002types}を参考にしました。
+また、タプルの言語への組み込みにあたっては\citet{oliveira2015modular}を参考にしました。
+
+\bibliographystyle{abbrvnat}
+
+
+\bibliography{reference}
+
+
+\end{document}
