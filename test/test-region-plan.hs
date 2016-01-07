@@ -99,7 +99,7 @@ thePlan = Plan{}
           & initialFs .~ [orthotope[(0,1),(0,48),(0,48),(0,48)],
                           orthotope[(0,1),(0,48),(0,48),(0,48)] ]
           & finalFs .~   [orthotope[(4,5),(0,48),(0,48),(0,48)],
-                          orthotope[(4,5),(0,48),(0,48),(0,47)]]
+                          orthotope[(4,5),(0,48),(0,48),(0,48)]]
 
 
 
@@ -126,7 +126,7 @@ tests = [ testGroup " The Plan "
     let
         t :: Int -> Facet -> Facet -> Test
         t i fi ff  = testProof ("true for facet #" ++ show i) $ move monitorOffset fi `sameset` ff in
-    testGroup "The final facets are exactly moved by monitoring offsets" $
+    testGroup "The final facets are exactly the initial facets moved by the monitoring offset" $
     zipWith3 t [0..] (thePlan ^. initialFs) (thePlan ^. finalFs)
   ]]
 

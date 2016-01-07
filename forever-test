@@ -1,0 +1,9 @@
+#!/bin/sh
+
+while :
+do
+    stack test --ghc-options=-ferror-spans
+    inotifywait -e modify -r ./src/ ./exe-src/ ./test/ formura.cabal
+done
+
+# http://stackoverflow.com/questions/32712775/generating-documentation-for-my-own-code-with-haddock-and-stack
