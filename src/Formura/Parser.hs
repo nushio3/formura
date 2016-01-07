@@ -179,7 +179,7 @@ imm = "rational literal" ?> parseIn $ do
 exprOf :: (OperatorF ∈ fs, ApplyF  ∈ fs) => P (Lang fs) -> P (Lang fs)
 exprOf termParser = X.buildExpressionParser tbl termParser
   where
-    tbl = [[binary "." Apply X.AssocRight],
+    tbl = [[binary "." (Binop ".") X.AssocRight],
            [binary "**" (Binop "**") X.AssocLeft],
            [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
