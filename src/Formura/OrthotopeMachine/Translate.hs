@@ -149,6 +149,7 @@ goUniop op (av :. at) = insert (Uniop op av) at
 goUniop _ _  = raiseErr $ failed $ "unimplemented path in unary operator"
 
 goBinop :: IdentName -> ValueExpr -> ValueExpr -> GenM ValueExpr
+goBinop (".") a b = return $ FunValue (Ident "x") (Apply (subFix a) (Apply (subFix b) (Ident "x")))
 goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
   TopType -> raiseErr $ failed $ unwords
              ["there is no common type that can accomodate both hand side:", show at, op , show bt]
@@ -160,7 +161,7 @@ goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
     (bv2 :. _) <- castVal (subFix ct) bx
     insert (Binop op av2 bv2) (typeModifier ct)
 
-goBinop _ _ _  = raiseErr $ failed $ "unimplemented path in binary operator"
+goBinop o a b  = raiseErr $ failed $ "unimplemented path in binary operator: " ++ show (o,a,b)
 
 isBoolishType :: NodeType -> Bool
 isBoolishType (ElemType "bool") = True
