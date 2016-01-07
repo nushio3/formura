@@ -17,5 +17,5 @@ begin function dens_next = step(dens)
   float :: Dx, Dt
   Dx = 4.2
   Dt = 0.1
-  dens_next = dens + Dx**2/Dt * Σ for(i) ∂ i . ∂ i dens
+  dens_next = dens + Dx**2/Dt * Σ for(i) (∂ i . ∂ i) dens
 end function
