@@ -1,2 +1,25 @@
-density :: grid3;
-velocity :: grid2array1;
+answer = 6 * 7
+(x,y) = 3
+pair = (7,4-2)
+== = ==
+fact = for(x) x * fact(x-1)
+fix = for (f)  f(fix(f))
+b[i+1, j] = (a+b)[i]
+big = let a = 1; b = 2; int :: c in A + B + C
+double :: a , b = 3, c
+
+ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+
+∂ = (ddx,ddy,ddz)
+
+dvdt(i) = Σ for(j) ∂j . ∂i . p j
+
+begin function y = square(x)
+    y = x ** 2
+end function
+
+begin function cube(x) returns (x * y)
+    y = x ** 2
+end function

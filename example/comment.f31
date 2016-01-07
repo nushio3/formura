@@ -1,4 +1,0 @@
-begin function (dens_next) = update (dens)
-      # comment
-      a = b
-end function

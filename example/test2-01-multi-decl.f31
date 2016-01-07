@@ -1,5 +1,0 @@
-begin function () = update ()
-      float[,] :: F = 1.0
-      F[] = 2.0
-      F[] = 3.0
-end function

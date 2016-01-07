@@ -1,2 +1,0 @@
-parameter dimension = 3
-      
