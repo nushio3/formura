@@ -1,11 +1,12 @@
-#include "stdio.h"
-#include "stdlib.h"
-#include "sys/time.h"
-#define NX 32
-#define NY 32
-#define NZ 32
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <fj_tool/fapp.h>
+#define NX 64
+#define NY 64
+#define NZ 64
 
-#define T_MAX 1000000
+#define T_MAX 100000
 
 double aa[NZ][NY][NX];
 double ab[NZ][NY][NX];
@@ -35,27 +36,54 @@ int main () {
   }
 
   double t_begin = wctime();
+  start_collection("region");
 
   for (int t=0;t<T_MAX; ++t){
     for (int k=0;k<NZ;++k) {
       for (int j=0;j<NY;++j) {
         for (int i=0;i<NX;++i) {
           double x = aa[k][j][i];
-          x = 3.89*x - 3.88*x*x;
-          aa[k][j][i] = x;
+
+          double x0 = 0.890*x - 0.880*x*x;
+          double x1 = 0.889*x - 0.881*x*x;
+          double x2 = 0.888*x - 0.882*x*x;
+
+          x0 = 3.89*x0 - 3.88*x0*x0;
+          x1 = 3.89*x1 - 3.88*x1*x1;
+          x2 = 3.89*x2 - 3.88*x2*x2;
+
+          x0 = 3.89*x0 - 3.88*x0*x0;
+          x1 = 3.89*x1 - 3.88*x1*x1;
+          x2 = 3.89*x2 - 3.88*x2*x2;
+
+          x0 = 3.89*x0 - 3.88*x0*x0;
+          x1 = 3.89*x1 - 3.88*x1*x1;
+          x2 = 3.89*x2 - 3.88*x2*x2;
+
+          x0 = 3.89*x0 - 3.88*x0*x0;
+          x1 = 3.89*x1 - 3.88*x1*x1;
+          x2 = 3.89*x2 - 3.88*x2*x2;
+
+          x0 = 3.89*x0 - 3.88*x0*x0;
+          x1 = 3.89*x1 - 3.88*x1*x1;
+          x2 = 3.89*x2 - 3.88*x2*x2;
+
+
+          aa[k][j][i] = (x0*x1+x2)/2;
         }
       }
     }
   }
 
+  stop_collection("region");
   double t_end = wctime();
-  double flops = 4.0*(double)NX*NY*NZ*T_MAX / (t_end - t_begin);
+  double flops = (6 * 12 + 3.0)*(double)NX*NY*NZ*T_MAX / (t_end - t_begin);
 
   double sum = 0;
   for (int k=0;k<NZ;++k) {
     for (int j=0;j<NY;++j) {
       for (int i=0;i<NX;++i) {
-        sum += aa[k][j][i];
+        sum += aa[k][j][i] + ab[k][j][i] + ac[k][j][i] + ad[k][j][i];
       }
     }
   }

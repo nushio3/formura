@@ -1,6 +1,4 @@
 #!/bin/bash
-OPTFLAGS="-O3 -Kparallel  -Kocl -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Keval"
-
 ./configure --host=sparc64 CXX=mpiFCCpx CC=mpifccpx \
-            CFLAGS=$OPTFLAGS \
-            CXXFLAGS=$OPTFLAGS
+            CFLAGS="-O3 -Kfast,parallel  -Kocl -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Keval" \
+            CXXFLAGS="-O3 -Kfast,parallel  -Kocl -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Keval"
