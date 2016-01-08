@@ -12,8 +12,8 @@ AC_PATH_PROG(CC_PATH, $CC, NO_PATH)
 if test "$CC_PATH" = NO_PATH; then
    CC="mpicc"
    CXX="mpicxx"
-   CFLAGS="-std=c99"
-   CXXFLAGS="-g -std=c++11"
+   CFLAGS="-O3 -std=c99"
+   CXXFLAGS="-O3 -std=c++11"
 fi
 
 # Checks for programs.
