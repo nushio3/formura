@@ -6,7 +6,7 @@
 #define NY 64
 #define NZ 64
 
-#define T_MAX 50000
+#define T_MAX 10000
 
 double aa[NZ][NY][NX];
 double ab[NZ][NY][NX];
@@ -38,39 +38,6 @@ int main () {
   double t_begin = wctime();
   start_collection("region");
 
-#define LOOPBODY(PRE_HOOK,POST_HOOK)	 \
-    double x = aa[k][j][i];		 \
-					 \
-    PRE_HOOK;				 \
-					 \
-    double x0 = 0.890*x - 0.880*x*x;	 \
-    double x1 = 0.889*x - 0.881*x*x;	 \
-    double x2 = 0.888*x - 0.882*x*x;	 \
-					 \
-    x0 = 3.89*x0 - 3.88*x0*x0;		 \
-    x1 = 3.89*x1 - 3.88*x1*x1;		 \
-    x2 = 3.89*x2 - 3.88*x2*x2;		 \
-					 \
-    x0 = 3.89*x0 - 3.88*x0*x0;		 \
-    x1 = 3.89*x1 - 3.88*x1*x1;		 \
-    x2 = 3.89*x2 - 3.88*x2*x2;		 \
-					 \
-    x0 = 3.89*x0 - 3.88*x0*x0;		 \
-    x1 = 3.89*x1 - 3.88*x1*x1;		 \
-    x2 = 3.89*x2 - 3.88*x2*x2;		 \
-					 \
-    x0 = 3.89*x0 - 3.88*x0*x0;		 \
-    x1 = 3.89*x1 - 3.88*x1*x1;		 \
-    x2 = 3.89*x2 - 3.88*x2*x2;		 \
-					 \
-    x0 = 3.89*x0 - 3.88*x0*x0;		 \
-    x1 = 3.89*x1 - 3.88*x1*x1;		 \
-    x2 = 3.89*x2 - 3.88*x2*x2;		 \
-					 \
-					 \
-    aa[k][j][i] = (x0*x1+x2)/2;		 \
-					 \
-    POST_HOOK;				 \
 
 
 
@@ -78,16 +45,40 @@ int main () {
     for (int k=0;k<NZ;++k) {
       for (int j=0;j<NY;++j) {
 
-	{
-	  const int i = 0;
-	  LOOPBODY(x=ab[k][j][i],	{}) ;
-	}
-	for (int i=1;i<NX-1;++i) {
-	  LOOPBODY({},{});
-	}
-	{
-	  const int i = NX-1;
-	  LOOPBODY({}, ab[k][j][i] *= x1) ;
+	for (int i=0;i<NX;++i) {
+
+	  double x = aa[k][j][i];		 
+	  
+	  if(i==0) x=ab[k][j][i];
+	  
+	  double x0 = 0.890*x - 0.880*x*x;	 
+	  double x1 = 0.889*x - 0.881*x*x;	 
+	  double x2 = 0.888*x - 0.882*x*x;	 
+					 
+	  x0 = 3.89*x0 - 3.88*x0*x0;		 
+	  x1 = 3.89*x1 - 3.88*x1*x1;		 
+	  x2 = 3.89*x2 - 3.88*x2*x2;		 
+					 
+	  x0 = 3.89*x0 - 3.88*x0*x0;		 
+	  x1 = 3.89*x1 - 3.88*x1*x1;		 
+	  x2 = 3.89*x2 - 3.88*x2*x2;		 
+					 
+	  x0 = 3.89*x0 - 3.88*x0*x0;		 
+	  x1 = 3.89*x1 - 3.88*x1*x1;		 
+	  x2 = 3.89*x2 - 3.88*x2*x2;		 
+					 
+	  x0 = 3.89*x0 - 3.88*x0*x0;		 
+	  x1 = 3.89*x1 - 3.88*x1*x1;		 
+	  x2 = 3.89*x2 - 3.88*x2*x2;		 
+					 
+	  x0 = 3.89*x0 - 3.88*x0*x0;		 
+	  x1 = 3.89*x1 - 3.88*x1*x1;		 
+	  x2 = 3.89*x2 - 3.88*x2*x2;		 
+					 
+					 
+	  aa[k][j][i] = (x0*x1+x2)/2;		 
+	  if(i==NX-1) ab[k][j][i] *= x1;
+
 	}
       }
     }
