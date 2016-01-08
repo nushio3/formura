@@ -1,5 +1,9 @@
 #!/bin/bash
 ./configure --host=sparc64 CXX=mpiFCCpx CC=mpifccpx \
-            CFLAGS="-O3 -Kfast,parallel  -Kocl -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Keval -Kreduction" \
-            CXXFLAGS="-O3 -Kfast,parallel  -Kocl -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Keval  -Kreduction"
+      CFLAGS="-O3 -Kfast,parallel  -Kocl -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2" \
+    CXXFLAGS="-O3 -Kfast,parallel  -Kocl -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2"
+
+
+
+
 

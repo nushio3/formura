@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <fj_tool/fapp.h>
-#define NX 66
+#define NX 68
 #define NY 64
 #define NZ 64
 
-#define T_MAX 50000
+#define T_MAX 10000
 
 double aa[NZ][NY][NX];
 double ab[NZ][NY][NX];
@@ -78,15 +78,13 @@ int main () {
     for (int k=0;k<NZ;++k) {
       for (int j=0;j<NY;++j) {
 
-	{
-	  const int i = 0;
+	for(int i=0; i<2; ++i){
 	  LOOPBODY(x=ab[k][j][i],	{}) ;
 	}
-	for (int i=1;i<NX-1;++i) {
+	for (int i=2;i<NX-2;++i) {
 	  LOOPBODY({},{});
 	}
-	{
-	  const int i = NX-1;
+	for(int i=NX-2; i<NX; ++i){
 	  LOOPBODY({}, ab[k][j][i] *= x1) ;
 	}
       }
