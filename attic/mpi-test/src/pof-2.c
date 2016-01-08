@@ -1,9 +1,10 @@
+#include "math.h"
 #include "stdio.h"
 #include "stdlib.h"
 #include "sys/time.h"
-#define NX 32
-#define NY 32
-#define NZ 32
+#define NX 16
+#define NY 16
+#define NZ 16
 
 #define T_MAX 1000000
 
@@ -53,13 +54,13 @@ int main () {
   }
 
   double t_end = wctime();
-  double flops = (6.0 + 2.0/32.0)*(double)NX*NY*NZ*T_MAX / (t_end - t_begin);
+  double flops = (6.0 + 2.0/NX)*(double)NX*NY*NZ*T_MAX / (t_end - t_begin);
 
   double sum = 0;
   for (int k=0;k<NZ;++k) {
     for (int j=0;j<NY;++j) {
       for (int i=0;i<NX;++i) {
-        sum += aa[k][j][i];
+        sum += log(aa[k][j][i] * ab[k][j][i] * ac[k][j][i] * ad[k][j][i]);
       }
     }
   }
