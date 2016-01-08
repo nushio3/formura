@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <fj_tool/fapp.h>
-#define NX 66
+#define NX 64
 #define NY 64
 #define NZ 64
 
@@ -47,9 +47,8 @@ int main () {
 
 	for (int i=0;i<NX;++i) {
 
-	  double x = aa[k][j][i];		 
-	  
-	  if(i==0) x=ab[k][j][i];
+	  double x = //aa[k][j][i];
+	  	  (i<2 ? ab[k][j][i] : aa[k][j][i]);		 
 	  
 	  double x0 = 0.890*x - 0.880*x*x;	 
 	  double x1 = 0.889*x - 0.881*x*x;	 
@@ -77,7 +76,7 @@ int main () {
 					 
 					 
 	  aa[k][j][i] = (x0*x1+x2)/2;		 
-	  if(i==NX-1) ab[k][j][i] *= x1;
+	  //if(i==NX-1) ab[k][j][i] *= x1;
 
 	}
       }
