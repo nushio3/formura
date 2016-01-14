@@ -27,6 +27,7 @@ library
                   Formura.Annotation
                   Formura.Annotation.Representation
                   Formura.Compiler
+                  Formura.Geometry
                   Formura.GlobalEnvironment
                   Formura.Parser
                   Formura.Syntax
@@ -51,10 +52,13 @@ library
               , lattices
               , lens
               , mmorph
+              , monads-tf
               , mtl
               , parsers
               , QuickCheck
+              , sbv
               , text
+              , transformers
               , trifecta
               , vector
 

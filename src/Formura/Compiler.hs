@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, PackageImports, StandaloneDeriving, TemplateHaskell #-}
 
 module Formura.Compiler where
 
@@ -6,7 +6,7 @@ import           Control.Applicative
 import           Control.Lens
 import           Control.Monad.Trans.Either
 import           Control.Monad.Morph
-import           Control.Monad.RWS
+import "mtl"     Control.Monad.RWS
 import qualified Data.IntMap as G
 import qualified Data.Set as S
 import           System.IO

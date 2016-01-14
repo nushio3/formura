@@ -1,11 +1,11 @@
-{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings, PackageImports, TemplateHaskell #-}
 
 module Formura.Cxx.Translate where
 
 import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
-import           Control.Monad.RWS
+import "mtl"     Control.Monad.RWS
 import qualified Data.Aeson.TH as J
 import           Data.Char (toLower)
 import           Data.Foldable (toList)

@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
-DeriveTraversable, FlexibleContexts, FlexibleInstances, GADTs,  PatternSynonyms,
+DeriveTraversable, FlexibleContexts, FlexibleInstances, GADTs, PackageImports, PatternSynonyms,
 ScopedTypeVariables,
 TemplateHaskell, TypeOperators, ViewPatterns #-}
 module Formura.OrthotopeMachine.Translate where
@@ -8,7 +8,7 @@ import           Algebra.Lattice
 import           Control.Applicative
 import           Control.Lens hiding (op)
 import           Control.Monad
-import           Control.Monad.Reader hiding (fix)
+import "mtl"     Control.Monad.Reader hiding (fix)
 import qualified Data.IntMap as G
 import qualified Data.Map as M
 import qualified Data.Set as S

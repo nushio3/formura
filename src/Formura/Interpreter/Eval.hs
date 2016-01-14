@@ -1,9 +1,9 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances,  RankNTypes, TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, PackageImports, RankNTypes, TemplateHaskell #-}
 module Formura.Interpreter.Eval where
 
 import           Control.Applicative
 import           Control.Lens
-import           Control.Monad.RWS hiding (fix)
+import "mtl"     Control.Monad.RWS hiding (fix)
 import qualified Data.Map as M
 import qualified Data.Vector as V
 import           Text.Trifecta (failed, raiseErr)
