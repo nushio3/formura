@@ -52,7 +52,6 @@ library
               , lattices
               , lens
               , mmorph
-              , monads-tf
               , mtl
               , parsers
               , QuickCheck
@@ -127,3 +126,18 @@ test-suite test-region-plan
               , HUnit
               , QuickCheck
               , sbv >= 5.9
+
+test-suite test-geometry
+  type:         exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: test-geometry.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+                base == 4.*
+              , formura
+              , test-framework
+              , test-framework-quickcheck2
+              , test-framework-hunit
+              , HUnit
+              , QuickCheck

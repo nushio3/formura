@@ -1,3 +1,12 @@
+{- |
+Copyright   : (c) Takayuki Muranushi, 2015
+License     : MIT
+Maintainer  : muranushi@gmail.com
+Stability   : experimental
+
+Module for geometry inference.
+-}
+
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PackageImports, TypeFamilies #-}
 
 module Formura.Geometry where
@@ -5,15 +14,17 @@ module Formura.Geometry where
 import Control.Lens
 import Control.Monad
 import Control.Monad.IO.Class
-import "monads-tf" Control.Monad.Reader
+import Control.Monad.Reader
+import Data.List (lookup)
 import Formura.GlobalEnvironment
 import Formura.Vec
 import Data.SBV
+import Data.SBV.Internals (SMTModel(..), CW(..), CWVal(..))
 
 type SInt = SInt32
 type Pt = Vec SInt
 
-doesProve :: (Provable a, MonadGeometry m) =>  a -> m Bool
+doesProve :: (Provable a, MonadGeometry r m) =>  a -> m Bool
 doesProve thm = do
   result <- liftIO $ prove thm
   if (not $ modelExists result)
@@ -21,8 +32,7 @@ doesProve thm = do
     else return False
 
 
-
-class (HasGlobalEnvironment (EnvType m), MonadReader m, MonadIO m) => MonadGeometry m
+class (HasGlobalEnvironment r, MonadReader r m, MonadIO m) => MonadGeometry r m
 
 newtype Body = Body (Pt -> SBool)
 
@@ -41,6 +51,9 @@ range (lo,hi) x = lo' .<= x &&& x .< hi'
     lo' = fromIntegral lo
     hi' = fromIntegral hi
 
+sRange :: (SInt, SInt) -> (SInt -> SBool)
+sRange (lo,hi) x = lo .<= x &&& x .< hi
+
 -- TODO: newtype this range.
 instance Num (Int, Int) where
   fromInteger n = (fromInteger n,fromInteger n)
@@ -51,21 +64,32 @@ instance HasPredicate Orthotope where
     Vec bs -> bAnd bs
 
 class HasCompound a where
-  toCompound :: MonadGeometry m => a -> m Compound
+  toCompound :: MonadGeometry r m => a -> m Compound
 
 instance HasCompound Compound where
   toCompound = return
 
 instance HasCompound Body where
-  toCompound (Body p0) = do
-    iNames <- view axesNames
-    let loNames = map ("lo_" ++) iNames
-        hiNames = map ("hi_" ++) iNames
-        problem0 :: Symbolic SBool
-        problem0 = do
-          loVars <- mapM exists loNames
-          hiVars <- mapM exists hiNames
-          ptVars <- mapM forall iNames
-          sequence_ [constrain $ (l .<= i &&& i .< (h::SInt)) | (l,h,i)<-zip3 loVars hiVars ptVars]
-          return true
-    return $ Compound []
+  toCompound = bodyToCompound
+
+bodyToCompound :: MonadGeometry r m => Body -> m Compound
+bodyToCompound (Body pred0) = do
+  iNames <- view axesNames
+  let loNames = map ("lo_" ++) iNames
+      hiNames = map ("hi_" ++) iNames
+      problem0 :: (Pt -> SBool) -> Symbolic SBool
+      problem0 pred1 = do
+        loVars <- mapM exists loNames
+        hiVars <- mapM exists hiNames
+        ptVars <- mapM forall iNames
+        sequence_ [constrain $ sRange (l,h) i | (l,h,i)<-zip3 loVars hiVars ptVars]
+        return $ pred1 $ Vec ptVars
+  SatResult smtResult0 <- liftIO $ sat $ problem0 pred0
+  case smtResult0 of
+    Satisfiable _ (SMTModel assoc0)-> do
+      forM_ (loNames ++ hiNames) $ \ n1 -> do
+        case (lookup n1 assoc0) of
+          Just (CW _ (CWInteger val1)) -> do
+            liftIO $ print (n1, val1)
+    _ -> error "unsatisfiable."
+  return $ Compound []
