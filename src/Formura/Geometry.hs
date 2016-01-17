@@ -21,7 +21,7 @@ import Formura.Vec
 import Data.SBV
 import Data.SBV.Internals (SMTModel(..), CW(..), CWVal(..))
 
-type SInt = SInt32
+type SInt = SInteger
 type Pt = Vec SInt
 
 doesProve :: (Provable a, MonadGeometry r m) =>  a -> m Bool
@@ -82,7 +82,8 @@ bodyToCompound (Body pred0) = do
       problem0 pred1 = do
         loVars <- mapM exists loNames
         hiVars <- mapM exists hiNames
-        sequence_ [constrain $ lo .< hi | (lo,hi) <- zip loVars hiVars]
+        let largeness = 3
+        sequence_ [constrain $ lo + largeness .<= hi | (lo,hi) <- zip loVars hiVars]
         ptVars <- mapM forall iNames
         let inRanges = bAnd [sRange (l,h) i | (l,h,i)<-zip3 loVars hiVars ptVars]
         return $ inRanges ==> pred1 (Vec ptVars)
