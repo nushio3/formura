@@ -125,7 +125,7 @@ test-suite test-region-plan
               , test-framework-hunit
               , HUnit
               , QuickCheck
-              , sbv >= 5.9
+              , sbv
 
 test-suite test-geometry
   type:         exitcode-stdio-1.0
@@ -136,8 +136,11 @@ test-suite test-geometry
   build-depends:
                 base == 4.*
               , formura
+              , mtl
               , test-framework
               , test-framework-quickcheck2
               , test-framework-hunit
               , HUnit
               , QuickCheck
+              , sbv
+              , transformers

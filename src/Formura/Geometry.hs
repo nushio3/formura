@@ -7,7 +7,7 @@ Stability   : experimental
 Module for geometry inference.
 -}
 
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PackageImports, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PackageImports, TypeFamilies #-}
 
 module Formura.Geometry where
 
@@ -32,7 +32,8 @@ doesProve thm = do
     else return False
 
 
-class (HasGlobalEnvironment r, MonadReader r m, MonadIO m) => MonadGeometry r m
+type MonadGeometry r m = (HasGlobalEnvironment r, MonadReader r m, MonadIO m)
+
 
 newtype Body = Body (Pt -> SBool)
 
@@ -81,9 +82,10 @@ bodyToCompound (Body pred0) = do
       problem0 pred1 = do
         loVars <- mapM exists loNames
         hiVars <- mapM exists hiNames
+        sequence_ [constrain $ lo .< hi | (lo,hi) <- zip loVars hiVars]
         ptVars <- mapM forall iNames
-        sequence_ [constrain $ sRange (l,h) i | (l,h,i)<-zip3 loVars hiVars ptVars]
-        return $ pred1 $ Vec ptVars
+        let inRanges = bAnd [sRange (l,h) i | (l,h,i)<-zip3 loVars hiVars ptVars]
+        return $ inRanges ==> pred1 (Vec ptVars)
   SatResult smtResult0 <- liftIO $ sat $ problem0 pred0
   case smtResult0 of
     Satisfiable _ (SMTModel assoc0)-> do

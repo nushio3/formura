@@ -15,4 +15,7 @@ data GlobalEnvironment = GlobalEnvironment {
 defaultGlobalEnvironment :: GlobalEnvironment
 defaultGlobalEnvironment = GlobalEnvironment 0 []
 
+sample3Denvironment :: GlobalEnvironment
+sample3Denvironment = GlobalEnvironment 3 ["x","y","z"]
+
 makeClassy ''GlobalEnvironment
