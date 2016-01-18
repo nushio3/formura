@@ -85,7 +85,7 @@ bodyToCompound (Body pred0) = do
         sequence_ [constrain $ lo  .< hi | (lo,hi) <- zip loVars hiVars]
         let ookisa = foldr1 smin [ hi - lo | (lo,hi) <- zip loVars hiVars]
                      + sum [ hi - lo | (lo,hi) <- zip loVars hiVars]
-        constrain $ ookisa .>=100
+        constrain $ ookisa .>=102
         ptVars <- mapM forall iNames
         let inRanges = bAnd [sRange (l,h) i | (l,h,i)<-zip3 loVars hiVars ptVars]
         return $ inRanges ==> pred1 (Vec ptVars)
