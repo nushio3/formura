@@ -46,6 +46,7 @@ library
                 base == 4.*
               , aeson
               , ansi-wl-pprint
+              , binary-search
               , bytestring
               , containers
               , either
