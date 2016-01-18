@@ -28,15 +28,19 @@ bodyConvertsToCorrectCompound = do
 
     samplePred :: Pt -> SBool
     samplePred (Vec [x,y,z]) =
-      bAnd [x+y+z .<= 3,
-            x+y+z .>= -3,
-            x+y-z .<= 3,
-            x+y-z .>= -3,
-            x-y+z .<= 3,
-            x-y+z .>= -3,
-            -x+y+z .<= 3,
-            -x+y+z .>= -3
-            ]
+      bAnd [ 0 .<= x, x .< 40,
+             0 .<= y, y .< 30,
+             0 .<= z, z .< 20,
+             x ./= 16 ||| y ./= 16 ||| z ./= 16]
+{-      bAnd [x+y+z .<= 32,
+            x+y+z .>= -30,
+            x+y-z .<= 30,
+            x+y-z .>= -30,
+            x-y+z .<= 30,
+            x-y+z .>= -30,
+            -x+y+z .<= 30,
+            -x+y+z .>= -30
+            ]-}
 
 tests :: [Test]
 tests = [testCase "Basic arithmetic holds." $ 2 @=? 1+1,
