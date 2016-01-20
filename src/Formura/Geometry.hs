@@ -181,11 +181,10 @@ bodyToCompound (Body pred0) = do
 -- * Canvas
 type Canvas a = M.Map a Compound
 
--- zipCanvas :: forall a r m. (Ord a, MonadGeometry r m) =>
---              Canvas [a] -> Canvas [a] -> m (Canvas [a])
--- zipCanvas xs0 ys0 = do
---   zs <- sequence [zipC2 x y | x <- M.toList xs0, y <- M.toList ys0]
---   return $ M.fromList $ concat zs
---   where
---     zipC2 :: ([a], Compound) -> ([a], Compound) -> m [([a], Compound)]
---     zipC2 a b = return []
+zipCanvas :: (ImplicitGlobalEnvironment, Ord a) =>
+             Canvas [a] -> Canvas [a] -> Canvas [a]
+zipCanvas xs0 ys0 = M.fromList $ concat zs
+  where
+   zs = [zipC2 x y | x <- M.toList xs0, y <- M.toList ys0]
+   zipC2 :: ([a], Compound) -> ([a], Compound) ->  [([a], Compound)]
+   zipC2 a b = []
