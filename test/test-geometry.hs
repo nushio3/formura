@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ImplicitParams, TemplateHaskell #-}
 
 module Main where
 
@@ -16,12 +16,11 @@ import Formura.GlobalEnvironment
 import Formura.Vec
 
 
-bodyConvertsToSingleCompound :: Assertion
+bodyConvertsToSingleCompound :: ImplicitGlobalEnvironment => Assertion
 bodyConvertsToSingleCompound = do
-  Compound boxes <- runReaderT go sample3Denvironment
   length boxes @?= 1
   where
-    go = bodyToCompound sampleBody
+    Compound boxes = toCompound sampleBody
 
     sampleBody :: Body
     sampleBody = Body samplePred
@@ -33,12 +32,11 @@ bodyConvertsToSingleCompound = do
              45 .<= z, z .< 56]
 
 
-bodyConvertsToCorrectCompound :: Assertion
+bodyConvertsToCorrectCompound :: ImplicitGlobalEnvironment => Assertion
 bodyConvertsToCorrectCompound = do
-  boxes <- runReaderT go sample3Denvironment
   volume boxes @?= 40*30*20-1
   where
-    go = bodyToCompound sampleBody
+    boxes = toCompound sampleBody
 
     sampleBody :: Body
     sampleBody = Body samplePred
@@ -52,7 +50,8 @@ bodyConvertsToCorrectCompound = do
              ]
 
 tests :: [Test]
-tests = [testCase "Basic arithmetic holds." $ 2 @=? 1+1,
+tests = let     ?globalEnvironment =  sample3Denvironment in
+  [testCase "Basic arithmetic holds." $ 2 @=? 1+1,
          testCase "We can convert a Body to Compound with expected volume." $ bodyConvertsToCorrectCompound,
          testCase "An orthotopic Body converts to singleton Compound." $ bodyConvertsToSingleCompound
          ]

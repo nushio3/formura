@@ -7,7 +7,7 @@ Stability   : experimental
 Module for geometry inference.
 -}
 
-{-# LANGUAGE ConstraintKinds, DeriveFunctor, LambdaCase, FlexibleContexts, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PackageImports, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, DeriveFunctor, LambdaCase, FlexibleContexts, FlexibleInstances, FunctionalDependencies, ImplicitParams, MultiParamTypeClasses, PackageImports, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 
 module Formura.Geometry where
 
@@ -22,6 +22,7 @@ import Formura.Vec
 import Data.SBV
 import Data.SBV.Internals (SMTModel(..), CW(..), CWVal(..))
 import Numeric.Search
+import System.IO.Unsafe
 
 -- | Symbolic Integer
 type SInt = SInteger
@@ -32,22 +33,19 @@ type SPt = Vec SInt
 -- | Numerical point
 type Pt = Vec NInt
 
-doesProve :: (Provable a, MonadGeometry r m) =>  a -> m Bool
-doesProve thm = do
-  result <- liftIO $ prove thm
+doesProve :: Provable a =>  a -> Bool
+doesProve thm = unsafePerformIO $ do
+  result <- prove thm
   if (not $ modelExists result)
     then return True
     else return False
 
-doesSat :: (Provable a, MonadGeometry r m) =>  a -> m Bool
-doesSat thm = do
-  result <- liftIO $ sat thm
+doesSat :: (Provable a) =>  a -> Bool
+doesSat thm = unsafePerformIO $ do
+  result <- sat thm
   if (modelExists result)
     then return True
     else return False
-
-
-type MonadGeometry r m = (HasGlobalEnvironment r, MonadReader r m, MonadIO m)
 
 -- * range combinators
 
@@ -61,6 +59,8 @@ sInRange :: SInt -> SInt -> (SInt -> SBool)
 sInRange lo hi x = lo .<= x &&& x .< hi
 
 -- * Geometry class
+
+type ImplicitGlobalEnvironment = ?globalEnvironment :: GlobalEnvironment
 
 -- | An object that accepts geometric operations.
 
@@ -117,15 +117,15 @@ volume (Compound os) = sum $ map vol os
     vol (los, his) = let Vec sizes = (-) <$> his <*> los in product sizes
 
 class HasCompound a where
-  toCompound :: MonadGeometry r m => a -> m Compound
+  toCompound :: ImplicitGlobalEnvironment => a -> Compound
 
 instance HasCompound Compound where
-  toCompound = return
+  toCompound = id
 
 instance HasCompound Body where
-  toCompound = bodyToCompound
+  toCompound b = unsafePerformIO $ bodyToCompound b
 
-bodyToCompound :: forall r m. MonadGeometry r m => Body -> m Compound
+bodyToCompound :: ImplicitGlobalEnvironment => Body -> IO Compound
 bodyToCompound (Body pred0) = do
   satAny >>= \case
     False -> return $ Compound []
@@ -135,10 +135,11 @@ bodyToCompound (Body pred0) = do
       Compound os <- bodyToCompound (Body (\v -> pred0 v &&& bnot (toPredicate o v)))
       return $ Compound (o:os)
   where
+    iNames = ?globalEnvironment ^. axesNames
 
-    satAny :: m Bool
+    satAny :: IO Bool
     satAny = do
-      iNames <- view axesNames
+
       SatResult smtResult0 <- liftIO $ sat $ do
         iVars <- mapM exists iNames
         return $ pred0 (Vec iVars)
@@ -148,9 +149,8 @@ bodyToCompound (Body pred0) = do
 
 
 
-    satBoxOfSize :: NInt -> m (Evidence () Orthotope)
+    satBoxOfSize :: NInt -> IO (Evidence () Orthotope)
     satBoxOfSize ookisa0 = do
-      iNames <- view axesNames
       let loNames = map ("lo_" ++) iNames
           hiNames = map ("hi_" ++) iNames
           problem0 :: Symbolic SBool
@@ -181,11 +181,11 @@ bodyToCompound (Body pred0) = do
 -- * Canvas
 type Canvas a = M.Map a Compound
 
-zipCanvas :: forall a r m. (Ord a, MonadGeometry r m) =>
-             Canvas [a] -> Canvas [a] -> m (Canvas [a])
-zipCanvas xs0 ys0 = do
-  zs <- sequence [zipC2 x y | x <- M.toList xs0, y <- M.toList ys0]
-  return $ M.fromList $ concat zs
-  where
-    zipC2 :: ([a], Compound) -> ([a], Compound) -> m [([a], Compound)]
-    zipC2 a b = return []
+-- zipCanvas :: forall a r m. (Ord a, MonadGeometry r m) =>
+--              Canvas [a] -> Canvas [a] -> m (Canvas [a])
+-- zipCanvas xs0 ys0 = do
+--   zs <- sequence [zipC2 x y | x <- M.toList xs0, y <- M.toList ys0]
+--   return $ M.fromList $ concat zs
+--   where
+--     zipC2 :: ([a], Compound) -> ([a], Compound) -> m [([a], Compound)]
+--     zipC2 a b = return []
