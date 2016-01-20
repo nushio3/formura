@@ -7,7 +7,7 @@ Stability   : experimental
 Module for geometry inference.
 -}
 
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PackageImports, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PackageImports, ScopedTypeVariables, TypeFamilies #-}
 
 module Formura.Geometry where
 
@@ -20,6 +20,7 @@ import Formura.GlobalEnvironment
 import Formura.Vec
 import Data.SBV
 import Data.SBV.Internals (SMTModel(..), CW(..), CWVal(..))
+import Numeric.Search
 
 type SInt = SInteger
 type Pt = Vec SInt
@@ -37,7 +38,7 @@ type MonadGeometry r m = (HasGlobalEnvironment r, MonadReader r m, MonadIO m)
 
 newtype Body = Body (Pt -> SBool)
 
-type Orthotope = Vec (Int,Int)
+type Orthotope = (Vec Int, Vec Int)
 newtype Compound = Compound [Orthotope]
 
 class HasPredicate a where
@@ -46,21 +47,17 @@ class HasPredicate a where
 instance HasPredicate Body where
   toPredicate (Body p) = p
 
-range :: (Int, Int) -> (SInt -> SBool)
-range (lo,hi) x = lo' .<= x &&& x .< hi'
+range :: Int -> Int -> (SInt -> SBool)
+range lo hi x = lo' .<= x &&& x .< hi'
   where
     lo' = fromIntegral lo
     hi' = fromIntegral hi
 
-sRange :: (SInt, SInt) -> (SInt -> SBool)
-sRange (lo,hi) x = lo .<= x &&& x .< hi
-
--- TODO: newtype this range.
-instance Num (Int, Int) where
-  fromInteger n = (fromInteger n,fromInteger n)
+sRange :: SInt -> SInt -> (SInt -> SBool)
+sRange lo hi x = lo .<= x &&& x .< hi
 
 instance HasPredicate Orthotope where
-  toPredicate vRange vx = case liftVec2 range vRange vx of
+  toPredicate (los,his) vx = case range <$> los <*> his <*> vx of
     PureVec b -> b
     Vec bs -> bAnd bs
 
@@ -73,28 +70,55 @@ instance HasCompound Compound where
 instance HasCompound Body where
   toCompound = bodyToCompound
 
-bodyToCompound :: MonadGeometry r m => Body -> m Compound
+bodyToCompound :: forall r m. MonadGeometry r m => Body -> m Compound
 bodyToCompound (Body pred0) = do
-  iNames <- view axesNames
-  let loNames = map ("lo_" ++) iNames
-      hiNames = map ("hi_" ++) iNames
-      problem0 :: (Pt -> SBool) -> Symbolic SBool
-      problem0 pred1 = do
-        loVars <- mapM exists loNames
-        hiVars <- mapM exists hiNames
-        sequence_ [constrain $ lo  .< hi | (lo,hi) <- zip loVars hiVars]
-        let ookisa = foldr1 smin [ hi - lo | (lo,hi) <- zip loVars hiVars]
-                     + sum [ hi - lo | (lo,hi) <- zip loVars hiVars]
-        constrain $ ookisa .>=102
-        ptVars <- mapM forall iNames
-        let inRanges = bAnd [sRange (l,h) i | (l,h,i)<-zip3 loVars hiVars ptVars]
-        return $ inRanges ==> pred1 (Vec ptVars)
-  SatResult smtResult0 <- liftIO $ sat $ problem0 pred0
-  case smtResult0 of
-    Satisfiable _ (SMTModel assoc0)-> do
-      forM_ (loNames ++ hiNames) $ \ n1 -> do
-        case (lookup n1 assoc0) of
-          Just (CW _ (CWInteger val1)) -> do
-            liftIO $ print (n1, val1)
-    _ -> error "unsatisfiable."
-  return $ Compound []
+  b <- satAny
+  case satAny of
+    False -> return $ Compound []
+    True -> do
+      Evidence o <- smallest evidence <$>
+                    searchM (0,replicate (*2) 1) splitForever satBoxOfSize
+      return $ Compound o
+  where
+
+    satAny :: m Bool
+    satAny = do
+      iNames <- view axesNames
+      SatResult smtResult0 <- liftIO $ sat $ do
+        iVars <- mapM exists iNames
+        return $ pred0 (Vec iVars)
+      case smtResult0 of
+        Satisfiable _ _ -> return True
+        _ -> return False
+
+
+
+    satBoxOfSize :: Int -> m (Evidence () Orthotope)
+    satBoxOfSize ookisa0 = do
+      iNames <- view axesNames
+      let loNames = map ("lo_" ++) iNames
+          hiNames = map ("hi_" ++) iNames
+          problem0 :: Symbolic SBool
+          problem0 = do
+            loVars <- mapM exists loNames
+            hiVars <- mapM exists hiNames
+            sequence_ [constrain $ lo  .< hi | (lo,hi) <- zip loVars hiVars]
+            let ookisa = foldr1 smin [ hi - lo | (lo,hi) <- zip loVars hiVars]
+                         + sum [ hi - lo | (lo,hi) <- zip loVars hiVars]
+            constrain $ ookisa .>= fromIntegral ookisa0
+            ptVars <- mapM forall iNames
+            let inRanges = bAnd [sRange l h i | (l,h,i)<-zip3 loVars hiVars ptVars]
+            return $ inRanges ==> pred0 (Vec ptVars)
+      SatResult smtResult0 <- liftIO $ sat $ problem0
+      case smtResult0 of
+        Satisfiable _ (SMTModel assoc0)-> do
+          let
+            lookupNames :: [String] -> [Int]
+            lookupNames ns = [ fromInteger val
+                             | n <- ns,
+                               Just (CW _ (CWInteger val)) <- [lookup n assoc0]
+                             ]
+            los = lookupNames loNames
+            his = lookupNames hiNames
+          return $ Evidence $ (Vec los, Vec his)
+        _ -> return $ CounterEvidence ()
