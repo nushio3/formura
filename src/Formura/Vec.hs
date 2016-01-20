@@ -21,7 +21,7 @@ formuraMaxDimension :: Int
 formuraMaxDimension = 26
 
 data Vec a = Vec { getVec :: [a] } | PureVec a
-           deriving (Functor, Foldable, Traversable)
+           deriving (Read, Functor, Foldable, Traversable)
 instance J.ToJSON a => J.ToJSON (Vec a) where
   toJSON (Vec xs) = J.toJSON xs
 
