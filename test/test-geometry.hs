@@ -18,8 +18,8 @@ import Formura.Vec
 
 bodyConvertsToCorrectCompound :: Assertion
 bodyConvertsToCorrectCompound = do
-  Compound boxes <- runReaderT go sample3Denvironment
-  0 @=? length boxes
+  boxes <- runReaderT go sample3Denvironment
+  volume boxes @?= 40*30*20-1
   where
     go = bodyToCompound sampleBody
 

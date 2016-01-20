@@ -2,7 +2,7 @@ flags: {}
 packages:
 - .
 extra-deps:
-  - binary-search-0.9
+  - binary-search-1.0
 
 resolver: lts-4.2
 # skip-ghc-check: True
