@@ -7,7 +7,7 @@ Stability   : experimental
 Module for geometry inference.
 -}
 
-{-# LANGUAGE ConstraintKinds, DeriveFunctor, LambdaCase, FlexibleContexts, FlexibleInstances, FunctionalDependencies, ImplicitParams, MultiParamTypeClasses, PackageImports, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DeriveFunctor, LambdaCase, FlexibleContexts, FlexibleInstances, FunctionalDependencies, ImplicitParams, MultiParamTypeClasses, PackageImports, ScopedTypeVariables, TypeFamilies #-}
 
 module Formura.Geometry where
 
@@ -16,7 +16,8 @@ import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Reader
 import qualified Data.Map as M
-import Data.List (lookup)
+import Data.List (lookup, foldl')
+import Data.Monoid
 import Formura.GlobalEnvironment
 import Formura.Vec
 import Data.SBV
@@ -66,12 +67,25 @@ type ImplicitGlobalEnvironment = ?globalEnvironment :: GlobalEnvironment
 
 class Geometric a where
   move :: Pt -> a -> a
+  empty :: a
+  isEmpty :: a -> Bool
+  volume :: a -> NInt
+
+
 
 instance Geometric Orthotope where
   move dx (x,y) = (x+dx, y+dx)
+  empty = (0,0)
+  isEmpty = (<=0) . volume
+  volume (los, his) = let Vec sizes = (\hi lo -> max 0 (hi-lo)) <$> his <*> los
+                      in product sizes
 
 instance Geometric Compound where
   move dx (Compound xs) = Compound (map (move dx) xs)
+  empty = Compound []
+  isEmpty = (<=0) . volume
+  volume (Compound os) = sum $ map volume os
+
 
 -- * Body
 
@@ -110,11 +124,6 @@ type Orthotope = (Vec NInt, Vec NInt)
 newtype Compound = Compound [Orthotope]
                  deriving (Eq, Ord, Show, Read)
 
-volume :: Compound -> NInt
-volume (Compound os) = sum $ map vol os
-  where
-    vol :: Orthotope -> NInt
-    vol (los, his) = let Vec sizes = (-) <$> his <*> los in product sizes
 
 class HasCompound a where
   toCompound :: ImplicitGlobalEnvironment => a -> Compound
@@ -179,12 +188,37 @@ bodyToCompound (Body pred0) = do
         _ -> return $ CounterEvidence ()
 
 -- * Canvas
-type Canvas a = M.Map a Compound
+type Paint  a = (a, Compound)
 
-zipCanvas :: (ImplicitGlobalEnvironment, Ord a) =>
-             Canvas [a] -> Canvas [a] -> Canvas [a]
-zipCanvas xs0 ys0 = M.fromList $ concat zs
+instance Monoid a => Geometric (Paint a) where
+  move dx (c,cp) = (c, move dx cp)
+  empty = (mempty, empty)
+  isEmpty (_, cp) = isEmpty cp
+  volume (_, cp) = volume cp
+
+data Canvas a = Canvas (M.Map a Compound)
+              deriving (Eq, Ord, Show)
+
+zipCanvas :: forall a.
+             (ImplicitGlobalEnvironment, Ord a, Monoid a) =>
+             Canvas a -> Canvas a -> Canvas a
+zipCanvas (Canvas xm0) (Canvas ym0) =
+  Canvas $ M.unionsWith (\(Compound x) (Compound y) -> Compound (x ++ y)) $
+  map (uncurry M.singleton) $
+  foldr (\x y -> go x y []) (M.toList ym0) (M.toList xm0)
   where
-   zs = [zipC2 x y | x <- M.toList xs0, y <- M.toList ys0]
-   zipC2 :: ([a], Compound) -> ([a], Compound) ->  [([a], Compound)]
-   zipC2 a b = []
+    go :: Paint a -> [Paint a] -> [Paint a] -> [Paint a]
+    go x [] dones = x:dones
+    go x todos@(y:ys) dones
+      | isEmpty x = todos ++ dones
+      | otherwise =
+          let
+            (cx, cpx) = x; px = toBody cpx
+            (cy, cpy) = y; py = toBody cpy
+            cpXandY    = toCompound $ px &&& py
+            cpXandnotY = toCompound $ px &&& bnot py
+            cpnotXandY = toCompound $ bnot px &&& py
+            ypart
+              | isEmpty cpnotXandY = []
+              | otherwise = [(cy, cpnotXandY) ]
+          in go (cx, cpXandnotY) ys ((cx <> cy, cpXandY) : (ypart ++ dones))
