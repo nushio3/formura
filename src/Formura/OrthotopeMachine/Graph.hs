@@ -30,7 +30,10 @@ data DataflowInstF x
   | StoreF IdentName x
   | LoadIndexF Int
   | LoadExtentF Int
-  | ShiftF (Vec Int) x
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+-- | The functor for language that support shift operations.
+data ShiftF x = ShiftF (Vec Int) x
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 
@@ -46,7 +49,7 @@ pattern LoadExtent n <- ((^? match) -> Just (LoadExtentF n)) where
 pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
   Shift v x = match # ShiftF v x
 
-type OMInstF = Sum '[DataflowInstF, OperatorF, ImmF]
+type OMInstF = Sum '[DataflowInstF, ShiftF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
 
 type NodeType  = Fix NodeTypeF
