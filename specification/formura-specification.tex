@@ -757,7 +757,7 @@ $ formura example/diffusion.f31 -o output/diffusion.cpp
 
 
 
-\section{\formura 文法における演算の意味論}
+\section{\formura における演算の意味論}
 
 % \begin{grammar}
 %   <T> ::= <element-type>
@@ -933,12 +933,14 @@ C言語のプログラムが\lit{main}関数から開始するように、
 \formura のプログラムは、最初に\lit{init}関数を一つ呼び出してシミュレーションの初期状態を作り、その後
 \lit{step}関数を繰り返し呼び出して状態を更新していきます。C言語の擬似コードで書けば、次のようになります。
 
-\begin{lstlisting}[mathescape]
+\begin{screen}
+\begin{verbatim}
   simulation_state = init();
   for (t = 0; t < T_MAX; ++t) {
     simulation_state = step(simulation_state);
   }
-\end{lstlisting}
+\end{verbatim}
+\end{screen}
 
 
 \lit{init}関数は0個の引数をとり、グリッド型の値、またはいくつかのグリッドを含むタプルを返すような関数でなくてはなりません。
@@ -1066,25 +1068,25 @@ int Formura_Forward (Formura_Navigator *navi)
 
 \formura の生成するコードの並列度や解像度は、
 \formura の特殊宣言での指定から決まります。以下に、
-\formura の特殊宣言の一覧を再掲します。
+\formura の特殊宣言の例を示します。
 
 \begin{lstlisting}[mathescape]
   dimension :: 3
   axes :: x, y, z
   intra_node_shape :: 64, 64, 64
   mpi_grid_shape :: 40, 20, 5
-  temporal_blocking_interval :: 2
-  monitor_interval :: 120
+  temporal_blocking_interval :: 3
+  monitor_interval :: 72
 \end{lstlisting}
 
 各ノードが担当する状態配列の大きさは、およそ
 \lit{intra_node_shape}程度の大きさになります。但し、temporal blockingや通信の都合上、この大きさは多少変更されることがあります。
 これらのノードを、\lit{mpi_grid_shape}で指定された数だけ$x,y,z$方向に並べた領域が計算領域となります。したがって、上記の例では
 計算の解像度は$2560 \times 1280 \times 320$となります。
-さらに、\lit{step}関数の計算をtemporal blockingで2ステップぶん一気に計算するコードが生成され、
-ユーザーコード側からは、120ステップごとに物理状態を観測することができます。
+さらに、\lit{step}関数の計算をtemporal blockingで3ステップ一気に計算するコードを生成すること、
+\verb`Formura_Forward`は72ステップ(temporal blockingされたコードを24回呼び出すことに相当)の計算を一気に行うことが指定されています。
 
-この仕様に伴って、\verb`Formura_Init`関数に渡すMPIコミュニケータ内にあるMPIランクの数は、
+この仕様にともない、\verb`Formura_Init`関数に渡すMPIコミュニケータ内にあるMPIランクの数は、
 \lit{mpi_grid_shape}の積と一致している必要があります。
 
 
@@ -1101,7 +1103,7 @@ Fortran版では、\verb`monitor_interval`ごとに、物理量をFortran形式�
 以上の構文を用いて、ステンシル計算を書いてみます。
 
 
-\formura が最低限できる必要があるのは、シンプルなグリッド変数どうしの演算です。具体的には、
+\formura は、シンプルなグリッド変数どうしの演算を組み合わせることで、ステンシル計算に必要な以下のような計算を記述することができます。
 
 \begin{enumerate}
 \item グリッドの次元とサイズをを宣言する
@@ -1110,36 +1112,36 @@ Fortran版では、\verb`monitor_interval`ごとに、物理量をFortran形式�
 \item 時間積分スキームを記述する（時間的に次のセルに値を渡す）
 \end{enumerate}
 
-ことができれば足ります。
 
 以下に、\formura を使って記述したプログラムを示します。
 
 \begin{lstlisting}[mathescape]
-dimension :: 3
-axes :: x, y, z
-single_node_shape :: 64, 64, 64
-mpi_shape :: 8,8,8
+  dimension :: 3
+  axes :: x, y, z
 
+  ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+  ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+  ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
 
-ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
-ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
-ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+  ∂ = (ddx,ddy,ddz)
 
-∂ = (ddx,ddy,ddz)
+  Σ = for (e) e(0) + e(1) + e(2)
 
-Σ = for (e) e(0) + e(1) + e(2)
+  begin function init() returns dens_init
+        float [] :: dens_init = 0
+  end function
 
-begin function init() returns dens_init
-      float [] :: dens_init = 0
-end function
-
-begin function dens_next = step(dens)
-  float :: Dx, Dt
-  Dx = 4.2
-  Dt = 0.1
-  dens_next = dens + Dx**2/Dt * Σ for(i) (∂ i . ∂ i) dens
-end function
+  begin function dens_next = step(dens)
+    float :: Dx, Dt
+    Dx = 4.2
+    Dt = 0.1
+    dens_next = dens + Dt / Dx**2 * Σ for(i) (∂ i . ∂ i) dens
+  end function
 \end{lstlisting}
+
+\newpage
+
+\section*{Acknowledgements}
 
 タプル型の設計にあたっては\citet{pierce2002types}を参考にしました。
 また、タプルの言語への組み込みにあたっては\citet{oliveira2015modular}を参考にしました。
