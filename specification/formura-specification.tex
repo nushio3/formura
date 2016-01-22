@@ -9,6 +9,7 @@
 \usepackage{listings,jlisting}
 \usepackage{natbib}
 \usepackage{colortbl}
+\usepackage{ascmac}
 \usepackage{ulem}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -21,6 +22,7 @@
 \def\dtime{\partial_t}
 \newcommand{\bbR}{\mathbb{R}}
 \newcommand{\bbZ}{\mathbb{Z}}
+\newcommand{\formura}{{\texttt{formura}}}
 
 \newcommand{\checkpoint}[1]{\uline{{\huge\makebox[0pt][l]{$\square$}\raisebox{.15ex}{\hspace{0.1em}$\checkmark$}} #1}}
 
@@ -29,9 +31,8 @@
     function,
     out,
     complex_float, complex_double,
-    dimension,axes,
-    initial_function,
-    step_function
+    dimension,axes,intra_node_shape,mpi_grid_shape,temporal_blocking_interval,
+    monitor_interval
 }}
 
 % grammar settings
@@ -45,7 +46,7 @@
 
 \begin{document}
 
-\title{Formura文法仕様書}
+\title{\formura 文法仕様書}
 
 \author{構造格子サブワーキンググループ}
 
@@ -53,21 +54,8 @@
 
 
 \begin{abstract}
-  私達は、ステンシル計算用のドメイン特化言語
-  Formura\citep{latticesubwg2015formura}の開発を進めています。
-  これまで、実装の端緒となるFormuraコア文法を策定し、
-  その後2015年10月にかけて、気象チームのご協力で
-  2次元流体アプリを実装してシミュレーションを行わせてみる
-  などの実地調査を行なってきました。その結果、
-  当初議論していたテンソルやマクロなどのかっこいい機能がない
-  コンパクトなコア言語仕様のままでも、「短いコードでHPCプログラムが書ける」という当初の目的を十分達成
-  できることがわかってきました。
-  また、ユーザーの要望や皆様の洞察をもりこみ、コア文法は当初文書化したものから
-  進歩したものになってきました。
-
-  そこで、この文書では、今後Formuraユーザーの便宜のため、
-  またFormura仕様を満たした最適な計算コードを生成することに注力できるようにするため、
-  現時点でFormuraコア文法と意味論を改めて明示的に定式化することにしました。
+  この文書では、ステンシル計算用のドメイン特化言語
+  \formura \citep{latticesubwg2015formura}の文法と意味論をまとめます。
 
 \end{abstract}
 
@@ -83,7 +71,7 @@
 \section{この仕様書で用いるBNFについて}
 
 この仕様書では文法を定義するのに、例文とあわせて
-BNF (Backus-Naur form,バッカス・ナウア記法) を用います。そこで、Formura文法の説明をはじめる前にBNFについて導入的な説明を行います。
+BNF (Backus-Naur form,バッカス・ナウア記法) を用います。そこで、\formura 文法の説明をはじめる前にBNFについて導入的な説明を行います。
 
 
 BNFとは、言語の文法を厳密に定義するのに用いられる記法の一つです。BNFでは、終端記号から出発して、さまざまな
@@ -179,9 +167,54 @@ BNFにおいて、左辺を右辺で定義するのには記号 {\tt ::=} を用
   <comma-separated-list> ::= `(' [ <term> `,' ...  ] `)'
 \end{grammar}
 
+\newpage
+\section{\formura のインストールと使用方法}
+
+\subsection{バイナリインストール}
+
+\formura の公式サイト
+\href{https://github.com/nushio3/formura}
+{https://github.com/nushio3/formura}
+に行き、案内に従って最新のreleaseをダウンロードしてください。
+
+\subsection{ソースインストール}
+
+\formura はプログラミング言語Haskellで書かれています。そこで、Haskellプログラムの開発環境を整える
+ためのプログラム、\verb`stack`を使います。\verb`stack`はWindows, Mac OS X, 様々なLinuxディストリビューションに対応しています。
+
+\verb`stack`の公式サイト\href{http://docs.haskellstack.org/en/stable/README.html}
+    {http://docs.haskellstack.org/en/stable/README.html}
+に行き、指示に従って\verb`stack`をインストールしてください。
+
+次に、\formura のレポジトリからソースコードをダウンロードし、レポジトリのルートディレクトリ内で\verb`stack install`コマンドを実行してください。
+
+\begin{verbatim}
+$ git clone git@github.com:nushio3/formura.git
+$ cd formura
+$ stack install
+\end{verbatim}
+
+\formura の実行ファイル群が\verb`stack`のインストール先（デフォルトではホームディレクトリの\verb+.local/bin+以下）にインストールされます。
 
 
-\section{Formuraコア文法}
+\subsection{使用方法}
+
+コマンドラインプログラム\formura に\formura ソースコードを渡すと、C++言語のコードとヘッダが生成されます。
+生成するコードのファイル名は
+\verb`-o`で指定できます。
+
+\begin{verbatim}
+$ formura example/diffusion.f31 -o output/diffusion.cpp
+\end{verbatim}
+
+上記のコマンドにより、
+\verb`output/diffusion.h`および
+\verb`output/diffusion.cpp`が生成されます。
+生成されるコードの内容については
+\S \ref{sec:formura-generated-code}で詳しく解説します。
+
+\newpage
+\section{\formura 文法}
 
 \subsection{文字}
 
@@ -201,10 +234,10 @@ BNFにおいて、左辺を右辺で定義するのには記号 {\tt ::=} を用
   \texttt{
     \input{char-tbl.tex}
   }
-  \caption {Formuraにおける7バイトASCII文字の分類。}\label{tbl:character}
+  \caption {\formura における7バイトASCII文字の分類。}\label{tbl:character}
 \end{table}
 
-FormuraのソースコードはUTF-8でエンコードされている必要があります。Formuraでは以下の文字種別を定義します：空白文字\<space-character>、アルファベット\<alphabet-character>、数字\<digit-character>、記号文字\<other-character>、文区切り文字\<punctuation-character>。
+\formura のソースコードはUTF-8でエンコードされている必要があります。\formura では以下の文字種別を定義します：空白文字\<space-character>、アルファベット\<alphabet-character>、数字\<digit-character>、記号文字\<symbol-character>、文区切り文字\<punctuation-character>。
 
 空白文字は、ユニコード空白文字のうち、改行文字{\tt $\backslash$n}を除いたものです。
 また、\lit{\#}から改行の直前までの文字列はコメントであり、字句解析上は空白文字とみなされます。
@@ -216,23 +249,23 @@ FormuraのソースコードはUTF-8でエンコードされている必要が�
 {http://www.unicode.org/reports/tr44/tr44-14.html\%23GC\_Values\_Table}
 
 
-記号文字は、ユニコードの印刷可能文字のうちアルファベットと空白文字でないもの全てから、Formuraで特殊な意味を割り当てられている、以下の記号を除いたものです。{\tt '"$\backslash$(),;[]{}\#}
+記号文字は、ユニコードの印刷可能文字のうちアルファベットと空白文字でないもの全てから、\formura で特殊な意味を割り当てられている、以下の記号を除いたものです。{\tt '"$\backslash$(),;[]{}\#}
 
 例として、7Bit ASCIIの範囲内の文字の分類については表\ref{tbl:character}を参照してください。
 
 \subsection{字句解析}
 
-Formuraの字句は、空白、数値および文字列リテラル、識別子名、各種括弧からなります。
+\formura の字句は、空白、数値および文字列リテラル、識別子名、各種括弧からなります。
 
 空白は、空白文字を並べたものです。
-空白は、字句を区切る以外の用途をもたず、単語区切りにはいくつあっても構いません。特に、Formuraはインデントに依存した文法を持ちません。
+空白は、字句を区切る以外の用途をもたず、単語区切りにはいくつあっても構いません。特に、\formura はインデントに依存した文法を持ちません。
 
-数値リテラルは一般的な浮動小数点記法に準じます(TODO: 詳しく)。Formuraの数値リテラルはデフォルトで、任意精度有理数型と解釈されます。
+数値リテラルは一般的な浮動小数点記法に準じます(TODO: 詳しく)。\formura の数値リテラルはデフォルトで、任意精度有理数型と解釈されます。
 
 文字列リテラルは二重引用符\lit{"}で囲まれた任意の文字列です(TODO: 詳しく)。
 
 
-Formuraの識別子名\<identifier-name>は、ユーザーが変数名、演算子名などとして自由に使える文字列です。識別子名を作る方法は２通りあります：
+\formura の識別子名\<identifier-name>は、ユーザーが変数名、演算子名などとして自由に使える文字列です。識別子名を作る方法は２通りあります：
 \begin{itemize}
 \item アルファベットから始まり、0個以上のアルファベットと数字からなる列が続くものは識別子名です。
 \item 1個以上の記号文字からなる文字列は識別子名です。
@@ -240,18 +273,18 @@ Formuraの識別子名\<identifier-name>は、ユーザーが変数名、演算�
 
 \begin{grammar}
   <identifier-name> ::= <alphabet-character> \{<alphabet-character> | <digit-character>\}
-  \alt <other-character> \{<other-character>\}
+  \alt <symbol-character> \{<symbol-character>\}
 \end{grammar}
 
-Formuraの標準ライブラリでは、主に変数名や関数名にはアルファベット文字列、
+\formura の標準ライブラリでは、主に変数名や関数名にはアルファベット文字列、
 中置演算子名には記号文字列を用いていますが、
-Formuraの文法において変数名と演算子名との扱いが異なるわけではありません。
+\formura の文法において変数名と演算子名との扱いが異なるわけではありません。
 したがって変数名に記号を用いたり、アルファベットからなる中置演算子を定義することができます。
-ただし、アルファベットと記号文字を混在させたシンボルは許されないことにしています。
-これは、{\tt a+b}のような式が、間にスペースがない場合に、ひとつのシンボル\lit{a+b}としてではなく、
+ただし、アルファベットと記号文字を混在させた識別子は許されないことにしています。
+これは、{\tt a+b}のような式が、間にスペースがない場合に、ひとつの識別子\lit{a+b}としてではなく、
 加算式$a+b$として解釈されるようにするためです。
 
-次の各行の文字列はFormuraの識別子名です。
+次の各行の文字列は\formura の識別子名です。
 \begin{lstlisting}
   alpha_beta_gamma
   sanma398
@@ -276,8 +309,8 @@ Formuraの文法において変数名と演算子名との扱いが異なるわ�
 
 \subsection{文}
 
-Formuraのプログラムは複数の文\<statement>を文区切り\<statement-delimiter>で区切ったものです。
-Formuraの文は、セミコロンもしくは改行で区切られます。
+\formura のプログラムは複数の文\<statement>を文区切り\<statement-delimiter>で区切ったものです。
+\formura の文は、セミコロンもしくは改行で区切られます。
 
 \begin{grammar}
   <formura-program> ::= <statement> <statement-delimiter> ...
@@ -286,7 +319,7 @@ Formuraの文は、セミコロンもしくは改行で区切られます。
   \alt <newline>
 \end{grammar}
 
-以下に、Formuraの文と区切り文字の例を示します。
+以下に、\formura の文と区切り文字の例を示します。
 
 \begin{lstlisting}[mathescape]
   a = b; c = d
@@ -295,7 +328,7 @@ Formuraの文は、セミコロンもしくは改行で区切られます。
 \end{lstlisting}
 
 
-Formuraの文には、代入文\<substitution-statement>、
+\formura の文には、代入文\<substitution-statement>、
 型宣言文\<type-declaration> 、
 特殊宣言文\<special-declaration>、
 関数定義\<function-definition>があります。
@@ -328,31 +361,38 @@ Formuraの文には、代入文\<substitution-statement>、
 
 \subsubsection{特殊宣言文}
 
-特殊宣言文には、空間次元宣言文\lit{dimension}、座標軸名宣言文\lit{axes}、初期化関数宣言文\lit{initial_function}、更新関数宣言文\lit{step_function}があります。
+離散化アルゴリズムの指定に関わる
+特殊宣言文は、空間次元宣言文\lit{dimension}と座標軸名宣言文\lit{axes}です。
 
 空間次元宣言文はステンシル計算に用いる空間グリッドの次元を宣言します。座標軸名宣言文は各座標にわりあてる名前を
-宣言します。これらの軸名の先頭に\lit{N}をつけた変数名が、Formuraが生成するコードにおいて、各空間次元のサイズとして使われます。
+宣言します。これらの軸名は、\formura が生成するコードにおいて、各空間次元の大きさの定数やループ添字変数の名前を作るのに使われます。
 
-\lit{initial_function}で指定する関数は引数をとらず、グリッド型の値、またはいくつかのグリッドを含むタプルを返すような関数でなくてはなりません。
-\lit{step_function}で指定する関数は、\lit{initial_function}関数が返す型を受け取り、同じ型を返す関数である必要があります。
+とくに、計算空間全体の解像度に対応する定数は、軸の名前を大文字にして\lit{N}を加えたものになります。
+たとえば、
+\lit{axes :: x, y, z}と指定しているならば、解像度は
+\lit{NX}×
+\lit{NY}×
+\lit{NZ}です。これらの変数名は\formura のコード側からも参照できます。
 
+% 初期化関数宣言文\lit{initial_function}、更新関数宣言文\lit{step_function}は削除
 
 例えば次の例では3次元の格子を初期化する関数を指定しています。
 
 \begin{lstlisting}[mathescape]
   dimension :: 3
-  axes :: X, Y, Z
-
-  initial_function :: init
-  step_function :: update
+  axes :: x, y, z
 
   begin function dens = init()
     Real [,,] :: dens
-    dens[i,j,k]  = sin(i) * j + k
-    dens[0,,]    = 0
-    dens[NX-1,,] = 0
+    dens[i,j,k]  = sin(2 * pi * i / NX) * j + k
   end function
 \end{lstlisting}
+
+他の特殊宣言文、\lit{intra_node_shape}, \lit{mpi_grid_shape}, \lit{temporal_blocking_interval},
+    \lit{monitor_interval}については、
+並列化コードの生成に関わるものですので、
+\S \ref{sec:formura-generated-code}で詳しく解説します。
+
 
 
 
@@ -387,7 +427,7 @@ Formuraの文には、代入文\<substitution-statement>、
 
 \subsubsection{複文}
 
-Formuraでは、型宣言文および複数の代入文を複合させて簡潔に記述することができます。
+\formura では、型宣言文および複数の代入文を複合させて簡潔に記述することができます。
 この形式を複文と呼びます。
 
 \begin{grammar}
@@ -466,7 +506,7 @@ Formuraでは、型宣言文および複数の代入文を複合させて簡潔�
 \end{table}
 
 
-Formuraの型は、要素型、および型のグリッド(格子)、型のタプル(組)、型のベクトル(ランダムアクセス可能な配列)からなります。
+\formura の型は、要素型、および型のグリッド(格子)、型のタプル(組)、型のベクトル(ランダムアクセス可能な配列)からなります。
 
 要素型の一覧については
 表\ref{tbl:scalar-type}を参照してください。グリッドは、ステンシル計算の格子を表現するデータ型です。これに対しベクトルは、
@@ -498,7 +538,7 @@ Formuraの型は、要素型、および型のグリッド(格子)、型のタ�
   Real[,](3) :: velocity_as_structure_of_array
 \end{lstlisting}
 
-Formuraにおいて、$n$次元のベクトルは$n$重のベクトルと等価であり、さらに$m$要素の一次元ベクトルは同じ型を$m$個要素にもつ$m$-タプルと等価です。例えば以下の文において、4つの変数\lit{t1} ... \lit{t4}はすべて同じ型です。
+\formura において、$n$次元のベクトルは$n$重のベクトルと等価であり、さらに$m$要素の一次元ベクトルは同じ型を$m$個要素にもつ$m$-タプルと等価です。例えば以下の文において、4つの変数\lit{t1} ... \lit{t4}はすべて互換性があります。
 
 \begin{lstlisting}[mathescape]
   Real(3,2) :: t1
@@ -517,7 +557,7 @@ Formuraにおいて、$n$次元のベクトルは$n$重のベクトルと等価�
 
 
 
-Formuraの式は、
+\formura の式は、
 即値               \<literal>
 、変数名           \<variable-name>
 、二項演算子式     \<binary-operator-expression>
@@ -607,12 +647,12 @@ Formuraの式は、
 \lit{-}は左結合なので、{\tt 3-4-5}は {\tt (3-4)-5}の意味になります。
 
 多結合演算子は、連続して登場した場合には一塊として解釈されます。
-例えば、Formuraにおいて{\tt 3<a<5}は{\tt (3<a)\&\&(a<5)}を意味します。
+例えば、\formura において{\tt 3<a<5}は{\tt (3<a)\&\&(a<5)}を意味します。
 
 
 \subsection{式の左辺}
 
-Formuraの代入文の左辺に来る
+\formura の代入文の左辺に来る
 \<left-hand-side-pattern>については、変数名、タプルのパターンマッチ、格子変数へのアクセスが書けます。
 
 \begin{grammar}
@@ -644,7 +684,7 @@ Formuraの代入文の左辺に来る
 
 \newpage
 
-\subsection{Formuraコア文法の全定義}
+\subsection{\formura 文法の全定義}
 
 \begin{grammar}
 <formura-program> ::= <statement> <statement-delimiter> ...
@@ -676,7 +716,7 @@ Formuraの代入文の左辺に来る
 | `complex_float' | `complex_double'
 | `Real' | `Complex' | `string'
 
-<special-declaration> ::= `dimension' | `axes'| `initial_function' |  `step_function'
+<special-declaration> ::= `dimension' | `axes' | `intra_node_shape' | `mpi_grid_shape' | `temporal_blocking_interval' | `monitor_interval'
 
 <function-definition> ::=
   `begin' `function' <return-value> `=' <function-name> <arguments-pattern> \\
@@ -707,7 +747,7 @@ Formuraの代入文の左辺に来る
 <function-name> ::= <identifier-name>
 
 <identifier-name> ::= <alphabet-character> \{<alphabet-character> | <digit-character>\}
-  \alt <other-character> \{<other-character>\}
+  \alt <symbol-character> \{<symbol-character>\}
 
 \end{grammar}
 
@@ -715,7 +755,9 @@ Formuraの代入文の左辺に来る
 
 
 
-\section{Formuraコア文法における演算の意味論}
+
+
+\section{\formura 文法における演算の意味論}
 
 % \begin{grammar}
 %   <T> ::= <element-type>
@@ -728,12 +770,12 @@ Formuraの代入文の左辺に来る
 
 
 
-\subsection{Formuraの演算}
+\subsection{\formura の演算}
 
-Formuraの目的は全ての代入文の左辺の値を計算することです。
-Formuraの代入文は上から順番に評価されます。
+\formura の目的は全ての代入文の左辺の値を計算することです。
+\formura の代入文は上から順番に評価されます。
 
-Formuraの代入文は静的単一代入です。これは、各行の変数を区別し、ある行の変数は前の行までの変数で定義されていると
+\formura の代入文は静的単一代入です。これは、各行の変数を区別し、ある行の変数は前の行までの変数で定義されていると
 解釈するという意味です。たとえば、つぎのプログラムは
 
 \begin{lstlisting}
@@ -759,28 +801,28 @@ Formuraの代入文は静的単一代入です。これは、各行の変数を�
 
 
 
-\subsection{Formuraの意味論}
+\subsection{\formura の意味論}
 
 
 スカラー変数には、ただ1つの値が対応します。
 
 タプルは要素番号を取って値を返す関数に対応させます。ベクトルに関しては、タプルと同一視することで意味をつけます。
 
-グリッド変数はFormuraにおいてステンシル計算を表現する重要な型です。
+グリッド変数は\formura においてステンシル計算を表現する重要な型です。
 $d$次元のグリッド変数は、$d$個の有理数$(r_i, .. ^{i \in 0 .. d-1})$によりオフセットを指定できます。
 グリッド変数の値は、$d$次元ユークリッド空間において、整数座標から$(r_i, ..)$だけずれた格子点
-$(n_i + r_i , .. ^{\i \in 0..d-1, n_i \in \bbZ})$において定義されます。いわばグリッド変数は
+$(n_i + r_i , .. ^{i \in 0..d-1, n_i \in \bbZ})$において定義されます。いわばグリッド変数は
 $(n_i + r_i , ..)$を受け取って値を返す関数です。
 
-Formuraにおけるグリッド変数は、必ず(オフセットされた)任意の格子点にて定義されていると解釈することに注意してください。
+\formura におけるグリッド変数は、必ず(オフセットされた)任意の格子点にて定義されていると解釈することに注意してください。
 たとえ境界条件があっても必ずです。このことは、PiTCH計算モデルを当てはめるうえで必要です。
 
 TODO: フォーマルな表示的意味論を整備する。
 
 
-\subsection{Formuraの暗黙の型変換}
+\subsection{\formura の暗黙の型変換}
 
-算術二項演算\lit{+}, \lit{*}, ... に渡す2つの値は、型が一致している必要があります。型が一致しない場合、Formuraは両者を共通に格納できる「大きな」型への変換を試みます。たとえば、スカラーとタプルの掛け算、スカラーとグリッドの掛け算は、それぞれスカラー値のほうの意味を拡張し、
+算術二項演算\lit{+}, \lit{*}, ... に渡す2つの値は、型が一致している必要があります。型が一致しない場合、\formura は両者を共通に格納できる「大きな」型への変換を試みます。たとえば、スカラーとタプルの掛け算、スカラーとグリッドの掛け算は、それぞれスカラー値のほうの意味を拡張し、
 タプルの各要素、グリッドの各要素とそのスカラー値の掛け算を行います。
 
 より詳細に、スカラーとタプル、もしくは、タプルとスカラーの間の演算は、そのスカラーとタプルの各要素間の演算として定義します。
@@ -837,7 +879,7 @@ TODO: フォーマルな表示的意味論を整備する。
 
 \subsection{添字を省いたグリッド演算}
 
-Formuraでは、グリッド変数同士に直接加減乗除などの演算を施すことができます。
+\formura では、グリッド変数同士に直接加減乗除などの演算を施すことができます。
 グリッド変数同士を直接演算する場合、グリッド変数のオフセットが一致している必要があります。
 
 \begin{lstlisting}
@@ -862,7 +904,7 @@ Formuraでは、グリッド変数同士に直接加減乗除などの演算を�
 上記のプログラムのまた違った解釈として、
 \lit{[+1]}を、配列を一つ左向きにずらす演算子だと思うこともできます。
 
-ただし、次のコードが意味をつけようとすると難しいのと同様、
+ただし、次のコードが意味をなさないのと同様、
 
 \begin{lstlisting}
   double [0] :: a
@@ -879,12 +921,187 @@ Formuraでは、グリッド変数同士に直接加減乗除などの演算を�
 
 \newpage
 
-\section{Formuraコア文法の利用}
+\section{\formura の生成するコード}\label{sec:formura-generated-code}
 
-以上のコア構文を用いて、ステンシル計算を書いてみます。
+\subsection{コード実行の流れ}
+
+C言語のプログラムが\lit{main}関数から開始するように、
+\formura のプログラムでは、
+\lit{init}と
+\lit{step}という名前の関数が、コード生成の起点として特別な意味を持ちます。
+
+\formura のプログラムは、最初に\lit{init}関数を一つ呼び出してシミュレーションの初期状態を作り、その後
+\lit{step}関数を繰り返し呼び出して状態を更新していきます。C言語の擬似コードで書けば、次のようになります。
+
+\begin{lstlisting}[mathescape]
+  simulation_state = init();
+  for (t = 0; t < T_MAX; ++t) {
+    simulation_state = step(simulation_state);
+  }
+\end{lstlisting}
 
 
-Formuraが最低限できる必要があるのは、シンプルなグリッド変数どうしの演算です。具体的には、
+\lit{init}関数は0個の引数をとり、グリッド型の値、またはいくつかのグリッドを含むタプルを返すような関数でなくてはなりません。
+\lit{step}関数は\lit{init}関数が返す型を受け取り、同じ型を返す関数である必要があります。
+
+\formura は、コード生成にあたって、
+シミュレーションの独立変数を保持する配列変数を名付けるとき、\lit{step}関数の引数に使われた名前を採用します。
+なぜなら、\formura プログラムの中でシミュレーションの全状態がひとかたまりになっている箇所は三つ
+（\lit{init}関数の返り値、
+\lit{step}関数の引数
+\lit{step}関数の返り値）ありますが、このうち「\lit{step}関数の引数」だけが左辺式であって、各変数に独立な名前がついていることが保証されているからです。
+
+
+\subsection{C/C++言語からの呼び出し規約}
+
+\formura　の生成するコードの命名規約は、MPIライブラリと違和感なく使えるように定めることにします。
+\formura　はC++のヘッダとソースコードを組で生成します。
+ユーザーは通常の方法でコンパイル・自身のプログラムとリンクして実行ファイルを作ってください。
+
+\formura が生成したコードを利用するユーザー側のプログラムは次のようになります。
+
+\begin{screen}
+\begin{verbatim}
+  #include "mpi.h"
+  #include "output.h"
+
+  int main (int argc, char **argv) {
+    Formura_Navigator navi;
+
+    MPI_Init(argc, argv);
+    Formura_Init(&navi, MPI_WORLD_COMM);
+
+    while(navi.time_step < T_MAX) {
+      Formura_Forward(&navi);
+    }
+
+    MPI_Finalize(argc, argv);
+  }
+\end{verbatim}
+\end{screen}
+
+\paragraph{生成されるコードの内容} \leavevmode\\
+
+
+\formura　の生成するヘッダには、次のものが含まれます。
+
+\begin{itemize}
+\item シミュレーションの独立変数に対応する配列変数（以下、状態配列 state array と呼びます）
+\item \verb`Formura_Navigator`構造体
+\item \verb`Formura_Init`関数
+\item \verb`Formura_Forward`、関数
+\end{itemize}
+
+
+状態配列は、\formura が生成したコードからも、ユーザーからも読み書きされることを想定しています。
+\formura の生成した関数を呼び出していないとき、ユーザーは状態配列を自由に更新することができます。
+
+\verb`Formura_Navigator`構造体は、\formura の関数からユーザーに対し、いま状態配列に、どの時点・どの範囲の物理量が
+入っているのか通知するために使います。
+
+たとえば、
+\verb`dimension :: 2`
+\verb`axes :: x, y`
+が指定されている場合、
+\verb`Formura_Navigator`構造体は次のようになります。
+
+\begin{screen}
+\begin{verbatim}
+  struct Formura_Navigator {
+    int time_step;
+    int lower_x;
+    int upper_x;
+    int lower_y;
+    int upper_y;
+  };
+\end{verbatim}
+\end{screen}
+
+これは、
+$t = \mathrm{time\_step}$
+$\mathrm{lower\_x} \leq x < \mathrm{upper\_x}$
+$\mathrm{lower\_y} \leq y < \mathrm{upper\_y}$
+の範囲の値が状態配列に格納されていることを意味しています。
+
+\formura は次のことを保証します：\verb`monitor_interval`タイムステップごとの、計算領域内の物理量は、
+少なくとも１つのMPIノードから読むことができる。
+
+
+\paragraph{\texttt{Formura\_Init}関数} \leavevmode\\
+
+\begin{screen}
+\begin{verbatim}
+int Formura_Init (Formura_Navigator *navi, MPI_Comm comm)
+\end{verbatim}
+\end{screen}
+\verb`Formura_Init`関数は、\formura ソースコードの\lit{init}関数に対応する計算を行い、結果を状態配列に書き込みます。
+
+\verb`Formura_Init`関数が返すナビゲータは、必ず
+$\mathrm{time\_step} = 0$を満たします。
+
+
+\verb`Formura_Init`関数は
+\verb`MPI_Comm`型の引数をひとつ取ります。\formura が行う通信は、ここの
+\verb`Formura_Init`で指定されたMPIコミュニケータを使います。
+
+
+\paragraph{\texttt{Formura\_Forward}関数} \leavevmode\\
+
+\begin{screen}
+\begin{verbatim}
+int Formura_Forward (Formura_Navigator *navi)
+\end{verbatim}
+\end{screen}
+\verb`Formura_Forward`関数は、
+状態配列を読み取り、
+\formura ソースコードの\lit{step}関数に対応する計算を
+\verb`monitor_interval`回繰り返し
+行い、結果を状態配列に書き込みます。
+
+ \verb`Formura_Forward`関数が返すナビゲータの
+ $\mathrm{time\_step}$は、直前の値より
+\verb`monitor_interval`だけ増加しています。
+
+\paragraph{\formura の生成するコードの並列度や解像度} \leavevmode\\
+
+\formura の生成するコードの並列度や解像度は、
+\formura の特殊宣言での指定から決まります。以下に、
+\formura の特殊宣言の一覧を再掲します。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 3
+  axes :: x, y, z
+  intra_node_shape :: 64, 64, 64
+  mpi_grid_shape :: 40, 20, 5
+  temporal_blocking_interval :: 2
+  monitor_interval :: 120
+\end{lstlisting}
+
+各ノードが担当する状態配列の大きさは、およそ
+\lit{intra_node_shape}程度の大きさになります。但し、temporal blockingや通信の都合上、この大きさは多少変更されることがあります。
+これらのノードを、\lit{mpi_grid_shape}で指定された数だけ$x,y,z$方向に並べた領域が計算領域となります。したがって、上記の例では
+計算の解像度は$2560 \times 1280 \times 320$となります。
+さらに、\lit{step}関数の計算をtemporal blockingで2ステップぶん一気に計算するコードが生成され、
+ユーザーコード側からは、120ステップごとに物理状態を観測することができます。
+
+この仕様に伴って、\verb`Formura_Init`関数に渡すMPIコミュニケータ内にあるMPIランクの数は、
+\lit{mpi_grid_shape}の積と一致している必要があります。
+
+
+\subsection{Fortranからの呼び出し規約}
+
+\formura は将来的にFortranからも使えるようにする予定です。ここで障害となるのは、Fortran処理系ごとに配列変数のメモリ上での表現が異なっている場合がある、ということです。
+
+このため、
+Fortran版では、\verb`monitor_interval`ごとに、物理量をFortran形式の配列に変換して書き込んでユーザーに見せ、変更があった場合はその配列から再度読み込んでシミュレーションを継続する方式を予定しています。
+
+\newpage
+\section{\formura 文法の利用}
+
+以上の構文を用いて、ステンシル計算を書いてみます。
+
+
+\formura が最低限できる必要があるのは、シンプルなグリッド変数どうしの演算です。具体的には、
 
 \begin{enumerate}
 \item グリッドの次元とサイズをを宣言する
@@ -895,35 +1112,33 @@ Formuraが最低限できる必要があるのは、シンプルなグリッド�
 
 ことができれば足ります。
 
-以下に、Formuraコア文法だけを使って記述したプログラムを示します。
+以下に、\formura を使って記述したプログラムを示します。
 
 \begin{lstlisting}[mathescape]
-  dimension :: 2
-  axes :: X, Y
+dimension :: 3
+axes :: x, y, z
+single_node_shape :: 64, 64, 64
+mpi_shape :: 8,8,8
 
-  d = 0.1
 
-  initial_function :: init
-  step_function :: step
+ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
 
-  begin function a = init ()
-    double[,] :: a
+∂ = (ddx,ddy,ddz)
 
-    a[i,j] = 1e4 * exp( - ((i-50)**2 + (j-50)**2) / 100)
-  end function
+Σ = for (e) e(0) + e(1) + e(2)
 
-  begin function a_next = step (a)
-    double[,] :: a, a_next
+begin function init() returns dens_init
+      float [] :: dens_init = 0
+end function
 
-    double[1/2,] :: flux_x
-    double[,1/2] :: flux_y
-    flux_x[i+1/2,j] = a[i+1,j] - a[i,j]
-    flux_y[i,j+1/2] = a[i,j+1] - a[i,j]
-
-    a_next[i,j] = a[i,j] +                          \
-      d * (flux_x[i+1/2,j]-flux_x[i-1/2,j] +        \
-           flux_y[i,j+1/2]-flux_y[i,j-1/2])
-  end function
+begin function dens_next = step(dens)
+  float :: Dx, Dt
+  Dx = 4.2
+  Dt = 0.1
+  dens_next = dens + Dx**2/Dt * Σ for(i) (∂ i . ∂ i) dens
+end function
 \end{lstlisting}
 
 タプル型の設計にあたっては\citet{pierce2002types}を参考にしました。
