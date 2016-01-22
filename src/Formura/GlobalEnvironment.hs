@@ -3,6 +3,7 @@
 module Formura.GlobalEnvironment where
 
 import Control.Lens
+import Data.Char (toUpper)
 
 import Formura.Syntax
 
@@ -11,6 +12,8 @@ data GlobalEnvironment = GlobalEnvironment {
   _axesNames :: [IdentName]
   }
                        deriving (Eq, Ord, Show)
+makeClassy ''GlobalEnvironment
+
 
 defaultGlobalEnvironment :: GlobalEnvironment
 defaultGlobalEnvironment = GlobalEnvironment 0 []
@@ -18,4 +21,6 @@ defaultGlobalEnvironment = GlobalEnvironment 0 []
 sample3Denvironment :: GlobalEnvironment
 sample3Denvironment = GlobalEnvironment 3 ["x","y","z"]
 
-makeClassy ''GlobalEnvironment
+
+extentVariableNames :: Getter GlobalEnvironment [IdentName]
+extentVariableNames = axesNames . to (map (("N"++) . map toUpper))

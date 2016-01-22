@@ -38,6 +38,7 @@ library
                   Formura.OrthotopeMachine.Graph
                   Formura.OrthotopeMachine.Translate
                   Formura.Cxx.Translate
+                  Formura.MPICxx.Translate
 
 
   -- other-modules:
