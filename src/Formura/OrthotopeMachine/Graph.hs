@@ -36,6 +36,10 @@ data DataflowInstF x
 data ShiftF x = ShiftF (Vec Int) x
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
+-- | The functor for language that support cursored load of graph nodes..
+data LoadCursorF x = LoadCursorF (Vec Int) NodeID
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
 
 -- | smart patterns
 pattern Load n <- ((^? match) -> Just (LoadF n)) where
@@ -48,6 +52,9 @@ pattern LoadExtent n <- ((^? match) -> Just (LoadExtentF n)) where
   LoadExtent n = match # LoadExtentF n
 pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
   Shift v x = match # ShiftF v x
+pattern LoadCursor v x <- ((^? match) -> Just (LoadCursorF v x)) where
+  LoadCursor v x = match # LoadCursorF v x
+
 
 type OMInstF = Sum '[DataflowInstF, ShiftF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
