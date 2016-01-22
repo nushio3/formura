@@ -1,5 +1,8 @@
 dimension :: 3
 axes :: x, y, z
+single_node_shape :: 64, 64, 64
+mpi_shape :: 8,8,8
+
 
 ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
 ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2

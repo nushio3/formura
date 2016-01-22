@@ -67,7 +67,7 @@ keyword k = "keyword " ++ k ?> do
     "Please report the compiler developer: \"" ++ k ++ "\" is not in a keyword list!"
   symbol k
 
--- | The set of keywords. The string is not parsed as a identifier if it's in the keyword list.
+-- | The set of reserved keywords. The string is not parsed as a identifier if it's in the keyword list.
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
              ["begin", "end", "function", "returns", "let", "in", "lambda",
@@ -321,7 +321,7 @@ typeValueStatements = "type-decl and/or substitiution statement" ?> do
     -- When there is type, we allow multiple substitutions, and lhs-only terms.
     Just _ -> lhsAndMaybeRhs `sepBy1` symbol ","
     -- When there is no type, we allow only one substitution.
-    Nothing -> do
+    Nothing -> "simple substitution expression" ?> do
       lhs <- lExpr
       keyword "="
       rhs <- rExpr
@@ -420,7 +420,7 @@ constIntExpr = fromInteger <$> natural
 
 
 specialDeclaration :: P SpecialDeclaration
-specialDeclaration = dd  <|> ad
+specialDeclaration = dd  <|> ad <|> od
   where
     dd = do
       "dimension declaration" ?> try $ keyword "dimension"
@@ -432,6 +432,14 @@ specialDeclaration = dd  <|> ad
       keyword "::"
       xs <- identName `sepBy` symbolic ','
       return $ AxesDeclaration xs
+    od = do
+      key <- "general special declaration" ?> try otherSDKeywords
+      keyword "::"
+      vals <- integer' `sepBy` symbolic ','
+      return $ OtherDeclaration key vals
+    otherSDKeywords =
+      choice [symbol x
+             | x <- ["mpi_shape" , "single_node_shape"]]
 
 program :: P Program
 program = do
