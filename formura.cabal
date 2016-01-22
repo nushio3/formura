@@ -67,6 +67,17 @@ library
   ghc-options:         -O3 -Wall  -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
 
 
+executable formura
+  hs-source-dirs: exe-src
+  main-is: formura.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+                base == 4.*
+              , formura
+
+
+
 
 executable formura-parser
   hs-source-dirs: exe-src
