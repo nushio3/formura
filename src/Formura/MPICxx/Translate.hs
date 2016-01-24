@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, PackageImports, TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts, FlexibleInstances, OverloadedStrings, PackageImports, TemplateHaskell #-}
 
 module Formura.MPICxx.Translate where
 
@@ -17,21 +17,20 @@ import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
 
-type Cxx = T.Text
 
-showC :: Show a => a -> Cxx
+showC :: Show a => a -> T.Text
 showC = T.pack . show
 
-parens :: Cxx -> Cxx
+parens :: T.Text -> T.Text
 parens x = "(" <> x <> ")"
 
-brackets :: Cxx -> Cxx
+brackets :: T.Text -> T.Text
 brackets x = "[" <> x <> "]"
 
 class ToC a where
-  toC :: a -> Cxx
+  toC :: a -> T.Text
 
-newtype VariableName = VariableName Cxx
+newtype VariableName = VariableName T.Text
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
@@ -53,7 +52,21 @@ defaultTranState = TranState
   }
 
 
-type TranM = CompilerMonad GlobalEnvironment Cxx TranState
+data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text}
+                deriving (Eq, Ord, Show)
+makeLenses ''CProgram
+
+tellH :: (MonadWriter CProgram m) => T.Text -> m ()
+tellH txt = tell $ CProgram txt ""
+tellC :: (MonadWriter CProgram m) => T.Text -> m ()
+tellC txt = tell $ CProgram "" txt
+
+
+instance Monoid CProgram where
+  mempty = CProgram "" ""
+  mappend (CProgram h1 c1) (CProgram h2 c2) = CProgram (h1 <> h2) (c1 <> c2)
+
+type TranM = CompilerMonad GlobalEnvironment CProgram TranState
 
 -- * Parallel code generation
 
@@ -72,10 +85,7 @@ defaultNumericalConfig =
   , _ncMPINodeShape = Vec [5,10]
   }
 
-translateHeader :: TranM ()
-translateHeader = do
-  tell $ T.unlines ["#include <mpi.h>"]
-
-translateBody :: TranM ()
-translateBody = do
-  tell $ T.unlines ["#include <mpi.h>" , "#include \"output.h\""]
+translateProgram :: TranM ()
+translateProgram = do
+  tellH $ T.unlines ["#include <mpi.h>"]
+  tellC $ T.unlines ["#include <mpi.h>" , "#include \"output.h\""]
