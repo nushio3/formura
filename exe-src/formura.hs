@@ -1,4 +1,8 @@
 module Main where
 
+import CommandLineOption(parseCommandLineOption)
+
 main :: IO ()
-main = putStrLn "hi"
+main = do
+  opts <- parseCommandLineOption
+  print opts

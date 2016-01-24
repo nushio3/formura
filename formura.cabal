@@ -76,6 +76,7 @@ executable formura
   build-depends:
                 base == 4.*
               , formura
+              , optparse-applicative
 
 
 
