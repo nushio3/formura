@@ -51,6 +51,7 @@ library
               , bytestring
               , containers
               , either
+              , filepath
               , lattices
               , lens
               , mmorph
