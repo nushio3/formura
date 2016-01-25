@@ -439,7 +439,7 @@ specialDeclaration = dd  <|> ad <|> od
       return $ OtherDeclaration key vals
     otherSDKeywords =
       choice [symbol x
-             | x <- ["mpi_shape" , "single_node_shape"]]
+             | x <- ["mpi_grid_shape" , "intra_node_shape", "temporal_blocking_interval", "monitor_interval"]]
 
 program :: P Program
 program = do
