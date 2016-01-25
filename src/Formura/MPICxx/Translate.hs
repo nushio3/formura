@@ -99,6 +99,7 @@ translateProgram = do
   tellBoth "\n\n"
 
   tellnH $ "struct Formura_Navigator {"
+  tellnH $ "int time_step;"
   forM_ ivars $ \i -> do
     tellnH $ "int lower_" <> i <> ";"
     tellnH $ "int upper_" <> i <> ";"
