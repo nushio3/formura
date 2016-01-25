@@ -60,6 +60,7 @@ library
               , mtl
               , optparse-applicative
               , parsers
+              , process
               , QuickCheck
               , sbv
               , text

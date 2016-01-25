@@ -11,6 +11,7 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import           System.Directory
 import           System.FilePath.Lens
+import           System.Process
 
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
@@ -30,6 +31,9 @@ parens x = "(" <> x <> ")"
 
 brackets :: T.Text -> T.Text
 brackets x = "[" <> x <> "]"
+
+braces :: T.Text -> T.Text
+braces x = "{" <> x <> "}"
 
 class ToC a where
   toC :: a -> T.Text
@@ -56,6 +60,11 @@ tellH txt = tell $ CProgram txt ""
 tellC :: (MonadWriter CProgram m) => T.Text -> m ()
 tellC txt = tell $ CProgram "" txt
 
+tellnH :: (MonadWriter CProgram m) => T.Text -> m ()
+tellnH txt = tell $ CProgram (txt <> "\n") ""
+tellnC :: (MonadWriter CProgram m) => T.Text -> m ()
+tellnC txt = tell $ CProgram "" (txt <> "\n")
+
 
 instance Monoid CProgram where
   mempty = CProgram "" ""
@@ -79,8 +88,20 @@ defaultNumericalConfig = undefined
 
 translateProgram :: WithCommandLineOption => TranM ()
 translateProgram = do
+  ivars <- map T.pack <$> view axesNames
+
   tellH $ T.unlines ["#include <mpi.h>"]
   tellC $ T.unlines ["#include <mpi.h>" , "#include \"" <> T.pack hxxFileName <> "\""]
+
+  tellH "\n"; tellC "\n"
+
+  tellnH $ "struct Formura_Navigator {"
+  forM_ ivars $ \i -> do
+    tellnH $ "int lower_" <> i <> ";"
+    tellnH $ "int upper_" <> i <> ";"
+    tellnH $ "int offset_" <> i <> ";"
+
+  tellnH $ "};"
 
 genCxxFiles :: WithCommandLineOption => Program -> OMProgram -> IO ()
 genCxxFiles formuraProg omProg = do
@@ -100,6 +121,10 @@ genCxxFiles formuraProg omProg = do
 
   T.writeFile hxxFilePath hxxContent
   T.writeFile cxxFilePath cxxContent
+
+  mapM_ indent [hxxFilePath, cxxFilePath]
+  where
+    indent fn = callProcess "indent" ["-kr", "-i2", fn]
 
 
 cxxFilePath :: WithCommandLineOption => FilePath
