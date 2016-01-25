@@ -27,6 +27,7 @@ library
                   Formura.Annotation
                   Formura.Annotation.Representation
                   Formura.Compiler
+                  Formura.CommandLineOption
                   Formura.Geometry
                   Formura.GlobalEnvironment
                   Formura.Parser
@@ -56,6 +57,7 @@ library
               , lens
               , mmorph
               , mtl
+              , optparse-applicative
               , parsers
               , QuickCheck
               , sbv
@@ -77,7 +79,15 @@ executable formura
   build-depends:
                 base == 4.*
               , formura
-              , optparse-applicative
+              , aeson
+              , ansi-wl-pprint
+              , bytestring
+              , containers
+              , lens
+              , text
+              , trifecta
+              , yaml
+
 
 
 

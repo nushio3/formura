@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, OverloadedStrings, PackageImports, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, ImplicitParams, OverloadedStrings, PackageImports, TemplateHaskell #-}
 
 module Formura.MPICxx.Translate where
 
@@ -8,10 +8,12 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import qualified Data.IntMap as G
 import qualified Data.Text as T
+import           System.FilePath.Lens
 
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
 import           Formura.Compiler
+import           Formura.CommandLineOption
 import           Formura.GlobalEnvironment
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
@@ -85,7 +87,11 @@ defaultNumericalConfig =
   , _ncMPINodeShape = Vec [5,10]
   }
 
-translateProgram :: TranM ()
+translateProgram :: WithCommandLineOption => TranM ()
 translateProgram = do
+  let cfn :: FilePath
+      cfn = ?commandLineOption ^. outputFilename . filename
+      hfn :: FilePath
+      hfn = cfn & extension .~ ".h"
   tellH $ T.unlines ["#include <mpi.h>"]
-  tellC $ T.unlines ["#include <mpi.h>" , "#include \"output.h\""]
+  tellC $ T.unlines ["#include <mpi.h>" , "#include \"" <> T.pack hfn <> "\""]
