@@ -113,6 +113,7 @@ translateProgram = do
   tellH ";"
   tellC $ T.unlines
     [ "{"
+    , "navi->time_step=0;"
     , "}"
     ]
 
@@ -122,7 +123,8 @@ translateProgram = do
   tellH ";"
   tellC $ T.unlines
     [ "{"
-    , "printf(\"mae ni susumou!\");"
+    , "printf(\"mae ni susumou!\n\");"
+    , "navi->time_step += 1;"
     , "}"
     ]
 
