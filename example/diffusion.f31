@@ -1,7 +1,9 @@
 dimension :: 3
 axes :: x, y, z
-single_node_shape :: 64, 64, 64
-mpi_shape :: 8,8,8
+intra_node_shape :: 64, 64, 64
+mpi_grid_shape :: 2, 2, 2
+temporal_blocking_interval :: 4
+monitor_interval :: 20
 
 
 ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
@@ -20,5 +22,5 @@ begin function dens_next = step(dens)
   float :: Dx, Dt
   Dx = 4.2
   Dt = 0.1
-  dens_next = dens + Dx**2/Dt * Σ for(i) (∂ i . ∂ i) dens
+  dens_next = dens + Dt / Dx**2 * Σ for(i) (∂ i . ∂ i) dens
 end function
