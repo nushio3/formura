@@ -51,6 +51,7 @@ library
               , binary-search
               , bytestring
               , containers
+              , directory
               , either
               , filepath
               , lattices

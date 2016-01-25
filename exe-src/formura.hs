@@ -2,6 +2,7 @@
 module Main where
 
 import           Control.Lens
+import           Control.Monad
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.IntMap as G
 import           Data.Monoid
@@ -20,13 +21,12 @@ import           Formura.OrthotopeMachine.Translate
 import qualified Formura.Parser as P
 import           Formura.Compiler
 import           Formura.Syntax
-import qualified Formura.Cxx.Translate as C
+import qualified Formura.MPICxx.Translate as C
 
 main :: IO ()
 main = do
   opts <- getCommandLineOption
   let ?commandLineOption = opts
-  print ?commandLineOption
   mapM_ process (opts ^. inputFilenames)
 
 process :: WithCommandLineOption => FilePath -> IO ()
@@ -38,30 +38,26 @@ process fn = do
 
 genMPICxx :: WithCommandLineOption => Program -> IO ()
 genMPICxx prog = do
-  omProg <- genProgram prog
+  omProg <- genOMProgram prog
 
-  putStrLn "## Debug print: global environment of the simulation"
-  print (omProg ^. omGlobalEnvironment)
-  putStrLn ""
+  when (?commandLineOption ^. verbose) $ do
+    putStrLn "## Debug print: global environment of the simulation"
+    print (omProg ^. omGlobalEnvironment)
+    putStrLn ""
 
-  putStrLn "## Debug print: simulation state"
-  print (omProg ^. omStateSignature)
-  putStrLn ""
+    putStrLn "## Debug print: simulation state"
+    print (omProg ^. omStateSignature)
+    putStrLn ""
 
-  putStrLn "## Debug print: init graph"
-  mapM_ pprNode $ G.toList (omProg ^. omInitGraph)
-  putStrLn ""
+    putStrLn "## Debug print: init graph"
+    mapM_ pprNode $ G.toList (omProg ^. omInitGraph)
+    putStrLn ""
 
-  putStrLn "## Debug print: step graph"
-  mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
-  putStrLn ""
+    putStrLn "## Debug print: step graph"
+    mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
+    putStrLn ""
 
-  (_, _, cxxCode) <- runCompilerRight (C.translate C.defaultNumericalConfig)
-                     (omProg ^. omGlobalEnvironment)
-                     C.defaultTranState{C._theGraph = omProg ^. omStepGraph}
-  T.putStrLn (cxxCode :: T.Text)
-  T.writeFile "output.cpp" cxxCode
-  BS.putStrLn $ Y.encode $ C.defaultNumericalConfig
+  C.genCxxFiles prog omProg
 
 pprNode :: (Int, Node) -> IO ()
 pprNode (i,n) = do

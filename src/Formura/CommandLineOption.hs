@@ -11,14 +11,21 @@ data CommandLineOption =
   CommandLineOption
     { _inputFilenames :: [FilePath]
     , _outputFilename :: FilePath
+    , _verbose :: Bool
     }
   deriving (Eq, Show)
 makeClassy ''CommandLineOption
 
 cloParser :: Parser CommandLineOption
-cloParser = CommandLineOption <$>
-            some (argument str (metavar "FILES...")) <*>
-            strOption (long "output-filename" <> short 'o' <> metavar "FILENAME" <> help "the name of the .c file to be generated.")
+cloParser = CommandLineOption
+            <$>
+            some (argument str (metavar "FILES..."))
+            <*>
+            strOption (long "output-filename" <> short 'o' <> metavar "FILENAME" <> value "" <>
+                       help "the name of the .c file to be generated.")
+            <*>
+            switch (long "verbose" <> short 'v' <> help "output debug messages.")
+
 
 getCommandLineOption :: IO CommandLineOption
 getCommandLineOption = execParser $

@@ -37,7 +37,7 @@ process fn = do
 
 genStmt :: Program -> IO ()
 genStmt prog = do
-  omProg <- genProgram prog
+  omProg <- genOMProgram prog
 
   putStrLn "## Debug print: global environment of the simulation"
   print (omProg ^. omGlobalEnvironment)

@@ -398,16 +398,12 @@ toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encount
 genGlobalFunction :: BindingF RExpr -> TypeExpr -> LExpr -> RExpr -> GenM TypeExpr
 genGlobalFunction globalBinding inputType outputPattern (Lambda l r) =  bindThemAll $ do
   typedLhs <- matchToLhs l inputType
-  liftIO $ putStrLn $ "input type: " ++ show inputType
   initBinds <- forM typedLhs $ \(name1, t1) -> do
 
     t1d <- toNodeType t1
     v1 <- insert (Load name1) t1d
     let (n :. _ ) = v1
     theGraph . ix n . A.annotation %= A.set Manifest
-
-    liftIO $ putStrLn $ "introduce binding: " ++ name1 ++ " = " ++ show v1
-
     return (name1, v1)
 
   returnValueExpr <- local (M.union $ M.fromList initBinds) $ genRhs $ subFix r
@@ -440,8 +436,8 @@ lookupToplevelIdents fprog name0 =  case lup stmts of
     lup (SubstF (Ident nam) rhs : xs) | nam == name0 = rhs : lup xs
     lup (_:xs) = lup xs
 
-genProgram :: Program -> IO OMProgram
-genProgram fprog = do
+genOMProgram :: Program -> IO OMProgram
+genOMProgram fprog = do
   let run g = runCompilerRight g defaultCodegenRead defaultCodegenState
       gbinds = fprog ^. programBinding
   (lhsOfStep,_,_) <- run $ do

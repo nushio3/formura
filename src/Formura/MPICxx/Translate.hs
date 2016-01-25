@@ -8,6 +8,8 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import qualified Data.IntMap as G
 import qualified Data.Text as T
+import qualified Data.Text.IO as T
+import           System.Directory
 import           System.FilePath.Lens
 
 import qualified Formura.Annotation as A
@@ -36,23 +38,14 @@ newtype VariableName = VariableName T.Text
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _tranGlobalEnvironment :: GlobalEnvironment
   , _theGraph :: Graph
   }
 makeClassy ''TranState
 
 instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
-
-instance HasGlobalEnvironment TranState where
-  globalEnvironment = tranGlobalEnvironment
-
-defaultTranState :: TranState
-defaultTranState = TranState
-  { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
-  , _theGraph = G.empty
-  }
-
+-- instance HasGlobalEnvironment TranState where
+--   globalEnvironment = tranGlobalEnvironment
 
 data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text}
                 deriving (Eq, Ord, Show)
@@ -68,30 +61,57 @@ instance Monoid CProgram where
   mempty = CProgram "" ""
   mappend (CProgram h1 c1) (CProgram h2 c2) = CProgram (h1 <> h2) (c1 <> c2)
 
+
 type TranM = CompilerMonad GlobalEnvironment CProgram TranState
 
 -- * Parallel code generation
 
 -- |  Configuration for distributed parallel code generation.
 data NumericalConfig = NumericalConfig
-  { _ncSingleThreadShape :: Vec Int
-  , _ncOMPThreadShape :: Vec Int
-  , _ncMPINodeShape :: Vec Int
+  { _ncIntraNodeShape :: Vec Int
+  , _ncMPIGridShape :: Vec Int
+  , _ncTemporalBlockingInterval :: Int
+  , _ncMonitorInterval :: Int
   }
 
 defaultNumericalConfig :: NumericalConfig
-defaultNumericalConfig =
-  NumericalConfig
-  { _ncSingleThreadShape = Vec [64,64]
-  , _ncOMPThreadShape = Vec [2,4]
-  , _ncMPINodeShape = Vec [5,10]
-  }
+defaultNumericalConfig = undefined
 
 translateProgram :: WithCommandLineOption => TranM ()
 translateProgram = do
-  let cfn :: FilePath
-      cfn = ?commandLineOption ^. outputFilename . filename
-      hfn :: FilePath
-      hfn = cfn & extension .~ ".h"
   tellH $ T.unlines ["#include <mpi.h>"]
-  tellC $ T.unlines ["#include <mpi.h>" , "#include \"" <> T.pack hfn <> "\""]
+  tellC $ T.unlines ["#include <mpi.h>" , "#include \"" <> T.pack hxxFileName <> "\""]
+
+genCxxFiles :: WithCommandLineOption => Program -> OMProgram -> IO ()
+genCxxFiles formuraProg omProg = do
+  let
+    tranState0 = TranState
+      { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
+      , _theGraph = G.empty
+      }
+
+  (_, _, CProgram hxxContent cxxContent)
+    <- runCompilerRight (translateProgram)
+       (omProg ^. omGlobalEnvironment)
+       tranState0
+
+  createDirectoryIfMissing True (cxxFilePath ^. directory)
+
+
+  T.writeFile hxxFilePath hxxContent
+  T.writeFile cxxFilePath cxxContent
+
+
+cxxFilePath :: WithCommandLineOption => FilePath
+cxxFilePath = case ?commandLineOption ^. outputFilename of
+  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".cpp"
+  x  -> x
+
+hxxFilePath :: WithCommandLineOption => FilePath
+hxxFilePath = cxxFilePath & extension .~ ".h"
+
+cxxFileName :: WithCommandLineOption => FilePath
+cxxFileName = cxxFilePath ^. filename
+
+hxxFileName :: WithCommandLineOption => FilePath
+hxxFileName = hxxFilePath ^. filename
