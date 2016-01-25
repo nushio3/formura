@@ -59,11 +59,14 @@ tellH :: (MonadWriter CProgram m) => T.Text -> m ()
 tellH txt = tell $ CProgram txt ""
 tellC :: (MonadWriter CProgram m) => T.Text -> m ()
 tellC txt = tell $ CProgram "" txt
+tellBoth :: (MonadWriter CProgram m) => T.Text -> m ()
+tellBoth txt = tell $ CProgram txt txt
 
 tellnH :: (MonadWriter CProgram m) => T.Text -> m ()
 tellnH txt = tell $ CProgram (txt <> "\n") ""
 tellnC :: (MonadWriter CProgram m) => T.Text -> m ()
 tellnC txt = tell $ CProgram "" (txt <> "\n")
+
 
 
 instance Monoid CProgram where
@@ -93,7 +96,7 @@ translateProgram = do
   tellH $ T.unlines ["#include <mpi.h>"]
   tellC $ T.unlines ["#include <mpi.h>" , "#include \"" <> T.pack hxxFileName <> "\""]
 
-  tellH "\n"; tellC "\n"
+  tellBoth "\n\n"
 
   tellnH $ "struct Formura_Navigator {"
   forM_ ivars $ \i -> do
@@ -102,6 +105,25 @@ translateProgram = do
     tellnH $ "int offset_" <> i <> ";"
 
   tellnH $ "};"
+
+  tellBoth "\n\n"
+
+  tellBoth "int Formura_Init (Formura_Navigator *navi, MPI_Comm comm)"
+  tellH ";"
+  tellC $ T.unlines
+    [ "{"
+    , "}"
+    ]
+
+  tellBoth "\n\n"
+
+  tellBoth "int Formura_Forward (Formura_Navigator *navi)"
+  tellH ";"
+  tellC $ T.unlines
+    [ "{"
+    , "printf(\"mae ni susumou!\");"
+    , "}"
+    ]
 
 genCxxFiles :: WithCommandLineOption => Program -> OMProgram -> IO ()
 genCxxFiles formuraProg omProg = do
