@@ -1,0 +1,33 @@
+\contentsline {section}{\numberline {1}この仕様書で用いるBNFについて}{3}{section.1}
+\contentsline {section}{\numberline {2}{\texttt {formura}}のインストールと使用方法}{5}{section.2}
+\contentsline {subsection}{\numberline {2.1}バイナリインストール}{5}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}ソースインストール}{5}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}使用方法}{5}{subsection.2.3}
+\contentsline {section}{\numberline {3}{\texttt {formura}}文法}{6}{section.3}
+\contentsline {subsection}{\numberline {3.1}文字}{6}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}字句解析}{6}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}文}{7}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}特殊宣言文}{8}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}関数定義文}{9}{subsubsection.3.3.2}
+\contentsline {subsubsection}{\numberline {3.3.3}複文}{9}{subsubsection.3.3.3}
+\contentsline {subsubsection}{\numberline {3.3.4}プログラム例}{9}{subsubsection.3.3.4}
+\contentsline {subsection}{\numberline {3.4}型}{10}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}式}{11}{subsection.3.5}
+\contentsline {subsection}{\numberline {3.6}演算子と優先順位}{12}{subsection.3.6}
+\contentsline {subsection}{\numberline {3.7}式の左辺}{13}{subsection.3.7}
+\contentsline {subsection}{\numberline {3.8}{\texttt {formura}}文法の全定義}{14}{subsection.3.8}
+\contentsline {section}{\numberline {4}{\texttt {formura}}における演算の意味論}{16}{section.4}
+\contentsline {subsection}{\numberline {4.1}{\texttt {formura}}の演算}{16}{subsection.4.1}
+\contentsline {subsection}{\numberline {4.2}{\texttt {formura}}の意味論}{16}{subsection.4.2}
+\contentsline {subsection}{\numberline {4.3}{\texttt {formura}}の暗黙の型変換}{16}{subsection.4.3}
+\contentsline {subsection}{\numberline {4.4}添字を明示した演算}{17}{subsection.4.4}
+\contentsline {subsection}{\numberline {4.5}添字を省いたグリッド演算}{18}{subsection.4.5}
+\contentsline {section}{\numberline {5}{\texttt {formura}}の生成するコード}{19}{section.5}
+\contentsline {subsection}{\numberline {5.1}コード実行の流れ}{19}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}C/C++言語からの呼び出し規約}{19}{subsection.5.2}
+\contentsline {paragraph}{生成されるコードの内容}{20}{section*.2}
+\contentsline {paragraph}{\texttt {Formura\_Init}関数}{21}{section*.3}
+\contentsline {paragraph}{\texttt {Formura\_Forward}関数}{21}{section*.4}
+\contentsline {paragraph}{{\texttt {formura}}の生成するコードの並列度や解像度}{21}{section*.5}
+\contentsline {subsection}{\numberline {5.3}Fortranからの呼び出し規約}{22}{subsection.5.3}
+\contentsline {section}{\numberline {6}{\texttt {formura}}文法の利用}{23}{section.6}

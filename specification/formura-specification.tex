@@ -1002,7 +1002,7 @@ C言語のプログラムが\lit{main}関数から開始するように、
 入っているのか通知するために使います。
 
 たとえば、
-\verb`dimension :: 2`
+\verb`dimension :: 2; `
 \verb`axes :: x, y`
 が指定されている場合、
 \verb`Formura_Navigator`構造体は次のようになります。
@@ -1011,19 +1011,26 @@ C言語のプログラムが\lit{main}関数から開始するように、
 \begin{verbatim}
   struct Formura_Navigator {
     int time_step;
+    int offset_x;
     int lower_x;
     int upper_x;
+    int offset_y;
     int lower_y;
     int upper_y;
   };
 \end{verbatim}
 \end{screen}
 
-これは、
-$t = \mathrm{time\_step}$
-$\mathrm{lower\_x} \leq x < \mathrm{upper\_x}$
+これは、状態配列の添字
+$\mathrm{lower\_x} \leq x < \mathrm{upper\_x}$,
 $\mathrm{lower\_y} \leq y < \mathrm{upper\_y}$
-の範囲の値が状態配列に格納されていることを意味しています。
+の範囲に、シミュレーションの
+$t = \mathrm{time\_step}$,
+$\mathrm{lower\_x} + \mathrm{offset\_x} \leq x < \mathrm{upper\_x} + \mathrm{offset\_x}$,
+$\mathrm{lower\_y} + \mathrm{offset\_y} \leq y < \mathrm{upper\_y} + \mathrm{offset\_y}$
+の範囲の値が格納されていることを意味しています。
+
+
 
 \formura は次のことを保証します：\verb`monitor_interval`タイムステップごとの、計算領域内の物理量は、
 少なくとも１つのMPIノードから読むことができる。
