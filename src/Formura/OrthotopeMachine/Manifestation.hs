@@ -11,3 +11,9 @@ A module for manifestation of the Orthotope Machine: that is, an operation that 
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Manifestation where
+
+import Formura.OrthotopeMachine.Graph
+
+
+manifestation :: OMProgram -> MMProgram
+manifestation = undefined
