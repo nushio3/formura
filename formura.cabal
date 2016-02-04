@@ -38,6 +38,7 @@ library
                   Formura.Interpreter.Eval
                   Formura.OrthotopeMachine.Graph
                   Formura.OrthotopeMachine.Translate
+                  Formura.OrthotopeMachine.Manifestation
                   Formura.Cxx.Translate
                   Formura.MPICxx.Translate
 
