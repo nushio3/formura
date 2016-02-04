@@ -4,5 +4,5 @@ packages:
 extra-deps:
   - binary-search-1.0
 
-resolver: lts-4.2
+resolver: lts-5.1
 # skip-ghc-check: True
