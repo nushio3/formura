@@ -62,7 +62,7 @@ genStmt prog = do
   T.writeFile "output.cpp" cxxCode
   BS.putStrLn $ Y.encode $ C.defaultNumericalConfig
 
-pprNode :: (Int, Node) -> IO ()
+pprNode :: (Int, OMNode) -> IO ()
 pprNode (i,n) = do
   let r = case A.toMaybe (n ^. A.annotation) of
         Just Manifest -> "M"

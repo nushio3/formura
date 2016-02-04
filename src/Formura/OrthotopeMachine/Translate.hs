@@ -38,7 +38,7 @@ instance HasBinding Binding where
 data CodegenState = CodegenState
   { _codegenSyntacticState :: CompilerSyntacticState
   , _codegenGlobalEnvironment :: GlobalEnvironment
-  , _theGraph :: Graph
+  , _theGraph :: Graph OMInstruction
   }
 makeClassy ''CodegenState
 
@@ -303,6 +303,8 @@ matchToIdents = go
     go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
     go (Ident x) y = return [(x,y)]
 
+
+-- | Create a Binding so that names in the LExpr become free variables,
 lexicalScopeHolder :: LExpr -> LexBinding
 lexicalScopeHolder l =
   let xs :: [TupleOfIdents]
@@ -459,7 +461,7 @@ genOMProgram fprog = do
     bs99 <- matchToLhs lhsOfStep stepType
     return $ M.fromList bs99
 
-  return OMProgram
+  return MachineProgram
     { _omGlobalEnvironment = stInit ^. globalEnvironment
     , _omInitGraph = stInit ^. theGraph
     , _omStepGraph = stStep ^. theGraph
