@@ -36,7 +36,7 @@ data DataflowInstF x
 data ShiftF x = ShiftF (Vec Int) x
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
--- | The functor for language that support cursored load of graph nodes..
+-- | The functor for language that support cursored load of graph nodes.
 data LoadCursorF x = LoadCursorF (Vec Int) NodeID
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
@@ -56,8 +56,14 @@ pattern LoadCursor v x <- ((^? match) -> Just (LoadCursorF v x)) where
   LoadCursor v x = match # LoadCursorF v x
 
 
+-- | The instruction type for Orthotope Machine.
 type OMInstF = Sum '[DataflowInstF, ShiftF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
+
+-- | The instruction type for Manifest Machine, where every node is manifest
+type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
+type MMInst  = Fix OMInstF
+
 
 type NodeType  = Fix NodeTypeF
 type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
