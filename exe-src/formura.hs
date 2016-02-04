@@ -59,7 +59,7 @@ genMPICxx prog = do
 
   C.genCxxFiles prog omProg
 
-pprNode :: (Int, Node) -> IO ()
+pprNode :: (Int, OMNode) -> IO ()
 pprNode (i,n) = do
   let r = case A.toMaybe (n ^. A.annotation) of
         Just Manifest -> "M"

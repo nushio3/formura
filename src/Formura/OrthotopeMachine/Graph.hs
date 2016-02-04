@@ -59,6 +59,7 @@ pattern LoadCursor v x <- ((^? match) -> Just (LoadCursorF v x)) where
 -- | The instruction type for Orthotope Machine.
 type OMInstF = Sum '[DataflowInstF, ShiftF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
+type OMInstruction = OMInstF NodeID
 
 -- | The instruction type for Manifest Machine, where every node is manifest
 type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
@@ -93,16 +94,18 @@ mapElemType f (GridType v t) = GridType v $ mapElemType f t
 mapElemType _ TopType = TopType
 
 type NodeID  = G.Key
-data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
-instance Show Node where
+data Node instType = Node {_nodeInst :: instType, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
+instance Show a => Show (Node a) where
   show (Node i t _) = show i ++ " :: " ++ show t
 
+type OMNode = Node OMInstruction
+type MMNode = Node MMInst
 
 makeLenses ''Node
-instance A.Annotated Node where
+instance A.Annotated (Node a) where
   annotation = nodeAnnot
 
-type Graph = G.IntMap Node
+type Graph instType = G.IntMap (Node instType)
 
 data NodeValueF x = NodeValueF NodeID NodeType
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
@@ -132,14 +135,17 @@ instance Typed ValueExpr where
   typeExprOf (FunValue _ _) = FunType
   typeExprOf (Tuple xs) = Tuple $ map typeExprOf xs
 
-data OMProgram = OMProgram
+data MachineProgram instType = MachineProgram
   { _omGlobalEnvironment :: GlobalEnvironment
-  , _omInitGraph :: Graph
-  , _omStepGraph :: Graph
+  , _omInitGraph :: Graph instType
+  , _omStepGraph :: Graph instType
   , _omStateSignature :: M.Map IdentName TypeExpr
   }
 
-makeLenses ''OMProgram
+makeLenses ''MachineProgram
 
-instance HasGlobalEnvironment OMProgram where
+type OMProgram = MachineProgram OMInstruction
+type MMProgram = MachineProgram MMInst
+
+instance HasGlobalEnvironment (MachineProgram a) where
   globalEnvironment = omGlobalEnvironment

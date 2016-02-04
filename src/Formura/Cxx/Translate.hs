@@ -38,7 +38,7 @@ data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
   , _extent :: Vec Int
   , _indexVariables :: Vec T.Text
-  , _theGraph :: Graph
+  , _theGraph :: Graph OMInstruction
   }
 makeClassy ''TranState
 
@@ -75,7 +75,7 @@ defaultNumericalConfig =
   }
 
 
-lookupNode :: NodeID -> TranM Node
+lookupNode :: NodeID -> TranM OMNode
 lookupNode i = do
   g <- use theGraph
   case G.lookup i g of
@@ -113,7 +113,7 @@ rhsCodeAt cursor nid = do
        cursorToCode vn cursor
      _  -> rhsDelayedCodeAt cursor nd
 
-rhsDelayedCodeAt :: Vec Int -> Node -> TranM T.Text
+rhsDelayedCodeAt :: Vec Int -> OMNode -> TranM T.Text
 rhsDelayedCodeAt cursor (Node inst0 typ0 ann0) = do
   case inst0 of
      Imm r -> return $ showt (realToFrac r :: Double)
@@ -131,13 +131,13 @@ rhsDelayedCodeAt cursor (Node inst0 typ0 ann0) = do
      Store _ a -> rhsCodeAt cursor a
      x -> raiseErr $ failed $ "cxx codegen unimplemented for keyword: " ++ show x
 
-manifestNodes :: Graph -> [NodeID]
+manifestNodes :: Graph OMInstruction -> [NodeID]
 manifestNodes g =
   map fst $
   filter f $
   G.toList g
   where
-    f :: (NodeID, Node) -> Bool
+    f :: (NodeID, OMNode) -> Bool
     f (_, nd) = case A.viewMaybe nd of
       Just Manifest -> True
       _             -> False
@@ -146,7 +146,7 @@ nameManifestVariables :: TranM ()
 nameManifestVariables = do
   theGraph %= G.mapWithKey nameIt
   where
-    nameIt :: NodeID -> Node -> Node
+    nameIt :: NodeID -> OMNode -> OMNode
     nameIt i n =
       let newName = case A.viewMaybe n of
                       Just (SourceName n) -> T.pack n <> "_" <> showt i

@@ -42,7 +42,7 @@ newtype VariableName = VariableName T.Text
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _theGraph :: Graph
+  , _theGraph :: Graph OMInstruction
   }
 makeClassy ''TranState
 
