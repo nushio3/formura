@@ -12,8 +12,47 @@ A module for manifestation of the Orthotope Machine: that is, an operation that 
 
 module Formura.OrthotopeMachine.Manifestation where
 
-import Formura.OrthotopeMachine.Graph
+import           Control.Lens
+import qualified Data.IntMap as G
+
+import qualified Formura.Annotation as A
+import           Formura.Annotation.Representation
+import           Formura.Compiler
+import           Formura.GlobalEnvironment
+import           Formura.OrthotopeMachine.Graph
 
 
-manifestation :: OMProgram -> MMProgram
-manifestation = undefined
+data TranState = TranState
+  { _tranSyntacticState :: CompilerSyntacticState
+  , _theGraph :: Graph OMInstruction
+  }
+makeClassy ''TranState
+
+instance HasCompilerSyntacticState TranState where
+  compilerSyntacticState = tranSyntacticState
+
+defaultTranState :: TranState
+defaultTranState = TranState
+  { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "manifestation"}
+  , _theGraph = G.empty
+  }
+
+
+type TranM = CompilerMonad GlobalEnvironment () TranState
+
+
+manifestG :: Graph OMInstruction -> TranM (Graph MMInst)
+manifestG omg = undefined
+
+
+
+manifestation :: OMProgram -> TranM MMProgram
+manifestation omprog = do
+  ig2 <- manifestG $ omprog ^. omInitGraph
+  sg2 <- manifestG $ omprog ^. omStepGraph
+
+  return $ MachineProgram
+    { _omGlobalEnvironment = omprog ^. omGlobalEnvironment
+    , _omStateSignature    = omprog ^. omStateSignature
+    , _omInitGraph         = ig2
+    , _omStepGraph         = sg2}

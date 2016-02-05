@@ -10,6 +10,7 @@ module Main where
 
 import           Control.Lens
 import           Control.Monad
+import           Control.Monad.Reader
 import           Data.Traversable
 import qualified Test.QuickCheck     as Q
 import qualified Text.Trifecta       as P hiding (string)
@@ -195,8 +196,15 @@ data ImmF x = ImmF Rational
 instance Show (ImmF x) where
   show (ImmF n) = show n
 
-pattern
 
+
+readquine :: forall a r m. MonadReader r m => Iso a (m (r,a))
+readquine = iso go back
+  where
+    go :: a -> m (r, a)
+    go x = (,x) <$> ask
+
+    back is not easy.
 
 main :: IO ()
 main = do
