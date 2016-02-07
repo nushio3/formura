@@ -17,7 +17,8 @@ import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
 import           Formura.CommandLineOption
 import           Formura.OrthotopeMachine.Graph
-import           Formura.OrthotopeMachine.Translate
+import           Formura.OrthotopeMachine.Translate (genOMProgram)
+import           Formura.OrthotopeMachine.Manifestation (genMMProgram)
 import qualified Formura.Parser as P
 import           Formura.Compiler
 import           Formura.Syntax
@@ -56,6 +57,8 @@ genMPICxx prog = do
     putStrLn "## Debug print: step graph"
     mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
     putStrLn ""
+
+  mmProg <- genMMProgram omProg
 
   C.genCxxFiles prog omProg
 

@@ -12,18 +12,27 @@ A module for manifestation of the Orthotope Machine: that is, an operation that 
 
 module Formura.OrthotopeMachine.Manifestation where
 
+import           Control.Applicative
 import           Control.Lens
+import           Control.Monad
+import           Control.Monad.IO.Class
 import qualified Data.IntMap as G
+import           Data.Maybe
+import           Text.Trifecta (failed, raiseErr)
+
 
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.GlobalEnvironment
 import           Formura.OrthotopeMachine.Graph
-
+import           Formura.Syntax
+import           Formura.Vec
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
+  , _nodeOtoM :: Int -> Maybe Int
+  , _nodeMtoO :: Int -> Int
   , _theGraph :: Graph OMInstruction
   }
 makeClassy ''TranState
@@ -41,8 +50,84 @@ defaultTranState = TranState
 type TranM = CompilerMonad GlobalEnvironment () TranState
 
 
+lookupNode :: NodeID -> TranM OMNode
+lookupNode i = do
+  g <- use theGraph
+  case G.lookup i g of
+   Nothing -> raiseErr $ failed $ "out-of-bound node reference: #" ++ show i
+   Just n -> do
+     case A.viewMaybe n of
+        Just meta -> compilerFocus %= (meta <|>)
+        Nothing -> return ()
+     return n
+
+rhsCodeAt :: Vec Int -> NodeID -> TranM MMInst
+rhsCodeAt cursor nid = do
+  nd <- lookupNode nid
+  o2m <- nodeOtoM
+  case o2m nid of
+     Just nM -> do
+       LoadCursor cursor nM
+     _  -> rhsDelayedCodeAt cursor nd
+
+
+rhsDelayedCodeAt :: Vec Int -> NodeID -> TranM MMInst
+rhsDelayedCodeAt cursor omNodeID = do
+  (Node inst0 _ _) <- lookupNode omNodeID
+  case inst0 of
+     Imm r -> return $ Imm r
+     Uniop op a -> do
+       a_code <- rhsCodeAt cursor a
+       return $ Uniop op a_code
+     Binop op a b -> do
+       a_code <- rhsCodeAt cursor a
+       b_code <- rhsCodeAt cursor b
+       return $ Binop a_code b_code
+     Shift vi a -> rhsCodeAt (cursor + vi) a
+     LoadIndex i -> LoadIndex i
+     LoadExtent i -> LoadExtent i
+     Store name a -> do
+       a_code <- rhsCodeAt cursor a
+       Store name a_code
+     x -> raiseErr $ failed $ "cxx codegen unimplemented for keyword: " ++ show x
+
+
+genMMInst :: NodeID -> TranM MMInst
+genMMInst omNodeID = rhsDelayedCodeAt 0 omNodeID
+
+
 manifestG :: Graph OMInstruction -> TranM (Graph MMInst)
-manifestG omg = undefined
+manifestG omg = do
+  theGraph .= omg
+  let keys = G.keys omg
+  manifestKeys <- fmap concat $ forM keys $ \k -> do
+    nd <- lookupNode k
+    return $ case A.viewMaybe nd of
+      Just Manifest -> [k :: Int]
+      _ -> []
+  liftIO $ do
+    putStrLn $ "manifest node ID: " ++ show  manifestKeys
+
+  let nodeOtoM_0 :: Int -> Maybe Int
+      nodeOtoM_0 n = G.lookup n nodeMap
+      nodeMtoO_0 :: Int -> Int
+      nodeMtoO_0 n = manifestKeys !! n
+
+      nodeMap :: G.IntMap Int
+      nodeMap = G.fromList $ zip manifestKeys [0..]
+
+  nodeOtoM .= nodeOtoM_0
+  nodeMtoO .= nodeMtoO_0
+
+  nodeList <- fmap catMaybes $ forM manifestKeys $ \nO -> do
+    case nodeOtoM nO of
+      Nothing -> return Nothing
+      Just nM -> do
+        ndInst <- genMMInst nO
+        omNode <- lookupNode nO
+        return $ Just (nM, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
+
+  return $ G.fromList nodeList
 
 
 
@@ -56,3 +141,9 @@ manifestation omprog = do
     , _omStateSignature    = omprog ^. omStateSignature
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
+
+genMMProgram :: OMProgram -> IO MMProgram
+genMMProgram omprog = do
+  let run g = runCompilerRight g (omprog ^. globalEnvironment) defaultTranState
+  (ret, _, _ ) <- run $ manifestation omprog
+  return ret
