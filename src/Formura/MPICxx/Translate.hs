@@ -7,11 +7,14 @@ import           Control.Lens
 import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import qualified Data.IntMap as G
+import qualified Data.Map as M
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import           System.Directory
 import           System.FilePath.Lens
 import           System.Process
+import           Text.Trifecta (failed, raiseErr)
+
 
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
@@ -40,16 +43,29 @@ class ToC a where
 
 newtype VariableName = VariableName T.Text
 
+-- |  Configuration for distributed parallel code generation.
+data NumericalConfig = NumericalConfig
+  { _ncIntraNodeShape :: Vec Int
+  , _ncMPIGridShape :: Vec Int
+  , _ncTemporalBlockingInterval :: Int
+  , _ncMonitorInterval :: Int
+  }
+makeClassy ''NumericalConfig
+
+
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _theProgram :: MMProgram
+  , _tsNumericalConfig :: NumericalConfig
+  , _theProgram :: Program
+  , _theMMProgram :: MMProgram
   }
 makeClassy ''TranState
 
+
 instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
--- instance HasGlobalEnvironment TranState where
---   globalEnvironment = tranGlobalEnvironment
+instance HasNumericalConfig TranState where
+  numericalConfig = tsNumericalConfig
 
 data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text}
                 deriving (Eq, Ord, Show)
@@ -78,19 +94,40 @@ type TranM = CompilerMonad GlobalEnvironment CProgram TranState
 
 -- * Parallel code generation
 
--- |  Configuration for distributed parallel code generation.
-data NumericalConfig = NumericalConfig
-  { _ncIntraNodeShape :: Vec Int
-  , _ncMPIGridShape :: Vec Int
-  , _ncTemporalBlockingInterval :: Int
-  , _ncMonitorInterval :: Int
-  }
 
-defaultNumericalConfig :: NumericalConfig
-defaultNumericalConfig = undefined
+-- | read all numerical config from the Formura source program
+setNumericalConfig :: TranM ()
+setNumericalConfig = do
+  dim <- view dimension
+  formuraProg <- use theProgram
 
+  -- set Numerical Configs
+  let sds :: [SpecialDeclaration]
+      sds = formuraProg ^. programSpecialDeclarations
+
+      sdMap :: M.Map String [Integer]
+      sdMap = M.fromList
+              [(k,v) | OtherDeclaration k v <- sds]
+
+  case M.lookup "mpi_grid_shape" sdMap of
+    Just xs | length xs == dim -> ncMPIGridShape .= (fmap fromInteger $ Vec xs)
+    _ -> raiseErr $ failed "bad mpi_grid_shape"
+  case M.lookup "intra_node_shape" sdMap of
+    Just xs | length xs == dim -> ncIntraNodeShape .= (fmap fromInteger $ Vec xs)
+    _ -> raiseErr $ failed "bad intra_node_shape"
+  case M.lookup "temporal_blocking_interval" sdMap of
+    Just xs | length xs == 1 -> ncTemporalBlockingInterval .= (fromInteger $ head xs)
+    _ -> raiseErr $ failed "bad temporal_blocking_interval"
+  case M.lookup "monitor_interval" sdMap of
+    Just xs | length xs == 1 -> ncMonitorInterval .= (fromInteger $ head xs)
+    _ -> raiseErr $ failed "bad monitor_interval"
+  return ()
+
+-- | The main translation logic
 translateProgram :: WithCommandLineOption => TranM ()
 translateProgram = do
+  setNumericalConfig
+
   ivars <- map T.pack <$> view axesNames
 
   tellH $ T.unlines ["#include <mpi.h>"]
@@ -128,12 +165,14 @@ translateProgram = do
     , "}"
     ]
 
+
 genCxxFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
 genCxxFiles formuraProg mmProg = do
   let
     tranState0 = TranState
       { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
-      , _theProgram = mmProg
+      , _theProgram = formuraProg
+      , _theMMProgram = mmProg
       }
 
   (_, _, CProgram hxxContent cxxContent)
