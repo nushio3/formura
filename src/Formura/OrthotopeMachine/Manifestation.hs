@@ -64,11 +64,10 @@ lookupNode i = do
 rhsCodeAt :: Vec Int -> NodeID -> TranM MMInst
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
-  o2m <- nodeOtoM
+  o2m <- use nodeOtoM
   case o2m nid of
-     Just nM -> do
-       LoadCursor cursor nM
-     _  -> rhsDelayedCodeAt cursor nd
+     Just nM -> return $ LoadCursor cursor nM
+     _  -> rhsDelayedCodeAt cursor nid
 
 
 rhsDelayedCodeAt :: Vec Int -> NodeID -> TranM MMInst
@@ -82,14 +81,20 @@ rhsDelayedCodeAt cursor omNodeID = do
      Binop op a b -> do
        a_code <- rhsCodeAt cursor a
        b_code <- rhsCodeAt cursor b
-       return $ Binop a_code b_code
+       return $ Binop op a_code b_code
+     Triop op a b c -> do
+       a_code <- rhsCodeAt cursor a
+       b_code <- rhsCodeAt cursor b
+       c_code <- rhsCodeAt cursor c
+       return $ Triop op a_code b_code c_code
      Shift vi a -> rhsCodeAt (cursor + vi) a
-     LoadIndex i -> LoadIndex i
-     LoadExtent i -> LoadExtent i
+     Load name -> return $ Load name
+     LoadIndex i -> return $ LoadIndex i
+     LoadExtent i -> return $ LoadExtent i
      Store name a -> do
        a_code <- rhsCodeAt cursor a
-       Store name a_code
-     x -> raiseErr $ failed $ "cxx codegen unimplemented for keyword: " ++ show x
+       return $ Store name a_code
+     x -> raiseErr $ failed $ "manifestation path unimplemented for keyword: " ++ show x
 
 
 genMMInst :: NodeID -> TranM MMInst
@@ -120,7 +125,7 @@ manifestG omg = do
   nodeMtoO .= nodeMtoO_0
 
   nodeList <- fmap catMaybes $ forM manifestKeys $ \nO -> do
-    case nodeOtoM nO of
+    case nodeOtoM_0 nO of
       Nothing -> return Nothing
       Just nM -> do
         ndInst <- genMMInst nO

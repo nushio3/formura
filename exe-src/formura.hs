@@ -59,6 +59,14 @@ genMPICxx prog = do
     putStrLn ""
 
   mmProg <- genMMProgram omProg
+  when (?commandLineOption ^. verbose) $ do
+    putStrLn "## Debug print: manifested init graph"
+    mapM_ pprMMNode $ G.toList (mmProg ^. omInitGraph)
+    putStrLn ""
+
+    putStrLn "## Debug print: manifested step graph"
+    mapM_ pprMMNode $ G.toList (mmProg ^. omStepGraph)
+    putStrLn ""
 
   C.genCxxFiles prog omProg
 
@@ -71,3 +79,11 @@ pprNode (i,n) = do
         Just (SourceName n1) -> n1
         _                   -> ""
   putStrLn $ unwords [r , take 4 $ varName ++ repeat ' ', show (i,n)]
+
+pprMMNode :: (Int, MMNode) -> IO ()
+pprMMNode (i,n) = do
+  let
+      varName = case A.toMaybe (n ^. A.annotation) of
+        Just (SourceName n1) -> n1
+        _                   -> ""
+  putStrLn $ unwords [take 4 $ varName ++ repeat ' ', show (i,n)]

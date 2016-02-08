@@ -63,7 +63,7 @@ type OMInstruction = OMInstF NodeID
 
 -- | The instruction type for Manifest Machine, where every node is manifest
 type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
-type MMInst  = Fix OMInstF
+type MMInst  = Fix MMInstF
 
 
 type NodeType  = Fix NodeTypeF
