@@ -137,7 +137,7 @@ genCxxFiles formuraProg mmProg = do
       }
 
   (_, _, CProgram hxxContent cxxContent)
-    <- runCompilerRight (translateProgram)
+    <- runCompilerRight translateProgram
        (mmProg ^. omGlobalEnvironment)
        tranState0
 
