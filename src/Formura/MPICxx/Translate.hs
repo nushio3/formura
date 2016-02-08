@@ -42,7 +42,7 @@ newtype VariableName = VariableName T.Text
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _theGraph :: Graph OMInstruction
+  , _theProgram :: MMProgram
   }
 makeClassy ''TranState
 
@@ -62,10 +62,10 @@ tellC txt = tell $ CProgram "" txt
 tellBoth :: (MonadWriter CProgram m) => T.Text -> m ()
 tellBoth txt = tell $ CProgram txt txt
 
-tellnH :: (MonadWriter CProgram m) => T.Text -> m ()
-tellnH txt = tell $ CProgram (txt <> "\n") ""
-tellnC :: (MonadWriter CProgram m) => T.Text -> m ()
-tellnC txt = tell $ CProgram "" (txt <> "\n")
+tellHLn :: (MonadWriter CProgram m) => T.Text -> m ()
+tellHLn txt = tell $ CProgram (txt <> "\n") ""
+tellCLn :: (MonadWriter CProgram m) => T.Text -> m ()
+tellCLn txt = tell $ CProgram "" (txt <> "\n")
 
 
 
@@ -98,14 +98,14 @@ translateProgram = do
 
   tellBoth "\n\n"
 
-  tellnH $ "struct Formura_Navigator {"
-  tellnH $ "int time_step;"
+  tellHLn $ "struct Formura_Navigator {"
+  tellHLn $ "int time_step;"
   forM_ ivars $ \i -> do
-    tellnH $ "int lower_" <> i <> ";"
-    tellnH $ "int upper_" <> i <> ";"
-    tellnH $ "int offset_" <> i <> ";"
+    tellHLn $ "int lower_" <> i <> ";"
+    tellHLn $ "int upper_" <> i <> ";"
+    tellHLn $ "int offset_" <> i <> ";"
 
-  tellnH $ "};"
+  tellHLn $ "};"
 
   tellBoth "\n\n"
 
@@ -128,17 +128,17 @@ translateProgram = do
     , "}"
     ]
 
-genCxxFiles :: WithCommandLineOption => Program -> OMProgram -> IO ()
-genCxxFiles formuraProg omProg = do
+genCxxFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
+genCxxFiles formuraProg mmProg = do
   let
     tranState0 = TranState
       { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
-      , _theGraph = G.empty
+      , _theProgram = mmProg
       }
 
   (_, _, CProgram hxxContent cxxContent)
     <- runCompilerRight (translateProgram)
-       (omProg ^. omGlobalEnvironment)
+       (mmProg ^. omGlobalEnvironment)
        tranState0
 
   createDirectoryIfMissing True (cxxFilePath ^. directory)

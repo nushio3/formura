@@ -68,7 +68,7 @@ genMPICxx prog = do
     mapM_ pprMMNode $ G.toList (mmProg ^. omStepGraph)
     putStrLn ""
 
-  C.genCxxFiles prog omProg
+  C.genCxxFiles prog mmProg
 
 pprNode :: (Int, OMNode) -> IO ()
 pprNode (i,n) = do
