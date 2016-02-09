@@ -6,6 +6,7 @@ import Control.Lens
 import Data.Char (toUpper)
 
 import Formura.Syntax
+import Formura.Vec
 
 data GlobalEnvironment = GlobalEnvironment {
   _dimension :: Int,

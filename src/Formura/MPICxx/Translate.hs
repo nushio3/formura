@@ -6,6 +6,7 @@ import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
 import "mtl"     Control.Monad.RWS
+import           Data.Char (toUpper)
 import qualified Data.IntMap as G
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -39,9 +40,6 @@ brackets x = "[" <> x <> "]"
 braces :: T.Text -> T.Text
 braces x = "{" <> x <> "}"
 
-class ToC a where
-  toC :: a -> T.Text
-
 newtype VariableName = VariableName T.Text
 
 -- |  Configuration for distributed parallel code generation.
@@ -61,10 +59,16 @@ data NamingState = NamingState
   { _alreadyGivenNames :: S.Set T.Text
   , _freeNameCounter :: Integer
   , _loopIndexNames :: Vec T.Text
+  , _loopExtentNames :: Vec T.Text
   }
 makeClassy ''NamingState
 
-defaultNamingState = NamingState S.empty 0 (PureVec "")
+defaultNamingState = NamingState
+  { _alreadyGivenNames = S.empty
+  , _freeNameCounter = 0
+  , _loopIndexNames = PureVec ""
+  , _loopExtentNames = PureVec ""
+  }
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
@@ -162,9 +166,26 @@ setNumericalConfig = do
 setNamingState :: TranM ()
 setNamingState = do
   ans <- view axesNames
-  lins <- traverse (genFreeName . ("i"++)) ans
+  lins <- traverse (genFreeName . ("i"++)) (Vec ans)
   loopIndexNames .= lins
+  luns <- traverse (genFreeName . ("N"++) . map toUpper) (Vec ans)
+  loopExtentNames .= luns
 
+  let nameNode :: Node MMInst -> TranM (Node MMInst)
+      nameNode nd = do
+        let initName = case A.viewMaybe nd  of
+                        Just (SourceName n) -> n
+                        _                   -> "a"
+        cName <- genFreeName initName
+        return $ nd & A.annotation %~ A.set (VariableName cName)
+
+  gr <- use omInitGraph
+  gr2 <- flip traverse gr $ nameNode
+  omInitGraph .= gr2
+
+  gr <- use omStepGraph
+  gr2 <- flip traverse gr $ nameNode
+  omStepGraph .= gr2
 
 
 -- | Generate C type declaration for given language.
@@ -192,8 +213,12 @@ tellStateArrays = do
 
 genGraph :: Graph MMInst -> TranM T.Text
 genGraph gr = do
-  return ""
-
+  ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> case inst of
+    Load _ -> return ""
+    _ -> do
+      let Just (VariableName nam) = A.viewMaybe anot
+      return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
+  return $ T.unlines ps
 
 -- | The main translation logic
 tellProgram :: WithCommandLineOption => TranM ()
