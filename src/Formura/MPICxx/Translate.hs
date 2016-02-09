@@ -193,6 +193,13 @@ tellProgram :: WithCommandLineOption => TranM ()
 tellProgram = do
   setNumericalConfig
 
+  tellH $ T.unlines
+    [ "#ifdef __cplusplus"
+    , "extern \"C\""
+    , "{"
+    , "#endif"
+    ]
+
   ivars <- map T.pack <$> view axesNames
 
   tellH $ T.unlines ["#include <mpi.h>"]
@@ -242,6 +249,13 @@ tellProgram = do
     , con
     , "navi->time_step += "  <> showC monitorInterval0  <> ";"
     , "}"
+    ]
+
+
+  tellH $ T.unlines
+    [ "#ifdef __cplusplus"
+    , "}"
+    , "#endif"
     ]
 
 
