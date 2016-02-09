@@ -1,0 +1,2 @@
+SUBDIRS=examples
+DIST_SUBDIRS=$(SUBDIRS)
