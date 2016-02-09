@@ -223,7 +223,6 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-
   tellBoth "int Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm)"
   tellH ";"
 
