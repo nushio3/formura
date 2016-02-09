@@ -1,7 +1,11 @@
-#include <stdio.h>
 #include <mpi.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+extern "C"{
 #include "pearson.h"
+}
 
 const int T_MAX = 100;
 

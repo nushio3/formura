@@ -216,7 +216,7 @@ tellProgram = do
   tellBoth "\n\n"
 
 
-  tellBoth "int Formura_Init (Formura_Navigator *navi, MPI_Comm comm)"
+  tellBoth "int Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm)"
   tellH ";"
 
   mmg <- use omInitGraph
@@ -231,7 +231,7 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  tellBoth "int Formura_Forward (Formura_Navigator *navi)"
+  tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
   tellH ";"
 
   mmg <- use omStepGraph
