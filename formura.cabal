@@ -79,6 +79,7 @@ executable formura
   main-is: formura.hs
   default-language:    Haskell2010
   ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+                       -- -optl-Wl,--whole-archive
   build-depends:
                 base == 4.*
               , formura
