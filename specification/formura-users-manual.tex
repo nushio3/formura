@@ -11,6 +11,7 @@
 \usepackage{colortbl}
 \usepackage{ascmac}
 \usepackage{ulem}
+\usepackage{eclbkbox}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{syntax}
@@ -29,7 +30,7 @@
 \lstset{language=Ruby, frame=single,morekeywords={
     define,
     function,
-    out,
+    out,fun,
     complex_float, complex_double,
     dimension,axes,intra_node_shape,mpi_grid_shape,temporal_blocking_interval,
     monitor_interval
@@ -320,6 +321,73 @@ Fortran版では、\verb`monitor_interval`ごとに、物理量をFortran形式�
 以下に、\formura を使って記述した拡散方程式のプログラムを示します。
 
 \begin{lstlisting}[mathescape]
+dimension :: 3
+axes :: x, y, z
+
+begin function ddx(a) returns b
+      b = (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+end function
+
+begin function ddy(a) returns b
+      b = (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+end function
+
+begin function ddz(a) returns b
+      b = (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+end function
+
+∂ = (ddx,ddy,ddz)
+
+begin function Σ(e) returns sum
+      sum = e(0) + e(1) + e(2)
+end function
+
+begin function init() returns dens_init
+      float [] :: dens_init = 0
+end function
+
+begin function dens_next = step(dens)
+  float :: Dx, Dt
+  Dx = 4.2
+  Dt = 0.1
+  dens_next = dens + Dx ** 2/Dt * Σ for(i) ∂ i (∂ i dens)
+end function
+\end{lstlisting}
+
+短い関数定義が並ぶと、やや冗長に感じられるでしょうか？例えば、次の関数定義
+
+\begin{lstlisting}[mathescape]
+begin function ddx(a) returns b
+      b = (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+end function
+\end{lstlisting}
+
+は、\verb`returns`の後ろには式が書けることを利用して、二行で書いてしまうこともできます。
+
+\begin{lstlisting}[mathescape]
+begin function ddx(a) returns (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+end function
+\end{lstlisting}
+
+さらに、\verb`for(a) expr`の形式を利用して次のように書くこともできます。
+ここで、\verb`for(a) expr`は、
+\verb`a`を引数にとって、
+\verb`expr`を返す関数、という意味です。プログラミング言語の用語でいえばラムダ式です。
+
+\begin{lstlisting}[mathescape]
+ddx(a) = for (a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+\end{lstlisting}
+
+\verb`fun(a) expr`のほうがいいでしょうか？
+
+\begin{lstlisting}[mathescape]
+ddx(a) = fun (a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+\end{lstlisting}
+
+
+さきほどの拡散方程式のコードを、ラムダ式を活用して書き直すと、次のようになります。
+
+\begin{lstlisting}[mathescape]
   dimension :: 3
   axes :: x, y, z
 
@@ -342,6 +410,154 @@ Fortran版では、\verb`monitor_interval`ごとに、物理量をFortran形式�
     dens_next = dens + Dt / Dx**2 * Σ for(i) (∂ i . ∂ i) dens
   end function
 \end{lstlisting}
+
+ラムダ式が\verb`fun`だと、次のように見えます。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 3
+  axes :: x, y, z
+
+  ddx = fun(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+  ddy = fun(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+  ddz = fun(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+
+  ∂ = (ddx,ddy,ddz)
+
+  Σ = fun (e) e(0) + e(1) + e(2)
+
+  begin function init() returns dens_init
+        float [] :: dens_init = 0
+  end function
+
+  begin function dens_next = step(dens)
+    float :: Dx, Dt
+    Dx = 4.2
+    Dt = 0.1
+    dens_next = dens + Dt / Dx**2 * Σ fun(i) (∂ i . ∂ i) dens
+  end function
+\end{lstlisting}
+
+
+\paragraph{生成されたcプログラム}
+
+\verb`diffusion.h`
+
+\begin{breakbox}
+\begin{verbatim}
+#pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <mpi.h>
+
+
+  extern float dens[64][64][64];
+
+  struct Formura_Navigator {
+    int time_step;
+    int lower_x;
+    int upper_x;
+    int offset_x;
+    int lower_y;
+    int upper_y;
+    int offset_y;
+    int lower_z;
+    int upper_z;
+    int offset_z;
+  };
+
+
+  int Formura_Init(struct Formura_Navigator *navi, MPI_Comm comm);
+
+  int Formura_Forward(struct Formura_Navigator *navi);
+#ifdef __cplusplus
+}
+#endif
+\end{verbatim}
+\end{breakbox}
+
+\verb`diffusion.c`
+
+\begin{breakbox}
+\begin{verbatim}
+#include <mpi.h>
+#include <math.h>
+#include "diffusion.h"
+
+
+float dens[64][64][64];
+float dens_init;
+;
+float a[64][64][64];
+float Dx;
+float Dt;
+float dens_next_0[64][64][64];
+;
+
+
+
+int Formura_Init(struct Formura_Navigator *navi, MPI_Comm comm)
+{
+  int ix, iy, iz;
+  const int NX = 64, NY = 64, NZ = 64;
+  dens_init = 0.0;
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      for (iz = 0; iz < NZ; ++iz) {
+	dens[ix][iy][iz] = dens_init;
+      }
+    }
+  }
+
+
+  navi->time_step = 0;
+}
+
+
+int Formura_Forward(struct Formura_Navigator *navi)
+{
+  int ix, iy, iz;
+  const int NX = 64, NY = 64, NZ = 64;
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      for (iz = 0; iz < NZ; ++iz) {
+	a[ix][iy][iz] = dens[ix][iy][iz];
+      }
+    }
+  }
+
+  Dx = 4.2;
+  Dt = 0.1;
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      for (iz = 0; iz < NZ; ++iz) {
+	dens_next_0[ix][iy][iz] =
+	    (a[ix][iy][iz] +
+	     ((Dt / pow(Dx, 2.0)) *
+	      ((((((a[ix - 1][iy][iz] - a[ix][iy][iz]) / 2.0) -
+		  ((a[ix][iy][iz] - a[ix + 1][iy][iz]) / 2.0)) / 2.0) +
+		((((a[ix][iy - 1][iz] - a[ix][iy][iz]) / 2.0) -
+		  ((a[ix][iy][iz] - a[ix][iy + 1][iz]) / 2.0)) / 2.0)) +
+	       ((((a[ix][iy][iz - 1] - a[ix][iy][iz]) / 2.0) -
+		 ((a[ix][iy][iz] - a[ix][iy][iz + 1]) / 2.0)) / 2.0))));
+      }
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      for (iz = 0; iz < NZ; ++iz) {
+	dens[ix][iy][iz] = dens_next_0[ix][iy][iz];
+      }
+    }
+  }
+
+
+  navi->time_step += 20;
+}
+\end{verbatim}
+\end{breakbox}
+
 
 \subsection{2次元反応拡散方程式}
 
@@ -394,6 +610,182 @@ Fortran版では、\verb`monitor_interval`ごとに、物理量をFortran形式�
     V_next = V + dt * dV_dt
   end function
 \end{lstlisting}
+
+
+上記のformuraソースコードから生成されるCコードは次のようになります。
+
+\paragraph{生成されたcプログラム}
+
+\verb`pearson.h`
+\begin{breakbox}
+\begin{verbatim}
+#pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <mpi.h>
+
+
+  extern float U[256][256];
+  extern float V[256][256];
+
+  struct Formura_Navigator {
+    int time_step;
+    int lower_x;
+    int upper_x;
+    int offset_x;
+    int lower_y;
+    int upper_y;
+    int offset_y;
+  };
+
+
+  int Formura_Init(struct Formura_Navigator *navi, MPI_Comm comm);
+
+  int Formura_Forward(struct Formura_Navigator *navi);
+#ifdef __cplusplus
+}
+#endif
+\end{verbatim}
+\end{breakbox}
+
+
+\verb`pearson.c`
+\begin{breakbox}
+\begin{verbatim}
+#include <mpi.h>
+#include <math.h>
+#include "pearson.h"
+
+
+float U[256][256];
+float V[256][256];
+float U_0;
+float V_0;
+;
+;
+float a[256][256];
+float a_0[256][256];
+float k;
+float F;
+float Du;
+float Dv;
+float dt;
+float dx;
+float dU_dt[256][256];
+float dV_dt[256][256];
+float U_next_0[256][256];
+float V_next_0[256][256];
+;
+;
+
+
+
+int Formura_Init(struct Formura_Navigator *navi, MPI_Comm comm)
+{
+  int ix, iy;
+  const int NX = 256, NY = 256;
+  U_0 = 0.0;
+  V_0 = 0.0;
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      U[ix][iy] = U_0;
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      V[ix][iy] = V_0;
+    }
+  }
+
+
+  navi->time_step = 0;
+}
+
+
+int Formura_Forward(struct Formura_Navigator *navi)
+{
+  int ix, iy;
+  const int NX = 256, NY = 256;
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      a[ix][iy] = U[ix][iy];
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      a_0[ix][iy] = V[ix][iy];
+    }
+  }
+
+  k = 5.0e-2;
+  F = 1.5e-2;
+  Du = 2.0e-5;
+  Dv = 1.0e-5;
+  dt = 1.0;
+  dx = 1.0;
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      dU_dt[ix][iy] =
+	  (((-(a[ix][iy] * pow(a_0[ix][iy], 2.0))) +
+	    (F * (1.0 - a[ix][iy]))) +
+	   ((Du / pow(dx, 2.0)) *
+	    (((a[ix - 1][iy] - a[ix][iy]) - (a[ix][iy] - a[ix + 1][iy])) +
+	     ((a[ix][iy - 1] - a[ix][iy]) -
+	      (a[ix][iy] - a[ix][iy + 1])))));
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      dV_dt[ix][iy] =
+	  (((a[ix][iy] * pow(a_0[ix][iy], 2.0)) -
+	    ((F + k) * a_0[ix][iy])) +
+	   ((Dv / pow(dx, 2.0)) *
+	    (((a_0[ix - 1][iy] - a_0[ix][iy]) -
+	      (a_0[ix][iy] - a_0[ix + 1][iy])) + ((a_0[ix][iy - 1] -
+						   a_0[ix][iy]) -
+						  (a_0[ix][iy] -
+						   a_0[ix][iy + 1])))));
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      U_next_0[ix][iy] = (a[ix][iy] + (dt * dU_dt[ix][iy]));
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      V_next_0[ix][iy] = (a_0[ix][iy] + (dt * dV_dt[ix][iy]));
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      U[ix][iy] = U_next_0[ix][iy];
+    }
+  }
+
+  for (ix = 0; ix < NX; ++ix) {
+    for (iy = 0; iy < NY; ++iy) {
+      V[ix][iy] = V_next_0[ix][iy];
+    }
+  }
+
+
+  navi->time_step += 1;
+}
+\end{verbatim}
+\end{breakbox}
+
+
+
+
+
 
 \newpage
 

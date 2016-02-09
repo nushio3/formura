@@ -21,7 +21,7 @@ addons:
 
 script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
-  - stack exec formura-parser example/diffusion.f31
-  - stack exec formura-gen example/diffusion.f31
+  - stack exec formura-parser examples/diffusion.f31
+  - stack exec formura-gen examples/diffusion.f31
   - stack test
   - echo "done test"
