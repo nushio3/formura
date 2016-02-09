@@ -3,7 +3,7 @@ AC_PREREQ([2.63])
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 
 #if a compiler is not specified by the user use intel compilers
 AC_PATH_PROG(CC_PATH, $CC, NO_PATH)
