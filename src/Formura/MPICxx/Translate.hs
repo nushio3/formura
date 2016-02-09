@@ -274,7 +274,7 @@ genCxxFiles formuraProg mmProg = do
 
 cxxFilePath :: WithCommandLineOption => FilePath
 cxxFilePath = case ?commandLineOption ^. outputFilename of
-  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".cpp"
+  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".c"
   x  -> x
 
 hxxFilePath :: WithCommandLineOption => FilePath
