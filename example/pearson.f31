@@ -12,7 +12,6 @@ ddy = for(a) (a[i,j+1/2] - a[i,j-1/2])
 
 Σ = for (e) e(0) + e(1)
 
-
 begin function init() returns (U,V)
   float [] :: U = 0, V = 0
 end function
