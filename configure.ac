@@ -32,5 +32,5 @@ AC_CHECK_HEADERS([unistd.h])
 # Checks for library functions.
 
 AC_CONFIG_FILES([Makefile
-  src/Makefile])
+  example/Makefile])
 AC_OUTPUT
