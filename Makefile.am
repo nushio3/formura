@@ -1,2 +1,2 @@
-SUBDIRS=examples
+SUBDIRS=example
 DIST_SUBDIRS=$(SUBDIRS)
