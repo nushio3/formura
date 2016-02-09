@@ -158,6 +158,13 @@ setNumericalConfig = do
     _ -> raiseErr $ failed "bad monitor_interval"
   return ()
 
+-- | prepare unique name for everyone
+setNamingState :: TranM ()
+setNamingState = do
+  ans <- view axesNames
+  lins <- traverse (genFreeName . ("i"++)) ans
+  loopIndexNames .= lins
+
 
 
 -- | Generate C type declaration for given language.
@@ -192,6 +199,7 @@ genGraph gr = do
 tellProgram :: WithCommandLineOption => TranM ()
 tellProgram = do
   setNumericalConfig
+  setNamingState
 
   tellH $ T.unlines
     [ "#pragma once"
