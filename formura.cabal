@@ -25,6 +25,7 @@ library
   exposed-modules:
                   Formura.Language.Combinator
                   Formura.Annotation
+                  Formura.Annotation.Boundary
                   Formura.Annotation.Representation
                   Formura.Compiler
                   Formura.CommandLineOption
