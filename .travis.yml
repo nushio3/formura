@@ -24,3 +24,4 @@ script:
   - stack exec formura-parser example/diffusion.f31
   - stack exec formura-gen example/diffusion.f31
   - stack test
+  - echo "done test"

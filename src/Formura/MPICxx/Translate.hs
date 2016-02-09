@@ -274,6 +274,7 @@ genExpr inst = do
       case node ^. nodeType of
         ElemType _ -> return $ nam
         _ -> return $ nam <> accAt vi
+    Store _ x -> genExpr x
     x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
 
 
@@ -292,12 +293,8 @@ genGraph gr = do
 
   ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> do
     let Just (VariableName lhsName) = A.viewMaybe anot
-    case typ of
-      ElemType "void" -> return "// void"
-      ElemType ctyp -> do
-        rhs <- genExpr inst
-        return $ lhsName <> "=" <> rhs <> ";"
-      GridType _ typ -> do
+    let
+      genGrid lhsName2 = do
         let openLoops =
               [ T.unwords
                 ["for (", i, "=0;", i,  "<", n, ";++", i, "){"]
@@ -305,9 +302,20 @@ genGraph gr = do
             closeLoops =
               ["}" | _ <- toList ivars]
         rhs <- genExpr inst
-        let bodyExpr = lhsName <> foldMap brackets ivars <> "=" <> rhs <> ";"
+        let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
         return $ T.unlines $
           openLoops ++ [bodyExpr] ++ closeLoops
+
+
+    case typ of
+      ElemType "void" ->
+        case inst of
+          Store n _ -> genGrid (T.pack n)
+          _ -> return "// void"
+      ElemType ctyp -> do
+        rhs <- genExpr inst
+        return $ lhsName <> "=" <> rhs <> ";"
+      GridType _ typ -> genGrid lhsName
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot
         return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst

@@ -7,4 +7,10 @@ add_custom_command(
   COMMAND stack exec formura -- examples/pearson.f31
   DEPENDS examples/pearson.f31 ./bin/formura
   )
+add_custom_command(
+  OUTPUT examples/diffusion.c
+  COMMAND stack exec formura -- examples/diffusion.f31
+  DEPENDS examples/diffusion.f31 ./bin/formura
+  )
 add_executable(bin/pearson.out examples/pearson.c examples/pearson-main.cpp)
+add_executable(bin/diffusion.out examples/diffusion.c examples/diffusion-main.cpp)
