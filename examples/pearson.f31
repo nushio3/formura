@@ -18,7 +18,7 @@ end function
 
 begin function step(U,V) returns (U_next, V_next)
   float :: k = 0.05, F = 0.015, Du = 2e-5, Dv = 1e-5
-  float :: dt = 1.0, dx = 1.0
+  float :: dt = 0.1, dx = 1.0
 
   dU_dt = -U * V**2 + F * (1-U) + Du/dx**2 * Σ for(i) (∂ i . ∂ i) U
   dV_dt =  U * V**2 - (F+k) * V + Dv/dx**2 * Σ for(i) (∂ i . ∂ i) V

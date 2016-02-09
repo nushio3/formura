@@ -4,7 +4,7 @@
 #include <time.h>
 #include "pearson.h"
 
-const int T_MAX = 100;
+const int T_MAX = 200;
 
 Formura_Navigator navi;
 
@@ -35,13 +35,13 @@ int main (int argc, char **argv) {
   init();
 
   while(navi.time_step < T_MAX) {
-    if(navi.time_step % 100 == 0) {
+    if(navi.time_step % 10 == 0) {
       char fn[256];
       sprintf(fn, "frames/%06d.txt", navi.time_step);
       FILE *fp = fopen(fn,"w");
       for(int y = navi.lower_y; y < navi.upper_y; ++y) {
         for(int x = navi.lower_x; x < navi.upper_x; ++x) {
-          fprintf(fp, "%f ", U[y][x]);
+          fprintf(fp, "%d %d %f\n", x, y, U[y][x]);
         }
         fprintf(fp, "\n");
       }
