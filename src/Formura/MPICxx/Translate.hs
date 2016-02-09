@@ -194,7 +194,8 @@ tellProgram = do
   setNumericalConfig
 
   tellH $ T.unlines
-    [ "#ifdef __cplusplus"
+    [ "#pragma once"
+    , "#ifdef __cplusplus"
     , "extern \"C\""
     , "{"
     , "#endif"
