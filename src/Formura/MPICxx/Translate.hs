@@ -336,6 +336,7 @@ tellProgram = do
     ]
 
   ivars <- map T.pack <$> view axesNames
+  intraExtents <- use ncIntraNodeShape
 
   tellH $ T.unlines ["#include <mpi.h>"]
   tellC $ T.unlines ["#include <mpi.h>" ,
@@ -366,12 +367,15 @@ tellProgram = do
   mmg <- use omInitGraph
   con <- genGraph $ mmg
 
-  tellC $ T.unlines
-    [ "{"
-    , con
-    , "navi->time_step=0;"
-    , "}"
-    ]
+  tellCLn "{"
+  tellC  con
+  tellCLn "navi->time_step=0;"
+  forM_ (zip ivars (toList intraExtents)) $ \(i, e) -> do
+    tellCLn $ "navi->lower_" <> i <> "=0;"
+    tellCLn $ "navi->offset_" <> i <> "=0;"
+    tellCLn $ "navi->upper_" <> i <> "=" <> showC e <> ";"
+  tellCLn "}"
+
 
   tellBoth "\n\n"
 

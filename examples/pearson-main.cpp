@@ -35,6 +35,18 @@ int main (int argc, char **argv) {
   init();
 
   while(navi.time_step < T_MAX) {
+    if(navi.time_step % 100 == 0) {
+      char fn[256];
+      sprintf(fn, "frames/%06d.txt", navi.time_step);
+      FILE *fp = fopen(fn,"w");
+      for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+        for(int x = navi.lower_x; x < navi.upper_x; ++x) {
+          fprintf(fp, "%f ", U[y][x]);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+    }
     Formura_Forward(&navi);
     printf("t = %d\n", navi.time_step);
   }
