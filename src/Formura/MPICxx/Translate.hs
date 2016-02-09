@@ -23,6 +23,7 @@ import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.CommandLineOption
 import           Formura.GlobalEnvironment
+import           Formura.Language.Combinator (subFix)
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
@@ -166,6 +167,9 @@ setNumericalConfig = do
 -- | prepare unique name for everyone
 setNamingState :: TranM ()
 setNamingState = do
+  stateVars <- use omStateSignature
+  alreadyGivenNames .= (S.fromList $ map T.pack $ M.keys stateVars)
+
   ans <- view axesNames
   lins <- traverse (genFreeName . ("i"++)) (Vec ans)
   loopIndexNames .= lins
@@ -190,25 +194,42 @@ setNamingState = do
 
 
 -- | Generate C type declaration for given language.
-toTypeDecl :: IdentName -> TypeExpr -> TranM T.Text
-toTypeDecl name typ = case typ of
+genTypeDecl :: IdentName -> TypeExpr -> TranM T.Text
+genTypeDecl name typ = case typ of
+  ElemType "void" -> return ""
+  ElemType "Rational" -> return $ "float " <> T.pack name
   ElemType x -> return $ T.pack  x <> " " <> T.pack name
   GridType _ x -> do
-    body <- toTypeDecl name x
-    sz <- use ncIntraNodeShape
-    let szpt = foldMap (brackets . showC) sz
-    return $ body <> szpt
+    body <- genTypeDecl name x
+    if body == "" then return ""
+      else do
+        sz <- use ncIntraNodeShape
+        let szpt = foldMap (brackets . showC) sz
+        return $ body <> szpt
   _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
 
--- | Extent String for State Arrays
+-- | Generate Declaration for State Arrays
 tellStateArrays :: TranM ()
 tellStateArrays = do
   stateSig <- use omStateSignature
   forM_ (M.toList stateSig) $ \ (identName, typ) -> do
     tellH "extern "
-    decl <- toTypeDecl identName typ
+    decl <- genTypeDecl identName typ
     tellBoth decl
     tellBothLn ";"
+
+-- | Generate Declarations for intermediate variables
+tellIntermediateVariables :: TranM ()
+tellIntermediateVariables = do
+  g1 <- use omInitGraph
+  g2 <- use omStepGraph
+  forM_ [g1, g2] $ \gr -> do
+    forM_ (G.toList gr) $ \(_, node) -> do
+      let typ = subFix $ node ^. nodeType
+          Just (VariableName vname) = A.viewMaybe node
+      decl <- genTypeDecl (T.unpack vname) typ
+      tellC decl
+      tellCLn ";"
 
 -- | lookup node by its index
 lookupNode :: NodeID -> TranM MMNode
@@ -259,6 +280,8 @@ genGraph gr = do
       ElemType ctyp -> do
         rhs <- genExpr inst
         return $ lhsName <> "=" <> rhs <> ";"
+      GridType _ typ -> do
+        return "// array"
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot
         return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
@@ -286,6 +309,7 @@ tellProgram = do
   tellBoth "\n\n"
 
   tellStateArrays
+  tellIntermediateVariables
 
   tellBoth "\n"
 
