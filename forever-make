@@ -2,9 +2,10 @@
 
 while :
 do
-    stack build --ghc-options=-ferror-spans
+    ./cmake-for-x86.sh
+    make # stack build --ghc-options=-ferror-spans
     nohup ./make-doc.sh > /dev/null  2>&1 &
-    inotifywait -e modify -r ./src/ ./exe-src/ formura.cabal
+    inotifywait -e modify -r ./src/ ./exe-src/ ./example/ formura.cabal
 done
 
 # http://stackoverflow.com/questions/32712775/generating-documentation-for-my-own-code-with-haddock-and-stack
