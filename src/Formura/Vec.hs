@@ -20,6 +20,8 @@ import           Data.Monoid
 formuraMaxDimension :: Int
 formuraMaxDimension = 26
 
+-- TODO: toList (PureVec a) returns only 1 element. this is bug.
+
 data Vec a = Vec { getVec :: [a] } | PureVec a
            deriving (Read, Functor, Foldable, Traversable)
 instance J.ToJSON a => J.ToJSON (Vec a) where

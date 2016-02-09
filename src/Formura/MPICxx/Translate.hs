@@ -20,6 +20,7 @@ import           Text.Trifecta (failed, raiseErr)
 
 
 import qualified Formura.Annotation as A
+import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.CommandLineOption
@@ -294,11 +295,14 @@ genGraph gr = do
   ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> do
     let Just (VariableName lhsName) = A.viewMaybe anot
     let
+      Just (Boundary (lowerBound, upperBound)) = A.toMaybe anot
+
       genGrid lhsName2 = do
         let openLoops =
               [ T.unwords
-                ["for (", i, "=0;", i,  "<", n, ";++", i, "){"]
-              | (i,n) <- zip (toList ivars) (toList nvars) ]
+                ["for (", i, "=", showC l ,";", i,  "<", n,"+",showC h, ";++", i, "){"]
+              | ((i,n),(l,h)) <- zip (toList ivars) (toList nvars) `zip`
+                                 zip (toList lowerBound++[0..]) (toList upperBound++[0..])]
             closeLoops =
               ["}" | _ <- toList ivars]
         rhs <- genExpr inst

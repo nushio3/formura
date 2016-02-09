@@ -18,10 +18,12 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import qualified Data.IntMap as G
 import           Data.Maybe
+import           Data.Monoid
 import           Text.Trifecta (failed, raiseErr)
 
 
 import qualified Formura.Annotation as A
+import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.GlobalEnvironment
@@ -132,9 +134,7 @@ manifestG omg = do
         omNode <- lookupNode nO
         return $ Just (nM, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
 
-  return $ G.fromList nodeList
-
-
+  return $ boundaryAnalysis $ G.fromList nodeList
 
 manifestation :: OMProgram -> TranM MMProgram
 manifestation omprog = do
@@ -146,6 +146,33 @@ manifestation omprog = do
     , _omStateSignature    = omprog ^. omStateSignature
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
+
+boundaryAnalysis :: Graph MMInst -> Graph MMInst
+boundaryAnalysis gr =
+  flip G.mapWithKey gr $
+  \ k nd -> case G.lookup k bgr of
+  Just b ->  nd & A.annotation %~ A.set (b <> Boundary (0,0))
+  Nothing -> nd
+  where
+    bgr :: G.IntMap Boundary
+    bgr = G.mapWithKey knb gr
+
+    knb :: Int -> MMNode -> Boundary
+    knb k nd = listBounds $ nd ^. nodeInst
+    listBounds :: MMInst -> Boundary
+    listBounds (Load _)    = Boundary (0,0)
+    listBounds (Store _ x) = listBounds x
+    listBounds (LoadIndex _) = mempty
+    listBounds (LoadExtent _) = mempty
+    listBounds (Imm _)        = mempty
+    listBounds (LoadCursor v nid) =
+      let Boundary (a,b) = b_of_n
+          Just b_of_n = G.lookup nid bgr
+      in Boundary (a+v, b+v)
+    listBounds (Uniop _ a) = listBounds a
+    listBounds (Binop _ a b) = mconcat $ map listBounds [a, b]
+    listBounds (Triop _ a b c) = mconcat $ map listBounds [a, b, c]
+
 
 genMMProgram :: OMProgram -> IO MMProgram
 genMMProgram omprog = do

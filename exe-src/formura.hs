@@ -14,6 +14,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import qualified Text.Trifecta as P
 
 import qualified Formura.Annotation as A
+import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
 import           Formura.CommandLineOption
 import           Formura.OrthotopeMachine.Graph
@@ -86,4 +87,5 @@ pprMMNode (i,n) = do
       varName = case A.toMaybe (n ^. A.annotation) of
         Just (SourceName n1) -> n1
         _                   -> ""
-  putStrLn $ unwords [take 4 $ varName ++ repeat ' ', show (i,n)]
+      Just (Boundary bdy) = A.toMaybe $ n^.A.annotation
+  putStrLn $ unwords [take 4 $ varName ++ repeat ' ', show (i,n),show bdy]
