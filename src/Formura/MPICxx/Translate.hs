@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, ImplicitParams, OverloadedStrings, PackageImports, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, ImplicitParams, MultiParamTypeClasses, OverloadedStrings, PackageImports, TemplateHaskell #-}
 
 module Formura.MPICxx.Translate where
 
@@ -8,6 +8,7 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import qualified Data.IntMap as G
 import qualified Data.Map as M
+import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import           System.Directory
@@ -52,10 +53,23 @@ data NumericalConfig = NumericalConfig
   }
 makeClassy ''NumericalConfig
 
+defaultNumericalConfig :: NumericalConfig
+defaultNumericalConfig = NumericalConfig 0 0 0 0
+
+-- | The struct for generating unique names, and holds already given names.
+data NamingState = NamingState
+  { _alreadyGivenNames :: S.Set T.Text
+  , _freeNameCounter :: Integer
+  , _loopIndexNames :: Vec T.Text
+  }
+makeClassy ''NamingState
+
+defaultNamingState = NamingState S.empty 0 (PureVec "")
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
   , _tsNumericalConfig :: NumericalConfig
+  , _tsNamingState :: NamingState
   , _theProgram :: Program
   , _theMMProgram :: MMProgram
   }
@@ -66,6 +80,10 @@ instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
 instance HasNumericalConfig TranState where
   numericalConfig = tsNumericalConfig
+instance HasMachineProgram TranState MMInst where
+  machineProgram = theMMProgram
+instance HasNamingState TranState where
+  namingState = tsNamingState
 
 data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text}
                 deriving (Eq, Ord, Show)
@@ -82,6 +100,8 @@ tellHLn :: (MonadWriter CProgram m) => T.Text -> m ()
 tellHLn txt = tell $ CProgram (txt <> "\n") ""
 tellCLn :: (MonadWriter CProgram m) => T.Text -> m ()
 tellCLn txt = tell $ CProgram "" (txt <> "\n")
+tellBothLn :: (MonadWriter CProgram m) => T.Text -> m ()
+tellBothLn txt = tell $ CProgram (txt <> "\n")(txt <> "\n")
 
 
 
@@ -94,6 +114,21 @@ type TranM = CompilerMonad GlobalEnvironment CProgram TranState
 
 -- * Parallel code generation
 
+-- | generate new free name based on given identifier,
+--   and prevent further generation of that name
+genFreeName :: IdentName -> TranM T.Text
+genFreeName ident = do
+  agNames <- use alreadyGivenNames
+  let initName = T.pack ident
+      go = do
+        ctr <- use freeNameCounter
+        let tmpName = initName <> "_" <> showC ctr
+        if S.member tmpName agNames
+          then (freeNameCounter += 1) >> go
+          else return tmpName
+  givenName <- if S.member initName agNames then go else return initName
+  alreadyGivenNames %= S.insert givenName
+  return givenName
 
 -- | read all numerical config from the Formura source program
 setNumericalConfig :: TranM ()
@@ -123,9 +158,39 @@ setNumericalConfig = do
     _ -> raiseErr $ failed "bad monitor_interval"
   return ()
 
+
+
+-- | Generate C type declaration for given language.
+toTypeDecl :: IdentName -> TypeExpr -> TranM T.Text
+toTypeDecl name typ = case typ of
+  ElemType x -> return $ T.pack  x <> " " <> T.pack name
+  GridType _ x -> do
+    body <- toTypeDecl name x
+    sz <- use ncIntraNodeShape
+    let szpt = foldMap (brackets . showC) sz
+    return $ body <> szpt
+  _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
+
+-- | Extent String for State Arrays
+tellStateArrays :: TranM ()
+tellStateArrays = do
+  stateSig <- use omStateSignature
+  forM_ (M.toList stateSig) $ \ (identName, typ) -> do
+    tellH "extern "
+    decl <- toTypeDecl identName typ
+    tellBoth decl
+    tellBothLn ";"
+
+-- | generate a formura function body.
+
+genGraph :: Graph MMInst -> TranM T.Text
+genGraph gr = do
+  return ""
+
+
 -- | The main translation logic
-translateProgram :: WithCommandLineOption => TranM ()
-translateProgram = do
+tellProgram :: WithCommandLineOption => TranM ()
+tellProgram = do
   setNumericalConfig
 
   ivars <- map T.pack <$> view axesNames
@@ -134,6 +199,10 @@ translateProgram = do
   tellC $ T.unlines ["#include <mpi.h>" , "#include \"" <> T.pack hxxFileName <> "\""]
 
   tellBoth "\n\n"
+
+  tellStateArrays
+
+  tellBoth "\n"
 
   tellHLn $ "struct Formura_Navigator {"
   tellHLn $ "int time_step;"
@@ -146,11 +215,17 @@ translateProgram = do
 
   tellBoth "\n\n"
 
+
   tellBoth "int Formura_Init (Formura_Navigator *navi, MPI_Comm comm)"
   tellH ";"
+
+  mmg <- use omInitGraph
+  con <- genGraph $ mmg
+
   tellC $ T.unlines
     [ "{"
     , "navi->time_step=0;"
+    , con
     , "}"
     ]
 
@@ -158,10 +233,14 @@ translateProgram = do
 
   tellBoth "int Formura_Forward (Formura_Navigator *navi)"
   tellH ";"
+
+  mmg <- use omStepGraph
+  con <- genGraph $ mmg
+  monitorInterval0 <- use ncMonitorInterval
   tellC $ T.unlines
     [ "{"
-    , "printf(\"mae ni susumou!\n\");"
-    , "navi->time_step += 1;"
+    , con
+    , "navi->time_step += "  <> showC monitorInterval0  <> ";"
     , "}"
     ]
 
@@ -171,12 +250,14 @@ genCxxFiles formuraProg mmProg = do
   let
     tranState0 = TranState
       { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
+      , _tsNamingState = defaultNamingState
       , _theProgram = formuraProg
       , _theMMProgram = mmProg
+      , _tsNumericalConfig = defaultNumericalConfig
       }
 
   (_, _, CProgram hxxContent cxxContent)
-    <- runCompilerRight translateProgram
+    <- runCompilerRight tellProgram
        (mmProg ^. omGlobalEnvironment)
        tranState0
 

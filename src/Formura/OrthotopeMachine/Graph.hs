@@ -8,7 +8,7 @@ A virtual machine with multidimensional vector instructions that operates on str
 in http://arxiv.org/abs/1204.4779 .
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Graph where
 
@@ -142,7 +142,7 @@ data MachineProgram instType = MachineProgram
   , _omStateSignature :: M.Map IdentName TypeExpr
   }
 
-makeLenses ''MachineProgram
+makeClassy ''MachineProgram
 
 type OMProgram = MachineProgram OMInstruction
 type MMProgram = MachineProgram MMInst

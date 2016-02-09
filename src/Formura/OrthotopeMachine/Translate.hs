@@ -423,6 +423,8 @@ genGlobalFunction globalBinding inputType outputPattern (Lambda l r) =  bindThem
   return $ typeExprOf returnValueExpr
   where
     bindThemAll = withBindings $ fmap (genRhs .subFix) globalBinding
+
+
 genGlobalFunction _ _ _ _ = raiseErr $ failed "Identifier specified for function generation is not of function type."
 
 lookupToplevelIdents :: Program -> IdentName -> GenM RExpr
