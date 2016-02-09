@@ -5,6 +5,6 @@ add_custom_target(formura ALL stack build)
 add_custom_command(
   OUTPUT examples/pearson.c
   COMMAND stack exec formura -- examples/pearson.f31
-  DEPENDS examples/pearson.f31 bin/formura
+  DEPENDS examples/pearson.f31 ./bin/formura
   )
 add_executable(bin/pearson.out examples/pearson.c examples/pearson-main.cpp)

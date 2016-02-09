@@ -7,6 +7,7 @@ import           Control.Lens
 import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper)
+import           Data.Foldable (toList)
 import qualified Data.IntMap as G
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -173,6 +174,7 @@ setNamingState = do
   ans <- view axesNames
   lins <- traverse (genFreeName . ("i"++)) (Vec ans)
   loopIndexNames .= lins
+
   luns <- traverse (genFreeName . ("N"++) . map toUpper) (Vec ans)
   loopExtentNames .= luns
 
@@ -250,7 +252,10 @@ genExpr :: MMInst -> TranM T.Text
 genExpr inst = do
   indNames <- use loopIndexNames
   let accAt :: Vec Int -> T.Text
-      accAt v = foldMap brackets $ (\i d -> i <> "+" <> showC d)  <$> indNames <*> v
+      accAt v = foldMap brackets $ kutukeru  <$> indNames <*> v
+      kutukeru i d | d == 0 = i
+                   | d <  0 = i <> showC d
+                   | otherwise = i <> "+" <> showC d
   case inst of
     Load name -> return $ T.pack name <> accAt 0
     Imm r -> return $ showC (realToFrac r :: Double)
@@ -260,11 +265,15 @@ genExpr inst = do
     Binop op a b -> do
       a_code <- genExpr a
       b_code <- genExpr b
-      return $ parens $ a_code <> T.pack op <> b_code
+      case op of
+        "**" -> return $ ("pow"<>) $ parens $ a_code <> "," <> b_code
+        _ -> return $ parens $ a_code <> T.pack op <> b_code
     LoadCursor vi nid -> do
       node <- lookupNode nid
       let Just (VariableName nam) = A.viewMaybe node
-      return $ nam <> accAt vi
+      case node ^. nodeType of
+        ElemType _ -> return $ nam
+        _ -> return $ nam <> accAt vi
     x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
 
 
@@ -273,6 +282,14 @@ genExpr inst = do
 genGraph :: Graph MMInst -> TranM T.Text
 genGraph gr = do
   theGraph .= gr
+  ivars <- use loopIndexNames
+  nvars <- use loopExtentNames
+  intraExtent <- use ncIntraNodeShape
+
+  let ivarDecl = "int " <> T.intercalate ", " (toList ivars) <> ";"
+      nvarDecl = "const int " <> T.intercalate ", " nvarEqn <> ";"
+      nvarEqn = [x <> "=" <> showC n  | (x,n) <- zip (toList nvars) (toList intraExtent)]
+
   ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> do
     let Just (VariableName lhsName) = A.viewMaybe anot
     case typ of
@@ -281,11 +298,20 @@ genGraph gr = do
         rhs <- genExpr inst
         return $ lhsName <> "=" <> rhs <> ";"
       GridType _ typ -> do
-        return "// array"
+        let openLoops =
+              [ T.unwords
+                ["for (", i, "=0;", i,  "<", n, ";++", i, "){"]
+              | (i,n) <- zip (toList ivars) (toList nvars) ]
+            closeLoops =
+              ["}" | _ <- toList ivars]
+        rhs <- genExpr inst
+        let bodyExpr = lhsName <> foldMap brackets ivars <> "=" <> rhs <> ";"
+        return $ T.unlines $
+          openLoops ++ [bodyExpr] ++ closeLoops
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot
         return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
-  return $ T.unlines ps
+  return $ ivarDecl <> nvarDecl <>T.unlines ps
 
 -- | The main translation logic
 tellProgram :: WithCommandLineOption => TranM ()
@@ -304,7 +330,9 @@ tellProgram = do
   ivars <- map T.pack <$> view axesNames
 
   tellH $ T.unlines ["#include <mpi.h>"]
-  tellC $ T.unlines ["#include <mpi.h>" , "#include \"" <> T.pack hxxFileName <> "\""]
+  tellC $ T.unlines ["#include <mpi.h>" ,
+                     "#include <math.h>" ,
+                     "#include \"" <> T.pack hxxFileName <> "\""]
 
   tellBoth "\n\n"
 
@@ -332,8 +360,8 @@ tellProgram = do
 
   tellC $ T.unlines
     [ "{"
-    , "navi->time_step=0;"
     , con
+    , "navi->time_step=0;"
     , "}"
     ]
 
