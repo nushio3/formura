@@ -76,6 +76,7 @@ data TranState = TranState
   , _tsNamingState :: NamingState
   , _theProgram :: Program
   , _theMMProgram :: MMProgram
+  , _theGraph :: Graph MMInst
   }
 makeClassy ''TranState
 
@@ -209,15 +210,58 @@ tellStateArrays = do
     tellBoth decl
     tellBothLn ";"
 
+-- | lookup node by its index
+lookupNode :: NodeID -> TranM MMNode
+lookupNode i = do
+  g <- use theGraph
+  case G.lookup i g of
+   Nothing -> raiseErr $ failed $ "out-of-bound node reference: #" ++ show i
+   Just n -> do
+     case A.viewMaybe n of
+        Just meta -> compilerFocus %= (meta <|>)
+        Nothing -> return ()
+     return n
+
+
+-- | generate expression.
+
+genExpr :: MMInst -> TranM T.Text
+genExpr inst = do
+  indNames <- use loopIndexNames
+  let accAt :: Vec Int -> T.Text
+      accAt v = foldMap brackets $ (\i d -> i <> "+" <> showC d)  <$> indNames <*> v
+  case inst of
+    Load name -> return $ T.pack name <> accAt 0
+    Imm r -> return $ showC (realToFrac r :: Double)
+    Uniop op a -> do
+      a_code <- genExpr a
+      return $ parens $ T.pack op <> a_code
+    Binop op a b -> do
+      a_code <- genExpr a
+      b_code <- genExpr b
+      return $ parens $ a_code <> T.pack op <> b_code
+    LoadCursor vi nid -> do
+      node <- lookupNode nid
+      let Just (VariableName nam) = A.viewMaybe node
+      return $ nam <> accAt vi
+    x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
+
+
 -- | generate a formura function body.
 
 genGraph :: Graph MMInst -> TranM T.Text
 genGraph gr = do
-  ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> case inst of
-    Load _ -> return ""
-    _ -> do
-      let Just (VariableName nam) = A.viewMaybe anot
-      return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
+  theGraph .= gr
+  ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> do
+    let Just (VariableName lhsName) = A.viewMaybe anot
+    case typ of
+      ElemType "void" -> return "// void"
+      ElemType ctyp -> do
+        rhs <- genExpr inst
+        return $ lhsName <> "=" <> rhs <> ";"
+      _ -> do
+        let Just (VariableName nam) = A.viewMaybe anot
+        return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
   return $ T.unlines ps
 
 -- | The main translation logic
@@ -301,6 +345,7 @@ genCxxFiles formuraProg mmProg = do
       , _theProgram = formuraProg
       , _theMMProgram = mmProg
       , _tsNumericalConfig = defaultNumericalConfig
+      , _theGraph = G.empty
       }
 
   (_, _, CProgram hxxContent cxxContent)
