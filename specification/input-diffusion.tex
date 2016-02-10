@@ -1,0 +1,125 @@
+\begin{breakbox}
+\begin{verbatim}
+#pragma once
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include <mpi.h>
+
+
+  extern float dens[64][64][64];
+
+  struct Formura_Navigator {
+    int time_step;
+    int lower_x;
+    int upper_x;
+    int offset_x;
+    int lower_y;
+    int upper_y;
+    int offset_y;
+    int lower_z;
+    int upper_z;
+    int offset_z;
+  };
+
+
+  int Formura_Init(struct Formura_Navigator *navi, MPI_Comm comm);
+
+  int Formura_Forward(struct Formura_Navigator *navi);
+#ifdef __cplusplus
+}
+#endif
+\end{verbatim}
+\end{breakbox}
+
+\verb`diffusion.c`
+
+\begin{breakbox}
+\begin{verbatim}
+#include <mpi.h>
+#include <math.h>
+#include "diffusion.h"
+
+
+float dens[64][64][64];
+float dens_init;
+;
+float a[64][64][64];
+float Dx;
+float Dt;
+float dens_next_0[64][64][64];
+;
+
+
+
+int Formura_Init(struct Formura_Navigator *navi, MPI_Comm comm)
+{
+  int ix, iy, iz;
+  const int NX = 64, NY = 64, NZ = 64;
+  dens_init = 0.0;
+  for (ix = 0; ix < NX + 0; ++ix) {
+    for (iy = 0; iy < NY + 0; ++iy) {
+      for (iz = 1; iz < NZ + 1; ++iz) {
+        dens[ix][iy][iz] = dens_init;
+      }
+    }
+  }
+
+  navi->time_step = 0;
+  navi->lower_x = 0;
+  navi->offset_x = 0;
+  navi->upper_x = 64;
+  navi->lower_y = 0;
+  navi->offset_y = 0;
+  navi->upper_y = 64;
+  navi->lower_z = 0;
+  navi->offset_z = 0;
+  navi->upper_z = 64;
+}
+
+
+int Formura_Forward(struct Formura_Navigator *navi)
+{
+  int ix, iy, iz;
+  const int NX = 64, NY = 64, NZ = 64;
+  int timestep;
+  for (timestep = 0; timestep < 20; ++timestep) {
+    for (ix = 0; ix < NX + 0; ++ix) {
+      for (iy = 0; iy < NY + 0; ++iy) {
+        for (iz = 1; iz < NZ + 1; ++iz) {
+          a[ix][iy][iz] = dens[ix][iy][iz];
+        }
+      }
+    }
+
+    Dx = 4.2;
+    Dt = 0.1;
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        for (iz = 1; iz < NZ + -1; ++iz) {
+          dens_next_0[ix][iy][iz] =
+              (a[ix][iy][iz] +
+               ((Dt / pow(Dx, 2.0)) *
+                ((((((a[ix - 1][iy][iz] - a[ix][iy][iz]) / 2.0) -
+                    ((a[ix][iy][iz] - a[ix + 1][iy][iz]) / 2.0)) / 2.0) +
+                  ((((a[ix][iy - 1][iz] - a[ix][iy][iz]) / 2.0) -
+                    ((a[ix][iy][iz] - a[ix][iy + 1][iz]) / 2.0)) / 2.0)) +
+                 ((((a[ix][iy][iz - 1] - a[ix][iy][iz]) / 2.0) -
+                   ((a[ix][iy][iz] - a[ix][iy][iz + 1]) / 2.0)) / 2.0))));
+        }
+      }
+    }
+
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        for (iz = 1; iz < NZ + -1; ++iz) {
+          dens[ix][iy][iz] = dens_next_0[ix][iy][iz];
+        }
+      }
+    }
+
+  }
+  navi->time_step += 20;
+}
+\end{verbatim}
+\end{breakbox}
