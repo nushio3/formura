@@ -28,6 +28,7 @@ void init() {
 }
 
 int main (int argc, char **argv) {
+  system("mkdir -p frames");
   srand(time(NULL));
   MPI_Init(&argc, &argv);
   Formura_Init(&navi, MPI_COMM_WORLD);
