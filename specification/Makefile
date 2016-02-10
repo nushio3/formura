@@ -7,7 +7,7 @@ formura-specification.pdf: formura-specification.tex
 	platex --shell-escape formura-specification.tex
 	dvipdfmx formura-specification.dvi
 
-formura-users-manual.pdf: formura-users-manual.tex
+formura-users-manual.pdf: formura-users-manual.tex input-*.tex
 	platex --shell-escape formura-users-manual.tex
 	bibtex formura-users-manual
 	platex --shell-escape formura-users-manual.tex
