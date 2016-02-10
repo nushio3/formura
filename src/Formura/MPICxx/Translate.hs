@@ -288,9 +288,18 @@ genGraph gr = do
   nvars <- use loopExtentNames
   intraExtent <- use ncIntraNodeShape
 
+  monitorInterval0 <- use ncMonitorInterval
+  timeStepVarName <- genFreeName "timestep"
+
   let ivarDecl = "int " <> T.intercalate ", " (toList ivars) <> ";"
       nvarDecl = "const int " <> T.intercalate ", " nvarEqn <> ";"
       nvarEqn = [x <> "=" <> showC n  | (x,n) <- zip (toList nvars) (toList intraExtent)]
+      timeStepDecl = "int " <> timeStepVarName <> ";"
+
+  let openTimeLoop = "for(" <> timeStepVarName <> "=0;" <>
+                     timeStepVarName <> "<" <> showC monitorInterval0  <> ";" <>
+                     "++" <> timeStepVarName <>  "){"
+      closeTimeLoop = "}"
 
   ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> do
     let Just (VariableName lhsName) = A.viewMaybe anot
@@ -323,7 +332,8 @@ genGraph gr = do
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot
         return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
-  return $ ivarDecl <> nvarDecl <>T.unlines ps
+  return $ ivarDecl <> nvarDecl <> timeStepDecl <>
+           openTimeLoop <> T.unlines ps <> closeTimeLoop
 
 -- | The main translation logic
 tellProgram :: WithCommandLineOption => TranM ()
@@ -429,7 +439,7 @@ genCxxFiles formuraProg mmProg = do
 
   mapM_ indent [hxxFilePath, cxxFilePath]
   where
-    indent fn = callProcess "indent" ["-kr", "-i2", fn]
+    indent fn = callProcess "indent" ["-kr", "-i2", "-nut", fn]
 
 
 cxxFilePath :: WithCommandLineOption => FilePath
