@@ -281,15 +281,17 @@ genExpr inst = do
 
 -- | generate a formura function body.
 
-genGraph :: Graph MMInst -> TranM T.Text
-genGraph gr = do
+genGraph :: Bool -> Graph MMInst -> TranM T.Text
+genGraph isTimeLoop gr = do
   theGraph .= gr
   ivars <- use loopIndexNames
   nvars <- use loopExtentNames
   intraExtent <- use ncIntraNodeShape
 
   monitorInterval0 <- use ncMonitorInterval
-  timeStepVarName <- genFreeName "timestep"
+
+  timeStepVarName <- if isTimeLoop then genFreeName "timestep"
+                     else return ""
 
   let ivarDecl = "int " <> T.intercalate ", " (toList ivars) <> ";"
       nvarDecl = "const int " <> T.intercalate ", " nvarEqn <> ";"
@@ -332,8 +334,9 @@ genGraph gr = do
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot
         return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
-  return $ ivarDecl <> nvarDecl <> timeStepDecl <>
-           openTimeLoop <> T.unlines ps <> closeTimeLoop
+  let ifTime x = if isTimeLoop then x else ""
+  return $ ivarDecl <> nvarDecl <> ifTime timeStepDecl <>
+    ifTime openTimeLoop <> T.unlines ps <> ifTime closeTimeLoop
 
 -- | The main translation logic
 tellProgram :: WithCommandLineOption => TranM ()
@@ -379,7 +382,7 @@ tellProgram = do
   tellH ";"
 
   mmg <- use omInitGraph
-  con <- genGraph $ mmg
+  con <- genGraph False $ mmg
 
   tellCLn "{"
   tellC  con
@@ -397,7 +400,7 @@ tellProgram = do
   tellH ";"
 
   mmg <- use omStepGraph
-  con <- genGraph $ mmg
+  con <- genGraph True $ mmg
   monitorInterval0 <- use ncMonitorInterval
   tellC $ T.unlines
     [ "{"
