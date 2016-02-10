@@ -442,7 +442,7 @@ genCxxFiles formuraProg mmProg = do
 
   mapM_ indent [hxxFilePath, cxxFilePath]
   where
-    indent fn = callProcess "indent" ["-kr", "-i2", "-nut", fn]
+    indent fn = callProcess "indent" ["-gnu", "-i2", "-nut","-br", "-nlp","-ip0","-l80", fn]
 
 
 cxxFilePath :: WithCommandLineOption => FilePath
