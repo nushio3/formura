@@ -205,7 +205,7 @@ instance Generatable GridF where
             typ1 = GridType newOff etyp0
         if intOff == 0
                 then return (val0 :. typ1)
-                else insert (Shift intOff val0) typ1
+                else insert (Shift (negate intOff) val0) typ1
 
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
@@ -392,7 +392,6 @@ toNodeType (GridType v x) = do
   x2 <- toNodeType x
   return $ GridType v x2
 toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encountered in conversion to node type."
-
 
 -- | Generate code for a global function. This generates 'Load' and 'Store' nodes,
 --   in addition to all the usual computation nodes.
