@@ -1,2 +1,0 @@
-SUBDIRS=example
-DIST_SUBDIRS=$(SUBDIRS)
