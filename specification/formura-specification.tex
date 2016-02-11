@@ -519,9 +519,10 @@ BNFにおいて、左辺を右辺で定義するのには記号 {\tt ::=} を用
 \formura の式は、
 即値               \<literal>
 、変数名           \<variable-name>
-、二項演算子式     \<binary-operator-expression>
 、単項演算子式     \<unary-operator-expression>
+、二項演算子式     \<binary-operator-expression>
 、if文             \<if-then-else-expression>
+、ラムダ式           \<lambda-expression>
 、括弧式           \<parenthesis-expression>
 、格子アクセス式   \<grid-access-expression>
 、要素アクセス式   \<projection-expression>
@@ -537,6 +538,7 @@ BNFにおいて、左辺を右辺で定義するのには記号 {\tt ::=} を用
 <binary-operator-expression> |
 <unary-operator-expression>  |
 <if-then-else-expression>    |
+<lambda-expression>    |
 <parenthesis-expression>     |
 <grid-access-expression>    |
 <projection-expression>    |
@@ -547,6 +549,8 @@ BNFにおいて、左辺を右辺で定義するのには記号 {\tt ::=} を用
 <unary-operator-expression>  ::= <unary-operator> <expression>
 
 <if-then-else-expression>    ::= `if' <expression> `then' <expression> `else' <expression>
+
+<lambda-expression>    ::= `fun'  <parenthesis-expression>  <expression>
 
 <parenthesis-expression>     ::= `('  <expression>  `)'
 
@@ -692,6 +696,7 @@ BNFにおいて、左辺を右辺で定義するのには記号 {\tt ::=} を用
 \alt <expression> <binary-operator> <expression>
 \alt <unary-operator> <expression>
 \alt `if' <expression> `then' <expression> `else' <expression>
+\alt `fun' `('  <expression>  `)' <expression>
 \alt  `('  <expression>  `)'
 \alt <variable-name> `[' <expression> `,' ... `]'
 \alt <function-name> `(' [ <expression> `,' ... ] `)'

@@ -133,7 +133,7 @@ C言語のプログラムが\lit{main}関数から開始するように、
 \begin{screen}
 \begin{verbatim}
   simulation_state = init();
-  for (t = 0; t < T_MAX; ++t) {
+  fun (t = 0; t < T_MAX; ++t) {
     simulation_state = step(simulation_state);
   }
 \end{verbatim}
@@ -362,7 +362,7 @@ begin function dens_next = step(dens)
   float :: Dx, Dt
   Dx = 4.2
   Dt = 0.1
-  dens_next = dens + Dx ** 2/Dt * Σ for(i) ∂ i (∂ i dens)
+  dens_next = dens + Dx ** 2/Dt * Σ fun(i) ∂ i (∂ i dens)
 end function
 \end{lstlisting}
 
@@ -381,49 +381,18 @@ begin function ddx(a) returns (a[i+1/2,j,k] - a[i-1/2,j,k])/2
 end function
 \end{lstlisting}
 
-さらに、\verb`for(a) expr`の形式を利用して次のように書くこともできます。
-ここで、\verb`for(a) expr`は、
+さらに、\verb`fun (a) expr`の形式を利用して次のように書くこともできます。
+ここで、\verb`fun (a) expr`は、
 \verb`a`を引数にとって、
 \verb`expr`を返す関数、という意味です。プログラミング言語の用語でいえばラムダ式です。
-
-\begin{lstlisting}[mathescape]
-ddx(a) = for (a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
-\end{lstlisting}
-
-\verb`fun(a) expr`のほうがいいでしょうか？
 
 \begin{lstlisting}[mathescape]
 ddx(a) = fun (a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
 \end{lstlisting}
 
 
+
 さきほどの拡散方程式のコードを、ラムダ式を活用して書き直すと、次のようになります。
-
-\begin{lstlisting}[mathescape]
-  dimension :: 3
-  axes :: x, y, z
-
-  ddx = for(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
-  ddy = for(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
-  ddz = for(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
-
-  ∂ = (ddx,ddy,ddz)
-
-  Σ = for (e) e(0) + e(1) + e(2)
-
-  begin function init() returns dens_init
-        float [] :: dens_init = 0
-  end function
-
-  begin function dens_next = step(dens)
-    float :: Dx, Dt
-    Dx = 4.2
-    Dt = 0.1
-    dens_next = dens + Dt / Dx**2 * Σ for(i) (∂ i . ∂ i) dens
-  end function
-\end{lstlisting}
-
-ラムダ式が\verb`fun`だと、次のように見えます。
 
 \begin{lstlisting}[mathescape]
   dimension :: 3
@@ -485,12 +454,12 @@ ddx(a) = fun (a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
   temporal_blocking_interval :: 4
   monitor_interval :: 20
 
-  ddx = for(a) (a[i+1/2,j] - a[i-1/2,j])
-  ddy = for(a) (a[i,j+1/2] - a[i,j-1/2])
+  ddx = fun(a) (a[i+1/2,j] - a[i-1/2,j])
+  ddy = fun(a) (a[i,j+1/2] - a[i,j-1/2])
 
   ∂ = (ddx,ddy)
 
-  Σ = for (e) e(0) + e(1)
+  Σ = fun (e) e(0) + e(1)
 
   begin function init() returns (U,V)
     float [] :: U = 0, V = 0
@@ -500,8 +469,8 @@ ddx(a) = fun (a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
     float :: k = 0.05, F = 0.015, Du = 2e-5, Dv = 1e-5
     float :: dt = 1.0, dx = 1.0
 
-    dU_dt = -U * V**2 + F * (1-U) + Du/dx**2 * Σ for(i) (∂ i . ∂ i) U
-    dV_dt =  U * V**2 - (F+k) * V + Dv/dx**2 * Σ for(i) (∂ i . ∂ i) V
+    dU_dt = -U * V**2 + F * (1-U) + Du/dx**2 * Σ fun(i) (∂ i . ∂ i) U
+    dV_dt =  U * V**2 - (F+k) * V + Dv/dx**2 * Σ fun(i) (∂ i . ∂ i) V
 
     U_next = U + dt * dU_dt
     V_next = V + dt * dV_dt
