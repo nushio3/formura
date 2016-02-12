@@ -415,7 +415,7 @@ genGlobalFunction globalBinding inputType outputPattern (Lambda l r) =  bindThem
     t1d <- toNodeType t1
     v1 <- insert (Load name1) t1d
     let (n :. _ ) = v1
-    theGraph . ix n . A.annotation %= A.set Manifest
+    -- theGraph . ix n . A.annotation %= A.set Manifest
     return (name1, v1)
 
   returnValueExpr <- local (M.union $ M.fromList initBinds) $ genRhs $ subFix r
