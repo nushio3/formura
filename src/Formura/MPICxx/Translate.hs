@@ -313,9 +313,11 @@ genGraph isTimeLoop gr = do
               [ T.unwords
                 ["for (", i, "=", showC l ,";", i,  "<", n,"+",showC h, ";++", i, "){"]
               | ((i,n),(l,h)) <- zip (toList ivars) (toList nvars) `zip`
-                                 zip (toList lowerBound++[0..]) (toList upperBound++[0..])]
+                                 zip (toList lowerBound++zeros) (toList upperBound++zeros)]
             closeLoops =
               ["}" | _ <- toList ivars]
+
+            zeros = repeat 0
         rhs <- genExpr inst
         let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
         return $ T.unlines $
