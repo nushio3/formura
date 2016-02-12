@@ -447,7 +447,7 @@ genCxxFiles formuraProg mmProg = do
 
   mapM_ indent [hxxFilePath, cxxFilePath]
   where
-    indent fn = X.handle ignore $ callProcess "indent-ga-nai" ["-gnu", "-i2", "-nut","-br", "-nlp","-ip0","-l80", fn]
+    indent fn = X.handle ignore $ callProcess "indent" ["-gnu", "-i2", "-nut","-br", "-nlp","-ip0","-l80", fn]
 
     ignore :: X.SomeException -> IO ()
     ignore _ = return ()
