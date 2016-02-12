@@ -18,7 +18,7 @@ addons:
     packages:
     - ghc-7.10.3
     - libgmp-dev
-
+    - mpich
 script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
   - ./cmake-for-x86.sh
