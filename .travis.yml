@@ -21,8 +21,7 @@ addons:
 
 script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
-  - stack exec formura examples/diffusion.fmr
-  - stack exec formura examples/pearson.fmr
-  - stack exec formura examples/hydro.fmr
+  - ./cmake-for-x86.sh
+  - make
   - stack test
   - echo "done test"
