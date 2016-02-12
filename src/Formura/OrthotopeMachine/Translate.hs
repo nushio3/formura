@@ -322,6 +322,8 @@ matchToIdents = go
     go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
     go (Ident x) y = return [(x,y)]
 
+matchValueExprToLhs :: LExpr -> ValueExpr -> GenM [(IdentName, ValueExpr)]
+matchValueExprToLhs = matchToLhs
 
 -- | Create a Binding so that names in the LExpr become free variables,
 lexicalScopeHolder :: LExpr -> LexBinding
@@ -372,7 +374,7 @@ withBindings b1 genX = do
     graduallyBind [] = return []
     graduallyBind ((l0,genV): restOfBinds) = do
       v0 <- genV
-      lvs <- matchToLhs l0 v0
+      lvs <- matchValueExprToLhs l0 v0
       nvs <- forM lvs $ \ (name0, v1) -> do
         v <- case M.lookup (name0) typeDict of
           Nothing -> return v1

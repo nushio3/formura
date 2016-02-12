@@ -232,7 +232,7 @@ tellIntermediateVariables = do
       let typ = subFix $ node ^. nodeType
           Just (VariableName vname) = A.viewMaybe node
       decl <- genTypeDecl (T.unpack vname) typ
-      tellC decl
+      tellC $ "static " <> decl
       tellCLn ";"
 
 -- | lookup node by its index

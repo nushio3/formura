@@ -16,6 +16,7 @@ ddz = fun(a) (-a[i,j,k+2] + 8*a[i,j,k+1] - 8*a[i,j,k-1] + a[i,j,k-2])/12
 
 δ = ((1,0,0),(0,1,0),(0,0,1))
 
+vec = fun (e) (e 0, e 1, e 2)
 
 begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
       float [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
@@ -31,11 +32,11 @@ end function
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
       ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
 
-      ddt_v = fun(i) !( -(Σ fun(j) v j * ∂ i (v i))  \
+      ddt_v = vec fun(i) !( -(Σ fun(j) v j * ∂ i (v i))  \
             - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j) \
             + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  ))
 
-      ddt_B =  fun(i) ! (Σ fun(j) (v i * B j - v j * B i))
+      ddt_B = vec fun(i) ! (Σ fun(j) (v i * B j - v j * B i))
 
       ddt_s = ! (Σ fun(j) (v j * ∂ j s))
 end function
@@ -46,16 +47,20 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, 
       float :: dp_ds = 9/7
       float :: dt = 0.01
 
-      v = fun(i) (vx, vy, vz)(i)
-      B = fun(i) (Bx, By, Bz)(i)
+      v = (vx, vy, vz)
+      B = (Bx, By, Bz)
 
-      sys = (dens, v, B, s)
+      sys_0 = (dens, v, B, s)
 
-      sys_q1 = sys + dt/4 * ddt_sys(sys)
+      sys_q4 = sys_0 + dt/4 * ddt_sys(sys_0)
 
-      sys_next = sys + dt/3 * ddt_sys(sys_q1)
+      sys_q3 = sys_0 + dt/3 * ddt_sys(sys_q4)
+
+      sys_q2 = sys_0 + dt/2 * ddt_sys(sys_q3)
+
+      sys_next = sys_0 + dt * ddt_sys(sys_q2)
 
       (dens_next, v_next, B_next, s_next) = sys_next
-      (vx_next, vy_next, vz_next) = (v_next 0, v_next 1, v_next 2)
-      (Bx_next, By_next, Bz_next) = (B_next 0, B_next 1, B_next 2)
+      (vx_next, vy_next, vz_next) = v_next
+      (Bx_next, By_next, Bz_next) = B_next
 end function
