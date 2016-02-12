@@ -90,7 +90,7 @@ rhsDelayedCodeAt cursor omNodeID = do
        c_code <- rhsCodeAt cursor c
        return $ Triop op a_code b_code c_code
      Shift vi a -> rhsCodeAt (cursor + vi) a
-     Load name -> return $ Load name -- TODO cursor has been dropped here!
+     Load name -> return $ LoadCursorStatic cursor name
      LoadIndex i -> return $ LoadIndex i
      LoadExtent i -> return $ LoadExtent i
      Store name a -> do

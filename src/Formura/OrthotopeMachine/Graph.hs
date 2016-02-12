@@ -25,9 +25,11 @@ import           Formura.Vec
 
 -- | The functor for orthotope machine-specific instructions. Note that arithmetic operations are outsourced.
 
+data LoadUncursoredF x = LoadF IdentName
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
 data DataflowInstF x
-  = LoadF IdentName
-  | StoreF IdentName x
+  = StoreF IdentName x
   | LoadIndexF Int
   | LoadExtentF Int
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
@@ -38,6 +40,7 @@ data ShiftF x = ShiftF (Vec Int) x
 
 -- | The functor for language that support cursored load of graph nodes.
 data LoadCursorF x = LoadCursorF (Vec Int) NodeID
+                   | LoadCursorStaticF (Vec Int) IdentName
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 
@@ -54,10 +57,12 @@ pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
   Shift v x = match # ShiftF v x
 pattern LoadCursor v x <- ((^? match) -> Just (LoadCursorF v x)) where
   LoadCursor v x = match # LoadCursorF v x
+pattern LoadCursorStatic v x <- ((^? match) -> Just (LoadCursorStaticF v x)) where
+  LoadCursorStatic v x = match # LoadCursorStaticF v x
 
 
 -- | The instruction type for Orthotope Machine.
-type OMInstF = Sum '[DataflowInstF, ShiftF, OperatorF, ImmF]
+type OMInstF = Sum '[DataflowInstF, LoadUncursoredF, ShiftF, OperatorF, ImmF]
 type OMInst  = Fix OMInstF
 type OMInstruction = OMInstF NodeID
 
