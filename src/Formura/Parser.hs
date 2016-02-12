@@ -70,7 +70,7 @@ keyword k = "keyword " ++ k ?> do
 -- | The set of reserved keywords. The string is not parsed as a identifier if it's in the keyword list.
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
-             ["begin", "end", "function", "returns", "let", "in", "lambda",
+             ["begin", "end", "function", "returns", "let", "in",
               "fun", "dimension", "axes",
               "if", "then", "else",
               "const","extern","manifest",

@@ -258,7 +258,7 @@ genExpr inst = do
                    | d <  0 = i <> showC d
                    | otherwise = i <> "+" <> showC d
   case inst of
-    Load name -> return $ T.pack name <> accAt 0
+    LoadCursorStatic vi name -> return $ T.pack name <> accAt vi
     Imm r -> return $ showC (realToFrac r :: Double)
     Uniop op a -> do
       a_code <- genExpr a

@@ -160,7 +160,7 @@ boundaryAnalysis gr =
     knb :: Int -> MMNode -> Boundary
     knb k nd = listBounds $ nd ^. nodeInst
     listBounds :: MMInst -> Boundary
-    listBounds (Load _)    = Boundary (0,0)
+    listBounds (LoadCursorStatic v _)    = Boundary (v,v)
     listBounds (Store _ x) = listBounds x
     listBounds (LoadIndex _) = mempty
     listBounds (LoadExtent _) = mempty
