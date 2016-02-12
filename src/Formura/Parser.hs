@@ -374,9 +374,11 @@ lExpr = "l-expr" ?> lFexpr
 modTypeExpr :: P ModifiedTypeExpr
 modTypeExpr = do
   tm1 <- many typeModifier
-  t <- typeFexpr
+  t <- optional typeFexpr
   tm2 <- many typeModifier
-  return $ ModifiedTypeExpr (tm1 ++ tm2) t
+  return $ case t of
+   Nothing -> ModifiedTypeExpr (tm1 ++ tm2) TopType
+   Just t -> ModifiedTypeExpr (tm1 ++ tm2) t
 
 typeModifier :: P TypeModifier
 typeModifier = (TMConst <$ keyword "const") <|> (TMExtern <$ keyword "extern") <|> (TMManifest <$ keyword "manifest")
