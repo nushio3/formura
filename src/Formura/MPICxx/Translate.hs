@@ -3,6 +3,7 @@
 module Formura.MPICxx.Translate where
 
 import           Control.Applicative
+import qualified Control.Exception as X
 import           Control.Lens
 import           Control.Monad
 import "mtl"     Control.Monad.RWS
@@ -347,7 +348,8 @@ tellProgram = do
   setNamingState
 
   tellH $ T.unlines
-    [ "#pragma once"
+    [ ""
+    , "#pragma once"
     , "#ifdef __cplusplus"
     , "extern \"C\""
     , "{"
@@ -413,7 +415,8 @@ tellProgram = do
 
 
   tellH $ T.unlines
-    [ "#ifdef __cplusplus"
+    [ ""
+    , "#ifdef __cplusplus"
     , "}"
     , "#endif"
     ]
@@ -444,8 +447,10 @@ genCxxFiles formuraProg mmProg = do
 
   mapM_ indent [hxxFilePath, cxxFilePath]
   where
-    indent fn = callProcess "indent" ["-gnu", "-i2", "-nut","-br", "-nlp","-ip0","-l80", fn]
+    indent fn = X.handle ignore $ callProcess "indent-ga-nai" ["-gnu", "-i2", "-nut","-br", "-nlp","-ip0","-l80", fn]
 
+    ignore :: X.SomeException -> IO ()
+    ignore _ = return ()
 
 cxxFilePath :: WithCommandLineOption => FilePath
 cxxFilePath = case ?commandLineOption ^. outputFilename of
