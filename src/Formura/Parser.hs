@@ -71,8 +71,9 @@ keyword k = "keyword " ++ k ?> do
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
              ["begin", "end", "function", "returns", "let", "in", "lambda",
-              "for", "dimension", "axes",
+              "fun", "dimension", "axes",
               "if", "then", "else",
+              "const","extern","manifest",
               "+","-","*","/",".","**",
               "::","=", ",",
               "<", "<=", "==", "!=", ">=", ">"]
@@ -244,7 +245,7 @@ letExpr = "let expression" ?> parseIn $ do
 
 lambdaExpr :: P RExpr
 lambdaExpr = "lambda expression" ?> parseIn $ do
-  "keyword for" ?> try $ keyword "for"
+  "keyword fun" ?> try $ keyword "fun"
   x <- tupleOf lExpr
   y <- rExpr
   return $ Lambda x y
@@ -310,7 +311,7 @@ functionSyntaxSugar = "function definition" ?> do
 
 typeValueStatements :: P [StatementF RExpr]
 typeValueStatements = "type-decl and/or substitiution statement" ?> do
-  maybeType <- optional $ "statement start by type decl" ?> try $ typeExpr <* keyword "::"
+  maybeType <- optional $ "statement start by type decl" ?> try $ modTypeExpr <* keyword "::"
 
   let lhsAndMaybeRhs :: P (LExpr, Maybe RExpr)
       lhsAndMaybeRhs = do
@@ -368,8 +369,17 @@ lFexpr = "applied l-expr" ?> do
 lExpr :: P LExpr
 lExpr = "l-expr" ?> lFexpr
 
-typeExpr :: P TypeExpr
-typeExpr = typeFexpr
+
+
+modTypeExpr :: P ModifiedTypeExpr
+modTypeExpr = do
+  tm1 <- many typeModifier
+  t <- typeFexpr
+  tm2 <- many typeModifier
+  return $ ModifiedTypeExpr (tm1 ++ tm2) t
+
+typeModifier :: P TypeModifier
+typeModifier = (TMConst <$ keyword "const") <|> (TMExtern <$ keyword "extern") <|> (TMManifest <$ keyword "manifest")
 
 typeAexpr :: P TypeExpr
 typeAexpr = "atomic type-expression" ?> tupleOf typeExpr <|> elemType <|> funType

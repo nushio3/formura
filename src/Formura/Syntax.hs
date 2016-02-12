@@ -37,12 +37,14 @@ instance Show (ElemTypeF x) where
 
 pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
 
-data TypeModifierF x = TypeModifierF IdentName x
-                 deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
-instance (Show x) => Show (TypeModifierF x) where
-  show (TypeModifierF n x) = n ++ " " ++ show x
+data TypeModifier = TMConst | TMManifest | TMExtern
+                 deriving (Eq, Ord)
+instance Show TypeModifier where
+  show TMConst = "const"
+  show TMManifest = "manifest"
+  show TMExtern = "extern"
 
-pattern TypeModifier n x <- ((^? match) -> Just (TypeModifierF n x)) where TypeModifier n x = match # TypeModifierF n x
+
 
 
 data FunTypeF x = FunTypeF
@@ -205,8 +207,12 @@ pattern Binding xs <- ((^? match) -> Just (BindingF xs )) where
 -- | extract all 'TypeDecl's from the binding
 typeDecls :: BindingF x -> [(LExpr, TypeExpr)]
 typeDecls (BindingF stmts0) = concat $ flip map stmts0 $ \x -> case x of
-        TypeDeclF t l -> [(l, t)]
-        _             -> []
+        TypeDeclF (ModifiedTypeExpr _ t) l -> [(l,t)]
+
+-- | extract all 'TypeModifier's from the binding
+typeModifiers :: BindingF x -> [(LExpr, TypeModifier)]
+typeModifiers (BindingF stmts0) = concat $ flip map stmts0 $ \x -> case x of
+  TypeDeclF (ModifiedTypeExpr ms _) l -> [(l,m) | m <- ms]
 
 -- | extract all the 'Subst'itutions from the binding
 substs :: BindingF x -> [(LExpr, x)]
@@ -215,12 +221,13 @@ substs (BindingF stmts0) = concat $ flip map stmts0 $ \x -> case x of
         _             -> []
 
 
+
 -- | Statement
 data StatementF x
   = SubstF LExpr x
   -- ^ substitution
-  | TypeDeclF TypeExpr LExpr
-  -- ^ type declaration
+  | TypeDeclF ModifiedTypeExpr LExpr
+  -- ^ type declaration with modification
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
 pattern Subst l r <- ((^? match) -> Just (SubstF l r)) where
   Subst l r = match # SubstF l r
@@ -250,6 +257,12 @@ instance Field2 NPlusK NPlusK Rational Rational where
 
 type TypeExpr  = Fix TypeExprF
 type TypeExprF = Sum '[ TopTypeF, GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
+data ModifiedTypeExpr = ModifiedTypeExpr [TypeModifier] TypeExpr
+             deriving (Eq, Ord)
+
+instance Show ModifiedTypeExpr where
+  show (ModifiedTypeExpr ms t) = unwords (map show ms) ++ " " ++ show t
+
 
 type LExpr  = Fix LExprF
 type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
