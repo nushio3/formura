@@ -145,9 +145,9 @@ goUniop :: IdentName -> ValueExpr -> GenM ValueExpr
 goUniop op (av :. at) = insert (Uniop op av) at
 goUniop op (f@(FunValue _ _)) =
   return $ FunValue (Ident "x") (Uniop op (Apply (subFix f) (Ident "x")))
-
--- TODO: Implement matching of unary operator with tuple.
-
+goUniop op (Tuple xs) = do
+  vs <- traverse (goUniop op) xs
+  return $ Tuple vs
 goUniop _ _  = raiseErr $ failed $ "unimplemented path in unary operator"
 
 goBinop :: IdentName -> ValueExpr -> ValueExpr -> GenM ValueExpr
@@ -169,9 +169,12 @@ goBinop op (f@(FunValue _ _)) (x@(_ :. _)) =
   return $ FunValue (Ident "x") (Binop op (Apply (subFix f) (Ident "x")) (subFix x))
 goBinop op (x@(_ :. _)) (g@(FunValue _ _)) =
   return $ FunValue (Ident "x") (Binop op (subFix x) (Apply (subFix g) (Ident "x")))
-
--- TODO: Implement matching of binary operator with tuple.
-
+goBinop op (Tuple xs) (Tuple ys) | length xs == length ys = do
+                                     zs <- zipWithM (goBinop op) xs ys
+                                     return $ Tuple zs
+goBinop op (Tuple xs) (Tuple ys) = raiseErr $ failed "tuple length mismatch."
+goBinop op (x@(_ :. _)) (Tuple ys) = Tuple <$> sequence [goBinop op x y | y <- ys]
+goBinop op (Tuple xs) (y@(_ :. _)) = Tuple <$> sequence [goBinop op x y | x <- xs]
 goBinop o a b  = raiseErr $ failed $ "unimplemented path in binary operator: " ++ show (o,a,b)
 
 isBoolishType :: NodeType -> Bool
