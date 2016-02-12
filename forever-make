@@ -3,6 +3,7 @@
 while :
 do
     ./cmake-for-x86.sh
+    stack build
     make # stack build --ghc-options=-ferror-spans
     # nohup ./make-doc.sh > /dev/null  2>&1 &
     inotifywait -e modify -r ./src/ ./exe-src/ ./examples/ formura.cabal

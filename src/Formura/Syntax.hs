@@ -37,6 +37,12 @@ instance Show (ElemTypeF x) where
 
 pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
 
+data TypeModifierF x = TypeModifierF IdentName x
+                 deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
+instance (Show x) => Show (TypeModifierF x) where
+  show (TypeModifierF n x) = n ++ " " ++ show x
+
+pattern TypeModifier n x <- ((^? match) -> Just (TypeModifierF n x)) where TypeModifier n x = match # TypeModifierF n x
 
 
 data FunTypeF x = FunTypeF
