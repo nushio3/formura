@@ -382,7 +382,7 @@ typeModifier :: P TypeModifier
 typeModifier = (TMConst <$ keyword "const") <|> (TMExtern <$ keyword "extern") <|> (TMManifest <$ keyword "manifest")
 
 typeAexpr :: P TypeExpr
-typeAexpr = "atomic type-expression" ?> tupleOf typeExpr <|> elemType <|> funType
+typeAexpr = "atomic type-expression" ?> tupleOf typeFexpr <|> elemType <|> funType
 
 typeFexpr :: P TypeExpr
 typeFexpr = "applied type-expression" ?> do

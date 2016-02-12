@@ -208,11 +208,12 @@ pattern Binding xs <- ((^? match) -> Just (BindingF xs )) where
 typeDecls :: BindingF x -> [(LExpr, TypeExpr)]
 typeDecls (BindingF stmts0) = concat $ flip map stmts0 $ \x -> case x of
         TypeDeclF (ModifiedTypeExpr _ t) l -> [(l,t)]
-
+        _             -> []
 -- | extract all 'TypeModifier's from the binding
 typeModifiers :: BindingF x -> [(LExpr, TypeModifier)]
 typeModifiers (BindingF stmts0) = concat $ flip map stmts0 $ \x -> case x of
   TypeDeclF (ModifiedTypeExpr ms _) l -> [(l,m) | m <- ms]
+  _             -> []
 
 -- | extract all the 'Subst'itutions from the binding
 substs :: BindingF x -> [(LExpr, x)]
