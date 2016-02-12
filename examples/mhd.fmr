@@ -16,7 +16,6 @@ ddz = fun(a) (-a[i,j,k+2] + 8*a[i,j,k+1] - 8*a[i,j,k-1] + a[i,j,k-2])/12
 
 δ = ((1,0,0),(0,1,0),(0,0,1))
 
-vec = fun (e) (e 0, e 1, e 2)
 
 begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
       float [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
@@ -29,14 +28,17 @@ begin function ! (x) returns mx
       manifest :: mx = x
 end function
 
+vec = fun (e) (!(e 0), !(e 1), !(e 2))
+
+
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
       ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
 
-      ddt_v = vec fun(i) !( -(Σ fun(j) v j * ∂ i (v i))  \
+      ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
             - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j) \
-            + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  ))
+            + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )
 
-      ddt_B = vec fun(i) ! (Σ fun(j) (v i * B j - v j * B i))
+      ddt_B = vec fun(i) Σ fun(j) (v i * B j - v j * B i)
 
       ddt_s = ! (Σ fun(j) (v j * ∂ j s))
 end function
