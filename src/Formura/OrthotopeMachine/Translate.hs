@@ -175,7 +175,7 @@ goBinop op (Tuple xs) (Tuple ys) | length xs == length ys = do
 goBinop op (Tuple xs) (Tuple ys) = raiseErr $ failed "tuple length mismatch."
 goBinop op (x@(_ :. _)) (Tuple ys) = Tuple <$> sequence [goBinop op x y | y <- ys]
 goBinop op (Tuple xs) (y@(_ :. _)) = Tuple <$> sequence [goBinop op x y | x <- xs]
-goBinop o a b  = raiseErr $ failed $ "unimplemented path in binary operator: " ++ show (o,a,b)
+goBinop o a b  = raiseErr $ failed $ unlines ["unimplemented path in binary operator: ", "OP:",  show o,"LHS:",show a,"RHS:",show b]
 
 isBoolishType :: NodeType -> Bool
 isBoolishType (ElemType "bool") = True

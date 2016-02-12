@@ -21,32 +21,41 @@ begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
       float [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
 end function
 
+float :: π = 3.141592653589793
+
+
+begin function ! (x) returns mx
+      manifest :: mx = x
+end function
+
+begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
+      ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
+
+      ddt_v = fun(i) !( -(Σ fun(j) v j * ∂ i (v i))  \
+            - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j) \
+            + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  ))
+
+      ddt_B =  fun(i) ! (Σ fun(j) (v i * B j - v j * B i))
+
+      ddt_s = ! (Σ fun(j) (v j * ∂ j s))
+end function
+
 begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
       float :: dens0 = 1.5
       float :: dp_ddens = 5/3
       float :: dp_ds = 9/7
       float :: dt = 0.01
-      float :: π = 3.141592653589793
 
-      v = (vx, vy, vz)
-      B = (Bx, By, Bz)
+      v = fun(i) (vx, vy, vz)(i)
+      B = fun(i) (Bx, By, Bz)(i)
 
-      ddt_dens = Σ fun(i) ∂ i (dens0 * v i)
+      sys = (dens, v, B, s)
 
-      ddt_v = fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
-            - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j) \
-            + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )
+      sys_q1 = sys + dt/4 * ddt_sys(sys)
 
-      ddt_B =  fun(i) Σ fun(j) (v i * B j - v j * B i)
+      sys_next = sys + dt/3 * ddt_sys(sys_q1)
 
-      ddt_s = Σ fun(j) (v j * ∂ j s)
-
-
-      dens_next = dens + dt * ddt_dens
-      v_next = fun(i) v i + dt * ddt_v i
-      B_next = fun(i) B i + dt * ddt_B i
-      s_next = s + dt * ddt_s
-
+      (dens_next, v_next, B_next, s_next) = sys_next
       (vx_next, vy_next, vz_next) = (v_next 0, v_next 1, v_next 2)
       (Bx_next, By_next, Bz_next) = (B_next 0, B_next 1, B_next 2)
 end function
