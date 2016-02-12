@@ -80,7 +80,7 @@ data TranState = TranState
   , _tsNamingState :: NamingState
   , _theProgram :: Program
   , _theMMProgram :: MMProgram
-  , _theGraph :: Graph MMInst
+  , _theGraph :: Graph MMInstruction
   }
 makeClassy ''TranState
 
@@ -89,7 +89,7 @@ instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
 instance HasNumericalConfig TranState where
   numericalConfig = tsNumericalConfig
-instance HasMachineProgram TranState MMInst where
+instance HasMachineProgram TranState MMInstruction where
   machineProgram = theMMProgram
 instance HasNamingState TranState where
   namingState = tsNamingState
@@ -180,7 +180,7 @@ setNamingState = do
   luns <- traverse (genFreeName . ("N"++) . map toUpper) (Vec ans)
   loopExtentNames .= luns
 
-  let nameNode :: Node MMInst -> TranM (Node MMInst)
+  let nameNode :: Node MMInstruction -> TranM (Node MMInstruction)
       nameNode nd = do
         let initName = case A.viewMaybe nd  of
                         Just (SourceName n) -> n
@@ -249,7 +249,7 @@ lookupNode i = do
 
 -- | generate expression.
 
-genExpr :: MMInst -> TranM T.Text
+genExpr :: MMInstruction -> TranM T.Text
 genExpr inst = do
   indNames <- use loopIndexNames
   let accAt :: Vec Int -> T.Text
@@ -281,7 +281,7 @@ genExpr inst = do
 
 -- | generate a formura function body.
 
-genGraph :: Bool -> Graph MMInst -> TranM T.Text
+genGraph :: Bool -> Graph MMInstruction -> TranM T.Text
 genGraph isTimeLoop gr = do
   theGraph .= gr
   ivars <- use loopIndexNames

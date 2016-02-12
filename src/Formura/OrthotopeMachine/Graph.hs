@@ -63,12 +63,11 @@ pattern LoadCursorStatic v x <- ((^? match) -> Just (LoadCursorStaticF v x)) whe
 
 -- | The instruction type for Orthotope Machine.
 type OMInstF = Sum '[DataflowInstF, LoadUncursoredF, ShiftF, OperatorF, ImmF]
-type OMInst  = Fix OMInstF
 type OMInstruction = OMInstF NodeID
 
 -- | The instruction type for Manifest Machine, where every node is manifest
 type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
-type MMInst  = Fix MMInstF
+type MMInstruction = G.IntMap (MMInstF NodeID)
 
 
 type NodeType  = Fix NodeTypeF
@@ -104,7 +103,7 @@ instance Show a => Show (Node a) where
   show (Node i t _) = show i ++ " :: " ++ show t
 
 type OMNode = Node OMInstruction
-type MMNode = Node MMInst
+type MMNode = Node MMInstruction
 
 makeLenses ''Node
 instance A.Annotated (Node a) where
@@ -150,7 +149,7 @@ data MachineProgram instType = MachineProgram
 makeClassy ''MachineProgram
 
 type OMProgram = MachineProgram OMInstruction
-type MMProgram = MachineProgram MMInst
+type MMProgram = MachineProgram MMInstruction
 
 instance HasGlobalEnvironment (MachineProgram a) where
   globalEnvironment = omGlobalEnvironment

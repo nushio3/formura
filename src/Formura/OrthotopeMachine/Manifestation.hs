@@ -19,6 +19,7 @@ import           Control.Monad.IO.Class
 import qualified Data.IntMap as G
 import           Data.Maybe
 import           Data.Monoid
+import qualified Data.Set as S
 import           Text.Trifecta (failed, raiseErr)
 
 
@@ -33,8 +34,7 @@ import           Formura.Vec
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _nodeOtoM :: Int -> Maybe Int
-  , _nodeMtoO :: Int -> Int
+  , _isManifestNode :: NodeID -> Bool
   , _theGraph :: Graph OMInstruction
   }
 makeClassy ''TranState
@@ -63,16 +63,16 @@ lookupNode i = do
         Nothing -> return ()
      return n
 
-rhsCodeAt :: Vec Int -> NodeID -> TranM MMInst
+rhsCodeAt :: Vec Int -> NodeID -> TranM MMInstruction
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
-  o2m <- use nodeOtoM
-  case o2m nid of
-     Just nM -> return $ LoadCursor cursor nM
-     _  -> rhsDelayedCodeAt cursor nid
+  isM <- use isManifestNode
+  case isM nid of
+     True  -> return $ G.singleton nid (LoadCursor cursor nid)
+     False -> rhsDelayedCodeAt cursor nid
 
 
-rhsDelayedCodeAt :: Vec Int -> NodeID -> TranM MMInst
+rhsDelayedCodeAt :: Vec Int -> NodeID -> TranM MMInstruction
 rhsDelayedCodeAt cursor omNodeID = do
   (Node inst0 _ _) <- lookupNode omNodeID
   case inst0 of
@@ -99,11 +99,11 @@ rhsDelayedCodeAt cursor omNodeID = do
      x -> raiseErr $ failed $ "manifestation path unimplemented for keyword: " ++ show x
 
 
-genMMInst :: NodeID -> TranM MMInst
-genMMInst omNodeID = rhsDelayedCodeAt 0 omNodeID
+genMMInstruction :: NodeID -> TranM MMInstruction
+genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID
 
 
-manifestG :: Graph OMInstruction -> TranM (Graph MMInst)
+manifestG :: Graph OMInstruction -> TranM (Graph MMInstruction)
 manifestG omg = do
   theGraph .= omg
   let keys = G.keys omg
@@ -115,24 +115,20 @@ manifestG omg = do
   liftIO $ do
     putStrLn $ "manifest node ID: " ++ show  manifestKeys
 
-  let nodeOtoM_0 :: Int -> Maybe Int
-      nodeOtoM_0 n = G.lookup n nodeMap
-      nodeMtoO_0 :: Int -> Int
-      nodeMtoO_0 n = manifestKeys !! n
+  let isM_0 :: Int -> Bool
+      isM_0 n = S.member n manifestSet
+      manifestSet :: S.Set Int
+      manifestSet = S.fromList manifestKeys
 
-      nodeMap :: G.IntMap Int
-      nodeMap = G.fromList $ zip manifestKeys [0..]
-
-  nodeOtoM .= nodeOtoM_0
-  nodeMtoO .= nodeMtoO_0
+  isManifestNode .= isM_0
 
   nodeList <- fmap catMaybes $ forM manifestKeys $ \nO -> do
-    case nodeOtoM_0 nO of
-      Nothing -> return Nothing
-      Just nM -> do
-        ndInst <- genMMInst nO
+    case isM_0 nO of
+      False -> return Nothing
+      True -> do
+        ndInst <- genMMInstruction nO
         omNode <- lookupNode nO
-        return $ Just (nM, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
+        return $ Just (nO, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
 
   return $ boundaryAnalysis $ G.fromList nodeList
 
@@ -147,7 +143,7 @@ manifestation omprog = do
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
 
-boundaryAnalysis :: Graph MMInst -> Graph MMInst
+boundaryAnalysis :: Graph MMInstruction -> Graph MMInstruction
 boundaryAnalysis gr =
   flip G.mapWithKey gr $
   \ k nd -> case G.lookup k bgr of
@@ -159,7 +155,7 @@ boundaryAnalysis gr =
 
     knb :: Int -> MMNode -> Boundary
     knb k nd = listBounds $ nd ^. nodeInst
-    listBounds :: MMInst -> Boundary
+    listBounds :: MMInstruction -> Boundary
     listBounds (LoadCursorStatic v _)    = Boundary (v,v)
     listBounds (Store _ x) = listBounds x
     listBounds (LoadIndex _) = mempty
