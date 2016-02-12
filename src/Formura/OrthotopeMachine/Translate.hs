@@ -157,6 +157,8 @@ goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
     (av2 :. _) <- castVal (subFix ct) ax
     (bv2 :. _) <- castVal (subFix ct) bx
     insert (Binop op av2 bv2) (typeModifier ct)
+goBinop op (f@(FunValue _ _)) (g@(FunValue _ _)) =
+  return $ FunValue (Ident "x") (Binop op (Apply (subFix f) (Ident "x")) (Apply (subFix g) (Ident "x")))
 
 goBinop o a b  = raiseErr $ failed $ "unimplemented path in binary operator: " ++ show (o,a,b)
 
