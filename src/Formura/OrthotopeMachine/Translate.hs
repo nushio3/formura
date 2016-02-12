@@ -231,6 +231,7 @@ goApply (Tuple xs) (Imm r) = do
       l = length xs
   when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
   return $ xs!!n
+
 goApply x@(Tuple xs) arg0 = do
   i <- evalToImm arg0
   case i of
@@ -238,6 +239,7 @@ goApply x@(Tuple xs) arg0 = do
     _ -> do
       g <- use theGraph
       raiseErr $ failed $ "tuple applied to non-constant integer: " ++ show arg0 ++ show g
+
 goApply (FunValue l r) x = do
   lrs <- matchToLhs l x
   let x2 :: Binding
