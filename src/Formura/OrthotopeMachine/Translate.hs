@@ -337,8 +337,15 @@ withBindings b1 genX = do
 
   let evalTypeDecl :: (LExpr, TypeExpr) -> GenM [(IdentName, TypeExpr)]
       evalTypeDecl (l, t) = matchToLhs l t
+  let evalTypeModDecl :: (LExpr, TypeModifier) -> [(IdentName, TypeModifier)]
+      evalTypeModDecl (l, tm) = [(n, tm) | Ident n <- tupleContents $ namesOfLhs l]
+
   (typeDict :: M.Map IdentName TypeExpr)
     <- (M.fromList . concat) <$> mapM evalTypeDecl typeDecls0
+  let typeModDict :: M.Map IdentName [TypeModifier]
+      typeModDict = M.unionsWith (++) $
+                    map (\(ident, tm) -> M.singleton ident [tm]) $
+                    (typeModifiers b1) >>= evalTypeModDecl
 
   let
     -- make bindings enter scope one by one, not simultaneously
@@ -356,7 +363,11 @@ withBindings b1 genX = do
         case v of
            (n :. _) -> do
              theGraph . ix n . A.annotation %= A.set (SourceName $ name0)
-             theGraph . ix n . A.annotation %= A.set Manifest
+             let isManifest = do
+                   ms <- M.lookup name0 typeModDict
+                   return $ TMManifest `elem` ms
+             when (isManifest == Just True) $
+               theGraph . ix n . A.annotation %= A.set Manifest
            _        -> return ()
         return (name0, v)
 
