@@ -4,6 +4,7 @@ sudo: false
 before_install:
   # stack
   - mkdir -p ~/.local/bin
+  - ln -s  $HOME/.local/bin bin
   - mkdir -p ~/.local/lib
   - export PATH=~/.local/bin:$PATH
   - export LD_LIBRARY_PATH=~/.local/lib:$LD_LIBRARY_PATH
@@ -22,6 +23,7 @@ addons:
     - libopenmpi-dev
 script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
+  - stack install .
   - ./cmake-for-x86.sh
   - make
   - stack test
