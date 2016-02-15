@@ -6,9 +6,17 @@ temporal_blocking_interval :: 4
 monitor_interval :: 20
 
 
-ddx = fun(a) (-a[i+2,j,k] + 8*a[i+1,j,k] - 8*a[i-1,j,k] + a[i-2,j,k])/12
-ddy = fun(a) (-a[i,j+2,k] + 8*a[i,j+1,k] - 8*a[i,j-1,k] + a[i,j-2,k])/12
-ddz = fun(a) (-a[i,j,k+2] + 8*a[i,j,k+1] - 8*a[i,j,k-1] + a[i,j,k-2])/12
+float :: π = 3.141592653589793
+float :: dens0 = 1.5
+float :: dp_ddens = 5/3
+float :: dp_ds = 9/7
+float :: dt = 0.01
+float :: dx = 0.1, dy = 0.1, dz = 0.1
+
+
+ddx = fun(a) (-a[i+2,j,k] + 8*a[i+1,j,k] - 8*a[i-1,j,k] + a[i-2,j,k])/(12*dx)
+ddy = fun(a) (-a[i,j+2,k] + 8*a[i,j+1,k] - 8*a[i,j-1,k] + a[i,j-2,k])/(12*dy)
+ddz = fun(a) (-a[i,j,k+2] + 8*a[i,j,k+1] - 8*a[i,j,k-1] + a[i,j,k-2])/(12*dz)
 
 ∂ = (ddx,ddy,ddz)
 
@@ -21,7 +29,7 @@ begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
       float [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
 end function
 
-float :: π = 3.141592653589793
+
 
 
 begin function ! (x) returns mx
@@ -30,6 +38,26 @@ end function
 
 vec = fun (e) (!(e 0), !(e 1), !(e 2))
 
+
+begin function interpolate_wall(u) returns (u_next)
+      up[i,j,k] = u[i+1,j,k]
+      um[i,j,k] = u[i-1,j,k]
+      delta_u[i,j,k] = (up-um)/2 <% 2*(up-u0) <% 2(u0-um)
+      u_l[i+1/2, j, k] = u0[i,j,k] + 0.5 * delta_u[i,j,k]
+      u_r[i-1/2, j, k] = u0[i,j,k] - 0.5 * delta_u[i,j,k]
+
+      uu_num[i+1/2,j,k] = u_r[i+1/2,j,k]-u_l[i+1/2,j,k]
+      uu_den[i+1/2,j,k] = u[i+1,j,k]-u[i,j,k]
+
+      Phi = if uu_num * uu_den <= 0 then 0 else 0 >? 1 + 2 *(uu_num / uu_den - 1)
+
+      f = -0.5*Phi*uu_num
+
+      u_next[i,j,k] = u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k]
+
+end function
+
+begin function diffusion_flux()
 
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
       ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
@@ -44,10 +72,6 @@ begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
 end function
 
 begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
-      float :: dens0 = 1.5
-      float :: dp_ddens = 5/3
-      float :: dp_ds = 9/7
-      float :: dt = 0.01
 
       v = (vx, vy, vz)
       B = (Bx, By, Bz)
