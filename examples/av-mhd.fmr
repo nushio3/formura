@@ -1,6 +1,6 @@
 dimension :: 3
 axes :: x, y, z
-intra_node_shape :: 256,256,256
+intra_node_shape :: 256,1,1
 mpi_grid_shape :: 1,1,1
 temporal_blocking_interval :: 4
 monitor_interval :: 20
@@ -36,34 +36,34 @@ vec = fun (e) (!(e 0), !(e 1), !(e 2))
 
 
 begin function apply_av(u) returns (u_next)
-      up[i,j,k] = u[i+1,j,k]
-      um[i,j,k] = u[i-1,j,k]
-      delta_u[i,j,k] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
-      u_l[i+1/2, j, k] = u[i,j,k] + 0.5 * delta_u[i,j,k]
-      u_r[i-1/2, j, k] = u[i,j,k] - 0.5 * delta_u[i,j,k]
+  up[i,j,k] = u[i+1,j,k]
+  um[i,j,k] = u[i-1,j,k]
+  delta_u[i,j,k] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+  u_l[i+1/2, j, k] = u[i,j,k] + 0.5 * delta_u[i,j,k]
+  u_r[i-1/2, j, k] = u[i,j,k] - 0.5 * delta_u[i,j,k]
 
-      uu_num[i+1/2,j,k] = u_r[i+1/2,j,k]-u_l[i+1/2,j,k]
-      uu_den[i+1/2,j,k] = u[i+1,j,k]-u[i,j,k]
+  uu_num[i+1/2,j,k] = u_r[i+1/2,j,k]-u_l[i+1/2,j,k]
+  uu_den[i+1/2,j,k] = u[i+1,j,k]-u[i,j,k]
 
-      Phi = if uu_num * uu_den <= 0 then 0 else 0 >? 1 + 2 *(uu_num / uu_den - 1)
+  Phi = if uu_num * uu_den <= 0 then 0 else 0 >? 1 + 2 *(uu_num / uu_den - 1)
 
-      f = -0.5*Phi*uu_num
+  f = -0.5*Phi*uu_num
 
-      manifest :: u_next
-      u_next[i,j,k] = u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k]
+  manifest :: u_next
+  u_next[i,j,k] = u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k]
 end function
 
 
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
-      ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
+  ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
 
-      ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
-            - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j) \
-            + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )
+  ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
+        - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens0 \
+        + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens0
 
-      ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
+  ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
 
-      ddt_s = ! (Σ fun(j) (v j * ∂ j s))
+  ddt_s = ! (Σ fun(j) (v j * ∂ j s))
 end function
 
 begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
