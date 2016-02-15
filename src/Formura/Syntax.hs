@@ -251,6 +251,7 @@ data NPlusK = NPlusK IdentName Rational
              deriving (Eq, Ord, Show)
 instance Num NPlusK where
   fromInteger n = NPlusK "" $ fromInteger n
+  negate (NPlusK ident n) = NPlusK ident (negate n)
   (+)    = error "instance Num NPlusK is only partially defined"
   (*)    = error "instance Num NPlusK is only partially defined"
   (-)    = error "instance Num NPlusK is only partially defined"

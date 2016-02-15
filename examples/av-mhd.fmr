@@ -39,12 +39,12 @@ end function
 vec = fun (e) (!(e 0), !(e 1), !(e 2))
 
 
-begin function interpolate_wall(u) returns (u_next)
+begin function apply_av(u) returns (u_next)
       up[i,j,k] = u[i+1,j,k]
       um[i,j,k] = u[i-1,j,k]
-      delta_u[i,j,k] = (up-um)/2 <% 2*(up-u0) <% 2(u0-um)
-      u_l[i+1/2, j, k] = u0[i,j,k] + 0.5 * delta_u[i,j,k]
-      u_r[i-1/2, j, k] = u0[i,j,k] - 0.5 * delta_u[i,j,k]
+      delta_u[i,j,k] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+      u_l[i+1/2, j, k] = u[i,j,k] + 0.5 * delta_u[i,j,k]
+      u_r[i-1/2, j, k] = u[i,j,k] - 0.5 * delta_u[i,j,k]
 
       uu_num[i+1/2,j,k] = u_r[i+1/2,j,k]-u_l[i+1/2,j,k]
       uu_den[i+1/2,j,k] = u[i+1,j,k]-u[i,j,k]
@@ -53,7 +53,7 @@ begin function interpolate_wall(u) returns (u_next)
 
       f = -0.5*Phi*uu_num
 
-      u_next[i,j,k] = u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k]
+      u_next[i,j,k] = ! (u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k])
 end function
 
 
@@ -84,7 +84,9 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, 
 
       sys_next = sys_0 + dt * ddt_sys(sys_q2)
 
-      (dens_next, v_next, B_next, s_next) = sys_next
+      sys_av = apply_av(sys_next)
+
+      (dens_next, v_next, B_next, s_next) = sys_av
       (vx_next, vy_next, vz_next) = v_next
       (Bx_next, By_next, Bz_next) = B_next
 end function

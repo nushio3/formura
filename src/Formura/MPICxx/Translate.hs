@@ -306,7 +306,16 @@ genMMInstruction mminst = do
         b_code <- query b
         case op of
           "**" -> thisEq $ ("pow"<>) $ parens $ a_code <> "," <> b_code
+          ">?" -> thisEq $ ("max"<>) $ parens $ a_code <> "," <> b_code
+          "<?" -> thisEq $ ("min"<>) $ parens $ a_code <> "," <> b_code
+          "<%" -> thisEq $ ("minmod"<>) $ parens $ a_code <> "," <> b_code
           _ -> thisEq $ parens $ a_code <> T.pack op <> b_code
+      Triop "ite" a b c -> do
+        a_code <- query a
+        b_code <- query b
+        c_code <- query c
+        thisEq $ parens $ a_code <> "?" <> b_code <> ":" <> c_code
+
       LoadCursor vi nid -> do
         node <- lookupNode nid
         let Just (VariableName nam) = A.viewMaybe node

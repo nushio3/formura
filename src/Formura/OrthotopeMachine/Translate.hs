@@ -191,7 +191,13 @@ goTriop op (av :. at) (bv :. bt) (cv :. ct)
         TopType -> raiseErr $ failed $ unwords $
                    ["Type mismatch in if-then-else expr:", show at, show bt, show ct]
         _ -> insert (Triop op av bv cv) bct
-goTriop _ _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator"
+
+-- TODO: more generalized triop
+goTriop op (Tuple xs) (Tuple ys) (Tuple zs) = Tuple <$> sequence
+  [goTriop op x y z | (x,y,z)<-zip3 xs ys zs]
+goTriop op (Tuple xs) (bv:.bt) (Tuple zs) = Tuple <$> sequence
+  [goTriop op x y z | (x,y,z)<-zip3 xs (repeat $ bv :. bt) zs]
+goTriop op _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator" ++ show op
 
 instance Generatable IdentF where
   gen (Ident n) = do
@@ -209,20 +215,25 @@ instance Generatable TupleF where
 
 instance Generatable GridF where
   gen (Grid npks gen0) = do
-    vt0@(val0 :. typ0) <- gen0
-    case typ0 of
-      ElemType _   -> return vt0
-      GridType offs0 etyp0 -> do
-        let
-            patK   = fmap (^. _2) (npks :: Vec NPlusK)
-            newPos = offs0 - patK
-            intOff = fmap floor newPos
-            newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
-            typ1 = GridType newOff etyp0
-        if intOff == 0
-                then return (val0 :. typ1)
-                else insert (Shift (negate intOff) val0) typ1
+    vex <- gen0
+    case vex of
+      vt0@(val0 :. typ0) -> case typ0 of
+        ElemType _   -> return vt0
+        GridType offs0 etyp0 -> do
+          let
+              patK   = fmap (^. _2) (npks :: Vec NPlusK)
+              newPos = offs0 - patK
+              intOff = fmap floor newPos
+              newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
+              typ1 = GridType newOff etyp0
+          if intOff == 0
+                  then return (val0 :. typ1)
+                  else insert (Shift (negate intOff) val0) typ1
+      Tuple vs -> do
+        xs <- sequence [gen $ GridF npks (return v :: GenM ValueExpr) | v <- vs]
+        return $ Tuple xs
 
+      _ -> raiseErr $ failed $ "unexpected pattern in gen of grid" ++ show vex
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
 instance Generatable ApplyF where
@@ -321,8 +332,16 @@ matchToIdents = go
     go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
     go (Ident x) y = return [(x,y)]
 
+
 matchValueExprToLhs :: LExpr -> ValueExpr -> GenM [(IdentName, ValueExpr)]
-matchValueExprToLhs = matchToLhs
+-- TODO: LHS grid pattern must be taken care of.
+matchValueExprToLhs (Grid npk lx) vx = do
+  ivx <- matchToLhs lx vx
+  forM ivx $ \(i,v) -> do
+    v2 <- gen (GridF (negate npk) (return v))
+    return (i,v2)
+
+matchValueExprToLhs lx vx = matchToLhs lx vx
 
 -- | Create a Binding so that names in the LExpr become free variables,
 lexicalScopeHolder :: LExpr -> LexBinding
@@ -378,7 +397,6 @@ withBindings b1 genX = do
         v <- case M.lookup (name0) typeDict of
           Nothing -> return v1
           Just t  -> castVal t v1
-        -- TODO: LHS grid pattern must be taken care of.
 
         case v of
            (n :. _) -> do
