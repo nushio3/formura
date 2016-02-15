@@ -35,7 +35,7 @@ import           Formura.Vec
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
   , _isManifestNode :: OMNodeID -> Bool
-  , _theGraph :: Graph OMInstruction
+  , _theGraph :: OMGraph
   , _theMMInstruction :: MMInstruction
   , _nodeIDMap :: M.Map (Vec Int, OMNodeID) MMNodeID
   }
@@ -126,7 +126,7 @@ genMMInstruction :: OMNodeID -> TranM ()
 genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID >> return ()
 
 
-manifestG :: Graph OMInstruction -> TranM (Graph MMInstruction)
+manifestG :: OMGraph -> TranM MMGraph
 manifestG omg = do
   theGraph .= omg
   let keys = M.keys omg
@@ -171,7 +171,7 @@ manifestation omprog = do
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
 
-boundaryAnalysis :: Graph MMInstruction -> Graph MMInstruction
+boundaryAnalysis :: MMGraph -> MMGraph
 boundaryAnalysis gr =
   flip M.mapWithKey gr $
   \ k nd -> case M.lookup k bgr of

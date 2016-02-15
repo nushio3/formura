@@ -37,7 +37,7 @@ instance HasBinding Binding where
 data CodegenState = CodegenState
   { _codegenSyntacticState :: CompilerSyntacticState
   , _codegenGlobalEnvironment :: GlobalEnvironment
-  , _theGraph :: Graph OMInstruction
+  , _theGraph :: OMGraph
   }
 makeClassy ''CodegenState
 
@@ -97,7 +97,7 @@ freeNodeID = do
   g <- use theGraph
   return $ fromIntegral $ M.size g
 
-insert :: OMInstruction -> NodeType -> GenM ValueExpr
+insert :: OMInstruction -> OMNodeType -> GenM ValueExpr
 insert inst typ = do
   n0 <- freeNodeID
   foc <- use compilerFocus
@@ -176,7 +176,7 @@ goBinop op (x@(_ :. _)) (Tuple ys) = Tuple <$> sequence [goBinop op x y | y <- y
 goBinop op (Tuple xs) (y@(_ :. _)) = Tuple <$> sequence [goBinop op x y | x <- xs]
 goBinop o a b  = raiseErr $ failed $ unlines ["unimplemented path in binary operator: ", "OP:",  show o,"LHS:",show a,"RHS:",show b]
 
-isBoolishType :: NodeType -> Bool
+isBoolishType :: OMNodeType -> Bool
 isBoolishType (ElemType "bool") = True
 isBoolishType (GridType _ x) = isBoolishType x
 isBoolishType _ = False
@@ -417,7 +417,7 @@ instance (Generatable f, Generatable (Sum fs)) => Generatable (Sum (f ': fs)) wh
 genRhs :: RXExpr -> GenM ValueExpr
 genRhs r = compilerFoldout gen r
 
-toNodeType :: TypeExpr -> GenM NodeType
+toNodeType :: TypeExpr -> GenM OMNodeType
 toNodeType (ElemType x) = return $ ElemType x
 toNodeType (GridType v x) = do
   x2 <- toNodeType x

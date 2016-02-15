@@ -86,21 +86,21 @@ mmInstTail :: MMInstruction -> MMInstF MMNodeID
 mmInstTail = snd . M.findMax
 
 
-type NodeType  = Fix NodeTypeF
-type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
+type OMNodeType  = Fix OMNodeTypeF
+type OMNodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
 
 
-instance MeetSemiLattice NodeType where
-  (/\) = semiLatticeOfNodeType
+instance MeetSemiLattice OMNodeType where
+  (/\) = semiLatticeOfOMNodeType
 
-semiLatticeOfNodeType :: NodeType -> NodeType -> NodeType
-semiLatticeOfNodeType a b = case go a b of
+semiLatticeOfOMNodeType :: OMNodeType -> OMNodeType -> OMNodeType
+semiLatticeOfOMNodeType a b = case go a b of
   TopType -> case go b a of
     TopType -> TopType
     c -> c
   c       -> c
   where
-    go :: NodeType -> NodeType -> NodeType
+    go :: OMNodeType -> OMNodeType -> OMNodeType
     go a b | a == b = a
     go (ElemType ea) (ElemType eb) = subFix (ElemType ea /\ ElemType eb :: ElementalType)
     go a@(ElemType _) b@(GridType v c) = let d = a /\ c in
@@ -108,25 +108,27 @@ semiLatticeOfNodeType a b = case go a b of
     go (GridType v1 c1) (GridType v2 c2) = (if v1 == v2 then GridType v1 (c1 /\ c2) else TopType)
     go _ _          = TopType
 
-mapElemType :: (IdentName -> IdentName) -> NodeType -> NodeType
+mapElemType :: (IdentName -> IdentName) -> OMNodeType -> OMNodeType
 mapElemType f (ElemType t) = ElemType $ f t
 mapElemType f (GridType v t) = GridType v $ mapElemType f t
 mapElemType _ TopType = TopType
 
-data Node instType = Node {_nodeInst :: instType, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
-instance Show a => Show (Node a) where
-  show (Node i t _) = show i ++ " :: " ++ show t
+data Node instType typeType = Node {_nodeInst :: instType, _nodeType :: typeType, _nodeAnnot :: A.Annotation}
+instance (Show v, Show t) => Show (Node v t) where
+  show (Node v t _) = show v ++ " :: " ++ show t
 
-type OMNode = Node OMInstruction
-type MMNode = Node MMInstruction
+type OMNode = Node OMInstruction OMNodeType
+type MMNode = Node MMInstruction OMNodeType
 
 makeLenses ''Node
-instance A.Annotated (Node a) where
+instance A.Annotated (Node v t) where
   annotation = nodeAnnot
 
-type Graph instType = M.Map OMNodeID (Node instType)
+type Graph instType typeType = M.Map OMNodeID (Node instType typeType)
+type OMGraph = Graph OMInstruction OMNodeType
+type MMGraph = Graph MMInstruction OMNodeType
 
-data NodeValueF x = NodeValueF OMNodeID NodeType
+data NodeValueF x = NodeValueF OMNodeID OMNodeType
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n t = match # NodeValueF n t
@@ -154,17 +156,18 @@ instance Typed ValueExpr where
   typeExprOf (FunValue _ _) = FunType
   typeExprOf (Tuple xs) = Tuple $ map typeExprOf xs
 
-data MachineProgram instType = MachineProgram
+data MachineProgram instType typeType = MachineProgram
   { _omGlobalEnvironment :: GlobalEnvironment
-  , _omInitGraph :: Graph instType
-  , _omStepGraph :: Graph instType
+  , _omInitGraph :: Graph instType typeType
+  , _omStepGraph :: Graph instType typeType
   , _omStateSignature :: M.Map IdentName TypeExpr
   }
 
 makeClassy ''MachineProgram
 
-type OMProgram = MachineProgram OMInstruction
-type MMProgram = MachineProgram MMInstruction
 
-instance HasGlobalEnvironment (MachineProgram a) where
+type OMProgram = MachineProgram OMInstruction OMNodeType
+type MMProgram = MachineProgram MMInstruction OMNodeType
+
+instance HasGlobalEnvironment (MachineProgram v t) where
   globalEnvironment = omGlobalEnvironment
