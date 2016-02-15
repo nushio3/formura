@@ -67,7 +67,7 @@ keyword k = "keyword " ++ k ?> do
     "Please report the compiler developer: \"" ++ k ++ "\" is not in a keyword list!"
 
   let moreLikeThis = head $ filter ($ (last k)) [isIdentifierAlphabet1, isIdentifierSymbol]
-  token $ string k <* notFollowedBy (satisfy moreLikeThis)
+  token $ try $ string k <* notFollowedBy (satisfy moreLikeThis)
 
 -- | The set of reserved keywords. The string is not parsed as a identifier if it's in the keyword list.
 keywordSet :: S.Set IdentName
