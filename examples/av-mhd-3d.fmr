@@ -1,0 +1,89 @@
+dimension :: 3
+axes :: x, y, z
+intra_node_shape :: 256,1,1
+mpi_grid_shape :: 1,1,1
+temporal_blocking_interval :: 4
+monitor_interval :: 20
+
+
+float :: π = 3.141592653589793
+float :: dens0 = 1.0
+float :: dp_ddens = 5/3
+float :: dp_ds = 9/7
+float :: dt = 0.01
+float :: dx = 0.1, dy = 0.1, dz = 0.1
+
+
+ddx = fun(a) (-a[i+2,j,k] + 8*a[i+1,j,k] - 8*a[i-1,j,k] + a[i-2,j,k])/(12*dx)
+ddy = fun(a) (-a[i,j+2,k] + 8*a[i,j+1,k] - 8*a[i,j-1,k] + a[i,j-2,k])/(12*dy)
+ddz = fun(a) (-a[i,j,k+2] + 8*a[i,j,k+1] - 8*a[i,j,k-1] + a[i,j,k-2])/(12*dz)
+
+∂ = (ddx,ddy,ddz)
+
+Σ = fun (e) e(0) + e(1) + e(2)
+
+
+begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
+      float [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
+end function
+
+
+begin function ! (x) returns mx
+      manifest :: mx = x
+end function
+
+vec = fun (e) (!(e 0), !(e 1), !(e 2))
+
+
+begin function apply_av(u) returns (u_next)
+  up[i,j,k] = u[i+1,j,k]
+  um[i,j,k] = u[i-1,j,k]
+  delta_u[i,j,k] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+  u_l[i+1/2, j, k] = u[i,j,k] + 0.5 * delta_u[i,j,k]
+  u_r[i-1/2, j, k] = u[i,j,k] - 0.5 * delta_u[i,j,k]
+
+  uu_num[i+1/2,j,k] = u_r[i+1/2,j,k]-u_l[i+1/2,j,k]
+  uu_den[i+1/2,j,k] = u[i+1,j,k]-u[i,j,k]
+
+  Phi = if uu_num * uu_den <= 0 then 0 else 0 >? 1 + 2 *(uu_num / uu_den - 1)
+
+  f = -0.5*Phi*uu_num
+
+  manifest :: u_next
+  u_next[i,j,k] = u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k]
+end function
+
+
+begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
+  ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
+
+  ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
+        - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens0 \
+        + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens0
+
+  ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
+
+  ddt_s = ! (Σ fun(j) (v j * ∂ j s))
+end function
+
+begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
+
+      v = (vx, vy, vz)
+      B = (Bx, By, Bz)
+
+      sys_0 = (dens, v, B, s)
+
+      sys_q4 = sys_0 + dt/4 * ddt_sys(sys_0)
+
+      sys_q3 = sys_0 + dt/3 * ddt_sys(sys_q4)
+
+      sys_q2 = sys_0 + dt/2 * ddt_sys(sys_q3)
+
+      sys_next = sys_0 + dt * ddt_sys(sys_q2)
+
+      sys_av = apply_av(sys_next)
+
+      (dens_next, v_next, B_next, s_next) = sys_av
+      (vx_next, vy_next, vz_next) = v_next
+      (Bx_next, By_next, Bz_next) = B_next
+end function
