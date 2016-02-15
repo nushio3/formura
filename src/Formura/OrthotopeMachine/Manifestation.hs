@@ -72,30 +72,35 @@ rhsCodeAt cursor nid = do
      False -> rhsDelayedCodeAt cursor nid
 
 
+
+
 rhsDelayedCodeAt :: Vec Int -> NodeID -> TranM MMInstruction
 rhsDelayedCodeAt cursor omNodeID = do
+  -- TODO: MMInst nodeID should be generated once per (cursor, nodeID), not (nodeID)
+
+  let mk1 = G.singleton omNodeID
   (Node inst0 _ _) <- lookupNode omNodeID
   case inst0 of
-     Imm r -> return $ Imm r
+     Imm r -> return $ mk1 $ Imm r
      Uniop op a -> do
        a_code <- rhsCodeAt cursor a
-       return $ Uniop op a_code
+       return $ a_code <> (mk1 $ Uniop op a)
      Binop op a b -> do
        a_code <- rhsCodeAt cursor a
        b_code <- rhsCodeAt cursor b
-       return $ Binop op a_code b_code
+       return $ a_code <> b_code <> (mk1 $ Binop op a b)
      Triop op a b c -> do
        a_code <- rhsCodeAt cursor a
        b_code <- rhsCodeAt cursor b
        c_code <- rhsCodeAt cursor c
-       return $ Triop op a_code b_code c_code
+       return $ a_code <> b_code <> c_code <> (mk1 $ Triop op a b c)
      Shift vi a -> rhsCodeAt (cursor + vi) a
-     Load name -> return $ LoadCursorStatic cursor name
-     LoadIndex i -> return $ LoadIndex i
-     LoadExtent i -> return $ LoadExtent i
+     Load name -> return $ mk1 $ LoadCursorStatic cursor name
+     LoadIndex i -> return $ mk1 $ LoadIndex i
+     LoadExtent i -> return $ mk1 $ LoadExtent i
      Store name a -> do
        a_code <- rhsCodeAt cursor a
-       return $ Store name a_code
+       return $ a_code <> (mk1 $ Store name a)
      x -> raiseErr $ failed $ "manifestation path unimplemented for keyword: " ++ show x
 
 
@@ -153,21 +158,17 @@ boundaryAnalysis gr =
     bgr :: G.IntMap Boundary
     bgr = G.mapWithKey knb gr
 
+    -- compute boundary for manifest node nd
     knb :: Int -> MMNode -> Boundary
-    knb k nd = listBounds $ nd ^. nodeInst
-    listBounds :: MMInstruction -> Boundary
+    knb _ nd = mconcat $ map listBounds $ G.elems $ nd ^. nodeInst
+
+    listBounds :: MMInstF NodeID -> Boundary
     listBounds (LoadCursorStatic v _)    = Boundary (v,v)
-    listBounds (Store _ x) = listBounds x
-    listBounds (LoadIndex _) = mempty
-    listBounds (LoadExtent _) = mempty
-    listBounds (Imm _)        = mempty
     listBounds (LoadCursor v nid) =
       let Boundary (a,b) = b_of_n
           Just b_of_n = G.lookup nid bgr
       in Boundary (a+v, b+v)
-    listBounds (Uniop _ a) = listBounds a
-    listBounds (Binop _ a b) = mconcat $ map listBounds [a, b]
-    listBounds (Triop _ a b c) = mconcat $ map listBounds [a, b, c]
+    listBounds _ = mempty
 
 
 genMMProgram :: OMProgram -> IO MMProgram

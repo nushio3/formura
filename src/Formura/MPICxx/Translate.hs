@@ -61,7 +61,10 @@ defaultNumericalConfig = NumericalConfig 0 0 0 0
 -- | The struct for generating unique names, and holds already given names.
 data NamingState = NamingState
   { _alreadyGivenNames :: S.Set T.Text
+  , _alreadyGivenLocalNames :: S.Set T.Text
   , _freeNameCounter :: Integer
+  , _freeLocalNameCounter :: Integer
+  , _nodeIDtoLocalName :: G.IntMap T.Text
   , _loopIndexNames :: Vec T.Text
   , _loopExtentNames :: Vec T.Text
   }
@@ -69,7 +72,10 @@ makeClassy ''NamingState
 
 defaultNamingState = NamingState
   { _alreadyGivenNames = S.empty
+  , _alreadyGivenLocalNames = S.empty
   , _freeNameCounter = 0
+  , _freeLocalNameCounter = 0
+  , _nodeIDtoLocalName = G.empty
   , _loopIndexNames = PureVec ""
   , _loopExtentNames = PureVec ""
   }
@@ -123,20 +129,33 @@ type TranM = CompilerMonad GlobalEnvironment CProgram TranState
 
 -- * Parallel code generation
 
--- | generate new free name based on given identifier,
+-- | generate new free global name based on given identifier,
 --   and prevent further generation of that name
 genFreeName :: IdentName -> TranM T.Text
-genFreeName ident = do
-  agNames <- use alreadyGivenNames
+genFreeName = genFreeName' True
+
+-- | generate new free local name based on given identifier,
+--   and prevent further generation of that name within current scope
+genFreeLocalName :: IdentName -> TranM T.Text
+genFreeLocalName = genFreeName' False
+
+-- | base function for giving names
+genFreeName' :: Bool -> IdentName -> TranM T.Text
+genFreeName' isGlobal ident = do
+  aggNames <- use alreadyGivenNames
+  aglNames <- use alreadyGivenLocalNames
   let initName = T.pack ident
+      agNames = aggNames <> aglNames
+      nCounter :: Lens' TranState Integer
+      nCounter = if isGlobal then freeNameCounter else freeLocalNameCounter
       go = do
-        ctr <- use freeNameCounter
+        ctr <- use nCounter
         let tmpName = initName <> "_" <> showC ctr
         if S.member tmpName agNames
-          then (freeNameCounter += 1) >> go
+          then (nCounter += 1) >> go
           else return tmpName
   givenName <- if S.member initName agNames then go else return initName
-  alreadyGivenNames %= S.insert givenName
+  (if isGlobal then alreadyGivenNames else alreadyGivenLocalNames) %= S.insert givenName
   return givenName
 
 -- | read all numerical config from the Formura source program
@@ -184,7 +203,7 @@ setNamingState = do
       nameNode nd = do
         let initName = case A.viewMaybe nd  of
                         Just (SourceName n) -> n
-                        _                   -> "a"
+                        _                   -> "g"
         cName <- genFreeName initName
         return $ nd & A.annotation %~ A.set (VariableName cName)
 
@@ -249,35 +268,49 @@ lookupNode i = do
 
 -- | generate expression.
 
-genExpr :: MMInstruction -> TranM T.Text
-genExpr inst = do
+genMMInstruction :: MMInstruction -> TranM T.Text
+genMMInstruction mminst = do
   indNames <- use loopIndexNames
   let accAt :: Vec Int -> T.Text
       accAt v = foldMap brackets $ kutukeru  <$> indNames <*> v
       kutukeru i d | d == 0 = i
                    | d <  0 = i <> showC d
                    | otherwise = i <> "+" <> showC d
-  case inst of
-    LoadCursorStatic vi name -> return $ T.pack name <> accAt vi
-    Imm r -> return $ showC (realToFrac r :: Double)
-    Uniop op a -> do
-      a_code <- genExpr a
-      return $ parens $ T.pack op <> a_code
-    Binop op a b -> do
-      a_code <- genExpr a
-      b_code <- genExpr b
-      case op of
-        "**" -> return $ ("pow"<>) $ parens $ a_code <> "," <> b_code
-        _ -> return $ parens $ a_code <> T.pack op <> b_code
-    LoadCursor vi nid -> do
-      node <- lookupNode nid
-      let Just (VariableName nam) = A.viewMaybe node
-      case node ^. nodeType of
-        ElemType _ -> return $ nam
-        _ -> return $ nam <> accAt vi
-    Store _ x -> genExpr x
-    x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
 
+  txts <- forM (G.toList mminst) $ \(nid0, inst) -> do
+    thisName <- genFreeLocalName "a"
+    nodeIDtoLocalName %= G.insert nid0 thisName
+    let thisEq :: T.Text -> TranM T.Text
+        thisEq code = return $ thisName <> "=" <> code <> ";"
+
+        query :: NodeID -> TranM T.Text
+        query nid1 = do
+          nmap <- use nodeIDtoLocalName
+          case G.lookup nid1 nmap of
+            Just vname -> return vname
+            Nothing -> raiseErr $ failed $ "genExpr: missing graph node " ++ show nid1
+
+    case inst of
+      LoadCursorStatic vi name -> thisEq $ T.pack name <> accAt vi
+      Imm r -> thisEq $ showC (realToFrac r :: Double)
+      Uniop op a -> do
+        a_code <- query a
+        thisEq $ parens $ T.pack op <> a_code
+      Binop op a b -> do
+        a_code <- query a
+        b_code <- query b
+        case op of
+          "**" -> thisEq $ ("pow"<>) $ parens $ a_code <> "," <> b_code
+          _ -> thisEq $ parens $ a_code <> T.pack op <> b_code
+      LoadCursor vi nid -> do
+        node <- lookupNode nid
+        let Just (VariableName nam) = A.viewMaybe node
+        case node ^. nodeType of
+          ElemType _ -> thisEq $ nam
+          _ -> thisEq $ nam <> accAt vi
+      Store _ x -> query x
+      x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
+  return $ T.unlines txts
 
 -- | generate a formura function body.
 
@@ -318,20 +351,20 @@ genGraph isTimeLoop gr = do
               ["}" | _ <- toList ivars]
 
             zeros = repeat 0
-        rhs <- genExpr inst
-        let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
+        letBs <- genMMInstruction inst
+        let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> "rhs" <> ";"
         return $ T.unlines $
-          openLoops ++ [bodyExpr] ++ closeLoops
+          openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
 
     case typ of
       ElemType "void" ->
-        case inst of
+        case mmInstTail inst of
           Store n _ -> genGrid (T.pack n)
           _ -> return "// void"
       ElemType ctyp -> do
-        rhs <- genExpr inst
-        return $ lhsName <> "=" <> rhs <> ";"
+        letBs <- genMMInstruction inst
+        return $ T.unlines ["{",letBs, lhsName <> "=" <> "rhs" <> ";", "}"]
       GridType _ typ -> genGrid lhsName
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot

@@ -65,9 +65,13 @@ pattern LoadCursorStatic v x <- ((^? match) -> Just (LoadCursorStaticF v x)) whe
 type OMInstF = Sum '[DataflowInstF, LoadUncursoredF, ShiftF, OperatorF, ImmF]
 type OMInstruction = OMInstF NodeID
 
--- | The instruction type for Manifest Machine, where every node is manifest
+-- | The instruction type for Manifest Machine, where every node is manifest,
+--   and each instruction is actually a subgraph for delayed computation
 type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
 type MMInstruction = G.IntMap (MMInstF NodeID)
+
+mmInstTail :: MMInstruction -> MMInstF NodeID
+mmInstTail = snd . G.findMax
 
 
 type NodeType  = Fix NodeTypeF
