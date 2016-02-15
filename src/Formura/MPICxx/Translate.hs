@@ -416,6 +416,7 @@ tellProgram = do
   tellC $ T.unlines ["#include <mpi.h>" ,
                      "#include <math.h>" ,
                      "#include \"" <> T.pack hxxFileName <> "\""]
+  tellC $ cxxTemplate
 
   tellBoth "\n\n"
 
@@ -518,3 +519,13 @@ cxxFileName = cxxFilePath ^. filename
 
 hxxFileName :: WithCommandLineOption => FilePath
 hxxFileName = hxxFilePath ^. filename
+
+cxxTemplate :: T.Text
+cxxTemplate = T.unlines
+  [ ""
+  , "#define min(a,b) ((a)<(b)?(a):(b))"
+  , "#define max(a,b) ((a)>(b)?(a):(b))"
+  , "#define minmod(a,b) ((a)*(b)<=0?0:min(a,b))"
+  , "typedef int bool;"
+  , ""
+  ]

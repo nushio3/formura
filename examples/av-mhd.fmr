@@ -7,7 +7,7 @@ monitor_interval :: 20
 
 
 float :: π = 3.141592653589793
-float :: dens0 = 1.5
+float :: dens0 = 1.0
 float :: dp_ddens = 5/3
 float :: dp_ds = 9/7
 float :: dt = 0.01
@@ -22,14 +22,10 @@ ddz = fun(a) (-a[i,j,k+2] + 8*a[i,j,k+1] - 8*a[i,j,k-1] + a[i,j,k-2])/(12*dz)
 
 Σ = fun (e) e(0) + e(1) + e(2)
 
-δ = ((1,0,0),(0,1,0),(0,0,1))
-
 
 begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
       float [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
 end function
-
-
 
 
 begin function ! (x) returns mx
@@ -53,7 +49,8 @@ begin function apply_av(u) returns (u_next)
 
       f = -0.5*Phi*uu_num
 
-      u_next[i,j,k] = ! (u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k])
+      manifest :: u_next
+      u_next[i,j,k] = u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k]
 end function
 
 
