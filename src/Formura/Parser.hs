@@ -65,7 +65,9 @@ keyword k = "keyword " ++ k ?> do
   when (k `S.notMember` keywordSet) $
     raiseErr $ failed $
     "Please report the compiler developer: \"" ++ k ++ "\" is not in a keyword list!"
-  symbol k
+
+  let moreLikeThis = head $ filter ($ (last k)) [isIdentifierAlphabet1, isIdentifierSymbol]
+  token $ string k <* notFollowedBy (satisfy moreLikeThis)
 
 -- | The set of reserved keywords. The string is not parsed as a identifier if it's in the keyword list.
 keywordSet :: S.Set IdentName
@@ -75,8 +77,9 @@ keywordSet = S.fromList
               "if", "then", "else",
               "const","extern","manifest",
               "+","-","*","/",".","**",
-              "::","=", ",",
-              "<", "<=", "==", "!=", ">=", ">"]
+              "::","=", ","]
+             <> minMaxOperatorNames
+             <> comparisonOperatorNames
 
 
 comment :: P ()
@@ -185,6 +188,7 @@ exprOf termParser = X.buildExpressionParser tbl termParser
            [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
            [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft],
+           [binary sym (Binop sym) X.AssocLeft | sym <- S.toList minMaxOperatorNames],
            [binary sym (Binop sym) X.AssocNone | sym <- S.toList comparisonOperatorNames]
           ]
     unary  name fun = X.Prefix (pUni name fun)

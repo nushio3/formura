@@ -119,7 +119,11 @@ data OperatorF x
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Generic)
 
 comparisonOperatorNames :: S.Set IdentName
-comparisonOperatorNames = S.fromList $ words "< <= == != > >="
+comparisonOperatorNames = S.fromList $ words "<= == != >= < >"
+
+minMaxOperatorNames :: S.Set IdentName
+minMaxOperatorNames = S.fromList $ words "<? >? <%"
+
 
 instance Q.Arbitrary x => Q.Arbitrary (OperatorF x) where
   arbitrary =
