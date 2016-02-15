@@ -282,7 +282,7 @@ genMMInstruction mminst = do
     let thisEq :: T.Text -> TranM T.Text
         thisEq code = return $ thisName <> "=" <> code <> ";"
 
-        query :: NodeID -> TranM T.Text
+        query :: MMNodeID -> TranM T.Text
         query nid1 = do
           nmap <- use nodeIDtoLocalName
           case M.lookup nid1 nmap of

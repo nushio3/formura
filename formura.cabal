@@ -120,6 +120,7 @@ executable formura-eval
               , trifecta
 
 executable formura-gen
+  buildable: False
   hs-source-dirs: exe-src
   main-is: formura-gen.hs
   default-language:    Haskell2010

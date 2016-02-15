@@ -36,7 +36,8 @@ data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
   , _isManifestNode :: OMNodeID -> Bool
   , _theGraph :: Graph OMInstruction
-  , _nodeIDMap :: M.Map (OMNodeID ,Vec Int) MMNodeID
+  , _theMMInstruction :: MMInstruction
+  , _nodeIDMap :: M.Map (Vec Int, OMNodeID) MMNodeID
   }
 makeClassy ''TranState
 
@@ -47,9 +48,9 @@ defaultTranState :: TranState
 defaultTranState = TranState
   { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "manifestation"}
   , _theGraph = M.empty
+  , _theMMInstruction = M.empty
   , _nodeIDMap = M.empty
   }
-
 
 type TranM = CompilerMonad GlobalEnvironment () TranState
 
@@ -68,58 +69,61 @@ lookupNode i = do
 mapNodeID :: Vec Int -> OMNodeID -> TranM MMNodeID
 mapNodeID c i = do
   f <- use nodeIDMap
-  case M.lookup f (c,i) of
+  case M.lookup (c,i) f of
     Just j -> return j
     Nothing -> do
       let j = fromIntegral $ M.size f
       nodeIDMap %= M.insert (c,i) j
       return j
 
-rhsCodeAt :: Vec Int -> OMNodeID -> TranM MMInstruction
+-- | insert a single subgraph instruction into current MMInstruction
+insertMM :: Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
+insertMM c i inst = do
+  j <- mapNodeID c i
+  theMMInstruction %= M.insert j inst
+  return j
+
+-- | generate code that returns the RHS of current (cursor,nid)
+rhsCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
   isM <- use isManifestNode
   case isM nid of
      True  -> do
-       j <- mapNodeID cursor nid
-       return $ M.singleton j (LoadCursor cursor nid)
+       insertMM cursor nid (LoadCursor cursor nid)
      False -> rhsDelayedCodeAt cursor nid
 
-
-
-
-rhsDelayedCodeAt :: Vec Int -> OMNodeID -> TranM MMInstruction
+-- | generate code that calculates the RHS of current (cursor,nid)
+rhsDelayedCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
 rhsDelayedCodeAt cursor omNodeID = do
-  -- TODO: MMInst nodeID should be generated once per (cursor, nodeID), not (nodeID)
-
-  let mk1 = M.singleton omNodeID
+  let ins = insertMM cursor omNodeID
   (Node inst0 _ _) <- lookupNode omNodeID
   case inst0 of
-     Imm r -> return $ mk1 $ Imm r
+     Imm r -> ins $ Imm r
      Uniop op a -> do
-       a_code <- rhsCodeAt cursor a
-       return $ a_code <> (mk1 $ Uniop op a)
+       ja <- rhsCodeAt cursor a
+       ins $ Uniop op ja
      Binop op a b -> do
-       a_code <- rhsCodeAt cursor a
-       b_code <- rhsCodeAt cursor b
-       return $ a_code <> b_code <> (mk1 $ Binop op a b)
+       ja <- rhsCodeAt cursor a
+       jb <- rhsCodeAt cursor b
+       ins $ Binop op ja jb
      Triop op a b c -> do
-       a_code <- rhsCodeAt cursor a
-       b_code <- rhsCodeAt cursor b
-       c_code <- rhsCodeAt cursor c
-       return $ a_code <> b_code <> c_code <> (mk1 $ Triop op a b c)
+       ja <- rhsCodeAt cursor a
+       jb <- rhsCodeAt cursor b
+       jc <- rhsCodeAt cursor c
+       ins $ Triop op ja jb jc
      Shift vi a -> rhsCodeAt (cursor + vi) a
-     Load name -> return $ mk1 $ LoadCursorStatic cursor name
-     LoadIndex i -> return $ mk1 $ LoadIndex i
-     LoadExtent i -> return $ mk1 $ LoadExtent i
+     Load name -> ins $ LoadCursorStatic cursor name
+     LoadIndex i -> ins $ LoadIndex i
+     LoadExtent i -> ins $ LoadExtent i
      Store name a -> do
-       a_code <- rhsCodeAt cursor a
-       return $ a_code <> (mk1 $ Store name a)
+       ja <- rhsCodeAt cursor a
+       ins $ Store name ja
      x -> raiseErr $ failed $ "manifestation path unimplemented for keyword: " ++ show x
 
 
-genMMInstruction :: OMNodeID -> TranM MMInstruction
-genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID
+genMMInstruction :: OMNodeID -> TranM ()
+genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID >> return ()
 
 
 manifestG :: Graph OMInstruction -> TranM (Graph MMInstruction)
@@ -134,9 +138,9 @@ manifestG omg = do
   liftIO $ do
     putStrLn $ "manifest node ID: " ++ show  manifestKeys
 
-  let isM_0 :: Int -> Bool
+  let isM_0 :: OMNodeID -> Bool
       isM_0 n = S.member n manifestSet
-      manifestSet :: S.Set Int
+      manifestSet :: S.Set OMNodeID
       manifestSet = S.fromList manifestKeys
 
   isManifestNode .= isM_0
@@ -146,9 +150,12 @@ manifestG omg = do
       False -> return Nothing
       True -> do
         nodeIDMap .= M.empty
+        theMMInstruction .= M.empty
 
-        ndInst <- genMMInstruction nO
         omNode <- lookupNode nO
+        genMMInstruction nO
+        ndInst <- use theMMInstruction
+
         return $ Just (nO, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
 
   return $ boundaryAnalysis $ M.fromList nodeList

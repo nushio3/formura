@@ -95,9 +95,9 @@ class Generatable f where
 freeNodeID :: GenM OMNodeID
 freeNodeID = do
   g <- use theGraph
-  return $ M.size g
+  return $ fromIntegral $ M.size g
 
-insert :: OMInstrunction -> NodeType -> GenM ValueExpr
+insert :: OMInstruction -> NodeType -> GenM ValueExpr
 insert inst typ = do
   n0 <- freeNodeID
   foc <- use compilerFocus
