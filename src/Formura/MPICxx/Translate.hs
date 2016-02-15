@@ -276,7 +276,7 @@ genMMInstruction mminst = do
                    | d <  0 = i <> showC d
                    | otherwise = i <> "+" <> showC d
 
-  txts <- forM (M.toList mminst) $ \(nid0, inst) -> do
+  txts <- forM (M.toList mminst) $ \(nid0, Node inst _ _) -> do
     thisName <- genFreeLocalName "a"
     nodeIDtoLocalName %= M.insert nid0 thisName
     let thisEq :: T.Text -> TranM T.Text

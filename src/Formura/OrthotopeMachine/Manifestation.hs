@@ -76,11 +76,19 @@ mapNodeID c i = do
       nodeIDMap %= M.insert (c,i) j
       return j
 
+-- | convert a OMNodeType to MicroNodeType
+toMicroType :: OMNodeType -> TranM MicroNodeType
+toMicroType (GridType _ x) = toMicroType x
+toMicroType (ElemType x) = return $ ElemType x
+toMicroType x = raiseErr $ failed $ "Top type encountered while manifestation"
+
 -- | insert a single subgraph instruction into current MMInstruction
 insertMM :: Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
 insertMM c i inst = do
   j <- mapNodeID c i
-  theMMInstruction %= M.insert j inst
+  omNode <- lookupNode i
+  typ2 <- toMicroType $ omNode ^. nodeType
+  theMMInstruction %= M.insert j (Node inst typ2 (omNode ^. nodeAnnot))
   return j
 
 -- | generate code that returns the RHS of current (cursor,nid)
@@ -183,7 +191,9 @@ boundaryAnalysis gr =
 
     -- compute boundary for manifest node nd
     knb :: OMNodeID -> MMNode -> Boundary
-    knb _ nd = mconcat $ map listBounds $ M.elems $ nd ^. nodeInst
+    knb _ nd = mconcat [ listBounds $ microNode ^. nodeInst |
+      microNode <- M.elems $ nd ^. nodeInst]
+
 
     listBounds :: MMInstF MMNodeID -> Boundary
     listBounds (LoadCursorStatic v _)    = Boundary (v,v)
