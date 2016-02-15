@@ -54,10 +54,8 @@ begin function interpolate_wall(u) returns (u_next)
       f = -0.5*Phi*uu_num
 
       u_next[i,j,k] = u[i,j,k] + f[i-1/2,j,k] - f[i+1/2,j,k]
-
 end function
 
-begin function diffusion_flux()
 
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
       ddt_dens = ! (Σ fun(i) ∂ i (dens0 * v i))
