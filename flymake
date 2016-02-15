@@ -1,0 +1,10 @@
+#!/bin/sh
+
+while :
+do
+    clear
+    stack build  2>&1 | head -n $1
+    inotifywait -e modify -r ./src/ ./exe-src/ ./examples/ formura.cabal
+done
+
+# http://stackoverflow.com/questions/32712775/generating-documentation-for-my-own-code-with-haddock-and-stack

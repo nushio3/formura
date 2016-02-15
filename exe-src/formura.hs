@@ -4,7 +4,7 @@ module Main where
 import           Control.Lens
 import           Control.Monad
 import qualified Data.ByteString.Char8 as BS
-import qualified Data.IntMap as G
+import qualified Data.Map as M
 import           Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
@@ -52,26 +52,26 @@ genMPICxx prog = do
     putStrLn ""
 
     putStrLn "## Debug print: init graph"
-    mapM_ pprNode $ G.toList (omProg ^. omInitGraph)
+    mapM_ pprNode $ M.toList (omProg ^. omInitGraph)
     putStrLn ""
 
     putStrLn "## Debug print: step graph"
-    mapM_ pprNode $ G.toList (omProg ^. omStepGraph)
+    mapM_ pprNode $ M.toList (omProg ^. omStepGraph)
     putStrLn ""
 
   mmProg <- genMMProgram omProg
   when (?commandLineOption ^. verbose) $ do
     putStrLn "## Debug print: manifested init graph"
-    mapM_ pprMMNode $ G.toList (mmProg ^. omInitGraph)
+    mapM_ pprMMNode $ M.toList (mmProg ^. omInitGraph)
     putStrLn ""
 
     putStrLn "## Debug print: manifested step graph"
-    mapM_ pprMMNode $ G.toList (mmProg ^. omStepGraph)
+    mapM_ pprMMNode $ M.toList (mmProg ^. omStepGraph)
     putStrLn ""
 
   C.genCxxFiles prog mmProg
 
-pprNode :: (Int, OMNode) -> IO ()
+pprNode :: (OMNodeID, OMNode) -> IO ()
 pprNode (i,n) = do
   let r = case A.toMaybe (n ^. A.annotation) of
         Just Manifest -> "M"
@@ -81,7 +81,7 @@ pprNode (i,n) = do
         _                   -> ""
   putStrLn $ unwords [r , take 4 $ varName ++ repeat ' ', show (i,n)]
 
-pprMMNode :: (Int, MMNode) -> IO ()
+pprMMNode :: (OMNodeID, MMNode) -> IO ()
 pprMMNode (i,n) = do
   let
       varName = case A.toMaybe (n ^. A.annotation) of

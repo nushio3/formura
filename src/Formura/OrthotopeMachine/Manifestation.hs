@@ -16,9 +16,10 @@ import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
-import qualified Data.IntMap as G
 import           Data.Maybe
 import           Data.Monoid
+import qualified Data.Map as M
+import qualified Data.Set as S
 import           Text.Trifecta (failed, raiseErr)
 
 
@@ -33,9 +34,10 @@ import           Formura.Vec
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _nodeOtoM :: Int -> Maybe Int
-  , _nodeMtoO :: Int -> Int
-  , _theGraph :: Graph OMInstruction
+  , _isManifestNode :: OMNodeID -> Bool
+  , _theGraph :: OMGraph
+  , _theMMInstruction :: MMInstruction
+  , _nodeIDMap :: M.Map (Vec Int, OMNodeID) MMNodeID
   }
 makeClassy ''TranState
 
@@ -45,17 +47,18 @@ instance HasCompilerSyntacticState TranState where
 defaultTranState :: TranState
 defaultTranState = TranState
   { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "manifestation"}
-  , _theGraph = G.empty
+  , _theGraph = M.empty
+  , _theMMInstruction = M.empty
+  , _nodeIDMap = M.empty
   }
-
 
 type TranM = CompilerMonad GlobalEnvironment () TranState
 
 
-lookupNode :: NodeID -> TranM OMNode
+lookupNode :: OMNodeID -> TranM OMNode
 lookupNode i = do
   g <- use theGraph
-  case G.lookup i g of
+  case M.lookup i g of
    Nothing -> raiseErr $ failed $ "out-of-bound node reference: #" ++ show i
    Just n -> do
      case A.viewMaybe n of
@@ -63,78 +66,107 @@ lookupNode i = do
         Nothing -> return ()
      return n
 
-rhsCodeAt :: Vec Int -> NodeID -> TranM MMInst
+mapNodeID :: Vec Int -> OMNodeID -> TranM MMNodeID
+mapNodeID c i = do
+  f <- use nodeIDMap
+  case M.lookup (c,i) f of
+    Just j -> return j
+    Nothing -> do
+      let j = fromIntegral $ M.size f
+      nodeIDMap %= M.insert (c,i) j
+      return j
+
+-- | convert a OMNodeType to MicroNodeType
+toMicroType :: OMNodeType -> TranM MicroNodeType
+toMicroType (GridType _ x) = toMicroType x
+toMicroType (ElemType x) = return $ ElemType x
+toMicroType x = raiseErr $ failed $ "Top type encountered while manifestation"
+
+-- | insert a single subgraph instruction into current MMInstruction
+insertMM :: Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
+insertMM c i inst = do
+  j <- mapNodeID c i
+  omNode <- lookupNode i
+  typ2 <- toMicroType $ omNode ^. nodeType
+  theMMInstruction %= M.insert j (Node inst typ2 (omNode ^. nodeAnnot))
+  return j
+
+-- | generate code that returns the RHS of current (cursor,nid)
+rhsCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
-  o2m <- use nodeOtoM
-  case o2m nid of
-     Just nM -> return $ LoadCursor cursor nM
-     _  -> rhsDelayedCodeAt cursor nid
+  isM <- use isManifestNode
+  case isM nid of
+     True  -> do
+       insertMM cursor nid (LoadCursor cursor nid)
+     False -> rhsDelayedCodeAt cursor nid
 
-
-rhsDelayedCodeAt :: Vec Int -> NodeID -> TranM MMInst
+-- | generate code that calculates the RHS of current (cursor,nid)
+rhsDelayedCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
 rhsDelayedCodeAt cursor omNodeID = do
+  let ins = insertMM cursor omNodeID
   (Node inst0 _ _) <- lookupNode omNodeID
   case inst0 of
-     Imm r -> return $ Imm r
+     Imm r -> ins $ Imm r
      Uniop op a -> do
-       a_code <- rhsCodeAt cursor a
-       return $ Uniop op a_code
+       ja <- rhsCodeAt cursor a
+       ins $ Uniop op ja
      Binop op a b -> do
-       a_code <- rhsCodeAt cursor a
-       b_code <- rhsCodeAt cursor b
-       return $ Binop op a_code b_code
+       ja <- rhsCodeAt cursor a
+       jb <- rhsCodeAt cursor b
+       ins $ Binop op ja jb
      Triop op a b c -> do
-       a_code <- rhsCodeAt cursor a
-       b_code <- rhsCodeAt cursor b
-       c_code <- rhsCodeAt cursor c
-       return $ Triop op a_code b_code c_code
+       ja <- rhsCodeAt cursor a
+       jb <- rhsCodeAt cursor b
+       jc <- rhsCodeAt cursor c
+       ins $ Triop op ja jb jc
      Shift vi a -> rhsCodeAt (cursor + vi) a
-     Load name -> return $ LoadCursorStatic cursor name
-     LoadIndex i -> return $ LoadIndex i
-     LoadExtent i -> return $ LoadExtent i
+     Load name -> ins $ LoadCursorStatic cursor name
+     LoadIndex i -> ins $ LoadIndex i
+     LoadExtent i -> ins $ LoadExtent i
      Store name a -> do
-       a_code <- rhsCodeAt cursor a
-       return $ Store name a_code
+       ja <- rhsCodeAt cursor a
+       ins $ Store name ja
      x -> raiseErr $ failed $ "manifestation path unimplemented for keyword: " ++ show x
 
 
-genMMInst :: NodeID -> TranM MMInst
-genMMInst omNodeID = rhsDelayedCodeAt 0 omNodeID
+genMMInstruction :: OMNodeID -> TranM ()
+genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID >> return ()
 
 
-manifestG :: Graph OMInstruction -> TranM (Graph MMInst)
+manifestG :: OMGraph -> TranM MMGraph
 manifestG omg = do
   theGraph .= omg
-  let keys = G.keys omg
+  let keys = M.keys omg
   manifestKeys <- fmap concat $ forM keys $ \k -> do
     nd <- lookupNode k
     return $ case A.viewMaybe nd of
-      Just Manifest -> [k :: Int]
+      Just Manifest -> [k]
       _ -> []
   liftIO $ do
     putStrLn $ "manifest node ID: " ++ show  manifestKeys
 
-  let nodeOtoM_0 :: Int -> Maybe Int
-      nodeOtoM_0 n = G.lookup n nodeMap
-      nodeMtoO_0 :: Int -> Int
-      nodeMtoO_0 n = manifestKeys !! n
+  let isM_0 :: OMNodeID -> Bool
+      isM_0 n = S.member n manifestSet
+      manifestSet :: S.Set OMNodeID
+      manifestSet = S.fromList manifestKeys
 
-      nodeMap :: G.IntMap Int
-      nodeMap = G.fromList $ zip manifestKeys [0..]
-
-  nodeOtoM .= nodeOtoM_0
-  nodeMtoO .= nodeMtoO_0
+  isManifestNode .= isM_0
 
   nodeList <- fmap catMaybes $ forM manifestKeys $ \nO -> do
-    case nodeOtoM_0 nO of
-      Nothing -> return Nothing
-      Just nM -> do
-        ndInst <- genMMInst nO
-        omNode <- lookupNode nO
-        return $ Just (nM, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
+    case isM_0 nO of
+      False -> return Nothing
+      True -> do
+        nodeIDMap .= M.empty
+        theMMInstruction .= M.empty
 
-  return $ boundaryAnalysis $ G.fromList nodeList
+        omNode <- lookupNode nO
+        genMMInstruction nO
+        ndInst <- use theMMInstruction
+
+        return $ Just (nO, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
+
+  return $ boundaryAnalysis $ M.fromList nodeList
 
 manifestation :: OMProgram -> TranM MMProgram
 manifestation omprog = do
@@ -147,31 +179,29 @@ manifestation omprog = do
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
 
-boundaryAnalysis :: Graph MMInst -> Graph MMInst
+boundaryAnalysis :: MMGraph -> MMGraph
 boundaryAnalysis gr =
-  flip G.mapWithKey gr $
-  \ k nd -> case G.lookup k bgr of
+  flip M.mapWithKey gr $
+  \ k nd -> case M.lookup k bgr of
   Just b ->  nd & A.annotation %~ A.set (b <> Boundary (0,0))
   Nothing -> nd
   where
-    bgr :: G.IntMap Boundary
-    bgr = G.mapWithKey knb gr
+    bgr :: M.Map OMNodeID Boundary
+    bgr = M.mapWithKey knb gr
 
-    knb :: Int -> MMNode -> Boundary
-    knb k nd = listBounds $ nd ^. nodeInst
-    listBounds :: MMInst -> Boundary
+    -- compute boundary for manifest node nd
+    knb :: OMNodeID -> MMNode -> Boundary
+    knb _ nd = mconcat [ listBounds $ microNode ^. nodeInst |
+      microNode <- M.elems $ nd ^. nodeInst]
+
+
+    listBounds :: MMInstF MMNodeID -> Boundary
     listBounds (LoadCursorStatic v _)    = Boundary (v,v)
-    listBounds (Store _ x) = listBounds x
-    listBounds (LoadIndex _) = mempty
-    listBounds (LoadExtent _) = mempty
-    listBounds (Imm _)        = mempty
     listBounds (LoadCursor v nid) =
       let Boundary (a,b) = b_of_n
-          Just b_of_n = G.lookup nid bgr
+          Just b_of_n = M.lookup nid bgr
       in Boundary (a+v, b+v)
-    listBounds (Uniop _ a) = listBounds a
-    listBounds (Binop _ a b) = mconcat $ map listBounds [a, b]
-    listBounds (Triop _ a b c) = mconcat $ map listBounds [a, b, c]
+    listBounds _ = mempty
 
 
 genMMProgram :: OMProgram -> IO MMProgram

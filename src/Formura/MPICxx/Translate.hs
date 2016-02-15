@@ -9,7 +9,6 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper)
 import           Data.Foldable (toList)
-import qualified Data.IntMap as G
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Text as T
@@ -61,7 +60,10 @@ defaultNumericalConfig = NumericalConfig 0 0 0 0
 -- | The struct for generating unique names, and holds already given names.
 data NamingState = NamingState
   { _alreadyGivenNames :: S.Set T.Text
+  , _alreadyGivenLocalNames :: S.Set T.Text
   , _freeNameCounter :: Integer
+  , _freeLocalNameCounter :: Integer
+  , _nodeIDtoLocalName :: M.Map MMNodeID T.Text
   , _loopIndexNames :: Vec T.Text
   , _loopExtentNames :: Vec T.Text
   }
@@ -69,7 +71,10 @@ makeClassy ''NamingState
 
 defaultNamingState = NamingState
   { _alreadyGivenNames = S.empty
+  , _alreadyGivenLocalNames = S.empty
   , _freeNameCounter = 0
+  , _freeLocalNameCounter = 0
+  , _nodeIDtoLocalName = M.empty
   , _loopIndexNames = PureVec ""
   , _loopExtentNames = PureVec ""
   }
@@ -80,7 +85,7 @@ data TranState = TranState
   , _tsNamingState :: NamingState
   , _theProgram :: Program
   , _theMMProgram :: MMProgram
-  , _theGraph :: Graph MMInst
+  , _theGraph :: MMGraph
   }
 makeClassy ''TranState
 
@@ -89,7 +94,7 @@ instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
 instance HasNumericalConfig TranState where
   numericalConfig = tsNumericalConfig
-instance HasMachineProgram TranState MMInst where
+instance HasMachineProgram TranState MMInstruction OMNodeType where
   machineProgram = theMMProgram
 instance HasNamingState TranState where
   namingState = tsNamingState
@@ -123,20 +128,33 @@ type TranM = CompilerMonad GlobalEnvironment CProgram TranState
 
 -- * Parallel code generation
 
--- | generate new free name based on given identifier,
+-- | generate new free global name based on given identifier,
 --   and prevent further generation of that name
 genFreeName :: IdentName -> TranM T.Text
-genFreeName ident = do
-  agNames <- use alreadyGivenNames
+genFreeName = genFreeName' True
+
+-- | generate new free local name based on given identifier,
+--   and prevent further generation of that name within current scope
+genFreeLocalName :: IdentName -> TranM T.Text
+genFreeLocalName = genFreeName' False
+
+-- | base function for giving names
+genFreeName' :: Bool -> IdentName -> TranM T.Text
+genFreeName' isGlobal ident = do
+  aggNames <- use alreadyGivenNames
+  aglNames <- use alreadyGivenLocalNames
   let initName = T.pack ident
+      agNames = aggNames <> aglNames
+      nCounter :: Lens' TranState Integer
+      nCounter = if isGlobal then freeNameCounter else freeLocalNameCounter
       go = do
-        ctr <- use freeNameCounter
+        ctr <- use nCounter
         let tmpName = initName <> "_" <> showC ctr
         if S.member tmpName agNames
-          then (freeNameCounter += 1) >> go
+          then (nCounter += 1) >> go
           else return tmpName
   givenName <- if S.member initName agNames then go else return initName
-  alreadyGivenNames %= S.insert givenName
+  (if isGlobal then alreadyGivenNames else alreadyGivenLocalNames) %= S.insert givenName
   return givenName
 
 -- | read all numerical config from the Formura source program
@@ -180,11 +198,11 @@ setNamingState = do
   luns <- traverse (genFreeName . ("N"++) . map toUpper) (Vec ans)
   loopExtentNames .= luns
 
-  let nameNode :: Node MMInst -> TranM (Node MMInst)
+  let nameNode :: MMNode -> TranM MMNode
       nameNode nd = do
         let initName = case A.viewMaybe nd  of
                         Just (SourceName n) -> n
-                        _                   -> "a"
+                        _                   -> "g"
         cName <- genFreeName initName
         return $ nd & A.annotation %~ A.set (VariableName cName)
 
@@ -228,17 +246,17 @@ tellIntermediateVariables = do
   g1 <- use omInitGraph
   g2 <- use omStepGraph
   forM_ [g1, g2] $ \gr -> do
-    forM_ (G.toList gr) $ \(_, node) -> do
+    forM_ (M.toList gr) $ \(_, node) -> do
       let typ = subFix $ node ^. nodeType
           Just (VariableName vname) = A.viewMaybe node
       decl <- genTypeDecl (T.unpack vname) typ
       when (decl /= "") $ tellCLn $ "static " <> decl <> ";"
 
 -- | lookup node by its index
-lookupNode :: NodeID -> TranM MMNode
+lookupNode :: OMNodeID -> TranM MMNode
 lookupNode i = do
   g <- use theGraph
-  case G.lookup i g of
+  case M.lookup i g of
    Nothing -> raiseErr $ failed $ "out-of-bound node reference: #" ++ show i
    Just n -> do
      case A.viewMaybe n of
@@ -247,41 +265,68 @@ lookupNode i = do
      return n
 
 
--- | generate expression.
+-- | generate bindings, and the final expression that contains the result of evaluation.
 
-genExpr :: MMInst -> TranM T.Text
-genExpr inst = do
+genMMInstruction :: MMInstruction -> TranM (T.Text, T.Text)
+genMMInstruction mminst = do
   indNames <- use loopIndexNames
+
+  alreadyGivenLocalNames .= S.empty
+  freeLocalNameCounter .= 0
+  nodeIDtoLocalName .= M.empty
+
   let accAt :: Vec Int -> T.Text
       accAt v = foldMap brackets $ kutukeru  <$> indNames <*> v
       kutukeru i d | d == 0 = i
                    | d <  0 = i <> showC d
                    | otherwise = i <> "+" <> showC d
-  case inst of
-    LoadCursorStatic vi name -> return $ T.pack name <> accAt vi
-    Imm r -> return $ showC (realToFrac r :: Double)
-    Uniop op a -> do
-      a_code <- genExpr a
-      return $ parens $ T.pack op <> a_code
-    Binop op a b -> do
-      a_code <- genExpr a
-      b_code <- genExpr b
-      case op of
-        "**" -> return $ ("pow"<>) $ parens $ a_code <> "," <> b_code
-        _ -> return $ parens $ a_code <> T.pack op <> b_code
-    LoadCursor vi nid -> do
-      node <- lookupNode nid
-      let Just (VariableName nam) = A.viewMaybe node
-      case node ^. nodeType of
-        ElemType _ -> return $ nam
-        _ -> return $ nam <> accAt vi
-    Store _ x -> genExpr x
-    x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
 
+  txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
+    thisName <- genFreeLocalName "a"
+    nodeIDtoLocalName %= M.insert nid0 thisName
+    microTypDecl <- genTypeDecl "" (subFix microTyp)
+    let thisEq :: T.Text -> TranM T.Text
+        thisEq code = return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";"
+
+        query :: MMNodeID -> TranM T.Text
+        query nid1 = do
+          nmap <- use nodeIDtoLocalName
+          case M.lookup nid1 nmap of
+            Just vname -> return vname
+            Nothing -> raiseErr $ failed $ "genExpr: missing graph node " ++ show nid1
+
+    case inst of
+      LoadCursorStatic vi name -> thisEq $ T.pack name <> accAt vi
+      Imm r -> thisEq $ showC (realToFrac r :: Double)
+      Uniop op a -> do
+        a_code <- query a
+        thisEq $ parens $ T.pack op <> a_code
+      Binop op a b -> do
+        a_code <- query a
+        b_code <- query b
+        case op of
+          "**" -> thisEq $ ("pow"<>) $ parens $ a_code <> "," <> b_code
+          _ -> thisEq $ parens $ a_code <> T.pack op <> b_code
+      LoadCursor vi nid -> do
+        node <- lookupNode nid
+        let Just (VariableName nam) = A.viewMaybe node
+        case node ^. nodeType of
+          ElemType _ -> thisEq $ nam
+          _ -> thisEq $ nam <> accAt vi
+      Store _ x -> do
+        x_code <- query x
+        nodeIDtoLocalName %= M.insert nid0 x_code
+        return ""
+      x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
+
+  nmap <- use nodeIDtoLocalName
+  let (tailID, _) = M.findMax mminst
+      Just tailName = M.lookup tailID nmap
+  return $ (T.unlines txts, tailName)
 
 -- | generate a formura function body.
 
-genGraph :: Bool -> Graph MMInst -> TranM T.Text
+genGraph :: Bool -> MMGraph -> TranM T.Text
 genGraph isTimeLoop gr = do
   theGraph .= gr
   ivars <- use loopIndexNames
@@ -303,7 +348,7 @@ genGraph isTimeLoop gr = do
                      "++" <> timeStepVarName <>  "){"
       closeTimeLoop = "}"
 
-  ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> do
+  ps <- forM (M.toList gr) $ \(nid, Node inst typ anot) -> do
     let Just (VariableName lhsName) = A.viewMaybe anot
     let
       Just (Boundary (lowerBound, upperBound)) = A.toMaybe anot
@@ -318,20 +363,20 @@ genGraph isTimeLoop gr = do
               ["}" | _ <- toList ivars]
 
             zeros = repeat 0
-        rhs <- genExpr inst
+        (letBs,rhs) <- genMMInstruction inst
         let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
         return $ T.unlines $
-          openLoops ++ [bodyExpr] ++ closeLoops
+          openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
 
     case typ of
       ElemType "void" ->
-        case inst of
+        case mmInstTail inst of
           Store n _ -> genGrid (T.pack n)
           _ -> return "// void"
       ElemType ctyp -> do
-        rhs <- genExpr inst
-        return $ lhsName <> "=" <> rhs <> ";"
+        (letBs,rhs) <- genMMInstruction inst
+        return $ T.unlines ["{",letBs, lhsName <> "=" <> rhs <> ";", "}"]
       GridType _ typ -> genGrid lhsName
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot
@@ -430,7 +475,7 @@ genCxxFiles formuraProg mmProg = do
       , _theProgram = formuraProg
       , _theMMProgram = mmProg
       , _tsNumericalConfig = defaultNumericalConfig
-      , _theGraph = G.empty
+      , _theGraph = M.empty
       }
 
   (_, _, CProgram hxxContent cxxContent)

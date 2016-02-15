@@ -40,7 +40,6 @@ library
                   Formura.OrthotopeMachine.Graph
                   Formura.OrthotopeMachine.Translate
                   Formura.OrthotopeMachine.Manifestation
-                  Formura.Cxx.Translate
                   Formura.MPICxx.Translate
 
 
@@ -121,6 +120,7 @@ executable formura-eval
               , trifecta
 
 executable formura-gen
+  buildable: False
   hs-source-dirs: exe-src
   main-is: formura-gen.hs
   default-language:    Haskell2010
