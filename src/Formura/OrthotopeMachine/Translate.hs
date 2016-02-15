@@ -9,7 +9,6 @@ import           Control.Applicative
 import           Control.Lens hiding (op)
 import           Control.Monad
 import "mtl"     Control.Monad.Reader hiding (fix)
-import qualified Data.IntMap as G
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Ratio
@@ -51,7 +50,7 @@ instance HasCompilerSyntacticState CodegenState where
 defaultCodegenState :: CodegenState
 defaultCodegenState = CodegenState
   { _codegenSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "codegen"}
-  , _theGraph = G.empty
+  , _theGraph = M.empty
   , _codegenGlobalEnvironment = defaultGlobalEnvironment
   }
 
@@ -93,19 +92,19 @@ setupGlobalEnvironment prog = do
 class Generatable f where
   gen :: f (GenM ValueExpr) -> GenM ValueExpr
 
-freeNodeID :: GenM NodeID
+freeNodeID :: GenM OMNodeID
 freeNodeID = do
   g <- use theGraph
-  return $ G.size g
+  return $ M.size g
 
-insert :: OMInstF NodeID -> NodeType -> GenM ValueExpr
+insert :: OMInstrunction -> NodeType -> GenM ValueExpr
 insert inst typ = do
   n0 <- freeNodeID
   foc <- use compilerFocus
   let a = case foc of
         Just meta -> A.singleton meta
         Nothing   -> A.empty
-  theGraph %= G.insert n0 (Node inst typ a)
+  theGraph %= M.insert n0 (Node inst typ a)
   mmeta <- use compilerFocus
   case mmeta of
        Just meta -> theGraph . ix n0 . A.annotation %= A.set meta
@@ -237,7 +236,7 @@ evalToImm x = do
   g <- use theGraph
   case x of
     Imm r -> return $ Just r
-    n :. _ -> case G.lookup n g of
+    n :. _ -> case M.lookup n g of
       Just (Node (Imm r) _ _) -> return $ Just r
     _ -> return Nothing
 

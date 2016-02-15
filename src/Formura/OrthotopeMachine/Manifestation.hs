@@ -16,9 +16,9 @@ import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
-import qualified Data.IntMap as G
 import           Data.Maybe
 import           Data.Monoid
+import qualified Data.Map as M
 import qualified Data.Set as S
 import           Text.Trifecta (failed, raiseErr)
 
@@ -34,8 +34,9 @@ import           Formura.Vec
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
-  , _isManifestNode :: NodeID -> Bool
+  , _isManifestNode :: OMNodeID -> Bool
   , _theGraph :: Graph OMInstruction
+  , _nodeIDMap :: M.Map (OMNodeID ,Vec Int) MMNodeID
   }
 makeClassy ''TranState
 
@@ -45,17 +46,18 @@ instance HasCompilerSyntacticState TranState where
 defaultTranState :: TranState
 defaultTranState = TranState
   { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "manifestation"}
-  , _theGraph = G.empty
+  , _theGraph = M.empty
+  , _nodeIDMap = M.empty
   }
 
 
 type TranM = CompilerMonad GlobalEnvironment () TranState
 
 
-lookupNode :: NodeID -> TranM OMNode
+lookupNode :: OMNodeID -> TranM OMNode
 lookupNode i = do
   g <- use theGraph
-  case G.lookup i g of
+  case M.lookup i g of
    Nothing -> raiseErr $ failed $ "out-of-bound node reference: #" ++ show i
    Just n -> do
      case A.viewMaybe n of
@@ -63,22 +65,34 @@ lookupNode i = do
         Nothing -> return ()
      return n
 
-rhsCodeAt :: Vec Int -> NodeID -> TranM MMInstruction
+mapNodeID :: Vec Int -> OMNodeID -> TranM MMNodeID
+mapNodeID c i = do
+  f <- use nodeIDMap
+  case M.lookup f (c,i) of
+    Just j -> return j
+    Nothing -> do
+      let j = fromIntegral $ M.size f
+      nodeIDMap %= M.insert (c,i) j
+      return j
+
+rhsCodeAt :: Vec Int -> OMNodeID -> TranM MMInstruction
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
   isM <- use isManifestNode
   case isM nid of
-     True  -> return $ G.singleton nid (LoadCursor cursor nid)
+     True  -> do
+       j <- mapNodeID cursor nid
+       return $ M.singleton j (LoadCursor cursor nid)
      False -> rhsDelayedCodeAt cursor nid
 
 
 
 
-rhsDelayedCodeAt :: Vec Int -> NodeID -> TranM MMInstruction
+rhsDelayedCodeAt :: Vec Int -> OMNodeID -> TranM MMInstruction
 rhsDelayedCodeAt cursor omNodeID = do
   -- TODO: MMInst nodeID should be generated once per (cursor, nodeID), not (nodeID)
 
-  let mk1 = G.singleton omNodeID
+  let mk1 = M.singleton omNodeID
   (Node inst0 _ _) <- lookupNode omNodeID
   case inst0 of
      Imm r -> return $ mk1 $ Imm r
@@ -104,18 +118,18 @@ rhsDelayedCodeAt cursor omNodeID = do
      x -> raiseErr $ failed $ "manifestation path unimplemented for keyword: " ++ show x
 
 
-genMMInstruction :: NodeID -> TranM MMInstruction
+genMMInstruction :: OMNodeID -> TranM MMInstruction
 genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID
 
 
 manifestG :: Graph OMInstruction -> TranM (Graph MMInstruction)
 manifestG omg = do
   theGraph .= omg
-  let keys = G.keys omg
+  let keys = M.keys omg
   manifestKeys <- fmap concat $ forM keys $ \k -> do
     nd <- lookupNode k
     return $ case A.viewMaybe nd of
-      Just Manifest -> [k :: Int]
+      Just Manifest -> [k]
       _ -> []
   liftIO $ do
     putStrLn $ "manifest node ID: " ++ show  manifestKeys
@@ -131,11 +145,13 @@ manifestG omg = do
     case isM_0 nO of
       False -> return Nothing
       True -> do
+        nodeIDMap .= M.empty
+
         ndInst <- genMMInstruction nO
         omNode <- lookupNode nO
         return $ Just (nO, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
 
-  return $ boundaryAnalysis $ G.fromList nodeList
+  return $ boundaryAnalysis $ M.fromList nodeList
 
 manifestation :: OMProgram -> TranM MMProgram
 manifestation omprog = do
@@ -150,23 +166,23 @@ manifestation omprog = do
 
 boundaryAnalysis :: Graph MMInstruction -> Graph MMInstruction
 boundaryAnalysis gr =
-  flip G.mapWithKey gr $
-  \ k nd -> case G.lookup k bgr of
+  flip M.mapWithKey gr $
+  \ k nd -> case M.lookup k bgr of
   Just b ->  nd & A.annotation %~ A.set (b <> Boundary (0,0))
   Nothing -> nd
   where
-    bgr :: G.IntMap Boundary
-    bgr = G.mapWithKey knb gr
+    bgr :: M.Map OMNodeID Boundary
+    bgr = M.mapWithKey knb gr
 
     -- compute boundary for manifest node nd
-    knb :: Int -> MMNode -> Boundary
-    knb _ nd = mconcat $ map listBounds $ G.elems $ nd ^. nodeInst
+    knb :: OMNodeID -> MMNode -> Boundary
+    knb _ nd = mconcat $ map listBounds $ M.elems $ nd ^. nodeInst
 
-    listBounds :: MMInstF NodeID -> Boundary
+    listBounds :: MMInstF MMNodeID -> Boundary
     listBounds (LoadCursorStatic v _)    = Boundary (v,v)
     listBounds (LoadCursor v nid) =
       let Boundary (a,b) = b_of_n
-          Just b_of_n = G.lookup nid bgr
+          Just b_of_n = M.lookup nid bgr
       in Boundary (a+v, b+v)
     listBounds _ = mempty
 

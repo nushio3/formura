@@ -8,14 +8,15 @@ A virtual machine with multidimensional vector instructions that operates on str
 in http://arxiv.org/abs/1204.4779 .
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, FunctionalDependencies, MultiParamTypeClasses, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, FunctionalDependencies, GeneralizedNewtypeDeriving, MultiParamTypeClasses, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Graph where
 
 import           Algebra.Lattice
 import           Control.Lens
-import qualified Data.IntMap as G
 import qualified Data.Map as M
+import           Text.Read (Read(..))
+
 import qualified Formura.Annotation as A
 import           Formura.GlobalEnvironment
 import           Formura.Language.Combinator
@@ -39,7 +40,7 @@ data ShiftF x = ShiftF (Vec Int) x
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 -- | The functor for language that support cursored load of graph nodes.
-data LoadCursorF x = LoadCursorF (Vec Int) NodeID
+data LoadCursorF x = LoadCursorF (Vec Int) OMNodeID
                    | LoadCursorStaticF (Vec Int) IdentName
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
@@ -61,17 +62,28 @@ pattern LoadCursorStatic v x <- ((^? match) -> Just (LoadCursorStaticF v x)) whe
   LoadCursorStatic v x = match # LoadCursorStaticF v x
 
 
+newtype OMNodeID = OMNodeID Int deriving (Eq, Ord, Num)
+instance Show OMNodeID where
+  showsPrec n (OMNodeID x) = showsPrec n x
+instance Read OMNodeID where
+  readPrec = fmap OMNodeID  readPrec
+newtype MMNodeID = MMNodeID Int deriving (Eq, Ord, Num)
+instance Show MMNodeID where
+  showsPrec n (MMNodeID x) = showsPrec n x
+instance Read MMNodeID where
+  readPrec = fmap MMNodeID  readPrec
+
 -- | The instruction type for Orthotope Machine.
 type OMInstF = Sum '[DataflowInstF, LoadUncursoredF, ShiftF, OperatorF, ImmF]
-type OMInstruction = OMInstF NodeID
+type OMInstruction = OMInstF OMNodeID
 
 -- | The instruction type for Manifest Machine, where every node is manifest,
 --   and each instruction is actually a subgraph for delayed computation
 type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
-type MMInstruction = G.IntMap (MMInstF NodeID)
+type MMInstruction = M.Map MMNodeID (MMInstF MMNodeID)
 
-mmInstTail :: MMInstruction -> MMInstF NodeID
-mmInstTail = snd . G.findMax
+mmInstTail :: MMInstruction -> MMInstF MMNodeID
+mmInstTail = snd . M.findMax
 
 
 type NodeType  = Fix NodeTypeF
@@ -101,7 +113,6 @@ mapElemType f (ElemType t) = ElemType $ f t
 mapElemType f (GridType v t) = GridType v $ mapElemType f t
 mapElemType _ TopType = TopType
 
-type NodeID  = G.Key
 data Node instType = Node {_nodeInst :: instType, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
 instance Show a => Show (Node a) where
   show (Node i t _) = show i ++ " :: " ++ show t
@@ -113,9 +124,9 @@ makeLenses ''Node
 instance A.Annotated (Node a) where
   annotation = nodeAnnot
 
-type Graph instType = G.IntMap (Node instType)
+type Graph instType = M.Map OMNodeID (Node instType)
 
-data NodeValueF x = NodeValueF NodeID NodeType
+data NodeValueF x = NodeValueF OMNodeID NodeType
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n t = match # NodeValueF n t

@@ -9,7 +9,6 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper)
 import           Data.Foldable (toList)
-import qualified Data.IntMap as G
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Text as T
@@ -64,7 +63,7 @@ data NamingState = NamingState
   , _alreadyGivenLocalNames :: S.Set T.Text
   , _freeNameCounter :: Integer
   , _freeLocalNameCounter :: Integer
-  , _nodeIDtoLocalName :: G.IntMap T.Text
+  , _nodeIDtoLocalName :: M.Map MMNodeID T.Text
   , _loopIndexNames :: Vec T.Text
   , _loopExtentNames :: Vec T.Text
   }
@@ -75,7 +74,7 @@ defaultNamingState = NamingState
   , _alreadyGivenLocalNames = S.empty
   , _freeNameCounter = 0
   , _freeLocalNameCounter = 0
-  , _nodeIDtoLocalName = G.empty
+  , _nodeIDtoLocalName = M.empty
   , _loopIndexNames = PureVec ""
   , _loopExtentNames = PureVec ""
   }
@@ -247,17 +246,17 @@ tellIntermediateVariables = do
   g1 <- use omInitGraph
   g2 <- use omStepGraph
   forM_ [g1, g2] $ \gr -> do
-    forM_ (G.toList gr) $ \(_, node) -> do
+    forM_ (M.toList gr) $ \(_, node) -> do
       let typ = subFix $ node ^. nodeType
           Just (VariableName vname) = A.viewMaybe node
       decl <- genTypeDecl (T.unpack vname) typ
       when (decl /= "") $ tellCLn $ "static " <> decl <> ";"
 
 -- | lookup node by its index
-lookupNode :: NodeID -> TranM MMNode
+lookupNode :: OMNodeID -> TranM MMNode
 lookupNode i = do
   g <- use theGraph
-  case G.lookup i g of
+  case M.lookup i g of
    Nothing -> raiseErr $ failed $ "out-of-bound node reference: #" ++ show i
    Just n -> do
      case A.viewMaybe n of
@@ -277,16 +276,16 @@ genMMInstruction mminst = do
                    | d <  0 = i <> showC d
                    | otherwise = i <> "+" <> showC d
 
-  txts <- forM (G.toList mminst) $ \(nid0, inst) -> do
+  txts <- forM (M.toList mminst) $ \(nid0, inst) -> do
     thisName <- genFreeLocalName "a"
-    nodeIDtoLocalName %= G.insert nid0 thisName
+    nodeIDtoLocalName %= M.insert nid0 thisName
     let thisEq :: T.Text -> TranM T.Text
         thisEq code = return $ thisName <> "=" <> code <> ";"
 
         query :: NodeID -> TranM T.Text
         query nid1 = do
           nmap <- use nodeIDtoLocalName
-          case G.lookup nid1 nmap of
+          case M.lookup nid1 nmap of
             Just vname -> return vname
             Nothing -> raiseErr $ failed $ "genExpr: missing graph node " ++ show nid1
 
@@ -336,7 +335,7 @@ genGraph isTimeLoop gr = do
                      "++" <> timeStepVarName <>  "){"
       closeTimeLoop = "}"
 
-  ps <- forM (G.toList gr) $ \(nid, Node inst typ anot) -> do
+  ps <- forM (M.toList gr) $ \(nid, Node inst typ anot) -> do
     let Just (VariableName lhsName) = A.viewMaybe anot
     let
       Just (Boundary (lowerBound, upperBound)) = A.toMaybe anot
@@ -463,7 +462,7 @@ genCxxFiles formuraProg mmProg = do
       , _theProgram = formuraProg
       , _theMMProgram = mmProg
       , _tsNumericalConfig = defaultNumericalConfig
-      , _theGraph = G.empty
+      , _theGraph = M.empty
       }
 
   (_, _, CProgram hxxContent cxxContent)
