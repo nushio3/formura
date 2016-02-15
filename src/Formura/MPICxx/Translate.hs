@@ -265,22 +265,28 @@ lookupNode i = do
      return n
 
 
--- | generate expression.
+-- | generate bindings, and the final expression that contains the result of evaluation.
 
-genMMInstruction :: MMInstruction -> TranM T.Text
+genMMInstruction :: MMInstruction -> TranM (T.Text, T.Text)
 genMMInstruction mminst = do
   indNames <- use loopIndexNames
+
+  alreadyGivenLocalNames .= S.empty
+  freeLocalNameCounter .= 0
+  nodeIDtoLocalName .= M.empty
+
   let accAt :: Vec Int -> T.Text
       accAt v = foldMap brackets $ kutukeru  <$> indNames <*> v
       kutukeru i d | d == 0 = i
                    | d <  0 = i <> showC d
                    | otherwise = i <> "+" <> showC d
 
-  txts <- forM (M.toList mminst) $ \(nid0, Node inst _ _) -> do
+  txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
     thisName <- genFreeLocalName "a"
     nodeIDtoLocalName %= M.insert nid0 thisName
+    microTypDecl <- genTypeDecl "" (subFix microTyp)
     let thisEq :: T.Text -> TranM T.Text
-        thisEq code = return $ thisName <> "=" <> code <> ";"
+        thisEq code = return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";"
 
         query :: MMNodeID -> TranM T.Text
         query nid1 = do
@@ -307,9 +313,16 @@ genMMInstruction mminst = do
         case node ^. nodeType of
           ElemType _ -> thisEq $ nam
           _ -> thisEq $ nam <> accAt vi
-      Store _ x -> query x
+      Store _ x -> do
+        x_code <- query x
+        nodeIDtoLocalName %= M.insert nid0 x_code
+        return ""
       x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
-  return $ T.unlines txts
+
+  nmap <- use nodeIDtoLocalName
+  let (tailID, _) = M.findMax mminst
+      Just tailName = M.lookup tailID nmap
+  return $ (T.unlines txts, tailName)
 
 -- | generate a formura function body.
 
@@ -350,8 +363,8 @@ genGraph isTimeLoop gr = do
               ["}" | _ <- toList ivars]
 
             zeros = repeat 0
-        letBs <- genMMInstruction inst
-        let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> "rhs" <> ";"
+        (letBs,rhs) <- genMMInstruction inst
+        let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
         return $ T.unlines $
           openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
@@ -362,8 +375,8 @@ genGraph isTimeLoop gr = do
           Store n _ -> genGrid (T.pack n)
           _ -> return "// void"
       ElemType ctyp -> do
-        letBs <- genMMInstruction inst
-        return $ T.unlines ["{",letBs, lhsName <> "=" <> "rhs" <> ";", "}"]
+        (letBs,rhs) <- genMMInstruction inst
+        return $ T.unlines ["{",letBs, lhsName <> "=" <> rhs <> ";", "}"]
       GridType _ typ -> genGrid lhsName
       _ -> do
         let Just (VariableName nam) = A.viewMaybe anot
