@@ -49,7 +49,7 @@ library
                 base == 4.*
               , aeson
               , ansi-wl-pprint
-              , binary-search
+              , binary-search >= 1.0.0.3
               , bytestring
               , containers
               , directory
@@ -79,7 +79,7 @@ executable formura
   main-is: formura.hs
   default-language:    Haskell2010
   ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
-                       -- -optl-Wl,--whole-archive -optl/usr/lib/x86_64-linux-gnu/libgmp.so.10  -optl-Wl,--no-whole-archive
+  ld-options: -static -pthread
   build-depends:
                 base == 4.*
               , formura
