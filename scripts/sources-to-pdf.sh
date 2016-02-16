@@ -32,7 +32,7 @@ cat<<EOF >$tex_file   ## Print the tex file header
 
 EOF
 
-find src/ -type f ! -regex ".*/\..*" ! -name ".*" ! -name "*~"  -name '*.hs' !  -name '*_flymake.hs'|
+find src/ -type f ! -regex ".*/\..*" ! -name ".*" ! -name "*~"  -name '*.hs' !  -name '*_flymake.hs'| sort |
 sed 's/^\..//' |                 ## Change ./foo/bar.src to foo/bar.src
 
 while read  i; do                ## Loop through each file
