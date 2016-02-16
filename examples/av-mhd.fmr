@@ -15,7 +15,7 @@ float :: dt = 0.01
 float :: dx = 0.1, dy = 0.1, dz = 0.1
 
 
-ddx = fun(a) (-a[i+2] + 8*a[i+1] - 8*a[i-1] + a[i-2])/(12*dx)
+ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
 ddy = fun(a) 0
 ddz = fun(a) 0
 
@@ -40,13 +40,13 @@ begin function apply_av(u) returns (u_next)
   up[i] = u[i+1]
   um[i] = u[i-1]
   delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
-  u_l= u[i-1/2] + 0.5 * delta_u[i-1/2]
-  u_r= u[i+1/2] - 0.5 * delta_u[i+1/2]
+  u_l = u[i-1/2] + 0.5 * delta_u[i-1/2]
+  u_r = u[i+1/2] - 0.5 * delta_u[i+1/2]
 
   uu_num[i] = u_r[i]-u_l[i]
   uu_den[i] = u[i+1/2]-u[i-1/2]
 
-  Phi = if uu_num * uu_den <= 0 then 0 else 0 >? 1 + 2 *(uu_num / uu_den - 1)
+  Phi = if uu_num * uu_den <= 0 then 0 else (0 >? 1 + 2 *(uu_num / uu_den - 1))
 
   f = -0.5*Phi*uu_num
 
@@ -54,23 +54,23 @@ begin function apply_av(u) returns (u_next)
   u_next[i] = u[i] + f[i-1/2] - f[i+1/2]
 end function
 
-begin function apply_av_l(u) returns (u_next)
-  up[i] = u[i+1]
-  um[i] = u[i-1]
-  delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
-  u_l[i+1/2] = u[i] + 0.5 * delta_u[i]
-  u_r[i-1/2] = u[i] - 0.5 * delta_u[i]
-
-  uu_num[i+1/2] = u_r[i+1/2]-u_l[i+1/2]
-  uu_den[i+1/2] = u[i+1]-u[i]
-
-  Phi = if uu_num * uu_den <= 0 then 0 else 0 >? 1 + 2 *(uu_num / uu_den - 1)
-
-  f = -0.5*Phi*uu_num
-
-  manifest :: u_next
-  u_next[i] = u[i] + f[i-1/2] - f[i+1/2]
-end function
+## begin function apply_av_l(u) returns (u_next)
+##   up[i] = u[i+1]
+##   um[i] = u[i-1]
+##   delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+##   u_l[i+1/2] = u[i] + 0.5 * delta_u[i]
+##   u_r[i-1/2] = u[i] - 0.5 * delta_u[i]
+##
+##   uu_num[i+1/2] = u_r[i+1/2]-u_l[i+1/2]
+##   uu_den[i+1/2] = u[i+1]-u[i]
+##
+##   Phi = if uu_num * uu_den <= 0 then 0 else (0 >? 1 + 2 *(uu_num / uu_den - 1))
+##
+##   f = -0.5*Phi*uu_num
+##
+##   manifest :: u_next
+##   u_next[i] = u[i] + f[i-1/2] - f[i+1/2]
+## end function
 
 
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
