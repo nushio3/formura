@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project (formura_examples)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -mcmodel=large")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O3 -mcmodel=large")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -mcmodel=large")
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -mcmodel=large")
 
 add_custom_command(
   OUTPUT examples/diffusion.c

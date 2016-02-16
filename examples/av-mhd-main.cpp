@@ -11,7 +11,7 @@ int init() {
   printf("init\n");
   printf("init %d-%d\n",navi.lower_x, navi.upper_x);
 
-  /*
+
   for(int x = navi.lower_x; x < navi.upper_x/2; ++x) {
     dens[x] = 0;
     vx[x] = 1;
@@ -19,10 +19,11 @@ int init() {
   for(int x = navi.upper_x/2; x < navi.upper_x; ++x) {
     dens[x] = 0;
     vx[x] = -0.01;
-    }*/
+    }
+  /*
   for(int x = 90; x < 110; ++x) {
     Bz[x] = 7.77;
-  }
+  }*/
 }
 
 int main (int argc, char **argv) {
@@ -43,4 +44,5 @@ int main (int argc, char **argv) {
     Formura_Forward(&navi);
   }
   MPI_Finalize();
+  return 0;
 }

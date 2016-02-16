@@ -449,7 +449,8 @@ tellProgram = do
     tellCLn $ "navi->lower_" <> i <> "=0;"
     tellCLn $ "navi->offset_" <> i <> "=0;"
     tellCLn $ "navi->upper_" <> i <> "=" <> showC e <> ";"
-  tellCLn "}"
+  tellCLn "return 0;}"
+
 
 
   tellBoth "\n\n"
@@ -464,7 +465,7 @@ tellProgram = do
     [ "{"
     , con
     , "navi->time_step += "  <> showC monitorInterval0  <> ";"
-    , "}"
+    , "return 0;}"
     ]
 
 

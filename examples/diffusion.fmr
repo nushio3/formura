@@ -3,7 +3,7 @@ axes :: x, y, z
 intra_node_shape :: 64, 64, 64
 mpi_grid_shape :: 2, 2, 2
 temporal_blocking_interval :: 4
-monitor_interval :: 20
+monitor_interval :: 1
 
 
 ddx = fun(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
