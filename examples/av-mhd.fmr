@@ -3,7 +3,7 @@ axes :: x
 intra_node_shape :: 200
 mpi_grid_shape :: 1
 temporal_blocking_interval :: 4
-monitor_interval :: 2
+monitor_interval :: 1
 
 
 
@@ -37,6 +37,24 @@ vec = fun (e) (!(e 0), !(e 1), !(e 2))
 
 
 begin function apply_av(u) returns (u_next)
+  up[i] = u[i+1]
+  um[i] = u[i-1]
+  delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+  u_l= u[i-1/2] + 0.5 * delta_u[i-1/2]
+  u_r= u[i+1/2] - 0.5 * delta_u[i+1/2]
+
+  uu_num[i] = u_r[i]-u_l[i]
+  uu_den[i] = u[i+1/2]-u[i-1/2]
+
+  Phi = if uu_num * uu_den <= 0 then 0 else 0 >? 1 + 2 *(uu_num / uu_den - 1)
+
+  f = -0.5*Phi*uu_num
+
+  manifest :: u_next
+  u_next[i] = u[i] + f[i-1/2] - f[i+1/2]
+end function
+
+begin function apply_av_l(u) returns (u_next)
   up[i] = u[i+1]
   um[i] = u[i-1]
   delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)

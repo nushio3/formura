@@ -525,7 +525,7 @@ cxxTemplate = T.unlines
   [ ""
   , "#define min(a,b) ((a)<(b)?(a):(b))"
   , "#define max(a,b) ((a)>(b)?(a):(b))"
-  , "#define minmod(a,b) ((a)*(b)<=0?0:min(a,b))"
+  , "#define minmod(a,b) (min(a,b)>0?min(a,b):(max(a,b)<0?max(a,b):0))"
   , "typedef int bool;"
   , ""
   ]
