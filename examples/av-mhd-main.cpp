@@ -7,7 +7,7 @@ const int T_MAX = 500;
 
 Formura_Navigator navi;
 
-int init() {
+void init() {
   printf("init\n");
   printf("init %d-%d\n",navi.lower_x, navi.upper_x);
 

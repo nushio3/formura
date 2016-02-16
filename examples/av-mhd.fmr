@@ -50,7 +50,7 @@ end function
 
 
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
-  ddt_dens = -Σ fun(i) ∂ i (dens0 * v i)
+  ddt_dens = - Σ fun(i) ∂ i (dens0 * v i)
 
    ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
          - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens0 \
@@ -58,7 +58,7 @@ begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
 
   ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
 
-  ddt_s = Σ fun(j) (v j * ∂ j s)
+  ddt_s = Σ fun(j) v j * ∂ j s
 end function
 
 begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
