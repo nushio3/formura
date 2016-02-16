@@ -28,17 +28,10 @@ begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
       float [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
 end function
 
-
-begin function ! (x) returns mx
-      manifest :: mx = x
-end function
-
-vec = fun (e) (!(e 0), !(e 1), !(e 2))
+vec = fun (e) (e 0, e 1, e 2)
 
 
-begin function apply_av(u0) returns (u_next)
-  manifest :: u = u0
-
+begin function apply_av(u) returns (u_next)
   up[i] = u[i+1]
   um[i] = u[i-1]
   delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
@@ -57,7 +50,7 @@ end function
 
 
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
-  ddt_dens = ! (-Σ fun(i) ∂ i (dens0 * v i))
+  ddt_dens = -Σ fun(i) ∂ i (dens0 * v i)
 
    ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
          - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens0 \
@@ -65,7 +58,7 @@ begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
 
   ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
 
-  ddt_s = ! (Σ fun(j) (v j * ∂ j s))
+  ddt_s = Σ fun(j) (v j * ∂ j s)
 end function
 
 begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
@@ -75,13 +68,13 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, 
 
       sys_0 = (dens, v, B, s)
 
-      sys_q4 = sys_0 + dt/4 * ddt_sys(sys_0)
+      manifest :: sys_q4 = sys_0 + dt/4 * ddt_sys(sys_0)
 
-      sys_q3 = sys_0 + dt/3 * ddt_sys(sys_q4)
+      manifest :: sys_q3 = sys_0 + dt/3 * ddt_sys(sys_q4)
 
-      sys_q2 = sys_0 + dt/2 * ddt_sys(sys_q3)
+      manifest :: sys_q2 = sys_0 + dt/2 * ddt_sys(sys_q3)
 
-      sys_next = sys_0 + dt * ddt_sys(sys_q2)
+      manifest :: sys_next = sys_0 + dt * ddt_sys(sys_q2)
 
       sys_av = apply_av(sys_next)
 
