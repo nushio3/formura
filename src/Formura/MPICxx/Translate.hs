@@ -219,7 +219,7 @@ setNamingState = do
 genTypeDecl :: IdentName -> TypeExpr -> TranM T.Text
 genTypeDecl name typ = case typ of
   ElemType "void" -> return ""
-  ElemType "Rational" -> return $ "float " <> T.pack name
+  ElemType "Rational" -> return $ "double " <> T.pack name
   ElemType x -> return $ T.pack  x <> " " <> T.pack name
   GridType _ x -> do
     body <- genTypeDecl name x
@@ -306,8 +306,8 @@ genMMInstruction mminst = do
         b_code <- query b
         case op of
           "**" -> thisEq $ ("pow"<>) $ parens $ a_code <> "," <> b_code
-          ">?" -> thisEq $ ("max"<>) $ parens $ a_code <> "," <> b_code
-          "<?" -> thisEq $ ("min"<>) $ parens $ a_code <> "," <> b_code
+          ">?" -> thisEq $ ("fmax"<>) $ parens $ a_code <> "," <> b_code
+          "<?" -> thisEq $ ("fmin"<>) $ parens $ a_code <> "," <> b_code
           "<%" -> thisEq $ ("minmod"<>) $ parens $ a_code <> "," <> b_code
           _ -> thisEq $ parens $ a_code <> T.pack op <> b_code
       Triop "ite" a b c -> do
@@ -524,9 +524,7 @@ hxxFileName = hxxFilePath ^. filename
 cxxTemplate :: T.Text
 cxxTemplate = T.unlines
   [ ""
-  , "#define min(a,b) ((a)<(b)?(a):(b))"
-  , "#define max(a,b) ((a)>(b)?(a):(b))"
-  , "#define minmod(a,b) (min(a,b)>0?min(a,b):(max(a,b)<0?max(a,b):0))"
+  , "#define minmod(a,b) (fmin(a,b)>0?fmin(a,b):(fmax(a,b)<0?fmax(a,b):0))"
   , "typedef int bool;"
   , ""
   ]
