@@ -15,7 +15,7 @@ set term png
 set yrange [-1:1]
 set out "frames/av-{ident}.png"
 fn = "frames/av-{ident}.txt"
-        plot fn w lp t 'dens' lt 3, fn u 1:3  w lp t 'vel' lt 2 , fn u 1:4  w lp t 's' lt 1
+        plot fn w lp t 'dens' lt 3, fn u 1:3  w lp t 'vel' lt 2 , fn u 1:4  w lp t 's' lt 1, fn u 1:5  w lp t 'Bz' lt 4
 """.format(ident=ident))
 
     subprocess.call("gnuplot scripts/plot.gnu", shell=True)
