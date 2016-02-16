@@ -1,8 +1,7 @@
 flags: {}
 packages:
 - .
-extra-deps:
-  - binary-search-1.0
+extra-deps: []
 
-resolver: lts-5.1
+resolver: lts-5.3
 # skip-ghc-check: True
