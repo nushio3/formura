@@ -398,15 +398,19 @@ withBindings b1 genX = do
           Nothing -> return v1
           Just t  -> castVal t v1
 
-        case v of
-           (n :. _) -> do
+        let
+          annV (n :. _) = do
              theGraph . ix n . A.annotation %= A.set (SourceName $ name0)
              let isManifest = do
                    ms <- M.lookup name0 typeModDict
                    return $ TMManifest `elem` ms
              when (isManifest == Just True) $
                theGraph . ix n . A.annotation %= A.set Manifest
-           _        -> return ()
+          annV (Tuple xs) = mapM_ annV xs
+          annV _ = return ()
+
+        annV v
+
         return (name0, v)
 
       nvs2 <- local (binding %~ M.union (M.fromList nvs)) $ graduallyBind restOfBinds
