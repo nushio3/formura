@@ -1,9 +1,5 @@
 dimension :: 2
 axes :: x, y
-intra_node_shape :: 256, 256
-mpi_grid_shape :: 1, 1
-temporal_blocking_interval :: 4
-monitor_interval :: 20
 
 ddx = fun(a) (a[i+1/2,j] - a[i-1/2,j])
 ddy = fun(a) (a[i,j+1/2] - a[i,j-1/2])
