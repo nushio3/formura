@@ -7,7 +7,7 @@ Stability   : experimental
 Module for geometry inference.
 -}
 
-{-# LANGUAGE FlexibleInstances, TemplateHaskell, TypeSynonymInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, TemplateHaskell, TypeSynonymInstances #-}
 
 module Formura.Geometry where
 
@@ -21,7 +21,7 @@ type Pt = Vec Int
 
 data Box a = Box { _lowerVertex :: Vec a ,
                    _upperVertex :: Vec a}
-           deriving (Eq, Ord, Show, Read)
+           deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable)
 
 
 makeLenses ''Box
@@ -51,6 +51,9 @@ instance Num a => Num (Levitated a) where
 
   fromInteger = Levitate . fromInteger
 
+touchdown :: Levitated a -> Maybe a
+touchdown (Levitate x) = Just x
+touchdown _ = Nothing -- airplane crash!
 
 type Partition = Box (Levitated Int)
 type Orthotope = Box Int
