@@ -11,6 +11,7 @@ data CommandLineOption =
   CommandLineOption
     { _inputFilenames :: [FilePath]
     , _outputFilename :: FilePath
+    , _numericalConfigFilename :: FilePath
     , _verbose :: Bool
     }
   deriving (Eq, Show)
@@ -23,6 +24,9 @@ cloParser = CommandLineOption
             <*>
             strOption (long "output-filename" <> short 'o' <> metavar "FILENAME" <> value "" <>
                        help "the name of the .c file to be generated.")
+            <*>
+            strOption (long "nc" <> metavar "FILENAME" <> value "" <>
+                       help "the name of the file that provides numerical simulation configuration in YAML format.")
             <*>
             switch (long "verbose" <> short 'v' <> help "output debug messages.")
 

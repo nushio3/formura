@@ -53,6 +53,7 @@ library
               , ansi-wl-pprint
               , binary-search >= 1.0.0.3
               , bytestring
+              , cases
               , containers
               , directory
               , either

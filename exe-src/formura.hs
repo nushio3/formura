@@ -8,7 +8,7 @@ import qualified Data.Map as M
 import           Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
-import qualified Data.Yaml as Y
+import qualified Data.Yaml.Pretty as Y
 import           System.IO
 import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 import qualified Text.Trifecta as P
@@ -17,6 +17,7 @@ import qualified Formura.Annotation as A
 import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
 import           Formura.CommandLineOption
+import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.OrthotopeMachine.Translate (genOMProgram)
 import           Formura.OrthotopeMachine.Manifestation (genMMProgram)
@@ -29,6 +30,7 @@ main :: IO ()
 main = do
   opts <- getCommandLineOption
   let ?commandLineOption = opts
+  BS.writeFile "sample.nc.yaml" $ Y.encodePretty (Y.setConfCompare compare Y.defConfig) sampleNumericalConfig
   mapM_ process (opts ^. inputFilenames)
 
 process :: WithCommandLineOption => FilePath -> IO ()

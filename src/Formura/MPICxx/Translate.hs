@@ -497,6 +497,12 @@ genCxxFiles formuraProg mmProg = do
     ignore :: X.SomeException -> IO ()
     ignore _ = return ()
 
+ncFilePath :: WithCommandLineOption => FilePath
+ncFilePath = case ?commandLineOption ^. numericalConfigFilename of
+  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".nc"
+  x  -> x
+
+
 cxxFilePath :: WithCommandLineOption => FilePath
 cxxFilePath = case ?commandLineOption ^. outputFilename of
   "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".c"
