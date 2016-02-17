@@ -31,6 +31,7 @@ library
                   Formura.CommandLineOption
                   Formura.Geometry
                   Formura.GlobalEnvironment
+                  Formura.NumericalConfig
                   Formura.Parser
                   Formura.Syntax
                   Formura.Type
@@ -69,6 +70,7 @@ library
               , transformers
               , trifecta
               , vector
+              , yaml
 
   hs-source-dirs:      src
   default-language:    Haskell2010
