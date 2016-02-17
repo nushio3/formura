@@ -31,7 +31,7 @@ import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
-
+import           Formura.MPICxx.Cut (makePlan, MPIPlan(..))
 
 showC :: Show a => a -> T.Text
 showC = T.pack . show
@@ -382,6 +382,12 @@ tellProgram = do
   setNumericalConfig
   setNamingState
 
+  nc <- use tsNumericalConfig
+  mmprog <- use theMMProgram
+
+  plan <- liftIO $ makePlan nc mmprog
+
+
   tellH $ T.unlines
     [ ""
     , "#pragma once"
@@ -470,6 +476,7 @@ genCxxFiles formuraProg mmProg = do
       , _tsNumericalConfig = defaultNumericalConfig
       , _theGraph = M.empty
       }
+
 
   (_, _, CProgram hxxContent cxxContent)
     <- runCompilerRight tellProgram
