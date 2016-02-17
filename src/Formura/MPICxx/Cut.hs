@@ -3,6 +3,7 @@
 module Formura.MPICxx.Cut where
 
 import           Control.Lens
+import           Control.Monad.IO.Class
 import qualified Data.Map as M
 import           Formura.Vec
 import           Formura.Geometry
@@ -22,6 +23,12 @@ data PlanRead = PlanRead
   , _prNumericalConfig :: NumericalConfig
    }
 makeClassy ''PlanRead
+
+instance HasGlobalEnvironment PlanRead where
+  globalEnvironment = prGlobalEnvironment
+instance HasNumericalConfig PlanRead where
+  numericalConfig = prNumericalConfig
+
 
 data PlanState = PlanState
   { _psSyntacticState :: CompilerSyntacticState
@@ -48,4 +55,7 @@ makePlan nc prog = do
   return ret
 
 cut :: PlanM MPIPlan
-cut = undefined
+cut = do
+  ivars <- view axesNames
+  liftIO $ print ivars
+  return MPIPlan
