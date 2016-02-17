@@ -29,7 +29,7 @@ library
                   Formura.Annotation.Representation
                   Formura.Compiler
                   Formura.CommandLineOption
---                  Formura.Geometry
+                  Formura.Geometry
                   Formura.GlobalEnvironment
                   Formura.Parser
                   Formura.Syntax
@@ -158,7 +158,6 @@ test-suite test-region-plan
               , sbv
 
 test-suite test-geometry
-  buildable: False
   type:         exitcode-stdio-1.0
   hs-source-dirs: test
   main-is: test-geometry.hs
@@ -174,5 +173,4 @@ test-suite test-geometry
               , test-framework-hunit
               , HUnit
               , QuickCheck
-              , sbv
               , transformers
