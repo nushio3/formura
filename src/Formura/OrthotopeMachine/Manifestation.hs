@@ -8,7 +8,7 @@ Stability   : experimental
 A module for manifestation of the Orthotope Machine: that is, an operation that removes all the delayed nodes, and replace all shift instructions with cursored-load at manifest variables.
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, ImplicitParams, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Manifestation where
 
@@ -27,6 +27,7 @@ import qualified Formura.Annotation as A
 import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
 import           Formura.Compiler
+import           Formura.CommandLineOption
 import           Formura.GlobalEnvironment
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
@@ -134,7 +135,7 @@ genMMInstruction :: OMNodeID -> TranM ()
 genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID >> return ()
 
 
-manifestG :: OMGraph -> TranM MMGraph
+manifestG :: WithCommandLineOption => OMGraph -> TranM MMGraph
 manifestG omg = do
   theGraph .= omg
   let keys = M.keys omg
@@ -143,7 +144,7 @@ manifestG omg = do
     return $ case A.viewMaybe nd of
       Just Manifest -> [k]
       _ -> []
-  liftIO $ do
+  when (?commandLineOption ^. verbose) $ liftIO $ do
     putStrLn $ "manifest node ID: " ++ show  manifestKeys
 
   let isM_0 :: OMNodeID -> Bool
@@ -168,7 +169,7 @@ manifestG omg = do
 
   return $ boundaryAnalysis $ M.fromList nodeList
 
-manifestation :: OMProgram -> TranM MMProgram
+manifestation :: WithCommandLineOption => OMProgram -> TranM MMProgram
 manifestation omprog = do
   ig2 <- manifestG $ omprog ^. omInitGraph
   sg2 <- manifestG $ omprog ^. omStepGraph
@@ -204,7 +205,7 @@ boundaryAnalysis gr =
     listBounds _ = mempty
 
 
-genMMProgram :: OMProgram -> IO MMProgram
+genMMProgram :: WithCommandLineOption => OMProgram -> IO MMProgram
 genMMProgram omprog = do
   let run g = runCompilerRight g (omprog ^. globalEnvironment) defaultTranState
   (ret, _, _ ) <- run $ manifestation omprog

@@ -13,6 +13,7 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.IO as T
+import qualified Data.Yaml as Y
 import           System.Directory
 import           System.FilePath.Lens
 import           System.Process
@@ -148,31 +149,23 @@ genFreeName' isGlobal ident = do
   return givenName
 
 -- | read all numerical config from the Formura source program
-setNumericalConfig :: TranM ()
+setNumericalConfig :: WithCommandLineOption => TranM ()
 setNumericalConfig = do
   dim <- view dimension
-  formuraProg <- use theProgram
+  ivars <- view axesNames
 
-  -- set Numerical Configs
-  let sds :: [SpecialDeclaration]
-      sds = formuraProg ^. programSpecialDeclarations
+  mnc <- liftIO $ Y.decodeFile ncFilePath
+  nc <- case mnc of
+     Nothing -> raiseErr $ failed $ "cannot parse .nc file: " ++ show ncFilePath
+     Just x -> return x
 
-      sdMap :: M.Map String [Integer]
-      sdMap = M.fromList
-              [(k,v) | OtherDeclaration k v <- sds]
+  tsNumericalConfig .= nc
 
-  case M.lookup "mpi_grid_shape" sdMap of
-    Just xs | length xs == dim -> ncMPIGridShape .= (fmap fromInteger $ Vec xs)
-    _ -> raiseErr $ failed "bad mpi_grid_shape"
-  case M.lookup "intra_node_shape" sdMap of
-    Just xs | length xs == dim -> ncIntraNodeShape .= (fmap fromInteger $ Vec xs)
-    _ -> raiseErr $ failed "bad intra_node_shape"
-  case M.lookup "temporal_blocking_interval" sdMap of
-    Just xs | length xs == 1 -> ncTemporalBlockingInterval .= (fromInteger $ head xs)
-    _ -> raiseErr $ failed "bad temporal_blocking_interval"
-  case M.lookup "monitor_interval" sdMap of
-    Just xs | length xs == 1 -> ncMonitorInterval .= (fromInteger $ head xs)
-    _ -> raiseErr $ failed "bad monitor_interval"
+
+  when (length (nc ^. ncMPIGridShape) /= dim) $
+    raiseErr $ failed $ "mpi_grid_shape need exactly " ++ show dim ++ " elements."
+  when (length (nc ^. ncIntraNodeShape) /= dim) $
+    raiseErr $ failed $ "intra_node_shape need exactly " ++ show dim ++ " elements."
   return ()
 
 -- | prepare unique name for everyone

@@ -30,7 +30,6 @@ main :: IO ()
 main = do
   opts <- getCommandLineOption
   let ?commandLineOption = opts
-  BS.writeFile "sample.nc.yaml" $ Y.encodePretty (Y.setConfCompare compare Y.defConfig) sampleNumericalConfig
   mapM_ process (opts ^. inputFilenames)
 
 process :: WithCommandLineOption => FilePath -> IO ()
