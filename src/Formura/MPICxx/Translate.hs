@@ -175,10 +175,10 @@ setNamingState = do
   alreadyGivenNames .= (S.fromList $ map T.pack $ M.keys stateVars)
 
   ans <- view axesNames
-  lins <- traverse (genFreeName . ("i"++)) (Vec ans)
+  lins <- traverse (genFreeName . ("i"++)) ans
   loopIndexNames .= lins
 
-  luns <- traverse (genFreeName . ("N"++) . map toUpper) (Vec ans)
+  luns <- traverse (genFreeName . ("N"++) . map toUpper) ans
   loopExtentNames .= luns
 
   let nameNode :: MMNode -> TranM MMNode
@@ -350,11 +350,10 @@ genGraph isTimeLoop gr = do
               [ T.unwords
                 ["for (", i, "=", showC l ,";", i,  "<", n,"+",showC h, ";++", i, "){"]
               | ((i,n),(l,h)) <- zip (toList ivars) (toList nvars) `zip`
-                                 zip (toList lowerBound++zeros) (toList upperBound++zeros)]
+                                 zip (toList lowerBound) (toList upperBound)]
             closeLoops =
               ["}" | _ <- toList ivars]
 
-            zeros = repeat 0
         (letBs,rhs) <- genMMInstruction inst
         let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
         return $ T.unlines $
@@ -392,7 +391,7 @@ tellProgram = do
     , "#endif"
     ]
 
-  ivars <- map T.pack <$> view axesNames
+  ivars <- fmap T.pack <$> view axesNames
   intraExtents <- use ncIntraNodeShape
 
   tellH $ T.unlines ["#include <mpi.h>"]
@@ -428,7 +427,7 @@ tellProgram = do
   tellCLn "{"
   tellC  con
   tellCLn "navi->time_step=0;"
-  forM_ (zip ivars (toList intraExtents)) $ \(i, e) -> do
+  forM_ (zip (toList ivars) (toList intraExtents)) $ \(i, e) -> do
     tellCLn $ "navi->lower_" <> i <> "=0;"
     tellCLn $ "navi->offset_" <> i <> "=0;"
     tellCLn $ "navi->upper_" <> i <> "=" <> showC e <> ";"

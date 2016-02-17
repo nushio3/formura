@@ -23,5 +23,5 @@ sample3Denvironment :: GlobalEnvironment
 sample3Denvironment = GlobalEnvironment 3 $ Vec ["x","y","z"]
 
 
-extentVariableNames :: Getter GlobalEnvironment [IdentName]
+extentVariableNames :: Getter GlobalEnvironment (Vec IdentName)
 extentVariableNames = axesNames . to (fmap (("N"++) . fmap toUpper))
