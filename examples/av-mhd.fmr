@@ -1,11 +1,5 @@
 dimension :: 1
 axes :: x
-intra_node_shape :: 200
-mpi_grid_shape :: 1
-temporal_blocking_interval :: 4
-monitor_interval :: 1
-
-
 
 double :: π = 3.141592653589793
 double :: dens0 = 1.0
