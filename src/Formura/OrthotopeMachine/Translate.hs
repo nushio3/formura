@@ -15,6 +15,7 @@ import           Data.Ratio
 import           Text.Trifecta (failed, raiseErr)
 
 import           Formura.Language.Combinator
+import           Formura.Language.TExpr
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
 import           Formura.Compiler
@@ -135,10 +136,18 @@ castVal t1 vx = let t0 = typeOfVal vx in case (t1, t0, vx) of
 instance Generatable ImmF where
   gen (Imm r) = insert (Imm r) (ElemType "Rational")
 
+spoonTExpr :: (TupleF ∈ fs) => TExpr (Lang fs) -> GenM (Lang fs)
+spoonTExpr x = case x ^? tExpr of
+  Nothing -> raiseErr $ failed $ "Tuple length mismatch"
+  Just y -> return y
+
 instance Generatable OperatorF where
   gen (Uniop op gA)       = do a <- gA                  ; goUniop op a
   gen (Binop op gA gB)    = do a <- gA; b <- gB         ; goBinop op a b
-  gen (Triop op gA gB gC) = do a <- gA; b <- gB; c <- gC; goTriop op a b c
+  gen (Triop op gA gB gC) = do
+    a <- gA; b <- gB; c <- gC;
+    ret <- sequence $ goTriop op <$> tExpr # a <*> tExpr # b <*> tExpr # c
+    spoonTExpr ret
   gen (Naryop op gXs) = do
     xs <- sequence gXs
     goNaryop op xs
@@ -199,12 +208,6 @@ goTriop op (av :. at) (bv :. bt) (cv :. ct)
         TopType -> raiseErr $ failed $ unwords $
                    ["Type mismatch in if-then-else expr:", show at, show bt, show ct]
         _ -> insert (Triop op av bv cv) bct
-
--- TODO: more generalized triop
-goTriop op (Tuple xs) (Tuple ys) (Tuple zs) = Tuple <$> sequence
-  [goTriop op x y z | (x,y,z)<-zip3 xs ys zs]
-goTriop op (Tuple xs) (bv:.bt) (Tuple zs) = Tuple <$> sequence
-  [goTriop op x y z | (x,y,z)<-zip3 xs (repeat $ bv :. bt) zs]
 goTriop op _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator" ++ show op
 
 instance Generatable IdentF where
