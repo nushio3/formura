@@ -10,18 +10,18 @@ import Formura.Vec
 
 data GlobalEnvironment = GlobalEnvironment {
   _dimension :: Int,
-  _axesNames :: [IdentName]
+  _axesNames :: Vec IdentName
   }
                        deriving (Eq, Ord, Show)
 makeClassy ''GlobalEnvironment
 
 
 defaultGlobalEnvironment :: GlobalEnvironment
-defaultGlobalEnvironment = GlobalEnvironment 0 []
+defaultGlobalEnvironment = GlobalEnvironment 0 $ Vec []
 
 sample3Denvironment :: GlobalEnvironment
-sample3Denvironment = GlobalEnvironment 3 ["x","y","z"]
+sample3Denvironment = GlobalEnvironment 3 $ Vec ["x","y","z"]
 
 
 extentVariableNames :: Getter GlobalEnvironment [IdentName]
-extentVariableNames = axesNames . to (map (("N"++) . map toUpper))
+extentVariableNames = axesNames . to (fmap (("N"++) . fmap toUpper))
