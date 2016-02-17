@@ -116,6 +116,7 @@ data OperatorF x
   = UniopF IdentName x
   | BinopF IdentName x x
   | TriopF IdentName x x x
+  | NaryopF IdentName [x]
              deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Generic)
 
 comparisonOperatorNames :: S.Set IdentName
@@ -148,6 +149,8 @@ pattern Binop op a b <- ((^? match) -> Just (BinopF op a b)) where
   Binop op a b = match # BinopF op a b
 pattern Triop op a b c <- ((^? match) -> Just (TriopF op a b c)) where
   Triop op a b c = match # TriopF op a b c
+pattern Naryop op xs <- ((^? match) -> Just (NaryopF op xs)) where
+  Naryop op xs = match # NaryopF op xs
 
 -- ** Structures and Element Access
 

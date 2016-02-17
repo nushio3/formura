@@ -139,6 +139,14 @@ instance Generatable OperatorF where
   gen (Uniop op gA)       = do a <- gA                  ; goUniop op a
   gen (Binop op gA gB)    = do a <- gA; b <- gB         ; goBinop op a b
   gen (Triop op gA gB gC) = do a <- gA; b <- gB; c <- gC; goTriop op a b c
+  gen (Naryop op gXs) = do
+    xs <- sequence gXs
+    goNaryop op xs
+
+
+goNaryop :: IdentName -> [ValueExpr] -> GenM ValueExpr
+goNaryop op [x] = return x
+
 
 goUniop :: IdentName -> ValueExpr -> GenM ValueExpr
 goUniop op (av :. at) = insert (Uniop op av) at

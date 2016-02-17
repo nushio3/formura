@@ -9,7 +9,7 @@ Stability   : experimental
 This module contains combinator for writing Formura parser, and also the parsers for Formura syntax.
 -}
 
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 module Formura.Parser where
 
 import Control.Applicative
@@ -188,11 +188,19 @@ exprOf termParser = X.buildExpressionParser tbl termParser
            [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
            [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft],
-           [binary sym (Binop sym) X.AssocLeft | sym <- S.toList minMaxOperatorNames],
+           [binary sym (catNary sym) X.AssocLeft | sym <- S.toList minMaxOperatorNames],
            [binary sym (Binop sym) X.AssocNone | sym <- S.toList comparisonOperatorNames]
           ]
     unary  name fun = X.Prefix (pUni name fun)
     binary name fun assoc = X.Infix (pBin name fun) assoc
+
+    catNary sim a b = let
+      aparts = case a of Naryop sim' xs | sim == sim' -> xs
+                         _                          -> [a]
+      bparts = case b of Naryop sim' xs | sim == sim' -> xs
+                         _                          -> [b]
+      in Naryop sim $ aparts ++ bparts
+
 
     pUni name fun = "unary operator " ++ name ?> do
       r1 <- rend

@@ -24,6 +24,7 @@ source-repository head
 library
   exposed-modules:
                   Formura.Language.Combinator
+                  Formura.Language.TExpr
                   Formura.Annotation
                   Formura.Annotation.Boundary
                   Formura.Annotation.Representation
