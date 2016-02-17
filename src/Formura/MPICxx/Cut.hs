@@ -21,6 +21,7 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import qualified Data.Map as M
+import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
 
 
@@ -105,6 +106,11 @@ initialWalls = do
      Just [] -> raiseErr $ failed $ "at least 1 element is needed for initial_wall numerical configuration for axis: " ++ x
      Just ws -> return $ [mkWall x True 0] ++ map (mkWall x False) ws ++ [mkWall x True (intraShape ! x)]
 
+evalWall :: Partition -> PlanM Int
+evalWall w = case foldMap (maybeToList . touchdown) w of
+  [x] -> return x
+  _   -> raiseErr $ failed $ "malformed wall: " ++ show w
+
 
 
 
@@ -112,4 +118,9 @@ cut :: PlanM MPIPlan
 cut = do
   ws <- initialWalls
   liftIO $ print ws
+
+  wvs <- mapM (mapM evalWall) ws
+
+  liftIO $ print (wvs :: Vec [Int])
+
   return MPIPlan
