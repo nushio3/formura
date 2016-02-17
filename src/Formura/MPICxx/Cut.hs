@@ -1,5 +1,16 @@
 {-# LANGUAGE TemplateHaskell #-}
 
+{-
+
+　＿＿＿_＿＿＿
+／＼／＼ ／＼／＼
+＼　\ 　|　 /　／
+　＼ \　|  / ／
+　　＼\ | /／
+　　　＼|／
+
+-}
+
 module Formura.MPICxx.Cut where
 
 import           Control.Lens
