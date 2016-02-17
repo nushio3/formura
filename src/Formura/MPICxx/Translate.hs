@@ -26,6 +26,7 @@ import           Formura.Compiler
 import           Formura.CommandLineOption
 import           Formura.GlobalEnvironment
 import           Formura.Language.Combinator (subFix)
+import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
@@ -45,17 +46,6 @@ braces x = "{" <> x <> "}"
 
 newtype VariableName = VariableName T.Text
 
--- |  Configuration for distributed parallel code generation.
-data NumericalConfig = NumericalConfig
-  { _ncIntraNodeShape :: Vec Int
-  , _ncMPIGridShape :: Vec Int
-  , _ncTemporalBlockingInterval :: Int
-  , _ncMonitorInterval :: Int
-  }
-makeClassy ''NumericalConfig
-
-defaultNumericalConfig :: NumericalConfig
-defaultNumericalConfig = NumericalConfig 0 0 0 0
 
 -- | The struct for generating unique names, and holds already given names.
 data NamingState = NamingState
