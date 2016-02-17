@@ -167,6 +167,7 @@ test-suite test-geometry
                 base == 4.*
               , containers
               , formura
+              , lattices
               , mtl
               , test-framework
               , test-framework-quickcheck2

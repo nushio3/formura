@@ -21,13 +21,17 @@ type Pt = Vec Int
 
 data Box a = Box { _lowerVertex :: Vec a ,
                    _upperVertex :: Vec a}
+           deriving (Eq, Ord, Show, Read)
+
+
 makeLenses ''Box
 
 instance Num a => Num (Levitated a) where
   (Levitate a) + (Levitate b) = Levitate (a + b)
-  Top + Top = Top
-  Bottom + Bottom = Bottom
-  _ + _ = error "NaN in Levitated arithmetics"
+  Top + _ = Top
+  Bottom + _ = Bottom
+  _ + Top = Top
+  _ + Bottom = Bottom
 
   (Levitate a) * (Levitate b) = Levitate (a * b)
   Top * Top = Bottom
