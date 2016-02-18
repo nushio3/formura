@@ -7,13 +7,14 @@ Stability   : experimental
 ZipList treated as mathematical vectors, to deal with multidimensionality in stencil computation.
 -}
 
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, TypeFamilies #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveTraversable, TypeFamilies #-}
 
 module Formura.Vec where
 
 import           Control.Applicative
 import           Control.Lens
 import qualified Data.Aeson as J
+import           Data.Data
 import           Data.Char (toLower)
 import           Data.Monoid
 
@@ -22,7 +23,7 @@ formuraMaxDimension :: Int
 formuraMaxDimension = 26
 
 data Vec a = Vec { getVec :: [a] } | PureVec a
-           deriving (Read, Functor, Traversable)
+           deriving (Read, Functor, Traversable, Typeable, Data)
 instance Foldable Vec where
   foldMap m (Vec xs) = foldMap m xs
   foldMap m (PureVec x) = foldMap m $ replicate formuraMaxDimension x

@@ -11,12 +11,13 @@ Components for syntatic elements of formura.
 
 {-# LANGUAGE DataKinds, DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveGeneric,
 DeriveTraversable, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses,
-PatternSynonyms, TemplateHaskell, ViewPatterns #-}
+PatternSynonyms, StandaloneDeriving, TemplateHaskell, ViewPatterns #-}
 
 module Formura.Syntax where
 
 import Algebra.Lattice
 import Control.Lens hiding (op)
+import Data.Data
 import Data.List (intercalate)
 import qualified Data.Set as S
 import Data.Typeable
@@ -31,14 +32,14 @@ import Formura.Vec
 -- ** Elemental types
 
 data ElemTypeF x = ElemTypeF IdentName
-                 deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
+                 deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable, Data)
 instance Show (ElemTypeF x) where
   show (ElemTypeF n) = n
 
 pattern ElemType x <- ((^? match) -> Just (ElemTypeF x)) where ElemType x = match # ElemTypeF x
 
 data TypeModifier = TMConst | TMManifest | TMExtern
-                 deriving (Eq, Ord)
+                 deriving (Eq, Ord, Typeable, Data)
 instance Show TypeModifier where
   show TMConst = "const"
   show TMManifest = "manifest"
@@ -48,13 +49,13 @@ instance Show TypeModifier where
 
 
 data FunTypeF x = FunTypeF
-                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern FunType <- ((^? match) -> Just FunTypeF) where FunType = match # FunTypeF
 
 
 data TopTypeF x = TopTypeF
-                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern TopType <- ((^? match) -> Just TopTypeF) where TopType = match # TopTypeF
 
@@ -63,7 +64,7 @@ pattern TopType <- ((^? match) -> Just TopTypeF) where TopType = match # TopType
 type IdentName = String
 
 data IdentF x = IdentF IdentName
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 -- | smart pattern
 pattern Ident xs <- ((^? match) -> Just (IdentF xs)) where
@@ -75,7 +76,7 @@ pattern Ident xs <- ((^? match) -> Just (IdentF xs)) where
 
 -- | The functor for tuple.
 data TupleF x = TupleF [x]
-             deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable, Data)
 instance Show x => Show (TupleF x) where
   show (TupleF xs) = "(" ++ (intercalate ", " $ map show xs) ++ ")"
 
@@ -94,7 +95,7 @@ pattern Tuple xs <- ((^? match) -> Just (TupleF xs)) where
 
 -- | Rational Literal
 data ImmF x = ImmF Rational
-            deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+            deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern Imm r <- ((^? match) -> Just (ImmF r)) where
   Imm r = match # ImmF r
@@ -105,7 +106,7 @@ instance Q.Arbitrary x => Q.Arbitrary (ImmF x) where
 
 -- | Boolean Literal
 data ImmBoolF x = ImmBoolF Bool
-                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern ImmBool r <- ((^? match) -> Just (ImmBoolF r)) where
   ImmBool r = match # ImmBoolF r
@@ -117,7 +118,7 @@ data OperatorF x
   | BinopF IdentName x x
   | TriopF IdentName x x x
   | NaryopF IdentName [x]
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Generic)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data, Generic)
 
 comparisonOperatorNames :: S.Set IdentName
 comparisonOperatorNames = S.fromList $ words "<= == != >= < >"
@@ -155,13 +156,13 @@ pattern Naryop op xs <- ((^? match) -> Just (NaryopF op xs)) where
 -- ** Structures and Element Access
 
 data GridF x = GridF (Vec NPlusK) x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern Grid args x <- ((^? match) -> Just (GridF args x )) where
   Grid args x = match # GridF args x
 
 data GridTypeF x = GridTypeF (Vec Rational) x
-             deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Functor, Foldable, Traversable, Typeable, Data)
 instance Show x => Show (GridTypeF x) where
   show (GridTypeF v x) = show x ++ show v
 
@@ -170,13 +171,13 @@ pattern GridType args x <- ((^? match) -> Just (GridTypeF args x )) where
 
 
 data VectorF x = VectorF IdentName x
-                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern Vector args x <- ((^? match) -> Just (VectorF args x )) where
   Vector args x = match # VectorF args x
 
 data VectorTypeF x = VectorTypeF Int x
-                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+                   deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern VectorType args x <- ((^? match) -> Just (VectorTypeF args x )) where
   VectorType args x = match # VectorTypeF args x
@@ -185,28 +186,28 @@ pattern VectorType args x <- ((^? match) -> Just (VectorTypeF args x )) where
 
 -- | Function application
 data ApplyF x = ApplyF x x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern Apply f x <- ((^? match) -> Just (ApplyF f x)) where
   Apply f x = match # ApplyF f x
 
 -- | Let clause
 data LetF x = LetF (BindingF x) x
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern Let binds x <- ((^? match) -> Just (LetF binds x)) where
   Let binds x = match # LetF binds x
 
 -- | Lambda expression. Lambda expression is not to recurse into its RExpr.
 data LambdaF x = LambdaF LExpr RExpr
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern Lambda args x <- ((^? match) -> Just (LambdaF args x )) where
   Lambda args x = match # LambdaF args x
 
 -- | Bunch of bindings
 data BindingF x = BindingF [StatementF x]
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 
 pattern Binding xs <- ((^? match) -> Just (BindingF xs )) where
   Binding xs = match # BindingF xs
@@ -239,7 +240,7 @@ data StatementF x
   -- ^ substitution
   | TypeDeclF ModifiedTypeExpr LExpr
   -- ^ type declaration with modification
-             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable)
+             deriving (Eq, Ord, Show, Functor, Foldable, Traversable, Typeable, Data)
 pattern Subst l r <- ((^? match) -> Just (SubstF l r)) where
   Subst l r = match # SubstF l r
 pattern TypeDecl t x <- ((^? match) -> Just (TypeDeclF t x)) where
@@ -251,7 +252,7 @@ type ConstRationalExprF = Sum '[ ApplyF, OperatorF, ImmF ]
 type ConstRationalExpr  = Lang '[ ApplyF, OperatorF, ImmF ]
 
 data NPlusK = NPlusK IdentName Rational
-             deriving (Eq, Ord, Show)
+             deriving (Eq, Ord, Show, Typeable, Data)
 instance Num NPlusK where
   fromInteger n = NPlusK "" $ fromInteger n
   negate (NPlusK ident n) = NPlusK ident (negate n)
@@ -269,8 +270,14 @@ instance Field2 NPlusK NPlusK Rational Rational where
 
 type TypeExpr  = Fix TypeExprF
 type TypeExprF = Sum '[ TopTypeF, GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
+instance Data TypeExpr where
+  gfoldl = undefined
+  gunfold = undefined
+  toConstr = undefined
+  dataTypeOf = undefined
+
 data ModifiedTypeExpr = ModifiedTypeExpr [TypeModifier] TypeExpr
-             deriving (Eq, Ord)
+             deriving (Eq, Ord, Data)
 
 instance Show ModifiedTypeExpr where
   show (ModifiedTypeExpr ms t) = unwords (map show ms) ++ " " ++ show t
@@ -278,22 +285,25 @@ instance Show ModifiedTypeExpr where
 
 type LExpr  = Fix LExprF
 type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
+instance Data LExpr where
+
 
 type TupleOfIdents  = Fix TupleOfIdentsF
 type TupleOfIdentsF = Sum '[ TupleF, IdentF ]
 
 type RExpr  = Fix RExprF
 type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, ImmF ]
+instance Data RExpr where
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
                         | OtherDeclaration String [Integer]
-             deriving (Eq, Ord, Show)
+             deriving (Eq, Ord, Show, Data)
 
 data Program = Program
                { _programSpecialDeclarations :: [SpecialDeclaration]
                , _programBinding :: BindingF RExpr}
-             deriving (Eq, Ord, Show)
+             deriving (Eq, Ord, Show, Data)
 makeLenses ''Program
 
 instance MeetSemiLattice TypeExpr where

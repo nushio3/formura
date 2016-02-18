@@ -16,6 +16,7 @@ module Formura.Desugar where
 
 import Control.Lens
 import Data.Data
+import Data.Foldable (toList)
 import Data.Generics.Schemes(everywhere)
 
 import Formura.Vec
@@ -40,6 +41,8 @@ desugar prog = do
   let
       modifyLExpr :: GridF LExpr -> GridF LExpr
       modifyLExpr (GridF v_npk x) = GridF v_npk x
+      modifyTypeExpr :: GridTypeF TypeExpr -> GridTypeF TypeExpr
+      modifyTypeExpr (GridTypeF xs x) = GridTypeF (Vec $ take dim $ (toList xs) ++ repeat 0) x
 
 
-  return $ mapEverywhere modifyLExpr prog
+  return $ mapEverywhere modifyTypeExpr prog

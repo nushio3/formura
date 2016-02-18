@@ -7,7 +7,7 @@ Stability   : experimental
 Combinators for creating a customized language based on Modular Reifiable Matching.
 -}
 
-{-# LANGUAGE ConstraintKinds, DataKinds, DeriveFoldable, DeriveFunctor,
+{-# LANGUAGE ConstraintKinds, DataKinds, DeriveDataTypeable, DeriveFoldable, DeriveFunctor,
 DeriveTraversable, FlexibleContexts, FlexibleInstances,
 FunctionalDependencies, GADTs, KindSignatures, MultiParamTypeClasses,
 PatternSynonyms, RankNTypes, ScopedTypeVariables, StandaloneDeriving,
@@ -30,6 +30,7 @@ data Sum (fs :: [* -> *]) x where
   Void :: Sum '[] x
   Here :: Traversable f => f x -> Sum (f ': fs) x
   There :: Sum fs x -> Sum (f ': fs) x
+
 
 instance Eq (Sum '[] x) where
   _ == _ = True
@@ -167,6 +168,7 @@ instance Show Metadata where
   show = const ""
 instance P.HasRendering Metadata where
   rendering = metadataRendering
+
 
 -- | The fix point of F-algebra, with compiler metadata information. This is the datatype we use to represent any AST.
 data Fix f where
