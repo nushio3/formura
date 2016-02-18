@@ -298,6 +298,15 @@ genMMInstruction mminst = do
         b_code <- query b
         c_code <- query c
         thisEq $ parens $ a_code <> "?" <> b_code <> ":" <> c_code
+      Naryop op xs -> do
+        xs_code <- mapM query xs
+        let fname = case op of
+              ">?" -> "fmax"
+              "<?" -> "fmin"
+              "<%" -> "minmod"
+              _    -> T.pack op
+        thisEq $ foldr1 (\a b -> fname <> parens (a <> "," <> b) )  xs_code
+
 
       LoadCursor vi nid -> do
         node <- lookupNode nid
