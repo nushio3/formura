@@ -289,9 +289,6 @@ genMMInstruction mminst = do
         b_code <- query b
         case op of
           "**" -> thisEq $ ("pow"<>) $ parens $ a_code <> "," <> b_code
-          ">?" -> thisEq $ ("fmax"<>) $ parens $ a_code <> "," <> b_code
-          "<?" -> thisEq $ ("fmin"<>) $ parens $ a_code <> "," <> b_code
-          "<%" -> thisEq $ ("minmod"<>) $ parens $ a_code <> "," <> b_code
           _ -> thisEq $ parens $ a_code <> T.pack op <> b_code
       Triop "ite" a b c -> do
         a_code <- query a
