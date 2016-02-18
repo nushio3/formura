@@ -9,6 +9,7 @@ import           Control.Applicative
 import           Control.Lens hiding (op)
 import           Control.Monad
 import "mtl"     Control.Monad.Reader hiding (fix)
+import           Data.Foldable
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Ratio
@@ -150,12 +151,28 @@ instance Generatable OperatorF where
     spoonTExpr ret
   gen (Naryop op gXs) = do
     xs <- sequence gXs
-    goNaryop op xs
+    let list_texpr_vals = map (tExpr#) xs :: [TExpr ValueExpr]
+        texpr_list_vals = sequenceA list_texpr_vals :: TExpr [ValueExpr]
+    ret <- sequence $ goNaryop op <$> texpr_list_vals
+    spoonTExpr ret
 
 
+type MVsT = Maybe ([OMNodeID], OMNodeType)
 goNaryop :: IdentName -> [ValueExpr] -> GenM ValueExpr
-goNaryop op [x] = return x
+goNaryop op xs = do
+  mvst <- foldrM foldVT Nothing xs
+  case mvst of
+    Nothing -> raiseErr $ failed $ "unexpected N-ary operator with 0 argument"
+    Just (vs,t) -> insert (Naryop op vs) t
 
+  where
+    foldVT :: ValueExpr -> MVsT -> GenM MVsT
+    foldVT (av :. at) Nothing = return $ Just ([av], at)
+    foldVT (av :. at) (Just (bvs,bt)) = case at /\ bt of
+      TopType -> raiseErr $ failed $ unwords
+             ["there is no common type that can accomodate both hand side:", op, show at , show bt]
+      ct -> return $ Just (av:bvs, ct)
+    foldVT _ _ = raiseErr $ failed $ "unexpected path in N-ary operator"
 
 goUniop :: IdentName -> ValueExpr -> GenM ValueExpr
 goUniop op (av :. at) = insert (Uniop op av) at
@@ -164,7 +181,7 @@ goUniop op (f@(FunValue _ _)) =
 goUniop op (Tuple xs) = do
   vs <- traverse (goUniop op) xs
   return $ Tuple vs
-goUniop _ _  = raiseErr $ failed $ "unimplemented path in unary operator"
+goUniop _ _  = raiseErr $ failed $ "unexpected path in unary operator"
 
 goBinop :: IdentName -> ValueExpr -> ValueExpr -> GenM ValueExpr
 goBinop (".") a b = return $ FunValue (Ident "x") (Apply (subFix a) (Apply (subFix b) (Ident "x")))
@@ -191,7 +208,7 @@ goBinop op (Tuple xs) (Tuple ys) | length xs == length ys = do
 goBinop op (Tuple xs) (Tuple ys) = raiseErr $ failed "tuple length mismatch."
 goBinop op (x@(_ :. _)) (Tuple ys) = Tuple <$> sequence [goBinop op x y | y <- ys]
 goBinop op (Tuple xs) (y@(_ :. _)) = Tuple <$> sequence [goBinop op x y | x <- xs]
-goBinop o a b  = raiseErr $ failed $ unlines ["unimplemented path in binary operator: ", "OP:",  show o,"LHS:",show a,"RHS:",show b]
+goBinop o a b  = raiseErr $ failed $ unlines ["unexpected path in binary operator: ", "OP:",  show o,"LHS:",show a,"RHS:",show b]
 
 isBoolishType :: OMNodeType -> Bool
 isBoolishType (ElemType "bool") = True
@@ -208,7 +225,7 @@ goTriop op (av :. at) (bv :. bt) (cv :. ct)
         TopType -> raiseErr $ failed $ unwords $
                    ["Type mismatch in if-then-else expr:", show at, show bt, show ct]
         _ -> insert (Triop op av bv cv) bct
-goTriop op _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator" ++ show op
+goTriop op _ _ _ = raiseErr $ failed $ "unexpected path in trinary operator" ++ show op
 
 instance Generatable IdentF where
   gen (Ident n) = do
