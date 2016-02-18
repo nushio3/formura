@@ -39,12 +39,19 @@ desugar prog = do
       dim = head $ [n | DimensionDeclaration n <- prog ^.programSpecialDeclarations] ++
             [error "no dimension declaration found."]
   let
-      modifyLExpr :: LExpr -> LExpr
-      modifyLExpr (Grid v_npk x) = Grid (Vec $ take dim $ toList v_npk ++ repeat 0 ) x
-      modifyLExpr x = x
-
       modifyTypeExpr :: TypeExpr -> TypeExpr
       modifyTypeExpr (GridType xs x) = GridType (Vec $ take dim $ (toList xs) ++ repeat 0) x
       modifyTypeExpr x = x
 
-  return $ mapEverywhere modifyTypeExpr prog
+      modifyLExpr :: LExpr -> LExpr
+      modifyLExpr (Grid v_npk x) = Grid (Vec $ take dim $ toList v_npk ++ repeat 0 ) x
+      modifyLExpr x = x
+
+      modifyRExpr :: RExpr -> RExpr
+      modifyRExpr (Grid v_npk x) = Grid (Vec $ take dim $ toList v_npk ++ repeat 0 ) x
+      modifyRExpr x = x
+
+  return $ mapEverywhere modifyTypeExpr $
+    mapEverywhere modifyLExpr $
+    mapEverywhere modifyRExpr $
+    prog

@@ -270,18 +270,6 @@ instance Field2 NPlusK NPlusK Rational Rational where
 
 type TypeExpr  = Fix TypeExprF
 type TypeExprF = Sum '[ TopTypeF, GridTypeF, TupleF, VectorTypeF, FunTypeF , ElemTypeF ]
--- instance Data TypeExpr where
---   gfoldl (*) z = go
---     where
---       go TopType = z TopType
---       go (GridType r x) = z GridType * r * x
---       go (Tuple xs) = z Tuple * xs
---       go (VectorType n x) = z VectorType * n * x
---       go FunType = z FunType
---       go (ElemType tn) = z ElemType * tn
--- --   gunfold = undefined
--- --   toConstr = undefined
--- --   dataTypeOf = undefined
 
 data ModifiedTypeExpr = ModifiedTypeExpr [TypeModifier] TypeExpr
              deriving (Eq, Ord, Data)
@@ -292,28 +280,12 @@ instance Show ModifiedTypeExpr where
 
 type LExpr  = Fix LExprF
 type LExprF = Sum '[ GridF, TupleF, VectorF, IdentF ]
--- instance Data LExpr where
---   gfoldl (*) z = go
---     where
---       go (Grid p x) = z Grid * p * x
---       go (Tuple xs) = z Tuple * xs
---       go (Vector n x) = z Vector * n * x
---       go (Ident n) = z Ident * n
 
 type TupleOfIdents  = Fix TupleOfIdentsF
 type TupleOfIdentsF = Sum '[ TupleF, IdentF ]
 
 type RExpr  = Fix RExprF
 type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, ImmF ]
--- instance Data RExpr where
---   gfoldl (*) z = go
---     where
---       go (Let b x) = z Let * b * x
---       go (Lambda l r) = z Lambda * l * r
---       go (Apply f x) = z Apply * f * x
---       go (Grid n x) = z Grid * n * x
---       go (Tuple xs) = z Tuple * xs
---       go
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]

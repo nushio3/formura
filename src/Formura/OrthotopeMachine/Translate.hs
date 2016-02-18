@@ -254,8 +254,6 @@ instance Generatable GridF where
               intOff = fmap floor newPos
               newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
               typ1 = GridType newOff etyp0
-          liftIO $ putStrLn $ "DEBUG" ++ show intOff
-          liftIO $ putStrLn $ "BUG because Vec is not auto-filled with 0 anymore"
 
           if intOff == 0
                   then return (val0 :. typ1)
