@@ -297,13 +297,13 @@ genMMInstruction mminst = do
         thisEq $ parens $ a_code <> "?" <> b_code <> ":" <> c_code
       Naryop op xs -> do
         xs_code <- mapM query xs
-        let fname = case op of
-              ">?" -> "fmax"
-              "<?" -> "fmin"
-              "<%" -> "minmod"
-              _    -> T.pack op
-        thisEq $ foldr1 (\a b -> fname <> parens (a <> "," <> b) )  xs_code
-
+        let chain fname cs = foldr1 (\a b -> fname <> parens (a <> "," <> b) ) cs
+        case op of
+          ">?" -> thisEq $ chain "fmax" xs_code
+          "<?" -> thisEq $ chain "fmin" xs_code
+          "<%" -> thisEq $ chain "fmin" ["0.0", chain "fmax" xs_code] <> "+" <>
+                           chain "fmax" ["0.0", chain "fmin" xs_code]
+          _ -> raiseErr $ failed $ "unexpected N-ary operator: " ++ show op
 
       LoadCursor vi nid -> do
         node <- lookupNode nid
