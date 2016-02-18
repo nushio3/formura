@@ -26,7 +26,15 @@ add_custom_command(
   DEPENDS examples/av-mhd.fmr
   DEPENDS bin/formura
   )
+add_custom_command(
+  OUTPUT examples/3d-mhd.c
+  COMMAND stack exec formura -- examples/3d-mhd.fmr
+  DEPENDS examples/3d-mhd.fmr
+  DEPENDS bin/formura
+  )
+
 
 add_executable(bin/diffusion.out examples/diffusion.c examples/diffusion-main.cpp)
 add_executable(bin/pearson.out examples/pearson.c examples/pearson-main.cpp)
 add_executable(bin/av-mhd.out examples/av-mhd.c examples/av-mhd-main.cpp)
+add_executable(bin/3d-mhd.out examples/3d-mhd.c examples/3d-mhd-main.cpp)
