@@ -84,7 +84,9 @@ getVecAccessor = do
       go (Vec ys) x' = let Just i = lookup x' indmap in ys!!i
   return go
 
-initialWalls :: PlanM (Vec [Partition])
+type Walls = Vec [Partition]
+
+initialWalls :: PlanM Walls
 initialWalls = do
   axes <- view axesNames
   iwparam <- view ncInitialWalls
