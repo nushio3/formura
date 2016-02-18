@@ -80,7 +80,7 @@ pprNode (i,n) = do
       varName = case A.toMaybe (n ^. A.annotation) of
         Just (SourceName n1) -> n1
         _                   -> ""
-  putStrLn $ unwords [r , take 4 $ varName ++ repeat ' ', show (i,n)]
+  putStrLn $ unwords [r , take 8 $ varName ++ repeat ' ', show (i,n)]
 
 pprMMNode :: (OMNodeID, MMNode) -> IO ()
 pprMMNode (i,n) = do
@@ -89,4 +89,4 @@ pprMMNode (i,n) = do
         Just (SourceName n1) -> n1
         _                   -> ""
       Just (Boundary bdy) = A.toMaybe $ n^.A.annotation
-  putStrLn $ unwords [take 4 $ varName ++ repeat ' ', show (i,n),show bdy]
+  putStrLn $ unwords [take 8 $ varName ++ repeat ' ', show (i,n),show bdy]

@@ -254,6 +254,9 @@ instance Generatable GridF where
               intOff = fmap floor newPos
               newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
               typ1 = GridType newOff etyp0
+          liftIO $ putStrLn $ "DEBUG" ++ show intOff
+          liftIO $ putStrLn $ "BUG because Vec is not auto-filled with 0 anymore"
+
           if intOff == 0
                   then return (val0 :. typ1)
                   else insert (Shift (negate intOff) val0) typ1
@@ -362,7 +365,6 @@ matchToIdents = go
 
 
 matchValueExprToLhs :: LExpr -> ValueExpr -> GenM [(IdentName, ValueExpr)]
--- TODO: LHS grid pattern must be taken care of.
 matchValueExprToLhs (Grid npk lx) vx = do
   ivx <- matchToLhs lx vx
   forM ivx $ \(i,v) -> do
@@ -428,12 +430,14 @@ withBindings b1 genX = do
 
         let
           annV (n :. _) = do
-             theGraph . ix n . A.annotation %= A.set (SourceName $ name0)
+             theGraph . ix n . A.annotation %= A.weakSet (SourceName $ name0)
              let isManifest = do
                    ms <- M.lookup name0 typeModDict
                    return $ TMManifest `elem` ms
-             when (isManifest == Just True) $
+             when (isManifest == Just True) $ do
                theGraph . ix n . A.annotation %= A.set Manifest
+               theGraph . ix n . A.annotation %= A.set (SourceName $ name0)
+
           annV (Tuple xs) = mapM_ annV xs
           annV _ = return ()
 
@@ -497,7 +501,7 @@ genGlobalFunction globalBinding inputType outputPattern (Lambda l r) =  bindThem
       (n99 :. _ ) -> do
         (n100 :. _) <- insert (Store name1 n99) unitType
         theGraph . ix n100 . A.annotation %= A.set Manifest
-        theGraph . ix n100 . A.annotation %= A.set (SourceName $ name1 ++ "_next")
+        theGraph . ix n100 . A.annotation %= A.weakSet (SourceName $ name1 ++ "_next")
       _           -> raiseErr $ failed "The return type of a global function must be a tuple of grids."
 
   return $ typeExprOf returnValueExpr
