@@ -22,6 +22,7 @@ import           Formura.OrthotopeMachine.Graph
 import           Formura.OrthotopeMachine.Translate (genOMProgram)
 import           Formura.OrthotopeMachine.Manifestation (genMMProgram)
 import qualified Formura.Parser as P
+import           Formura.Desugar
 import           Formura.Compiler
 import           Formura.Syntax
 import qualified Formura.MPICxx.Translate as C
@@ -40,7 +41,9 @@ process fn = do
       P.Success prog -> genMPICxx prog
 
 genMPICxx :: WithCommandLineOption => Program -> IO ()
-genMPICxx prog = do
+genMPICxx sugarcoated_prog = do
+  prog <- desugar sugarcoated_prog
+
   omProg <- genOMProgram prog
 
   when (?commandLineOption ^. verbose) $ do

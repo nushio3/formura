@@ -33,10 +33,11 @@ library
                   Formura.Geometry
                   Formura.GlobalEnvironment
                   Formura.NumericalConfig
-                  Formura.Parser
-                  Formura.Syntax
-                  Formura.Type
                   Formura.Vec
+                  Formura.Type
+                  Formura.Syntax
+                  Formura.Parser
+                  Formura.Desugar
                   Formura.Interpreter.Value
                   Formura.Interpreter.Eval
                   Formura.OrthotopeMachine.Graph
@@ -68,6 +69,7 @@ library
               , process
               , QuickCheck
               , sbv
+              , syb
               , text
               , transformers
               , trifecta
