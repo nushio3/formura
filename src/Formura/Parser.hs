@@ -166,14 +166,17 @@ gridIndicesOf parseIdx = "grid index" ?> do
   return $ Vec xs
 
 nPlusK :: P NPlusK
-nPlusK = "n+k pattern" ?> do
+nPlusK = "n+k pattern" ?> abbreviatedNPlusK <|> do
   x <-  identName
   mn <- optional $ do
     s <- symbolic '+' <|> symbolic '-'
     n <- constRationalExpr
     if s == '+' then return n else return (negate n)
   return $ NPlusK x (maybe 0 id mn)
-
+  where
+    abbreviatedNPlusK = do
+      lookAhead $ symbolic ','
+      return $ NPlusK "" 0
 
 
 imm :: (ImmF ∈ fs) => P (Lang fs)

@@ -1,5 +1,5 @@
-dimension :: 1
-axes :: x
+dimension :: 3
+axes :: x,y,z
 
 double :: π = 3.141592653589793
 double :: dens0 = 1.0
@@ -10,8 +10,8 @@ double :: dx = 0.1, dy = 0.1, dz = 0.1
 
 
 ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
-ddy = fun(a) 0
-ddz = fun(a) 0
+ddy = fun(a) (a[,i-2] + 8*a[,i+1] - 8*a[,i-1] - a[,i+2])/(12*dx)
+ddz = fun(a) (a[,,i-2] + 8*a[,,i+1] - 8*a[,,i-1] - a[,,i+2])/(12*dx)
 
 ∂ = (ddx,ddy,ddz)
 
@@ -25,7 +25,7 @@ end function
 vec = fun (e) (e 0, e 1, e 2)
 
 
-begin function apply_av(u) returns (u_next)
+begin function av_flux_x(u) returns (f)
   um[i] = u[i-1]
   up[i] = u[i+1]
   delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
@@ -38,9 +38,9 @@ begin function apply_av(u) returns (u_next)
   Phi = if uu_num * uu_den <= 0 then 0 else (0 >? 1 + 2 *(uu_num / uu_den - 1))
 
   f = -0.5*Phi*uu_num
-
-  u_next[i] = u[i] + f[i-1/2] - f[i+1/2]
 end function
+
+#   u_next[i] = u[i] + f[i-1/2] - f[i+1/2]
 
 
 begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
