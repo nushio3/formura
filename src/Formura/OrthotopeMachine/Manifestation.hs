@@ -121,6 +121,9 @@ rhsDelayedCodeAt cursor omNodeID = do
        jb <- rhsCodeAt cursor b
        jc <- rhsCodeAt cursor c
        ins $ Triop op ja jb jc
+     Naryop op xs -> do
+       jxs <- mapM (rhsCodeAt cursor) xs
+       ins $ Naryop op jxs
      Shift vi a -> rhsCodeAt (cursor + vi) a
      Load name -> ins $ LoadCursorStatic cursor name
      LoadIndex i -> ins $ LoadIndex i
