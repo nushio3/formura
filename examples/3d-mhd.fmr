@@ -103,13 +103,13 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s) \
 
       manifest :: sys_next = sys_0 + dt * ddt_sys(sys_q2)
 
-      avf_x = av_flux_x(sys_next)
-      avf_y = av_flux_y(sys_next)
-      avf_z = av_flux_z(sys_next)
+      manifest :: avf_x = av_flux_x(sys_next)
+      manifest :: avf_y = av_flux_y(sys_next)
+      manifest :: avf_z = av_flux_z(sys_next)
 
-      sys_avx = sys_next[i] + avf_x[i-1/2] - avf_x[i+1/2]
-      sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]
-      sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
+      manifest :: sys_avx = sys_next[i] + avf_x[i-1/2] - avf_x[i+1/2]
+      manifest :: sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]
+      manifest :: sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
 
       (dens_next, v_next, B_next, s_next) = sys_avz
       (vx_next, vy_next, vz_next) = v_next
