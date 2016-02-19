@@ -60,12 +60,26 @@ type Orthotope = Box Int
 
 class Geometric a where
   move :: Pt -> a -> a
+  (&&&) :: a -> a -> a
+  (|||) :: a -> a -> a
 
-instance Num a => Geometric (Box a) where
+instance Geometric a => Geometric [a] where
+  move v = fmap (move v)
+  (&&&) = zipWith (&&&)
+  (|||) = zipWith (|||)
+
+instance Geometric a => Geometric (Vec a) where
+  move v = fmap (move v)
+  (&&&) = liftVec2 (&&&)
+  (|||) = liftVec2 (|||)
+
+instance (Num a, Ord a) => Geometric (Box a) where
   move v (Box a b) =
     let mv = liftVec2 (\x lx -> fromIntegral x + lx)
     in Box (mv v a) (mv v b)
+  (Box a b) &&& (Box c d) = Box (liftVec2 max a c) (liftVec2 min b d)
+  (Box a b) ||| (Box c d) = Box (liftVec2 min a c) (liftVec2 max b d)
 
 instance Monoid Partition where
   mempty = Box (PureVec Top) (PureVec Bottom)
-  mappend (Box a b) (Box c d) = Box (liftVec2 max a c) (liftVec2 min b d)
+  mappend = (&&&)

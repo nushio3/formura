@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase, MultiWayIf, TemplateHaskell #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, LambdaCase, MultiWayIf, TemplateHaskell #-}
 
 {-
 
@@ -34,7 +34,13 @@ import           Formura.NumericalConfig
 import           Formura.Compiler
 
 
-newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read)
+newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num)
+newtype IRank = IRank (Vec Int) deriving (Eq, Show, Read, Num)
+
+instance Ord IRank where
+  (IRank (Vec xs)) `compare` (IRank (Vec ys)) = reverse xs `compare` reverse ys
+  compare _ _ = error "Comparison between IRank (PureVec _) is undefined"
+
 
 data MPIPlan = MPIPlan
 
@@ -42,6 +48,7 @@ data MPIPlan = MPIPlan
 data PlanRead = PlanRead
   { _prGlobalEnvironment :: GlobalEnvironment
   , _prNumericalConfig :: NumericalConfig
+  , _prStepGraph :: MMGraph
    }
 makeClassy ''PlanRead
 
@@ -63,14 +70,16 @@ type PlanM = CompilerMonad PlanRead () PlanState
 
 makePlan :: NumericalConfig -> MMProgram -> IO MPIPlan
 makePlan nc prog = do
-  let ps = PlanState
+  let pr = PlanRead
+           { _prGlobalEnvironment = prog ^. omGlobalEnvironment
+           , _prNumericalConfig = nc
+           , _prStepGraph = prog ^. omStepGraph
+           }
+      ps = PlanState
            { _psSyntacticState = defaultCompilerSyntacticState {_compilerStage = "MPI Planning"}
            }
 
-      pr = PlanRead
-           { _prGlobalEnvironment = prog ^. omGlobalEnvironment
-           , _prNumericalConfig = nc
-           }
+
 
   (ret, _, _) <- runCompilerRight cut pr ps
   return ret
@@ -85,6 +94,7 @@ getVecAccessor = do
   return go
 
 type Walls = Vec [Partition]
+
 
 initialWalls :: PlanM Walls
 initialWalls = do
@@ -118,11 +128,36 @@ evalWall w = case foldMap (maybeToList . touchdown) w of
 
 cut :: PlanM MPIPlan
 cut = do
-  ws <- initialWalls
-  liftIO $ print ws
+  ws0 <- initialWalls
+  -- liftIO $ print ws0
 
-  wvs <- mapM (mapM evalWall) ws
+  wvs <- mapM (mapM evalWall) ws0
 
-  liftIO $ print (wvs :: Vec [Int])
+  -- liftIO $ print (wvs :: Vec [Int])
+  stepGraph <- view prStepGraph
+
+  let wallMap :: M.Map OMNodeID Walls
+      wallMap = M.mapWithKey go stepGraph
+
+      go :: OMNodeID -> MMNode -> Walls
+      go i mmNode = let
+          mmInst :: MMInstruction
+          mmInst = mmNode ^. nodeInst
+          microInsts :: [MMInstF MMNodeID]
+          microInsts = map (^. nodeInst) $ M.elems mmInst
+        in foldr1 (&&&) (map listBounds microInsts)
+
+      listBounds :: MMInstF MMNodeID -> Walls
+      listBounds (LoadCursorStatic v _)    = ws0
+      listBounds (LoadCursor v nid) =
+        let Just w_of_n = M.lookup nid wallMap
+        in move v w_of_n
+      listBounds _ = fmap (fmap (const (mempty :: Partition))) ws0
+
+  wallEvolution <- traverse (mapM (mapM evalWall)) wallMap
+
+  forM_ (M.toList wallEvolution) $ \(nd, ws) -> liftIO $ do
+    putStrLn $ "NODE: " ++ show nd
+    putStrLn $ show ws
 
   return MPIPlan
