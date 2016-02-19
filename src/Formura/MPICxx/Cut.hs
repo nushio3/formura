@@ -151,7 +151,7 @@ cut = do
       listBounds (LoadCursorStatic v _)    = ws0
       listBounds (LoadCursor v nid) =
         let Just w_of_n = M.lookup nid wallMap
-        in move v w_of_n
+        in move (negate v) w_of_n
       listBounds _ = fmap (fmap (const (mempty :: Partition))) ws0
 
   wallEvolution <- traverse (mapM (mapM evalWall)) wallMap
