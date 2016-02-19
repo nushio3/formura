@@ -204,7 +204,7 @@ boundaryAnalysis gr =
     listBounds (LoadCursor v nid) =
       let Boundary (a,b) = b_of_n
           Just b_of_n = M.lookup nid bgr
-      in Boundary (a+v, b+v)
+      in Boundary (a-v, b-v)
     listBounds _ = mempty
 
 
