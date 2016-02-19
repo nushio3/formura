@@ -29,6 +29,7 @@ add_custom_command(
 add_custom_command(
   OUTPUT examples/3d-mhd.c
   COMMAND stack exec formura -- examples/3d-mhd.fmr
+  COMMAND sleep 1
   DEPENDS examples/3d-mhd.fmr
   DEPENDS bin/formura
   )

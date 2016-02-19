@@ -455,6 +455,9 @@ tellProgram = do
   mmg <- use omStepGraph
   con <- genGraph True $ mmg
   monitorInterval0 <- use ncMonitorInterval
+
+  liftIO $ putStrLn "DEBUG: Telling main program"
+
   tellC $ T.unlines
     [ "{"
     , con
