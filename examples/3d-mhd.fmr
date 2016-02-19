@@ -20,7 +20,7 @@ ddz2nd = fun(a) (a[,,i+1/2] - a[,,i-1/2])/dz
 
 ∂ = (ddx,ddy,ddz)
 
-# # partial2nd = (ddx2nd, ddy2nd, ddz2nd)
+partial2nd = (ddx2nd, ddy2nd, ddz2nd)
 
 Σ = fun (e) e(0)+e(1)+e(2)
 
@@ -73,10 +73,12 @@ end function
 
 
 
-begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
+begin function ddt_sys(dens, v, B, s)\
+  returns (ddt_dens, ddt_v, ddt_B, ddt_s)
+
   ddt_dens = - Σ fun(i) ∂ i (dens0 * v i)
 
-   ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
+  ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
          - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens0 \
          + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens0
 
@@ -85,7 +87,8 @@ begin function ddt_sys(dens, v, B, s) returns (ddt_dens, ddt_v, ddt_B, ddt_s)
   ddt_s = Σ fun(j) v j * ∂ j s
 end function
 
-begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
+begin function step(dens, vx, vy, vz, Bx,By,Bz, s) \
+  returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
 
       v = (vx, vy, vz)
       B = (Bx, By, Bz)
@@ -100,11 +103,15 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s) returns (dens_next, vx_next, 
 
       manifest :: sys_next = sys_0 + dt * ddt_sys(sys_q2)
 
-      f = av_flux_x(sys_next)
+      avf_x = av_flux_x(sys_next)
+      avf_y = av_flux_y(sys_next)
+      avf_z = av_flux_z(sys_next)
 
-      sys_av = sys_next[i] + f[i-1/2] - f[i+1/2]
+      sys_avx = sys_next[i] + avf_x[i-1/2] - avf_x[i+1/2]
+      sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]
+      sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
 
-      (dens_next, v_next, B_next, s_next) = sys_av
+      (dens_next, v_next, B_next, s_next) = sys_avz
       (vx_next, vy_next, vz_next) = v_next
       (Bx_next, By_next, Bz_next) = B_next
 end function

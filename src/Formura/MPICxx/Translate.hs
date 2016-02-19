@@ -456,8 +456,6 @@ tellProgram = do
   con <- genGraph True $ mmg
   monitorInterval0 <- use ncMonitorInterval
 
-  liftIO $ putStrLn "DEBUG: Telling main program"
-
   tellC $ T.unlines
     [ "{"
     , con
@@ -528,7 +526,6 @@ hxxFileName = hxxFilePath ^. filename
 cxxTemplate :: T.Text
 cxxTemplate = T.unlines
   [ ""
-  , "#define minmod(a,b) (fmin(a,b)>0?fmin(a,b):(fmax(a,b)<0?fmax(a,b):0))"
   , "typedef int bool;"
   , ""
   ]
