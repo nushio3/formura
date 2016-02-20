@@ -154,7 +154,20 @@ cut = do
         in move (negate v) w_of_n
       listBounds _ = fmap (fmap (const (mempty :: Partition))) ws0
 
+
   wallEvolution <- traverse (mapM (mapM evalWall)) wallMap
+
+  let
+      go :: (OMNodeID, MMNode) -> IO ()
+      go (i, mmNode) = let
+          mmInst :: MMInstruction
+          mmInst = mmNode ^. nodeInst
+          microInsts :: [MMInstF MMNodeID]
+          microInsts = map (^. nodeInst) $ M.elems mmInst
+        in forM_ microInsts $ \mi -> do
+            print $ listBounds mi
+
+  liftIO $ mapM_ go (M.toList stepGraph)
 
   forM_ (M.toList wallEvolution) $ \(nd, ws) -> liftIO $ do
     putStrLn $ "NODE: " ++ show nd
