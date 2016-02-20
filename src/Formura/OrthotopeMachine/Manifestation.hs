@@ -200,7 +200,7 @@ boundaryAnalysis gr =
 
 
     listBounds :: MMInstF MMNodeID -> Boundary
-    listBounds (LoadCursorStatic v _)    = Boundary (v,v)
+    listBounds (LoadCursorStatic v _) = Boundary (-v,-v)
     listBounds (LoadCursor v nid) =
       let Boundary (a,b) = b_of_n
           Just b_of_n = M.lookup nid bgr
