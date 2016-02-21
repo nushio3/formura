@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, LambdaCase, MultiWayIf, TemplateHaskell #-}
+{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, LambdaCase, MultiWayIf, TemplateHaskell #-}
 
 {-
 
@@ -21,6 +21,7 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.List (sort)
+import           Data.Data
 import qualified Data.Map as M
 import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
@@ -124,9 +125,13 @@ evalWall w = case foldMap (maybeToList . touchdown) w of
   [x] -> x
   _   -> error $ "malformed wall: " ++ show w
 
+data Resource = ResourceStatic IdentName | ResourceOMNode OMNodeID
+                                           deriving (Eq, Ord, Show, Read, Typeable, Data)
 
 cut :: PlanM MPIPlan
 cut = do
+  dim <- view dimension
+
   walls0 <- initialWalls
   -- liftIO $ print (walls0 :: Walls)
   let wvs = fmap (fmap evalWall) walls0
@@ -157,6 +162,8 @@ cut = do
 
   -- liftIO $ print (wallEvolution :: M.Map OMNodeID (Vec [Int]))
 
+  intraShape0 <- view ncIntraNodeShape
+
   let iRanks0 :: [IRank]
       iRanks0 =
         sort $
@@ -171,17 +178,34 @@ cut = do
       iRankMap = flip fmap wallEvolution $ \vi -> M.fromList
         [(ir, boxAt ir vi)| ir <- iRanks0]
 
-      boxAssignment :: OMNodeID -> MPIRank -> IRank -> Box
-      boxAssignment nid mpir ir = fromJust $ do
+      boxAssignment :: MPIRank -> IRank -> OMNodeID -> Box
+      boxAssignment (MPIRank mpir) ir nid = fromJust $ do
         m <- M.lookup nid iRankMap
         ret <- M.lookup ir m
-        return ret
+        return $ move (mpir*intraShape0) ret
+
+      mpiRanks0 :: [MPIRank]
+      mpiRanks0 =
+        map MPIRank $
+        (sequence :: Vec [Int] -> [Vec Int]) $
+        Vec $
+        replicate dim [-1,0,1]
+
 
   liftIO $ forM_ (M.keys stepGraph) $ \nid -> do
     putStrLn $ "NODE: " ++ show nid
     forM_ iRanks0 $ \ir -> do
       putStrLn $ "  IR: " ++ show ir
-      putStrLn $ "    " ++ show (boxAssignment nid undefined ir)
+      putStrLn $ "    " ++ show (boxAssignment undefined ir nid)
+
+  let
+      listSupport :: Box -> MMInstF MMNodeID -> [(Resource,Box)]
+      listSupport b0 (LoadCursorStatic v snName) = [(ResourceStatic  snName, move v b0)]
+      listSupport b0 (LoadCursor v nid) =
+        [(ResourceOMNode nid, move v b0)]
+      listSupport _ _ = []
+
+
 
 
   return MPIPlan

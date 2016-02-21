@@ -8,12 +8,13 @@ A virtual machine with multidimensional vector instructions that operates on str
 in http://arxiv.org/abs/1204.4779 .
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, FunctionalDependencies, GeneralizedNewtypeDeriving, MultiParamTypeClasses, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, FunctionalDependencies, GeneralizedNewtypeDeriving, MultiParamTypeClasses, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Graph where
 
 import           Algebra.Lattice
 import           Control.Lens
+import           Data.Data
 import qualified Data.Map as M
 import           Text.Read (Read(..))
 
@@ -62,12 +63,12 @@ pattern LoadCursorStatic v x <- ((^? match) -> Just (LoadCursorStaticF v x)) whe
   LoadCursorStatic v x = match # LoadCursorStaticF v x
 
 
-newtype OMNodeID = OMNodeID Int deriving (Eq, Ord, Num)
+newtype OMNodeID = OMNodeID Int deriving (Eq, Ord, Num, Data)
 instance Show OMNodeID where
   showsPrec n (OMNodeID x) = showsPrec n x
 instance Read OMNodeID where
   readPrec = fmap OMNodeID  readPrec
-newtype MMNodeID = MMNodeID Int deriving (Eq, Ord, Num)
+newtype MMNodeID = MMNodeID Int deriving (Eq, Ord, Num, Data)
 instance Show MMNodeID where
   showsPrec n (MMNodeID x) = showsPrec n x
 instance Read MMNodeID where

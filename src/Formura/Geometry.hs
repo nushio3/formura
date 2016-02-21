@@ -84,3 +84,14 @@ instance (Num a, Ord a) => Geometric (Orthotope a) where
 instance Monoid Partition where
   mempty = Orthotope (PureVec Top) (PureVec Bottom)
   mappend = (&&&)
+
+class Geometric a => HasVolume a where
+  volume :: a -> Int
+  intersects :: a -> a -> Bool
+  intersects a b = volume (a&&&b) > 0
+
+instance HasVolume Box where
+  volume (Orthotope l u) = product $ liftVec2 relu l u
+    where
+      relu l u | u <= l    = 0
+               | otherwise = u-l
