@@ -36,6 +36,7 @@ import           Formura.NumericalConfig
 import           Formura.Compiler
 
 
+
 newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num)
 newtype IRank = IRank (Vec Int) deriving (Eq, Show, Read, Num)
 
@@ -190,22 +191,42 @@ cut = do
         (sequence :: Vec [Int] -> [Vec Int]) $
         Vec $
         replicate dim [-1,0,1]
+      mpiRankOrigin :: MPIRank
+      mpiRankOrigin = MPIRank $ Vec $ replicate dim 0
 
-
+{-
   liftIO $ forM_ (M.keys stepGraph) $ \nid -> do
     putStrLn $ "NODE: " ++ show nid
     forM_ iRanks0 $ \ir -> do
       putStrLn $ "  IR: " ++ show ir
-      putStrLn $ "    " ++ show (boxAssignment undefined ir nid)
+      putStrLn $ "    " ++ show (boxAssignment mpiRankOrigin ir nid)
+-}
+  let supportMap :: M.Map (IRank, OMNodeID)  (M.Map Resource Box)
+      supportMap = M.fromList [((ir, nid), go ir nid (fromJust $ M.lookup nid stepGraph))
+                              | ir <- iRanks0, nid <- M.keys stepGraph]
 
-  let
-      listSupport :: Box -> MMInstF MMNodeID -> [(Resource,Box)]
-      listSupport b0 (LoadCursorStatic v snName) = [(ResourceStatic  snName, move v b0)]
+      go :: IRank -> OMNodeID -> MMNode -> M.Map Resource Box
+      go ir nid mmNode = let
+          mmInst :: MMInstruction
+          mmInst = mmNode ^. nodeInst
+          microInsts :: [MMInstF MMNodeID]
+          microInsts = map (^. nodeInst) $ M.elems mmInst
+          b0 = boxAssignment mpiRankOrigin ir nid
+        in M.unionsWith (|||) (map (listSupport b0) microInsts)
+
+      listSupport :: Box -> MMInstF MMNodeID -> M.Map Resource Box
+      listSupport b0 (LoadCursorStatic v snName) = M.singleton (ResourceStatic  snName) (move v b0)
       listSupport b0 (LoadCursor v nid) =
-        [(ResourceOMNode nid, move v b0)]
-      listSupport _ _ = []
+        M.singleton (ResourceOMNode nid) (move v b0)
+      listSupport _ _ = M.empty
 
-
+  {-
+  liftIO $ forM_ iRanks0 $ \ir -> do
+    putStrLn $ "IR: " ++ show ir
+    forM_ (M.keys stepGraph) $ \nid -> do
+      putStrLn $ "  NODE: " ++ show nid
+      putStrLn $ "    " ++ show (M.lookup (ir,nid) supportMap)
+-}
 
 
   return MPIPlan
