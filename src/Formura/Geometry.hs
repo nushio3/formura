@@ -11,7 +11,6 @@ Module for geometry inference.
 
 module Formura.Geometry where
 
-import Algebra.Lattice
 import Algebra.Lattice.Levitated
 import Control.Lens
 
@@ -19,12 +18,12 @@ import Formura.Vec
 
 type Pt = Vec Int
 
-data Box a = Box { _lowerVertex :: Vec a ,
+data Orthotope a = Orthotope { _lowerVertex :: Vec a ,
                    _upperVertex :: Vec a}
            deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable)
 
 
-makeLenses ''Box
+makeLenses ''Orthotope
 
 instance Num a => Num (Levitated a) where
   (Levitate a) + (Levitate b) = Levitate (a + b)
@@ -55,8 +54,10 @@ touchdown :: Levitated a -> Maybe a
 touchdown (Levitate x) = Just x
 touchdown _ = Nothing -- airplane crash!
 
-type Partition = Box (Levitated Int)
-type Orthotope = Box Int
+-- | A 'Partition' is an 'Orthotope' with possibly infinite extent
+type Partition = Orthotope (Levitated Int)
+-- | A 'Box' is an 'Orthotope' with strictly finite volue
+type Box = Orthotope Int
 
 class Geometric a where
   move :: Pt -> a -> a
@@ -73,13 +74,13 @@ instance Geometric a => Geometric (Vec a) where
   (&&&) = liftVec2 (&&&)
   (|||) = liftVec2 (|||)
 
-instance (Num a, Ord a) => Geometric (Box a) where
-  move v (Box a b) =
+instance (Num a, Ord a) => Geometric (Orthotope a) where
+  move v (Orthotope a b) =
     let mv = liftVec2 (\x lx -> fromIntegral x + lx)
-    in Box (mv v a) (mv v b)
-  (Box a b) &&& (Box c d) = Box (liftVec2 max a c) (liftVec2 min b d)
-  (Box a b) ||| (Box c d) = Box (liftVec2 min a c) (liftVec2 max b d)
+    in Orthotope (mv v a) (mv v b)
+  (Orthotope a b) &&& (Orthotope c d) = Orthotope (liftVec2 max a c) (liftVec2 min b d)
+  (Orthotope a b) ||| (Orthotope c d) = Orthotope (liftVec2 min a c) (liftVec2 max b d)
 
 instance Monoid Partition where
-  mempty = Box (PureVec Top) (PureVec Bottom)
+  mempty = Orthotope (PureVec Top) (PureVec Bottom)
   mappend = (&&&)

@@ -20,6 +20,7 @@ import           Algebra.Lattice.Levitated
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.List (sort)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
@@ -109,7 +110,7 @@ initialWalls = do
            | x == y              -> (Top       , Levitate n)
            | otherwise           -> (Top       , Bottom)
       mkWall :: String -> Bool -> Int -> Partition
-      mkWall x a n = let ret = boundOfAxis x a n in Box (fmap fst ret) (fmap snd ret)
+      mkWall x a n = let ret = boundOfAxis x a n in Orthotope (fmap fst ret) (fmap snd ret)
 
 
   forM axes $ \ x -> do
@@ -118,22 +119,19 @@ initialWalls = do
      Just [] -> raiseErr $ failed $ "at least 1 element is needed for initial_wall numerical configuration for axis: " ++ x
      Just ws -> return $ [mkWall x True 0] ++ map (mkWall x False) ws ++ [mkWall x True (intraShape ! x)]
 
-evalWall :: Partition -> PlanM Int
+evalWall :: Partition -> Int
 evalWall w = case foldMap (maybeToList . touchdown) w of
-  [x] -> return x
-  _   -> raiseErr $ failed $ "malformed wall: " ++ show w
-
-
+  [x] -> x
+  _   -> error $ "malformed wall: " ++ show w
 
 
 cut :: PlanM MPIPlan
 cut = do
-  ws0 <- initialWalls
-  -- liftIO $ print ws0
-
-  wvs <- mapM (mapM evalWall) ws0
-
+  walls0 <- initialWalls
+  -- liftIO $ print (walls0 :: Walls)
+  let wvs = fmap (fmap evalWall) walls0
   -- liftIO $ print (wvs :: Vec [Int])
+
   stepGraph <- view prStepGraph
 
   let wallMap :: M.Map OMNodeID Walls
@@ -148,30 +146,42 @@ cut = do
         in foldr1 (&&&) (map listBounds microInsts)
 
       listBounds :: MMInstF MMNodeID -> Walls
-      listBounds (LoadCursorStatic v _) = move (negate v) ws0
+      listBounds (LoadCursorStatic v _) = move (negate v) walls0
       listBounds (LoadCursor v nid) =
         let Just w_of_n = M.lookup nid wallMap
         in move (negate v) w_of_n
-      listBounds _ = fmap (fmap (const (mempty :: Partition))) ws0
+      listBounds _ = fmap (fmap (const (mempty :: Partition))) walls0
+
+      wallEvolution :: M.Map OMNodeID (Vec [Int])
+      wallEvolution = fmap (fmap (fmap evalWall)) wallMap
+
+  -- liftIO $ print (wallEvolution :: M.Map OMNodeID (Vec [Int]))
+
+  let iRanks0 :: [IRank]
+      iRanks0 =
+        sort $
+        map IRank $
+        sequence $
+        fmap (\partitions0 -> [0..length partitions0-2]) walls0
+
+      boxAt :: IRank -> Vec [Int] -> Box
+      boxAt (IRank vi) vw = Orthotope (liftVec2 (\i xs-> xs!!i) vi vw) (liftVec2 (\i xs-> xs!!(i+1)) vi vw)
+
+      iRankMap :: M.Map OMNodeID (M.Map IRank Box)
+      iRankMap = flip fmap wallEvolution $ \vi -> M.fromList
+        [(ir, boxAt ir vi)| ir <- iRanks0]
+
+      boxAssignment :: OMNodeID -> MPIRank -> IRank -> Box
+      boxAssignment nid mpir ir = fromJust $ do
+        m <- M.lookup nid iRankMap
+        ret <- M.lookup ir m
+        return ret
+
+  liftIO $ forM_ (M.keys stepGraph) $ \nid -> do
+    putStrLn $ "NODE: " ++ show nid
+    forM_ iRanks0 $ \ir -> do
+      putStrLn $ "  IR: " ++ show ir
+      putStrLn $ "    " ++ show (boxAssignment nid undefined ir)
 
 
-  wallEvolution <- traverse (mapM (mapM evalWall)) wallMap
-
-{-
-  let
-      go :: (OMNodeID, MMNode) -> IO ()
-      go (i, mmNode) = let
-          mmInst :: MMInstruction
-          mmInst = mmNode ^. nodeInst
-          microInsts :: [MMInstF MMNodeID]
-          microInsts = map (^. nodeInst) $ M.elems mmInst
-        in forM_ microInsts $ \mi -> do
-            print $ (mi, listBounds mi)
-
-  liftIO $ mapM_ go (M.toList stepGraph)
-
-  forM_ (M.toList wallEvolution) $ \(nd, ws) -> liftIO $ do
-    putStrLn $ "NODE: " ++ show nd
-    putStrLn $ show ws
---}
   return MPIPlan
