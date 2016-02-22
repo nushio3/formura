@@ -341,9 +341,17 @@ cut = do
         ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) box0
         ResourceOMNode nid (_,iDest) -> M.singleton (ResourceOMNode nid iDest) box0
 
-  progQ <- use psDistributedProgramQ
+  dProg0 <- toList <$> use psDistributedProgramQ
+
+
+  liftIO $ do
+    forM_ (M.toList allAllocs) $ \(rsc, box0) -> do
+      print rsc
+      putStrLn $ "  " ++ show box0
+    mapM_ print dProg0
+
 
   return MPIPlan
     { _planArrayAlloc = allAllocs
-    , _planDistributedProgram = toList progQ
+    , _planDistributedProgram = dProg0
     }

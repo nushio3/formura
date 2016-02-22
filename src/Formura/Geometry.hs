@@ -21,7 +21,10 @@ type Pt = Vec Int
 
 data Orthotope a = Orthotope { _lowerVertex :: Vec a ,
                    _upperVertex :: Vec a}
-           deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable, Data)
+           deriving (Eq, Ord, Read, Functor, Foldable, Traversable, Data)
+
+instance Show a => Show (Orthotope a) where
+  show (Orthotope a b) = "「" ++ show a ++ " " ++ show b ++ "」"
 
 
 makeLenses ''Orthotope

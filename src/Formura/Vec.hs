@@ -14,8 +14,9 @@ module Formura.Vec where
 import           Control.Applicative
 import           Control.Lens
 import qualified Data.Aeson as J
-import           Data.Data
 import           Data.Char (toLower)
+import           Data.Data
+import           Data.List (intercalate)
 import           Data.Monoid
 
 -- | The maximal dimension formura can handle
@@ -46,8 +47,8 @@ instance Ixed (Vec a) where
        in myIso . ix i
 
 instance Show a => Show (Vec a) where
-  show (Vec xs) = show xs
-  show (PureVec x) = "[" ++ show x ++ "..]"
+  show (Vec xs) = "(" ++ (intercalate "," $ map show xs) ++ ")"
+  show (PureVec x) = "(" ++ show x ++ "..)"
 
 instance Eq a => Eq (Vec a) where
   a == b = and $ liftVec2 (==) a b
