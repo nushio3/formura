@@ -37,8 +37,8 @@ import           Formura.Compiler
 
 
 
-newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num)
-newtype IRank = IRank (Vec Int) deriving (Eq, Show, Read, Num)
+newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num, Data)
+newtype IRank = IRank (Vec Int) deriving (Eq, Show, Read, Num, Data)
 
 instance Ord IRank where
   (IRank (Vec xs)) `compare` (IRank (Vec ys)) = reverse xs `compare` reverse ys
@@ -49,14 +49,20 @@ data ResourceT a b = ResourceStatic IdentName a | ResourceOMNode OMNodeID b
 type Resource = ResourceT () ()
 type ConcreteResource = ResourceT (MPIRank, Box) (MPIRank, IRank, Box)
 
-data DistributedInst
-  = Communication ConcreteResource (IRank, OMNodeID, Box)
-  | Computation (IRank, OMNodeID)
+data Ridge = Ridge { _ridgeDeltaMPI :: MPIRank, _ridgeDelta :: ResourceT () (IRank, IRank), _ridgeBox :: Box}
+                   deriving (Eq, Ord, Show, Read, Typeable, Data)
 
+data DistributedInst
+  = CommunicationRecv (MPIRank, IRank, IRank)
+  | Unstage Ridge
+  | Computation (IRank, OMNodeID)
+  | Stage Ridge
+  | CommunicationSend (MPIRank, IRank, IRank)
+                   deriving (Eq, Ord, Show, Read, Typeable, Data)
 
 data MPIPlan = MPIPlan
   { _planArrayMargin :: M.Map (ResourceT () IRank) Box
-  , _planDistributedInst :: [DistributedInst]
+  , _planDistributedProgram :: [DistributedInst]
   }
 makeClassy ''MPIPlan
 
@@ -243,22 +249,18 @@ cut = do
       putStrLn $ "    " ++ show (M.lookup (ir,nid) supportMap)
 -}
 
-  let locateSource :: (Resource, Box) -> [ConcreteResource]
-      locateSource (ResourceOMNode nid (),b0) =
+  let locateSources :: (Resource, Box) -> [ConcreteResource]
+      locateSources (ResourceOMNode nid (),b0) =
         [ ResourceOMNode nid (mpir, ir, b01)
         | (mpir,ir,b1) <- fromJust $ M.lookup nid allPossibleSources
         , let b01 = b0 &&& b1
         , volume b01 > 0]
-      locateSource (ResourceStatic snName (),b0) =
+      locateSources (ResourceStatic snName (),b0) =
         [ ResourceStatic snName (mpir, b01)
         | (mpir,b1) <- allPossibleSourcesStatic
         , let b01 = b0 &&& b1
         , volume b01 > 0]
 
-      locateSource (ResourceStatic snName (), b0) =
-        map (ResourceStatic snName) $
-        filter (\(_,b1) -> b0 `intersects` b1) $
-        allPossibleSourcesStatic
 
       allPossibleSources :: M.Map OMNodeID [(MPIRank, IRank, Box)]
       allPossibleSources = M.fromList
@@ -275,8 +277,20 @@ cut = do
         , let b = move (mpiVec*intraShape0) mpiBox0
         ]
 
-      locatedSupportMap :: M.Map (IRank, OMNodeID) [ConcreteResource]
-      locatedSupportMap = undefined
+
+  let ridgeRequest :: M.Map (IRank, OMNodeID) [Ridge]
+      ridgeRequest = M.mapWithKey go supportMap
+
+      go :: (IRank, OMNodeID) -> M.Map Resource Box -> [Ridge]
+      go (ir, nid) rbmap =
+        [ mkRidge ir crsc
+        | (rsc,b0) <- M.toList rbmap
+        , crsc <- locateSources (rsc,b0)
+        ]
+
+      mkRidge :: IRank -> ConcreteResource -> Ridge
+      mkRidge _      (ResourceStatic sn (mpir, b)) = Ridge mpir (ResourceStatic sn ()) b
+      mkRidge irDest (ResourceOMNode sn (mpir, irSrc, b)) = Ridge mpir (ResourceOMNode sn (irSrc, irDest)) b
 
 
   return MPIPlan{}
