@@ -379,7 +379,7 @@ cut = do
 
   dProg0 <- toList <$> use psDistributedProgramQ
 
-  when (?commandLineOption ^. verbose || True) $ liftIO $ do
+  when (?commandLineOption ^. verbose) $ liftIO $ do
     putStrLn "#### Allocation List ####"
     forM_ (M.toList allAllocs) $ \(rsc, box0) -> do
       print rsc
