@@ -44,11 +44,21 @@ instance Ord IRank where
   (IRank (Vec xs)) `compare` (IRank (Vec ys)) = reverse xs `compare` reverse ys
   compare _ _ = error "Comparison between IRank (PureVec _) is undefined"
 
+data ResourceT a b = ResourceStatic IdentName a | ResourceOMNode OMNodeID b
+                   deriving (Eq, Ord, Show, Read, Typeable, Data)
+type Resource = ResourceT () ()
+type ConcreteResource = ResourceT (MPIRank, Box) (MPIRank, IRank, Box)
+
+data DistributedInst
+  = Communication ConcreteResource (IRank, OMNodeID, Box)
+  | Computation (IRank, OMNodeID)
+
 
 data MPIPlan = MPIPlan
   { _planArrayMargin :: M.Map (ResourceT () IRank) Box
   , _planDistributedInst :: [DistributedInst]
   }
+makeClassy ''MPIPlan
 
 data PlanRead = PlanRead
   { _prGlobalEnvironment :: GlobalEnvironment
@@ -128,14 +138,6 @@ evalWall w = case foldMap (maybeToList . touchdown) w of
   [x] -> x
   _   -> error $ "malformed wall: " ++ show w
 
-data ResourceT a b = ResourceStatic IdentName a | ResourceOMNode OMNodeID b
-                   deriving (Eq, Ord, Show, Read, Typeable, Data)
-type Resource = ResourceT () ()
-type ConcreteResource = ResourceT (MPIRank, Box) (MPIRank, IRank, Box)
-
-data DistributedInst
-  = Communication ConcreteResource (IRank, OMNodeID, Box)
-  | Computation (IRank, OMNodeID)
 
 
 cut :: PlanM MPIPlan
@@ -273,8 +275,8 @@ cut = do
         , let b = move (mpiVec*intraShape0) mpiBox0
         ]
 
-      locatedSupportMap :: M.Map (IRank, OMNodeID)
+      locatedSupportMap :: M.Map (IRank, OMNodeID) [ConcreteResource]
       locatedSupportMap = undefined
 
 
-  return MPIPlan
+  return MPIPlan{}
