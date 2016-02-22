@@ -31,7 +31,7 @@ import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
-import           Formura.MPICxx.Cut (makePlan, MPIPlan(..))
+import           Formura.MPICxx.Cut hiding (cut)
 
 showC :: Show a => a -> T.Text
 showC = T.pack . show
@@ -77,6 +77,7 @@ data TranState = TranState
   , _theProgram :: Program
   , _theMMProgram :: MMProgram
   , _theGraph :: MMGraph
+  , _theMPIPlan :: MPIPlan
   }
 makeClassy ''TranState
 
@@ -393,6 +394,7 @@ tellProgram = do
 
   plan <- liftIO $ makePlan nc mmprog
 
+  theMPIPlan .= plan
 
   tellH $ T.unlines
     [ ""
@@ -482,6 +484,7 @@ genCxxFiles formuraProg mmProg = do
       , _theMMProgram = mmProg
       , _tsNumericalConfig = defaultNumericalConfig
       , _theGraph = M.empty
+      , _theMPIPlan = defaultMPIPlan
       }
 
 

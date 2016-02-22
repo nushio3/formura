@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, MultiWayIf, TemplateHaskell, TypeSynonymInstances #-}
+{-# LANGUAGE DeriveDataTypeable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, LambdaCase, MultiParamTypeClasses, MultiWayIf, TemplateHaskell, TypeSynonymInstances #-}
 
 {-
 
@@ -31,6 +31,7 @@ import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
 
 
+import           Formura.CommandLineOption
 import           Formura.Syntax(IdentName)
 import           Formura.Vec
 import           Formura.Geometry
@@ -73,6 +74,14 @@ data MPIPlan = MPIPlan
   }
 makeClassy ''MPIPlan
 
+defaultMPIPlan :: MPIPlan
+defaultMPIPlan =
+  MPIPlan
+  { _planArrayAlloc = M.empty
+  , _planRidgeAlloc = M.empty
+  , _planDistributedProgram = []
+  }
+
 data PlanRead = PlanRead
   { _prNumericalConfig :: NumericalConfig
   , _prMMProgram :: MMProgram
@@ -100,7 +109,7 @@ instance HasCompilerSyntacticState PlanState where
 
 type PlanM = CompilerMonad PlanRead () PlanState
 
-makePlan :: NumericalConfig -> MMProgram -> IO MPIPlan
+makePlan :: WithCommandLineOption => NumericalConfig -> MMProgram -> IO MPIPlan
 makePlan nc prog = do
   let pr = PlanRead
            { _prNumericalConfig = nc
@@ -158,7 +167,7 @@ evalWall w = case foldMap (maybeToList . touchdown) w of
 
 
 
-cut :: PlanM MPIPlan
+cut :: WithCommandLineOption => PlanM MPIPlan
 cut = do
   dim <- view dimension
   let zeroVec = Vec $ replicate dim 0
@@ -370,11 +379,16 @@ cut = do
 
   dProg0 <- toList <$> use psDistributedProgramQ
 
-
-  liftIO $ do
+  when (?commandLineOption ^. verbose || True) $ liftIO $ do
+    putStrLn "#### Allocation List ####"
     forM_ (M.toList allAllocs) $ \(rsc, box0) -> do
       print rsc
       putStrLn $ "  " ++ show box0
+    putStrLn "#### Ridge List ####"
+    forM_ (M.toList allRidges) $ \(rid, box) -> do
+      putStrLn $ show rid
+      putStrLn $ "  " ++ show box
+    putStrLn "#### Program ####"
     mapM_ print dProg0
 
 
