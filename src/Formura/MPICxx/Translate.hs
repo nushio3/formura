@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, ImplicitParams, MultiParamTypeClasses, OverloadedStrings, PackageImports, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, ImplicitParams, LambdaCase, MultiParamTypeClasses, OverloadedStrings, PackageImports, TemplateHaskell #-}
 
 module Formura.MPICxx.Translate where
 
@@ -7,7 +7,7 @@ import qualified Control.Exception as X
 import           Control.Lens
 import           Control.Monad
 import "mtl"     Control.Monad.RWS
-import           Data.Char (toUpper)
+import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
 import qualified Data.Map as M
 import qualified Data.Set as S
@@ -25,6 +25,7 @@ import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.CommandLineOption
+import           Formura.Geometry
 import           Formura.GlobalEnvironment
 import           Formura.Language.Combinator (subFix)
 import           Formura.NumericalConfig
@@ -57,6 +58,8 @@ data NamingState = NamingState
   , _nodeIDtoLocalName :: M.Map MMNodeID T.Text
   , _loopIndexNames :: Vec T.Text
   , _loopExtentNames :: Vec T.Text
+  , _resourceNames :: M.Map (ResourceT () IRank) T.Text
+  , _ridgeNames :: M.Map RidgeID T.Text
   }
 makeClassy ''NamingState
 
@@ -68,6 +71,8 @@ defaultNamingState = NamingState
   , _nodeIDtoLocalName = M.empty
   , _loopIndexNames = PureVec ""
   , _loopExtentNames = PureVec ""
+  , _resourceNames = M.empty
+  , _ridgeNames = M.empty
   }
 
 data TranState = TranState
@@ -90,6 +95,8 @@ instance HasMachineProgram TranState MMInstruction OMNodeType where
   machineProgram = theMMProgram
 instance HasNamingState TranState where
   namingState = tsNamingState
+instance HasMPIPlan TranState where
+  mPIPlan = theMPIPlan
 
 data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text}
                 deriving (Eq, Ord, Show)
@@ -214,15 +221,90 @@ genTypeDecl name typ = case typ of
         return $ body <> szpt
   _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
 
+
+elemTypeOfResource :: ResourceT a b -> TranM TypeExpr
+elemTypeOfResource (ResourceStatic sname _) = do
+  ssMap <- use omStateSignature
+  let Just typ = M.lookup sname ssMap
+  case typ of
+    ElemType _ -> return typ
+    GridType _ etyp -> return etyp
+elemTypeOfResource (ResourceOMNode nid _) = do
+  mmProg <- use omStepGraph
+  let Just nd = M.lookup nid mmProg
+  case nd ^.nodeType of
+    ElemType x -> return $ ElemType x
+    GridType _ etyp -> return $ subFix etyp
+
+
+genResourceDecl :: T.Text -> ResourceT a b -> Box -> TranM T.Text
+genResourceDecl name rsc box0 = do
+  typ <- elemTypeOfResource rsc
+  let szpt = foldMap (brackets . showC) sz
+      sz = box0 ^.upperVertex - box0 ^. lowerVertex
+
+  case typ of
+    ElemType "void" -> return ""
+    ElemType "Rational" -> return $ "double " <> name <> szpt
+    ElemType x -> return $ T.pack  x <> " " <> name <> szpt
+    _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
+
+
+toCName :: Show a => a -> IdentName
+toCName a = go False $ show a
+  where
+    go _ [] = []
+    go b (x:xs) = case isAlphaNum x of
+      True -> x : go False xs
+      False -> if b then go b xs else '_' : go True xs
+
+
+-- | Give name to Resources
+nameArrayResource :: (ResourceT () IRank) -> TranM T.Text
+nameArrayResource rsc = case rsc of
+  ResourceStatic sn _ -> return $ T.pack sn
+  _ -> do
+    dict <- use resourceNames
+    case M.lookup rsc dict of
+      Just ret -> return ret
+      Nothing -> do
+        ret <- genFreeName $ toCName rsc
+        resourceNames %= M.insert rsc ret
+        return ret
+
+
+nameRidgeResource :: RidgeID -> TranM T.Text
+nameRidgeResource r = do
+  dict <- use ridgeNames
+  case M.lookup r dict of
+    Just ret -> return ret
+    Nothing -> do
+      ret <- genFreeName $ toCName r
+      ridgeNames %= M.insert r ret
+      return ret
+
+
 -- | Generate Declaration for State Arrays
-tellStateArrays :: TranM ()
-tellStateArrays = do
-  stateSig <- use omStateSignature
-  forM_ (M.toList stateSig) $ \ (identName, typ) -> do
-    tellH "extern "
-    decl <- genTypeDecl identName typ
-    tellBoth decl
-    tellBothLn ";"
+tellArrayDecls :: TranM ()
+tellArrayDecls = do
+  aalloc <- use planArrayAlloc
+  forM_ (M.toList aalloc) $ \(rsc, box0) -> do
+    name <- nameArrayResource rsc
+    decl <- genResourceDecl name rsc box0
+    case rsc of
+      ResourceStatic _ _ -> do
+        tellH "extern "
+        tellBoth decl
+        tellBothLn ";"
+      _ -> do
+        tellCLn $ decl <> ";"
+
+  ralloc <- use planRidgeAlloc
+  forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
+    name <- nameRidgeResource rk
+    decl <- genResourceDecl name rsc box0
+    tellCLn $ decl <> ";"
+
 
 -- | Generate Declarations for intermediate variables
 tellIntermediateVariables :: TranM ()
@@ -416,8 +498,7 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  tellStateArrays
-  tellIntermediateVariables
+  tellArrayDecls
 
   tellBoth "\n"
 
