@@ -464,20 +464,18 @@ genComputation (ir0, nid0) = do
 
 -- | generate a staging/unstaging code
 
-genStagingCode :: RidgeID -> TranM T.Text
-genStagingCode rid = do
+genStagingCode :: Bool -> RidgeID -> TranM T.Text
+genStagingCode isStaging rid = do
   ridgeDict <- use planRidgeAlloc
   arrDict   <- use planArrayAlloc
   let Just box0 = M.lookup rid ridgeDict
       src :: ArrayResourceKey
       src = case rid of
-        RidgeID _ (ResourceOMNode nid (ir,_)) -> ResourceOMNode nid ir
+        RidgeID _ (ResourceOMNode nid (irS,irD)) -> ResourceOMNode nid (if isStaging then irS else irD)
         RidgeID _ (ResourceStatic sn ())  -> ResourceStatic sn ()
       Just box1 = M.lookup src arrDict
-  srcName <- nameArrayResource src
-  destName <- nameRidgeResource rid
-  return srcName
-
+  arrName <- nameArrayResource src
+  rdgName <- nameRidgeResource rid
   ivars <- use loopIndexNames
   let offset :: Vec Int
       offset = box0^.lowerVertex
@@ -499,13 +497,15 @@ genStagingCode rid = do
       closeLoops =
         ["}" | _ <- toList ivars]
 
-      body = destName <> foldMap brackets ivars <> "="
-          <> srcName  <> foldMap brackets (liftVec2 (\i n -> i <> "+" <> showC n) ivars otherOffset) <> ";"
+      rdgTerm = rdgName <> foldMap brackets ivars
+      arrTerm = arrName  <> foldMap brackets (liftVec2 (\i n -> i <> "+" <> showC n) ivars otherOffset)
 
-  return $ T.unlines openLoops <> body <> T.unlines closeLoops
+      body
+        | isStaging = rdgTerm <> "=" <> arrTerm
+        | otherwise = arrTerm <> "=" <> rdgTerm
 
-genUnstagingCode :: RidgeID -> TranM T.Text
-genUnstagingCode _ = return "\n//unstage\n"
+  return $ T.unlines openLoops <> body <> ";" <> T.unlines closeLoops
+
 
 -- | generate a distributed program
 genDistributedProgram :: [DistributedInst] -> TranM T.Text
@@ -527,8 +527,8 @@ genDistributedProgram insts = do
     where
       go :: DistributedInst -> TranM T.Text
       go (Computation cmp) = genComputation cmp
-      go (Unstage rid) = genUnstagingCode rid
-      go (Stage rid) = genStagingCode rid
+      go (Unstage rid) = genStagingCode False rid
+      go (Stage rid) = genStagingCode True rid
 
 
 
