@@ -70,6 +70,7 @@ data DistributedInst
 data MPIPlan = MPIPlan
   { _planArrayAlloc :: M.Map (ResourceT () IRank) Box
   , _planRidgeAlloc :: M.Map RidgeID Box
+  , _planRegionAlloc :: M.Map (IRank, OMNodeID) Box
   , _planDistributedProgram :: [DistributedInst]
   }
 makeClassy ''MPIPlan
@@ -79,6 +80,7 @@ defaultMPIPlan =
   MPIPlan
   { _planArrayAlloc = M.empty
   , _planRidgeAlloc = M.empty
+  , _planRegionAlloc = M.empty
   , _planDistributedProgram = []
   }
 
@@ -395,5 +397,10 @@ cut = do
   return MPIPlan
     { _planArrayAlloc = allAllocs
     , _planRidgeAlloc = allRidges
+    , _planRegionAlloc = M.fromList
+      [ ((ir,nid), boxAssignment mpiRankOrigin ir nid)
+      | ir <- iRanks0
+      , nid <- M.keys stepGraph
+      ]
     , _planDistributedProgram = dProg0
     }

@@ -405,65 +405,84 @@ genMMInstruction mminst = do
       Just tailName = M.lookup tailID nmap
   return $ (T.unlines txts, tailName)
 
+
 -- | generate a formura function body.
 
-genGraph :: Bool -> MMGraph -> TranM T.Text
-genGraph isTimeLoop gr = do
-  theGraph .= gr
+genComputation :: (IRank, OMNodeID) -> TranM T.Text
+genComputation (ir0, nid0) = do
   ivars <- use loopIndexNames
-  nvars <- use loopExtentNames
-  intraExtent <- use ncIntraNodeShape
+  regionDict <- use planRegionAlloc
+  arrayDict <- use planArrayAlloc
+  stepGraph <- use omStepGraph
+
+  let
+      regionBox :: Box
+      marginBox :: Box
+      Just regionBox = M.lookup (ir0, nid0) regionDict
+      Just marginBox = M.lookup (ResourceOMNode nid0 ir0) arrayDict
+
+      loopFroms :: Vec Int
+      loopFroms = regionBox^.lowerVertex - marginBox^.lowerVertex
+
+      loopTos :: Vec Int
+      loopTos = regionBox^.upperVertex - marginBox^.lowerVertex
+
+      mmInst :: MMInstruction
+      Just (Node mmInst typ annot) = M.lookup nid0 stepGraph
+
+
+
+  let
+    genGrid lhsName2 = do
+      let openLoops =
+            [ T.unwords
+              ["for (", i, "=", showC l ,";", i,  "<", showC h, ";++", i, "){"]
+            | (i,(l,h)) <- (toList ivars) `zip`
+              zip (toList loopFroms) (toList loopTos)]
+          closeLoops =
+            ["}" | _ <- toList ivars]
+
+      (letBs,rhs) <- genMMInstruction mmInst
+      let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
+      return $ T.unlines $
+        openLoops ++ [letBs,bodyExpr] ++ closeLoops
+
+  lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
+
+  case typ of
+    ElemType "void" ->
+      case mmInstTail mmInst of
+        Store n _ -> genGrid (T.pack n)
+        _ -> return "// void"
+    GridType _ typ -> genGrid lhsName
+    _ -> do
+      return $ T.pack $  "// dunno how gen " ++ show mmInst
+
+
+-- | generate a distributed program
+genDistributedProgram :: [DistributedInst] -> TranM T.Text
+genDistributedProgram insts = do
+  stepGraph <- use omStepGraph
+  theGraph .= stepGraph
+
+  ps <- mapM go insts
 
   monitorInterval0 <- use ncMonitorInterval
+  timeStepVarName <- genFreeName "timestep"
 
-  timeStepVarName <- if isTimeLoop then genFreeName "timestep"
-                     else return ""
-
-  let ivarDecl = "int " <> T.intercalate ", " (toList ivars) <> ";"
-      nvarDecl = "const int " <> T.intercalate ", " nvarEqn <> ";"
-      nvarEqn = [x <> "=" <> showC n  | (x,n) <- zip (toList nvars) (toList intraExtent)]
-      timeStepDecl = "int " <> timeStepVarName <> ";"
-
-  let openTimeLoop = "for(" <> timeStepVarName <> "=0;" <>
+  let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
                      timeStepVarName <> "<" <> showC monitorInterval0  <> ";" <>
                      "++" <> timeStepVarName <>  "){"
       closeTimeLoop = "}"
 
-  ps <- forM (M.toList gr) $ \(nid, Node inst typ anot) -> do
-    let Just (VariableName lhsName) = A.viewMaybe anot
-    let
-      Just (Boundary (lowerBound, upperBound)) = A.toMaybe anot
-
-      genGrid lhsName2 = do
-        let openLoops =
-              [ T.unwords
-                ["for (", i, "=", showC l ,";", i,  "<", n,"+",showC h, ";++", i, "){"]
-              | ((i,n),(l,h)) <- zip (toList ivars) (toList nvars) `zip`
-                                 zip (toList lowerBound) (toList upperBound)]
-            closeLoops =
-              ["}" | _ <- toList ivars]
-
-        (letBs,rhs) <- genMMInstruction inst
-        let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
-        return $ T.unlines $
-          openLoops ++ [letBs,bodyExpr] ++ closeLoops
+  return $ openTimeLoop <> mconcat ps <> closeTimeLoop
+    where
+      go :: DistributedInst -> TranM T.Text
+      go (Computation cmp) = genComputation cmp
+      go (Unstage _) = return "unstage"
+      go (Stage _) = return "stage"
 
 
-    case typ of
-      ElemType "void" ->
-        case mmInstTail inst of
-          Store n _ -> genGrid (T.pack n)
-          _ -> return "// void"
-      ElemType ctyp -> do
-        (letBs,rhs) <- genMMInstruction inst
-        return $ T.unlines ["{",letBs, lhsName <> "=" <> rhs <> ";", "}"]
-      GridType _ typ -> genGrid lhsName
-      _ -> do
-        let Just (VariableName nam) = A.viewMaybe anot
-        return $ T.pack $  "// dunno how gen " ++ show nam ++ show inst
-  let ifTime x = if isTimeLoop then x else ""
-  return $ ivarDecl <> nvarDecl <> ifTime timeStepDecl <>
-    ifTime openTimeLoop <> T.unlines ps <> ifTime closeTimeLoop
 
 -- | The main translation logic
 tellProgram :: WithCommandLineOption => TranM ()
@@ -532,8 +551,8 @@ tellProgram = do
   tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
   tellH ";"
 
-  mmg <- use omStepGraph
-  con <- genGraph True $ mmg
+  dProg <- use planDistributedProgram
+  con <- genDistributedProgram dProg
   monitorInterval0 <- use ncMonitorInterval
 
   tellC $ T.unlines
