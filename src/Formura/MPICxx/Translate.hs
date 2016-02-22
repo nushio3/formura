@@ -264,7 +264,10 @@ toCName a = go False $ show a
 -- | Give name to Resources
 nameArrayResource :: (ResourceT () IRank) -> TranM T.Text
 nameArrayResource rsc = case rsc of
-  ResourceStatic sn _ -> return $ T.pack sn
+  ResourceStatic sn _ -> do
+    let ret = T.pack sn
+    resourceNames %= M.insert rsc ret
+    return ret
   _ -> do
     dict <- use resourceNames
     case M.lookup rsc dict of
@@ -335,20 +338,31 @@ lookupNode i = do
 
 -- | generate bindings, and the final expression that contains the result of evaluation.
 
-genMMInstruction :: MMInstruction -> TranM (T.Text, T.Text)
-genMMInstruction mminst = do
+genMMInstruction :: IRank -> MMInstruction -> TranM (T.Text, T.Text)
+genMMInstruction ir0 mminst = do
   indNames <- use loopIndexNames
-  indOffset <- use loopIndexOffset
+  indOffset <- use loopIndexOffset -- indNames + indOffset = real addr
+  arrayDict <- use planArrayAlloc
+  resourceDict <- use resourceNames
+
+
+  let
+    -- how to access physical coordinate indNames + indOffset
+    -- in array allocated with margin box0
+    accAtMargin :: Box -> Vec Int -> T.Text
+    accAtMargin box0 vi = accAt (indOffset + vi - (box0 ^. lowerVertex))
+
+    accAt :: Vec Int -> T.Text
+    accAt v = foldMap brackets $ kutukeru  <$> indNames <*> v
+    kutukeru i d | d == 0 = i
+                 | d <  0 = i <> showC d
+                 | otherwise = i <> "+" <> showC d
+
 
   alreadyGivenLocalNames .= S.empty
   freeLocalNameCounter .= 0
   nodeIDtoLocalName .= M.empty
 
-  let accAt :: Vec Int -> T.Text
-      accAt v = foldMap brackets $ kutukeru  <$> indNames <*> v
-      kutukeru i d | d == 0 = i
-                   | d <  0 = i <> showC d
-                   | otherwise = i <> "+" <> showC d
 
   txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
     thisName <- genFreeLocalName "a"
@@ -365,7 +379,12 @@ genMMInstruction mminst = do
             Nothing -> raiseErr $ failed $ "genExpr: missing graph node " ++ show nid1
 
     case inst of
-      LoadCursorStatic vi name -> thisEq $ T.pack name <> accAt vi
+      LoadCursorStatic vi name -> do
+        let key  = ResourceStatic name () :: ArrayResourceKey
+        let Just abox = M.lookup key arrayDict
+            Just rscName = M.lookup key resourceDict
+
+        thisEq $ rscName <> accAtMargin abox vi
       Imm r -> thisEq $ showC (realToFrac r :: Double)
       Uniop op a -> do
         a_code <- query a
@@ -393,10 +412,12 @@ genMMInstruction mminst = do
 
       LoadCursor vi nid -> do
         node <- lookupNode nid
-        let Just (VariableName nam) = A.viewMaybe node
+        let Just abox = M.lookup key arrayDict
+            Just rscName = M.lookup key resourceDict
+            key = ResourceOMNode nid ir0
         case node ^. nodeType of
-          ElemType _ -> thisEq $ nam
-          _ -> thisEq $ nam <> accAt vi
+          ElemType _ -> thisEq $ rscName
+          _ -> thisEq $ rscName <> accAtMargin abox vi
       Store _ x -> do
         x_code <- query x
         nodeIDtoLocalName %= M.insert nid0 x_code
@@ -445,7 +466,7 @@ genComputation (ir0, nid0) = do
           closeLoops =
             ["}" | _ <- toList ivars]
 
-      (letBs,rhs) <- genMMInstruction mmInst
+      (letBs,rhs) <- genMMInstruction ir0 mmInst
       let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
       return $ T.unlines $
         openLoops ++ [letBs,bodyExpr] ++ closeLoops

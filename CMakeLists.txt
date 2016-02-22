@@ -5,7 +5,7 @@ endif()
 
 project (formura_examples)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -std=C99 -Wall -mcmodel=large")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -std=c99 -Wall -mcmodel=large")
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -mcmodel=large")
 
 add_custom_command(
@@ -35,7 +35,7 @@ add_custom_command(
   )
 
 
-add_executable(bin/diffusion.out examples/diffusion.c examples/diffusion-main.cpp)
+# add_executable(bin/diffusion.out examples/diffusion.c examples/diffusion-main.cpp)
 add_executable(bin/pearson.out examples/pearson.c examples/pearson-main.cpp)
-add_executable(bin/av-mhd.out examples/av-mhd.c examples/av-mhd-main.cpp)
-add_executable(bin/3d-mhd.out examples/3d-mhd.c examples/3d-mhd-main.cpp)
+# add_executable(bin/av-mhd.out examples/av-mhd.c examples/av-mhd-main.cpp)
+# add_executable(bin/3d-mhd.out examples/3d-mhd.c examples/3d-mhd-main.cpp)
