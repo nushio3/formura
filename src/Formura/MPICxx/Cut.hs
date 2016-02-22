@@ -68,6 +68,7 @@ data DistributedInst
 
 data MPIPlan = MPIPlan
   { _planArrayAlloc :: M.Map (ResourceT () IRank) Box
+  , _planRidgeAlloc :: M.Map RidgeID Box
   , _planDistributedProgram :: [DistributedInst]
   }
 makeClassy ''MPIPlan
@@ -330,6 +331,13 @@ cut = do
         aii <- use psAlreadyIssuedInst
         when (not $ S.member inst aii) $ insert inst
 
+  stateSignature0 <- view omStateSignature
+
+
+  forM_ (M.keys stateSignature0) $ \snName -> do
+      let outRidges = fromMaybe [] $ M.lookup (ResourceStatic snName ()) ridgeProvide
+
+      forM_ outRidges $ \rdg0 -> insertOnce $ Stage rdg0
 
 
   forM_ iRanks0 $ \ir -> do
@@ -345,19 +353,18 @@ cut = do
 
 
 
-  stateSignature0 <- view omStateSignature
 
   let allAllocs :: M.Map (ResourceT () IRank) Box
-      allAllocs = M.unionsWith (|||) $ basicAllocStatic : basicAllocOMNode : ridgeAllocs
+      allAllocs = M.unionsWith (|||) $ basicAllocStatic : basicAllocOMNode : ridgeMargins
 
       basicAllocStatic = M.fromList [(ResourceStatic sn (), mpiBox0) | sn <- M.keys stateSignature0]
       basicAllocOMNode = M.fromList [(ResourceOMNode nid ir, boxAssignment mpiRankOrigin ir nid)
                                     | ir <- iRanks0, nid <- M.keys stepGraph ]
 
-      ridgeAllocs = map mkRidgeAlloc $ M.toList allRidges
+      ridgeMargins = map mkRidgeMargin $ M.toList allRidges
 
-      mkRidgeAlloc :: Ridge -> M.Map (ResourceT () IRank) Box
-      mkRidgeAlloc (RidgeID _ drsc, box0) = case drsc of
+      mkRidgeMargin :: Ridge -> M.Map (ResourceT () IRank) Box
+      mkRidgeMargin (RidgeID _ drsc, box0) = case drsc of
         ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) box0
         ResourceOMNode nid (_,iDest) -> M.singleton (ResourceOMNode nid iDest) box0
 
@@ -373,5 +380,6 @@ cut = do
 
   return MPIPlan
     { _planArrayAlloc = allAllocs
+    , _planRidgeAlloc = allRidges
     , _planDistributedProgram = dProg0
     }
