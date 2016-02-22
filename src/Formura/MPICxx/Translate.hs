@@ -435,11 +435,8 @@ tellProgram = do
   tellBoth "int Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm)"
   tellH ";"
 
-  mmg <- use omInitGraph
-  con <- genGraph False $ mmg
 
   tellCLn "{"
-  tellC  con
   tellCLn "navi->time_step=0;"
   forM_ (zip (toList ivars) (toList intraExtents)) $ \(i, e) -> do
     tellCLn $ "navi->lower_" <> i <> "=0;"
