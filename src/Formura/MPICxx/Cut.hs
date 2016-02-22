@@ -255,17 +255,20 @@ cut = do
       putStrLn $ "    " ++ show (M.lookup (ir,nid) supportMap)
 -}
 
-  let locateSources :: (Resource, Box) -> [ConcreteResource]
-      locateSources (ResourceOMNode nid (),b0) =
+  let locateSources :: IRank -> (Resource, Box) -> [ConcreteResource]
+      locateSources irDest (ResourceOMNode nid (),b0) =
         [ ResourceOMNode nid (mpir, ir, b01)
         | (mpir,ir,b1) <- fromJust $ M.lookup nid allPossibleSources
+        , mpir /= mpiRankOrigin || ir /= irDest
         , let b01 = b0 &&& b1
         , volume b01 > 0]
-      locateSources (ResourceStatic snName (),b0) =
+      locateSources _ (ResourceStatic snName (),b0) =
         [ ResourceStatic snName (mpir, b01)
         | (mpir,b1) <- allPossibleSourcesStatic
+        , mpir /= mpiRankOrigin
         , let b01 = b0 &&& b1
-        , volume b01 > 0]
+        , volume b01 > 0
+        ]
 
 
       allPossibleSources :: M.Map OMNodeID [(MPIRank, IRank, Box)]
@@ -291,7 +294,7 @@ cut = do
       go (ir, nid) rbmap =
         [ mkRidge ir crsc
         | (rsc,b0) <- M.toList rbmap
-        , crsc <- locateSources (rsc,b0)
+        , crsc <- locateSources ir (rsc,b0)
         ]
 
       mkRidge :: IRank -> ConcreteResource -> Ridge
