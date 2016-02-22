@@ -22,7 +22,9 @@ import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.List (sort)
 import           Data.Data
+import           Data.Foldable
 import qualified Data.Map as M
+import qualified Data.Sequence as Q
 import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
 
@@ -81,6 +83,7 @@ instance HasNumericalConfig PlanRead where
 
 data PlanState = PlanState
   { _psSyntacticState :: CompilerSyntacticState
+  , _psDistributedProgramQ :: Q.Seq DistributedInst
   }
 makeClassy ''PlanState
 
@@ -98,6 +101,7 @@ makePlan nc prog = do
            }
       ps = PlanState
            { _psSyntacticState = defaultCompilerSyntacticState {_compilerStage = "MPI Planning"}
+           , _psDistributedProgramQ = Q.empty
            }
 
 
@@ -293,4 +297,31 @@ cut = do
       mkRidge irDest (ResourceOMNode sn (mpir, irSrc, b)) = Ridge mpir (ResourceOMNode sn (irSrc, irDest)) b
 
 
-  return MPIPlan{}
+  let ridgeProvide :: M.Map (ResourceT () IRank) [Ridge]
+      ridgeProvide = foldr (M.unionWith (++)) M.empty $ map mkProvide $ concat $ M.elems ridgeRequest
+
+      mkProvide :: Ridge -> M.Map (ResourceT () IRank) [Ridge]
+      mkProvide ridge0@(Ridge dmpi drsc box0) = case drsc of
+        ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) [ridge0]
+        ResourceOMNode nid (iSrc,_) -> M.singleton (ResourceOMNode nid iSrc) [ridge0]
+
+  let insert :: DistributedInst -> PlanM ()
+      insert inst = psDistributedProgramQ %= (Q.|> inst)
+
+  forM_ iRanks0 $ \ir -> do
+    forM_ (M.keys stepGraph) $ \nid -> do
+      let Just inRidges  = M.lookup (ir,nid) ridgeRequest
+          Just outRidges = M.lookup (ResourceOMNode nid ir) ridgeProvide
+
+      forM_ inRidges $ \rdg0 -> insert $ Unstage rdg0
+
+      insert $ Computation (ir, nid)
+
+      forM_ outRidges $ \rdg0 -> insert $ Stage rdg0
+
+  progQ <- use psDistributedProgramQ
+
+  return MPIPlan
+    { _planArrayMargin = M.empty
+    , _planDistributedProgram = toList progQ
+    }
