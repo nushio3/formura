@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveDataTypeable, GeneralizedNewtypeDeriving, LambdaCase, MultiWayIf, TemplateHaskell #-}
+{-# LANGUAGE DeriveDataTypeable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, LambdaCase, MultiParamTypeClasses, MultiWayIf, TemplateHaskell, TypeSynonymInstances #-}
 
 {-
 
@@ -24,6 +24,7 @@ import           Data.List (sort)
 import           Data.Data
 import           Data.Foldable
 import qualified Data.Map as M
+import           Data.Monoid
 import qualified Data.Sequence as Q
 import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
@@ -63,22 +64,24 @@ data DistributedInst
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 
 data MPIPlan = MPIPlan
-  { _planArrayMargin :: M.Map (ResourceT () IRank) Box
+  { _planArrayAlloc :: M.Map (ResourceT () IRank) Box
   , _planDistributedProgram :: [DistributedInst]
   }
 makeClassy ''MPIPlan
 
 data PlanRead = PlanRead
-  { _prGlobalEnvironment :: GlobalEnvironment
-  , _prNumericalConfig :: NumericalConfig
-  , _prStepGraph :: MMGraph
+  { _prNumericalConfig :: NumericalConfig
+  , _prMMProgram :: MMProgram
    }
 makeClassy ''PlanRead
 
+instance HasMachineProgram PlanRead MMInstruction OMNodeType where
+  machineProgram = prMMProgram
 instance HasGlobalEnvironment PlanRead where
-  globalEnvironment = prGlobalEnvironment
+  globalEnvironment = omGlobalEnvironment -- via HasMachineProgram
 instance HasNumericalConfig PlanRead where
   numericalConfig = prNumericalConfig
+
 
 
 data PlanState = PlanState
@@ -95,9 +98,8 @@ type PlanM = CompilerMonad PlanRead () PlanState
 makePlan :: NumericalConfig -> MMProgram -> IO MPIPlan
 makePlan nc prog = do
   let pr = PlanRead
-           { _prGlobalEnvironment = prog ^. omGlobalEnvironment
-           , _prNumericalConfig = nc
-           , _prStepGraph = prog ^. omStepGraph
+           { _prNumericalConfig = nc
+           , _prMMProgram = prog
            }
       ps = PlanState
            { _psSyntacticState = defaultCompilerSyntacticState {_compilerStage = "MPI Planning"}
@@ -160,7 +162,7 @@ cut = do
   let wvs = fmap (fmap evalWall) walls0
   -- liftIO $ print (wvs :: Vec [Int])
 
-  stepGraph <- view prStepGraph
+  stepGraph <- view omStepGraph
 
   let wallMap :: M.Map OMNodeID Walls
       wallMap = M.mapWithKey go stepGraph
@@ -293,12 +295,14 @@ cut = do
         ]
 
       mkRidge :: IRank -> ConcreteResource -> Ridge
-      mkRidge _      (ResourceStatic sn (mpir, b)) = Ridge mpir (ResourceStatic sn ()) b
+      mkRidge _      (ResourceStatic sn (mpir, b))         = Ridge mpir (ResourceStatic sn ()) b
       mkRidge irDest (ResourceOMNode nid (mpir, irSrc, b)) = Ridge mpir (ResourceOMNode nid (irSrc, irDest)) b
 
+      allRidges :: [Ridge]
+      allRidges = concat $ M.elems ridgeRequest
 
   let ridgeProvide :: M.Map (ResourceT () IRank) [Ridge]
-      ridgeProvide = foldr (M.unionWith (++)) M.empty $ map mkProvide $ concat $ M.elems ridgeRequest
+      ridgeProvide = foldr (M.unionWith (++)) M.empty $ map mkProvide allRidges
 
       mkProvide :: Ridge -> M.Map (ResourceT () IRank) [Ridge]
       mkProvide ridge0@(Ridge dmpi drsc box0) = case drsc of
@@ -310,8 +314,8 @@ cut = do
 
   forM_ iRanks0 $ \ir -> do
     forM_ (M.keys stepGraph) $ \nid -> do
-      let Just inRidges  = M.lookup (ir,nid) ridgeRequest
-          Just outRidges = M.lookup (ResourceOMNode nid ir) ridgeProvide
+      let inRidges  = fromMaybe [] $ M.lookup (ir,nid) ridgeRequest
+          outRidges = fromMaybe [] $ M.lookup (ResourceOMNode nid ir) ridgeProvide
 
       forM_ inRidges $ \rdg0 -> insert $ Unstage rdg0
 
@@ -319,9 +323,27 @@ cut = do
 
       forM_ outRidges $ \rdg0 -> insert $ Stage rdg0
 
+
+
+  stateSignature0 <- view omStateSignature
+
+  let allAllocs :: M.Map (ResourceT () IRank) Box
+      allAllocs = M.unionsWith (|||) $ basicAllocStatic : basicAllocOMNode : ridgeAllocs
+
+      basicAllocStatic = M.fromList [(ResourceStatic sn (), mpiBox0) | sn <- M.keys stateSignature0]
+      basicAllocOMNode = M.fromList [(ResourceOMNode nid ir, boxAssignment mpiRankOrigin ir nid)
+                                    | ir <- iRanks0, nid <- M.keys stepGraph ]
+
+      ridgeAllocs = map mkRidgeAlloc allRidges
+
+      mkRidgeAlloc :: Ridge -> M.Map (ResourceT () IRank) Box
+      mkRidgeAlloc (Ridge _ drsc box0) = case drsc of
+        ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) box0
+        ResourceOMNode nid (_,iDest) -> M.singleton (ResourceOMNode nid iDest) box0
+
   progQ <- use psDistributedProgramQ
 
   return MPIPlan
-    { _planArrayMargin = M.empty
+    { _planArrayAlloc = allAllocs
     , _planDistributedProgram = toList progQ
     }
