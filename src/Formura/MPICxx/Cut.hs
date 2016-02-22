@@ -46,7 +46,9 @@ instance Ord IRank where
 
 
 data MPIPlan = MPIPlan
-
+  { _planArrayMargin :: M.Map (ResourceT () IRank) Box
+  , _planDistributedInst :: [DistributedInst]
+  }
 
 data PlanRead = PlanRead
   { _prGlobalEnvironment :: GlobalEnvironment
@@ -129,6 +131,12 @@ evalWall w = case foldMap (maybeToList . touchdown) w of
 data ResourceT a b = ResourceStatic IdentName a | ResourceOMNode OMNodeID b
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 type Resource = ResourceT () ()
+type ConcreteResource = ResourceT (MPIRank, Box) (MPIRank, IRank, Box)
+
+data DistributedInst
+  = Communication ConcreteResource (IRank, OMNodeID, Box)
+  | Computation (IRank, OMNodeID)
+
 
 cut :: PlanM MPIPlan
 cut = do
@@ -206,7 +214,7 @@ cut = do
       putStrLn $ "  IR: " ++ show ir
       putStrLn $ "    " ++ show (boxAssignment mpiRankOrigin ir nid)
 -}
-  let supportMap :: M.Map (IRank, OMNodeID)  (M.Map Resource Box)
+  let supportMap :: M.Map (IRank, OMNodeID) (M.Map Resource Box)
       supportMap = M.fromList [((ir, nid), go ir nid (fromJust $ M.lookup nid stepGraph))
                               | ir <- iRanks0, nid <- M.keys stepGraph]
 
@@ -233,7 +241,7 @@ cut = do
       putStrLn $ "    " ++ show (M.lookup (ir,nid) supportMap)
 -}
 
-  let locateSource :: (Resource, Box) -> [ResourceT (MPIRank, Box) (MPIRank, IRank, Box)]
+  let locateSource :: (Resource, Box) -> [ConcreteResource]
       locateSource (ResourceOMNode nid (),b0) =
         [ ResourceOMNode nid (mpir, ir, b01)
         | (mpir,ir,b1) <- fromJust $ M.lookup nid allPossibleSources
@@ -265,7 +273,8 @@ cut = do
         , let b = move (mpiVec*intraShape0) mpiBox0
         ]
 
-
+      locatedSupportMap :: M.Map (IRank, OMNodeID)
+      locatedSupportMap = undefined
 
 
   return MPIPlan
