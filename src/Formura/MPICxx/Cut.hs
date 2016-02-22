@@ -126,12 +126,14 @@ evalWall w = case foldMap (maybeToList . touchdown) w of
   [x] -> x
   _   -> error $ "malformed wall: " ++ show w
 
-data Resource = ResourceStatic IdentName | ResourceOMNode OMNodeID
-                                           deriving (Eq, Ord, Show, Read, Typeable, Data)
+data ResourceT a b = ResourceStatic IdentName a | ResourceOMNode OMNodeID b
+                   deriving (Eq, Ord, Show, Read, Typeable, Data)
+type Resource = ResourceT () ()
 
 cut :: PlanM MPIPlan
 cut = do
   dim <- view dimension
+  let zeroVec = Vec $ replicate dim 0
 
   walls0 <- initialWalls
   -- liftIO $ print (walls0 :: Walls)
@@ -192,7 +194,10 @@ cut = do
         Vec $
         replicate dim [-1,0,1]
       mpiRankOrigin :: MPIRank
-      mpiRankOrigin = MPIRank $ Vec $ replicate dim 0
+      mpiRankOrigin = MPIRank $ zeroVec
+
+      mpiBox0 :: Box
+      mpiBox0 = Orthotope zeroVec intraShape0
 
 {-
   liftIO $ forM_ (M.keys stepGraph) $ \nid -> do
@@ -215,9 +220,9 @@ cut = do
         in M.unionsWith (|||) (map (listSupport b0) microInsts)
 
       listSupport :: Box -> MMInstF MMNodeID -> M.Map Resource Box
-      listSupport b0 (LoadCursorStatic v snName) = M.singleton (ResourceStatic  snName) (move v b0)
+      listSupport b0 (LoadCursorStatic v snName) = M.singleton (ResourceStatic snName ()) (move v b0)
       listSupport b0 (LoadCursor v nid) =
-        M.singleton (ResourceOMNode nid) (move v b0)
+        M.singleton (ResourceOMNode nid ()) (move v b0)
       listSupport _ _ = M.empty
 
   {-
@@ -227,6 +232,40 @@ cut = do
       putStrLn $ "  NODE: " ++ show nid
       putStrLn $ "    " ++ show (M.lookup (ir,nid) supportMap)
 -}
+
+  let locateSource :: (Resource, Box) -> [ResourceT (MPIRank, Box) (MPIRank, IRank, Box)]
+      locateSource (ResourceOMNode nid (),b0) =
+        [ ResourceOMNode nid (mpir, ir, b01)
+        | (mpir,ir,b1) <- fromJust $ M.lookup nid allPossibleSources
+        , let b01 = b0 &&& b1
+        , volume b01 > 0]
+      locateSource (ResourceStatic snName (),b0) =
+        [ ResourceStatic snName (mpir, b01)
+        | (mpir,b1) <- allPossibleSourcesStatic
+        , let b01 = b0 &&& b1
+        , volume b01 > 0]
+
+      locateSource (ResourceStatic snName (), b0) =
+        map (ResourceStatic snName) $
+        filter (\(_,b1) -> b0 `intersects` b1) $
+        allPossibleSourcesStatic
+
+      allPossibleSources :: M.Map OMNodeID [(MPIRank, IRank, Box)]
+      allPossibleSources = M.fromList
+                           [ (nid, [(mpir, ir, boxAssignment mpir ir nid)
+                                   | mpir <- mpiRanks0
+                                   , ir <- iRanks0])
+                           | nid <- M.keys stepGraph
+                           ]
+
+      allPossibleSourcesStatic :: [(MPIRank, Box)]
+      allPossibleSourcesStatic =
+        [ (mpir,b)
+        | mpir@(MPIRank mpiVec) <- mpiRanks0
+        , let b = move (mpiVec*intraShape0) mpiBox0
+        ]
+
+
 
 
   return MPIPlan
