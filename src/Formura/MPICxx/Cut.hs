@@ -26,6 +26,7 @@ import           Data.Foldable
 import qualified Data.Map as M
 import           Data.Monoid
 import qualified Data.Sequence as Q
+import qualified Data.Set as S
 import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
 
@@ -52,14 +53,16 @@ data ResourceT a b = ResourceStatic IdentName a | ResourceOMNode OMNodeID b
 type Resource = ResourceT () ()
 type ConcreteResource = ResourceT (MPIRank, Box) (MPIRank, IRank, Box)
 
-data Ridge = Ridge { _ridgeDeltaMPI :: MPIRank, _ridgeDelta :: ResourceT () (IRank, IRank), _ridgeBox :: Box}
+data RidgeID = RidgeID { _ridgeDeltaMPI :: MPIRank, _ridgeDelta :: ResourceT () (IRank, IRank)}
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
+
+type Ridge = (RidgeID, Box)
 
 data DistributedInst
   = CommunicationRecv (MPIRank, IRank, IRank)
-  | Unstage Ridge
+  | Unstage RidgeID
   | Computation (IRank, OMNodeID)
-  | Stage Ridge
+  | Stage RidgeID
   | CommunicationSend (MPIRank, IRank, IRank)
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 
@@ -87,6 +90,7 @@ instance HasNumericalConfig PlanRead where
 data PlanState = PlanState
   { _psSyntacticState :: CompilerSyntacticState
   , _psDistributedProgramQ :: Q.Seq DistributedInst
+  , _psAlreadyIssuedInst :: S.Set DistributedInst
   }
 makeClassy ''PlanState
 
@@ -104,6 +108,7 @@ makePlan nc prog = do
       ps = PlanState
            { _psSyntacticState = defaultCompilerSyntacticState {_compilerStage = "MPI Planning"}
            , _psDistributedProgramQ = Q.empty
+           , _psAlreadyIssuedInst = S.empty
            }
 
 
@@ -287,8 +292,11 @@ cut = do
         ]
 
 
-  let ridgeRequest :: M.Map (IRank, OMNodeID) [Ridge]
-      ridgeRequest = M.mapWithKey go supportMap
+  let ridgeAndBoxRequest :: M.Map (IRank, OMNodeID) [Ridge]
+      ridgeAndBoxRequest = M.mapWithKey go supportMap
+
+      ridgeRequest :: M.Map (IRank, OMNodeID) [RidgeID]
+      ridgeRequest = M.map (map fst) ridgeAndBoxRequest
 
       go :: (IRank, OMNodeID) -> M.Map Resource Box -> [Ridge]
       go (ir, nid) rbmap =
@@ -298,33 +306,42 @@ cut = do
         ]
 
       mkRidge :: IRank -> ConcreteResource -> Ridge
-      mkRidge _      (ResourceStatic sn (mpir, b))         = Ridge mpir (ResourceStatic sn ()) b
-      mkRidge irDest (ResourceOMNode nid (mpir, irSrc, b)) = Ridge mpir (ResourceOMNode nid (irSrc, irDest)) b
+      mkRidge _      (ResourceStatic sn (mpir, b))         = (RidgeID mpir (ResourceStatic sn ())               ,b)
+      mkRidge irDest (ResourceOMNode nid (mpir, irSrc, b)) = (RidgeID mpir (ResourceOMNode nid (irSrc, irDest)) ,b)
 
-      allRidges :: [Ridge]
-      allRidges = concat $ M.elems ridgeRequest
+      allRidges :: M.Map RidgeID Box
+      allRidges = M.unionsWith (|||) $ map (uncurry M.singleton) $ concat $  M.elems ridgeAndBoxRequest
 
-  let ridgeProvide :: M.Map (ResourceT () IRank) [Ridge]
-      ridgeProvide = foldr (M.unionWith (++)) M.empty $ map mkProvide allRidges
+  let ridgeProvide :: M.Map (ResourceT () IRank) [RidgeID]
+      ridgeProvide = foldr (M.unionWith (++)) M.empty $ map mkProvide $ M.keys $ allRidges
 
-      mkProvide :: Ridge -> M.Map (ResourceT () IRank) [Ridge]
-      mkProvide ridge0@(Ridge dmpi drsc box0) = case drsc of
+      mkProvide :: RidgeID -> M.Map (ResourceT () IRank) [RidgeID]
+      mkProvide ridge0@(RidgeID dmpi drsc) = case drsc of
         ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) [ridge0]
         ResourceOMNode nid (iSrc,_) -> M.singleton (ResourceOMNode nid iSrc) [ridge0]
 
   let insert :: DistributedInst -> PlanM ()
-      insert inst = psDistributedProgramQ %= (Q.|> inst)
+      insert inst = do
+        psAlreadyIssuedInst %= (S.insert inst)
+        psDistributedProgramQ %= (Q.|> inst)
+
+      insertOnce :: DistributedInst -> PlanM ()
+      insertOnce inst = do
+        aii <- use psAlreadyIssuedInst
+        when (not $ S.member inst aii) $ insert inst
+
+
 
   forM_ iRanks0 $ \ir -> do
     forM_ (M.keys stepGraph) $ \nid -> do
       let inRidges  = fromMaybe [] $ M.lookup (ir,nid) ridgeRequest
           outRidges = fromMaybe [] $ M.lookup (ResourceOMNode nid ir) ridgeProvide
 
-      forM_ inRidges $ \rdg0 -> insert $ Unstage rdg0
+      forM_ inRidges $ \rdg0 -> insertOnce $ Unstage rdg0
 
       insert $ Computation (ir, nid)
 
-      forM_ outRidges $ \rdg0 -> insert $ Stage rdg0
+      forM_ outRidges $ \rdg0 -> insertOnce $ Stage rdg0
 
 
 
@@ -337,10 +354,10 @@ cut = do
       basicAllocOMNode = M.fromList [(ResourceOMNode nid ir, boxAssignment mpiRankOrigin ir nid)
                                     | ir <- iRanks0, nid <- M.keys stepGraph ]
 
-      ridgeAllocs = map mkRidgeAlloc allRidges
+      ridgeAllocs = map mkRidgeAlloc $ M.toList allRidges
 
       mkRidgeAlloc :: Ridge -> M.Map (ResourceT () IRank) Box
-      mkRidgeAlloc (Ridge _ drsc box0) = case drsc of
+      mkRidgeAlloc (RidgeID _ drsc, box0) = case drsc of
         ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) box0
         ResourceOMNode nid (_,iDest) -> M.singleton (ResourceOMNode nid iDest) box0
 
