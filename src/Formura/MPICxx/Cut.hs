@@ -294,7 +294,7 @@ cut = do
 
       mkRidge :: IRank -> ConcreteResource -> Ridge
       mkRidge _      (ResourceStatic sn (mpir, b)) = Ridge mpir (ResourceStatic sn ()) b
-      mkRidge irDest (ResourceOMNode sn (mpir, irSrc, b)) = Ridge mpir (ResourceOMNode sn (irSrc, irDest)) b
+      mkRidge irDest (ResourceOMNode nid (mpir, irSrc, b)) = Ridge mpir (ResourceOMNode nid (irSrc, irDest)) b
 
 
   let ridgeProvide :: M.Map (ResourceT () IRank) [Ridge]
