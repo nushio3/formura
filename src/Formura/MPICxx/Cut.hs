@@ -67,8 +67,10 @@ data DistributedInst
   | CommunicationSend (MPIRank, IRank, IRank)
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 
+type ArrayResourceKey = ResourceT () IRank
+
 data MPIPlan = MPIPlan
-  { _planArrayAlloc :: M.Map (ResourceT () IRank) Box
+  { _planArrayAlloc :: M.Map ArrayResourceKey Box
   , _planRidgeAlloc :: M.Map RidgeID Box
   , _planRegionAlloc :: M.Map (IRank, OMNodeID) Box
   , _planDistributedProgram :: [DistributedInst]

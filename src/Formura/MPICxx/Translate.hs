@@ -57,6 +57,7 @@ data NamingState = NamingState
   , _freeLocalNameCounter :: Integer
   , _nodeIDtoLocalName :: M.Map MMNodeID T.Text
   , _loopIndexNames :: Vec T.Text
+  , _loopIndexOffset :: Vec Int
   , _loopExtentNames :: Vec T.Text
   , _resourceNames :: M.Map (ResourceT () IRank) T.Text
   , _ridgeNames :: M.Map RidgeID T.Text
@@ -70,6 +71,7 @@ defaultNamingState = NamingState
   , _freeLocalNameCounter = 0
   , _nodeIDtoLocalName = M.empty
   , _loopIndexNames = PureVec ""
+  , _loopIndexOffset = 0
   , _loopExtentNames = PureVec ""
   , _resourceNames = M.empty
   , _ridgeNames = M.empty
@@ -336,6 +338,7 @@ lookupNode i = do
 genMMInstruction :: MMInstruction -> TranM (T.Text, T.Text)
 genMMInstruction mminst = do
   indNames <- use loopIndexNames
+  indOffset <- use loopIndexOffset
 
   alreadyGivenLocalNames .= S.empty
   freeLocalNameCounter .= 0
@@ -430,13 +433,13 @@ genComputation (ir0, nid0) = do
       mmInst :: MMInstruction
       Just (Node mmInst typ annot) = M.lookup nid0 stepGraph
 
-
+  loopIndexOffset .= marginBox^. lowerVertex
 
   let
     genGrid lhsName2 = do
       let openLoops =
             [ T.unwords
-              ["for (", i, "=", showC l ,";", i,  "<", showC h, ";++", i, "){"]
+              ["for (int ", i, "=", showC l ,";", i,  "<", showC h, ";++", i, "){"]
             | (i,(l,h)) <- (toList ivars) `zip`
               zip (toList loopFroms) (toList loopTos)]
           closeLoops =
@@ -459,6 +462,51 @@ genComputation (ir0, nid0) = do
       return $ T.pack $  "// dunno how gen " ++ show mmInst
 
 
+-- | generate a staging/unstaging code
+
+genStagingCode :: RidgeID -> TranM T.Text
+genStagingCode rid = do
+  ridgeDict <- use planRidgeAlloc
+  arrDict   <- use planArrayAlloc
+  let Just box0 = M.lookup rid ridgeDict
+      src :: ArrayResourceKey
+      src = case rid of
+        RidgeID _ (ResourceOMNode nid (ir,_)) -> ResourceOMNode nid ir
+        RidgeID _ (ResourceStatic sn ())  -> ResourceStatic sn ()
+      Just box1 = M.lookup src arrDict
+  srcName <- nameArrayResource src
+  destName <- nameRidgeResource rid
+  return srcName
+
+  ivars <- use loopIndexNames
+  let offset :: Vec Int
+      offset = box0^.lowerVertex
+
+      loopFroms :: Vec Int
+      loopFroms = box0^.lowerVertex - offset
+
+      loopTos :: Vec Int
+      loopTos = box0^.upperVertex - offset
+
+      otherOffset :: Vec Int
+      otherOffset = offset - box1^.lowerVertex
+
+  let openLoops =
+        [ T.unwords
+          ["for (int ", i, "=", showC l ,";", i,  "<", showC h, ";++", i, "){"]
+        | (i,(l,h)) <- (toList ivars) `zip`
+          zip (toList loopFroms) (toList loopTos)]
+      closeLoops =
+        ["}" | _ <- toList ivars]
+
+      body = destName <> foldMap brackets ivars <> "="
+          <> srcName  <> foldMap brackets (liftVec2 (\i n -> i <> "+" <> showC n) ivars otherOffset) <> ";"
+
+  return $ T.unlines openLoops <> body <> T.unlines closeLoops
+
+genUnstagingCode :: RidgeID -> TranM T.Text
+genUnstagingCode _ = return "\n//unstage\n"
+
 -- | generate a distributed program
 genDistributedProgram :: [DistributedInst] -> TranM T.Text
 genDistributedProgram insts = do
@@ -479,8 +527,8 @@ genDistributedProgram insts = do
     where
       go :: DistributedInst -> TranM T.Text
       go (Computation cmp) = genComputation cmp
-      go (Unstage _) = return "unstage"
-      go (Stage _) = return "stage"
+      go (Unstage rid) = genUnstagingCode rid
+      go (Stage rid) = genStagingCode rid
 
 
 
