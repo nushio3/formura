@@ -22,18 +22,18 @@ tests :: [Test]
 tests =
   [ testCase "Basic arithmetic holds." $ 2 @=? 1+1
   , testCase "Monoid of Partition is intersection." $
-    Box (Vec [1]) (Vec [10]) <> Box (Vec [2]) (Vec [12]) @?= (Box 2 10 :: Partition)
+    Orthotope (Vec [1]) (Vec [10]) <> Orthotope (Vec [2]) (Vec [12]) @?= (Orthotope 2 10 :: Partition)
   , testCase "Top is smallest, Bottom is largest." $
-    Box (Vec [Top]) (Vec [Bottom]) <> Box (Vec [3]) (Vec [5]) @?= (Box 3 5 :: Partition)
+    Orthotope (Vec [Top]) (Vec [Bottom]) <> Orthotope (Vec [3]) (Vec [5]) @?= (Orthotope 3 5 :: Partition)
   , testCase "Top is smallest, Bottom is largest." $
-    Box (Vec [Bottom]) (Vec [Top]) <> Box (Vec [3]) (Vec [5]) @?=
-      (Box (pure Bottom) (pure Top) :: Partition)
-  , testProperty "Finite Box moves as expected." $ \vx vy ax ay bx by ->
-      move (Vec [vx,vy]) (Box (Vec [ax,ay]) (Vec [bx,by])) ==
-      (Box (Vec [ax+vx,ay+vy]) (Vec [bx+vx,by+vy]))
-  , testProperty "Infinite Box moves as expected." $ \vx vy ax bx ->
-      move (Vec [vx,vy]) (Box (Vec [pure ax,Top]) (Vec [pure bx,Bottom])) ==
-      (Box (Vec [pure $ ax+vx,Top]) (Vec [pure $ bx+vx,Bottom]) :: Partition)
+    Orthotope (Vec [Bottom]) (Vec [Top]) <> Orthotope (Vec [3]) (Vec [5]) @?=
+      (Orthotope (pure Bottom) (pure Top) :: Partition)
+  , testProperty "Finite Orthotope moves as expected." $ \vx vy ax ay bx by ->
+      move (Vec [vx,vy]) (Orthotope (Vec [ax,ay]) (Vec [bx,by])) ==
+      (Orthotope (Vec [ax+vx,ay+vy]) (Vec [bx+vx,by+vy]))
+  , testProperty "Infinite Orthotope moves as expected." $ \vx vy ax bx ->
+      move (Vec [vx,vy]) (Orthotope (Vec [pure ax,Top]) (Vec [pure bx,Bottom])) ==
+      (Orthotope (Vec [pure $ ax+vx,Top]) (Vec [pure $ bx+vx,Bottom]) :: Partition)
   ]
 
 main :: IO ()
