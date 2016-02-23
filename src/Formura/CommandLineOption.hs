@@ -13,6 +13,7 @@ data CommandLineOption =
     , _outputFilename :: FilePath
     , _numericalConfigFilename :: FilePath
     , _verbose :: Bool
+    , _sleepAfterGen :: Int
     }
   deriving (Eq, Show)
 makeClassy ''CommandLineOption
@@ -29,6 +30,9 @@ cloParser = CommandLineOption
                        help "the name of the file that provides numerical simulation configuration in YAML format.")
             <*>
             switch (long "verbose" <> short 'v' <> help "output debug messages.")
+            <*>
+            fmap read (strOption (long "sleep" <> metavar "SECOND" <> value "0" <>
+                    help "sleep n seconds after successful generation of the destination program."))
 
 
 getCommandLineOption :: IO CommandLineOption

@@ -1,5 +1,5 @@
-dimension :: 3
-axes :: x,y,z
+dimension :: 2
+axes :: x,y
 
 double :: π = 3.141592653589793
 double :: dens0 = 1.0
@@ -11,11 +11,11 @@ double :: dx = 0.1, dy = 0.1, dz = 0.1
 
 ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
 ddy = fun(a) (a[,i-2] + 8*a[,i+1] - 8*a[,i-1] - a[,i+2])/(12*dy)
-ddz = fun(a) (a[,,i-2] + 8*a[,,i+1] - 8*a[,,i-1] - a[,,i+2])/(12*dz)
+ddz = fun(a) 0
 
 ddx2nd = fun(a) (a[i+1/2] - a[i-1/2]) / dx
 ddy2nd = fun(a) (a[,i+1/2] - a[,i-1/2])/dy
-ddz2nd = fun(a) (a[,,i+1/2] - a[,,i-1/2])/dz
+ddz2nd = fun(a) 0
 
 
 ∂ = (ddx,ddy,ddz)
@@ -107,7 +107,7 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s) \
       manifest :: avf_y = av_flux_y(sys_next)
       manifest :: avf_z = av_flux_z(sys_next)
 
-      manifest :: sys_avx = sys_next[i] + avf_x[i-1/2] - avf_x[i+1/2]
+      manifest :: sys_avx = sys_next + avf_x[i-1/2] - avf_x[i+1/2]
       manifest :: sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]
       manifest :: sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
 
