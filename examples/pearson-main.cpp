@@ -19,7 +19,7 @@ void init() {
       V[x][y] = 0;
     }
   }
-  for (int x = 58; x < 78; ++x) {
+  for (int x = 18; x < 38; ++x) {
     for (int y = 58; y < 78; ++y) {
       U[x][y] = 0.5+0.01*frand();
       V[x][y] = 0.25+0.01*frand();

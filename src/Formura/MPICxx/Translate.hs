@@ -588,6 +588,29 @@ genDistributedProgram insts = do
       go (Stage rid) = genStagingCode True rid
 
 
+-- | Let the plans collaborate
+
+collaboratePlans :: TranM ()
+collaboratePlans = do
+  plans0 <- use tsMPIPlanMap
+
+  let commonStaticBox :: M.Map IdentName Box
+      commonStaticBox = M.unionsWith (|||)
+        [ M.singleton snName b
+        | p <- M.elems plans0
+        , (ResourceStatic snName (), b)  <- M.toList $ p ^. planArrayAlloc
+        ]
+
+      newPlans = M.map rewritePlan plans0
+
+      rewritePlan :: MPIPlan -> MPIPlan
+      rewritePlan = planArrayAlloc %~ M.mapWithKey go
+
+      go (ResourceStatic snName ()) _ = fromJust $ M.lookup snName commonStaticBox
+      go _ b = b
+
+  tsMPIPlanMap .= newPlans
+
 
 -- | The main translation logic
 tellProgram :: WithCommandLineOption => TranM ()
@@ -606,6 +629,7 @@ tellProgram = do
   plan <- liftIO $ makePlan (nc & ncWallInverted .~ Just True) mmprog
   mPIPlan .= plan
 
+  collaboratePlans
 
   tellH $ T.unlines
     [ ""
