@@ -13,16 +13,16 @@ float frand() {
 }
 
 void init() {
-  for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-    for(int x = navi.lower_x; x < navi.upper_x; ++x) {
-      U[y][x] = 1;
-      V[y][x] = 0;
+  for(int x = navi.lower_x; x < navi.upper_x; ++x) {
+    for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+      U[x][y] = 1;
+      V[x][y] = 0;
     }
   }
-  for (int y = 118; y < 138; ++y) {
-    for (int x = 118; x < 138; ++x) {
-      U[y][x] = 0.5+0.01*frand();
-      V[y][x] = 0.25+0.01*frand();
+  for (int x = 58; x < 78; ++x) {
+    for (int y = 58; y < 78; ++y) {
+      U[x][y] = 0.5+0.01*frand();
+      V[x][y] = 0.25+0.01*frand();
     }
   }
 }
@@ -41,9 +41,9 @@ int main (int argc, char **argv) {
       char fn[256];
       sprintf(fn, "frames/%06d.txt", navi.time_step);
       FILE *fp = fopen(fn,"w");
-      for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-        for(int x = navi.lower_x; x < navi.upper_x; ++x) {
-          fprintf(fp, "%d %d %f\n", x, y, U[y][x]);
+      for(int x = navi.lower_x; x < navi.upper_x; ++x) {
+        for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+          fprintf(fp, "%d %d %f\n", x, y, U[x][y]);
         }
         fprintf(fp, "\n");
       }
