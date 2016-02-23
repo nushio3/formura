@@ -56,6 +56,8 @@ type ConcreteResource = ResourceT (MPIRank, Box) (MPIRank, IRank, Box)
 
 data RidgeID = RidgeID { _ridgeDeltaMPI :: MPIRank, _ridgeDelta :: ResourceT () (IRank, IRank)}
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
+makeLenses ''RidgeID
+
 
 type Ridge = (RidgeID, Box)
 

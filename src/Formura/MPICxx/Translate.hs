@@ -254,12 +254,18 @@ genResourceDecl name rsc box0 = do
 
 
 toCName :: Show a => a -> IdentName
-toCName a = fix $ go False $ show a
+toCName a = postfix $ fix $ go False $ prefix $ show a
   where
     go _ [] = []
     go b (x:xs) = case isAlphaNum x of
       True -> x : go False xs
       False -> if b then go b xs else '_' : go True xs
+
+    postfix :: IdentName -> IdentName
+    postfix = reverse . dropWhile (=='_') . reverse
+
+    prefix :: IdentName -> IdentName
+    prefix = T.packed %~ (T.replace "-" "m")
 
     fix :: IdentName -> IdentName
     fix = T.packed %~ (T.replace "ResourceOMNode" "Om" .
@@ -466,7 +472,7 @@ genComputation (ir0, nid0) destRsc0 = do
   loopIndexOffset .= marginBox^. lowerVertex
 
   let
-    genGrid lhsName2 = do
+    genGrid useSystemOffset lhsName2 = do
       let openLoops =
             [ T.unwords
               ["for (int ", i, "=", showC l ,";", i,  "<", showC h, ";++", i, "){"]
@@ -476,18 +482,26 @@ genComputation (ir0, nid0) destRsc0 = do
             ["}" | _ <- toList ivars]
 
       (letBs,rhs) <- genMMInstruction ir0 mmInst
-      let bodyExpr = lhsName2 <> foldMap brackets ivars <> "=" <> rhs <> ";"
+
+      let bodyExpr = lhsName2 <> foldMap brackets ivarExpr <> "=" <> rhs <> ";"
+          ivarExpr
+            | useSystemOffset = (\i d -> i <> "-" <> showC d) <$> ivars <*> Vec [1,1] -- TODO: calculate system offset!
+            | otherwise       = ivars
+
       return $ T.unlines $
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
-  lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
 
   case typ of
     ElemType "void" ->
       case mmInstTail mmInst of
-        Store n _ -> genGrid (T.pack n)
+        Store n _ -> do
+          lhsName <- nameArrayResource (ResourceStatic n ())
+          genGrid True lhsName
         _ -> return "// void"
-    GridType _ typ -> genGrid lhsName
+    GridType _ typ -> do
+      lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
+      genGrid False lhsName
     _ -> do
       return $ T.pack $  "// dunno how gen " ++ show mmInst
 
@@ -498,12 +512,17 @@ genStagingCode :: Bool -> RidgeID -> TranM T.Text
 genStagingCode isStaging rid = do
   ridgeDict <- use planRidgeAlloc
   arrDict   <- use planArrayAlloc
+  intraShape <- use ncIntraNodeShape
+
+
   let Just box0 = M.lookup rid ridgeDict
       src :: ArrayResourceKey
       src = case rid of
         RidgeID _ (ResourceOMNode nid (irS,irD)) -> ResourceOMNode nid (if isStaging then irS else irD)
         RidgeID _ (ResourceStatic sn ())  -> ResourceStatic sn ()
       Just box1 = M.lookup src arrDict
+
+      MPIRank mpivec = rid ^. ridgeDeltaMPI
   arrName <- nameArrayResource src
   rdgName <- nameRidgeResource rid
   ivars <- use loopIndexNames
@@ -518,6 +537,7 @@ genStagingCode isStaging rid = do
 
       otherOffset :: Vec Int
       otherOffset = offset - box1^.lowerVertex
+        - (if isStaging then  mpivec * intraShape else 0)
 
   let openLoops =
         [ T.unwords
