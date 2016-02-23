@@ -389,6 +389,24 @@ genMMInstruction ir0 mminst = do
   freeLocalNameCounter .= 0
   nodeIDtoLocalName .= M.empty
 
+  let referenceCount :: M.Map MMNodeID Int
+      referenceCount = M.unionsWith (+) $
+        concat $
+        map (map (flip M.singleton 1) . genRefCnt . _nodeInst) $
+        M.elems mminst
+
+      genRefCnt :: MicroInstruction -> [MMNodeID]
+      genRefCnt (Imm _) = []
+      genRefCnt (Uniop _ a) = [a]
+      genRefCnt (Binop _ a b) = [a,b]
+      genRefCnt (Triop _ a b c) = [a,b,c]
+      genRefCnt (Naryop "<%" xs) = xs ++ xs
+      genRefCnt (Naryop _ xs) = xs
+      genRefCnt (Store _ x) = [x]
+      genRefCnt (LoadIndex _) = []
+      genRefCnt (LoadExtent _) = []
+      genRefCnt (LoadCursor _ _) = []
+      genRefCnt (LoadCursorStatic _ _) = []
 
   txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
     thisName <- genFreeLocalName "a"

@@ -81,7 +81,8 @@ type OMInstruction = OMInstF OMNodeID
 -- | The instruction type for Manifest Machine, where every node is manifest,
 --   and each instruction is actually a subgraph for delayed computation
 type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
-type MMInstruction = M.Map MMNodeID (Node (MMInstF MMNodeID) MicroNodeType)
+type MMInstruction = M.Map MMNodeID (Node MicroInstruction MicroNodeType)
+type MicroInstruction = MMInstF MMNodeID
 
 mmInstTail :: MMInstruction -> MMInstF MMNodeID
 mmInstTail = _nodeInst . snd . M.findMax
