@@ -21,6 +21,6 @@ begin function step(U,V) returns (U_next, V_next)
   dU_dt = -U * V**2 + F * (1-U) + Du/dx**2 * Σ fun(i) (∂ i . ∂ i) U
   dV_dt =  U * V**2 - (F+k) * V + Dv/dx**2 * Σ fun(i) (∂ i . ∂ i) V
 
-  manifest :: U_next = U + dt * dU_dt
-  manifest :: V_next = V + dt * dV_dt
+  U_next = U + dt * dU_dt
+  V_next = V + dt * dV_dt
 end function
