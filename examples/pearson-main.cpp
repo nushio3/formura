@@ -4,7 +4,7 @@
 #include <time.h>
 #include "pearson.h"
 
-const int T_MAX = 1000;
+int T_MAX;
 
 Formura_Navigator navi;
 
@@ -31,6 +31,8 @@ int main (int argc, char **argv) {
   srand(time(NULL));
   MPI_Init(&argc, &argv);
   Formura_Init(&navi, MPI_COMM_WORLD);
+
+  sscanf(argv[1], "%d",  &T_MAX);
 
   init();
 

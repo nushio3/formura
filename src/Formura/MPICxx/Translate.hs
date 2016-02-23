@@ -416,10 +416,10 @@ genMMInstruction ir0 mminst = do
 
       doesBind' :: Int -> MicroInstruction -> Bool
       doesBind' _ (Imm _) = False
-      doesBind' _ (LoadIndex _) = False
-      doesBind' _ (LoadExtent _) = False
-      doesBind' _ (LoadCursor _ _) = False
-      doesBind' _ (LoadCursorStatic _ _) = False
+      -- doesBind' _ (LoadIndex _) = False
+      -- doesBind' _ (LoadExtent _) = False
+      -- doesBind' _ (LoadCursor _ _) = False
+      -- doesBind' _ (LoadCursorStatic _ _) = False
       doesBind' _ (Store _ x) = False
       doesBind' n _ = n > 1
 
@@ -432,7 +432,7 @@ genMMInstruction ir0 mminst = do
             True ->  do
               thisName <- genFreeLocalName "a"
               nodeIDtoLocalName %= M.insert nid0 thisName
-              return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";"
+              return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";\n"
             False -> do
               nodeIDtoLocalName %= M.insert nid0 code
               return ""
@@ -492,7 +492,7 @@ genMMInstruction ir0 mminst = do
   nmap <- use nodeIDtoLocalName
   let (tailID, _) = M.findMax mminst
       Just tailName = M.lookup tailID nmap
-  return $ (T.unlines txts, tailName)
+  return $ (T.unwords txts, tailName)
 
 
 -- | generate a formura function body.
