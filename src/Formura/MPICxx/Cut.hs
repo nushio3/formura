@@ -20,6 +20,7 @@ import           Algebra.Lattice.Levitated
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
+import           Data.Bits(xor)
 import           Data.List (sort)
 import           Data.Data
 import           Data.Foldable
@@ -151,11 +152,15 @@ initialWalls = do
   intraShape <- view ncIntraNodeShape
   (!) <- getVecAccessor
 
+  maybeInv <- view ncWallInverted
+  let inverted0 = maybeInv == Just True :: Bool
+
+
   let boundOfAxis :: String -> Bool -> Int -> Vec (Levitated Int, Levitated Int)
       boundOfAxis x ascending n = flip fmap axes $ \y ->
-        if | x == y && ascending -> (Levitate n, Bottom)
-           | x == y              -> (Top       , Levitate n)
-           | otherwise           -> (Top       , Bottom)
+        if | x == y && (ascending`xor`inverted0) -> (Levitate n, Bottom)
+           | x == y                              -> (Top       , Levitate n)
+           | otherwise                           -> (Top       , Bottom)
       mkWall :: String -> Bool -> Int -> Partition
       mkWall x a n = let ret = boundOfAxis x a n in Orthotope (fmap fst ret) (fmap snd ret)
 
@@ -203,15 +208,36 @@ cut = do
         in move (negate v) w_of_n
       listBounds _ = fmap (fmap (const (mempty :: Partition))) walls0
 
-      wallEvolution :: M.Map OMNodeID (Vec [Int])
-      wallEvolution = fmap (fmap (fmap evalWall)) wallMap
+  -- assign the same wall for all the Static nodes
+  let wallMap2 = flip M.mapWithKey wallMap $ \nid0 wall0 ->
+        case mmInstTail $ (fromJust $ M.lookup nid0 stepGraph) ^. nodeInst of
+          Store _ _ -> staticWallConsensus
+          _ -> wall0
+
+      staticWalls :: [Walls]
+      staticWalls =
+        [ fromJust $ M.lookup nid0 wallMap
+        | (nid0, mmNode) <- M.toList stepGraph
+        , Store _ _ <- [mmInstTail $ mmNode ^. nodeInst]
+        ]
+
+      staticWallConsensus = minimum staticWalls
+
+
+  let wallEvolution :: M.Map OMNodeID (Vec [Int])
+      wallEvolution = fmap (fmap (fmap evalWall)) wallMap2
 
   -- liftIO $ print (wallEvolution :: M.Map OMNodeID (Vec [Int]))
 
   intraShape0 <- view ncIntraNodeShape
 
+  maybeInv <- view ncWallInverted
+  let inverted0 = maybeInv == Just True :: Bool
+
+
   let iRanks0 :: [IRank]
       iRanks0 =
+        (if inverted0 then reverse else id) $
         sort $
         map IRank $
         sequence $

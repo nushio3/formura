@@ -18,16 +18,27 @@ data NumericalConfig = NumericalConfig
   , _ncTemporalBlockingInterval :: Int
   , _ncMonitorInterval :: Int
   , _ncInitialWalls :: M.Map String [Int]
+  , _ncWallInverted :: Maybe Bool
   }
 makeClassy ''NumericalConfig
 
 
 $(deriveJSON (let toSnake = packed %~ snakify in
-               defaultOptions{fieldLabelModifier = toSnake . drop 3, constructorTagModifier = toSnake})
+               defaultOptions{fieldLabelModifier = toSnake . drop 3,
+                              constructorTagModifier = toSnake,
+                              omitNothingFields = True})
   ''NumericalConfig)
 
 defaultNumericalConfig :: NumericalConfig
-defaultNumericalConfig = NumericalConfig 0 0 0 0 M.empty
+defaultNumericalConfig =
+  NumericalConfig
+  { _ncIntraNodeShape = 0
+  , _ncMPIGridShape = 0
+  , _ncTemporalBlockingInterval = 1
+  , _ncMonitorInterval = 1
+  , _ncInitialWalls = M.empty
+  , _ncWallInverted = Nothing
+     }
 
 
 sampleNumericalConfig :: NumericalConfig
@@ -38,4 +49,5 @@ sampleNumericalConfig =
   , _ncTemporalBlockingInterval = 4
   , _ncMonitorInterval = 28
   , _ncInitialWalls = M.fromList [("x",[66]), ("y", [34]), ("z", [12,22]) ]
+  , _ncWallInverted = Nothing
      }
