@@ -4,7 +4,7 @@
 #include <time.h>
 #include "pearson.h"
 
-const int T_MAX = 10000;
+const int T_MAX = 1000;
 
 Formura_Navigator navi;
 
