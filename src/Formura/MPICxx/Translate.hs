@@ -646,6 +646,7 @@ tellProgram = do
   tellH $ T.unlines ["#include <mpi.h>"]
   tellC $ T.unlines ["#include <mpi.h>" ,
                      "#include <math.h>" ,
+                     "#include <stdbool.h>" ,
                      "#include \"" <> T.pack hxxFileName <> "\""]
   tellC $ cxxTemplate
 
@@ -779,6 +780,5 @@ hxxFileName = hxxFilePath ^. filename
 cxxTemplate :: T.Text
 cxxTemplate = T.unlines
   [ ""
-  , "typedef int bool;"
   , ""
   ]
