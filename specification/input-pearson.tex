@@ -1,0 +1,239 @@
+\verb`pearson.h`
+\begin{breakbox}
+\begin{verbatim}
+#pragma once
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+#include <mpi.h>
+
+
+  extern float U[256][256];
+  extern float V[256][256];
+
+  struct Formura_Navigator
+  {
+    int time_step;
+    int lower_x;
+    int upper_x;
+    int offset_x;
+    int lower_y;
+    int upper_y;
+    int offset_y;
+  };
+
+
+  int Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm);
+
+  int Formura_Forward (struct Formura_Navigator *navi);
+#ifdef __cplusplus
+}
+#endif
+\end{verbatim}
+\end{breakbox}
+
+
+\verb`pearson.c`
+\begin{breakbox}
+\begin{verbatim}
+#include <mpi.h>
+#include <math.h>
+#include "pearson.h"
+
+
+float U[256][256];
+float V[256][256];
+float U_0;
+float V_0;
+;
+;
+float a[256][256];
+float a_0[256][256];
+float k;
+float F;
+float Du;
+float Dv;
+float dt;
+float dx;
+float dU_dt[256][256];
+float dV_dt[256][256];
+float U_next_0[256][256];
+float V_next_0[256][256];
+;
+;
+
+
+
+int
+Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm)
+{
+  int ix, iy;
+  const int NX = 256, NY = 256;
+  U_0 = 0.0;
+  V_0 = 0.0;
+  for (ix = 0; ix < NX + 0; ++ix) {
+    for (iy = 0; iy < NY + 0; ++iy) {
+      U[ix][iy] = U_0;
+    }
+  }
+
+  for (ix = 0; ix < NX + 0; ++ix) {
+    for (iy = 0; iy < NY + 0; ++iy) {
+      V[ix][iy] = V_0;
+    }
+  }
+
+  navi->time_step = 0;
+  navi->lower_x = 0;
+  navi->offset_x = 0;
+  navi->upper_x = 256;
+  navi->lower_y = 0;
+  navi->offset_y = 0;
+  navi->upper_y = 256;
+}
+
+
+int
+Formura_Forward (struct Formura_Navigator *navi)
+{
+  int ix, iy;
+  const int NX = 256, NY = 256;
+  int timestep;
+  for (timestep = 0; timestep < 20; ++timestep) {
+    for (ix = 0; ix < NX + 0; ++ix) {
+      for (iy = 0; iy < NY + 0; ++iy) {
+        a[ix][iy] = U[ix][iy];
+      }
+    }
+
+    for (ix = 0; ix < NX + 0; ++ix) {
+      for (iy = 0; iy < NY + 0; ++iy) {
+        a_0[ix][iy] = V[ix][iy];
+      }
+    }
+
+    k = 5.0e-2;
+    F = 1.5e-2;
+    Du = 2.0e-5;
+    Dv = 1.0e-5;
+    dt = 1.0;
+    dx = 1.0e-2;
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        dU_dt[ix][iy] =
+          (((-(a[ix][iy] * pow (a_0[ix][iy],
+                  2.0))) + (F * (1.0 - a[ix][iy]))) + ((Du / pow (dx,
+                2.0)) * (((a[ix - 1][iy] - a[ix][iy]) - (a[ix][iy] - a[ix +
+                    1][iy])) + ((a[ix][iy - 1] - a[ix][iy]) - (a[ix][iy] -
+                  a[ix][iy + 1])))));
+      }
+    }
+
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        dV_dt[ix][iy] =
+          (((a[ix][iy] * pow (a_0[ix][iy],
+                2.0)) - ((F + k) * a_0[ix][iy])) + ((Dv / pow (dx,
+                2.0)) * (((a_0[ix - 1][iy] - a_0[ix][iy]) - (a_0[ix][iy] -
+                  a_0[ix + 1][iy])) + ((a_0[ix][iy - 1] - a_0[ix][iy]) -
+                (a_0[ix][iy] - a_0[ix][iy + 1])))));
+      }
+    }
+
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        U_next_0[ix][iy] = (a[ix][iy] + (dt * dU_dt[ix][iy]));
+      }
+    }
+
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        V_next_0[ix][iy] = (a_0[ix][iy] + (dt * dV_dt[ix][iy]));
+      }
+    }
+
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        U[ix][iy] = U_next_0[ix][iy];
+      }
+    }
+
+    for (ix = 1; ix < NX + -1; ++ix) {
+      for (iy = 1; iy < NY + -1; ++iy) {
+        V[ix][iy] = V_next_0[ix][iy];
+      }
+    }
+
+  }
+  navi->time_step += 20;
+}
+\end{verbatim}
+\end{breakbox}
+
+
+
+\paragraph{メインプログラム}
+
+上記プログラムを呼び出すメインプログラムのほうは次のようになります。
+
+\verb`pearson-main.cpp`
+\begin{breakbox}
+\begin{verbatim}
+#include <mpi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "pearson.h"
+
+const int T_MAX = 20000;
+
+Formura_Navigator navi;
+
+float frand() {
+  return rand() / float(RAND_MAX);
+}
+
+void init() {
+  for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+    for(int x = navi.lower_x; x < navi.upper_x; ++x) {
+      U[y][x] = 1;
+      V[y][x] = 0;
+    }
+  }
+  for (int y = 118; y < 138; ++y) {
+    for (int x = 118; x < 138; ++x) {
+      U[y][x] = 0.5+0.01*frand();
+      V[y][x] = 0.25+0.01*frand();
+    }
+  }
+}
+
+int main (int argc, char **argv) {
+  system("mkdir -p frames");
+  srand(time(NULL));
+  MPI_Init(&argc, &argv);
+  Formura_Init(&navi, MPI_COMM_WORLD);
+
+  init();
+
+  while(navi.time_step < T_MAX) {
+    if(navi.time_step % 100 == 0) {
+      printf("t = %d\n", navi.time_step);
+      char fn[256];
+      sprintf(fn, "frames/%06d.txt", navi.time_step);
+      FILE *fp = fopen(fn,"w");
+      for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+        for(int x = navi.lower_x; x < navi.upper_x; ++x) {
+          fprintf(fp, "%d %d %f\n", x, y, U[y][x]);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+    }
+    Formura_Forward(&navi);
+  }
+  MPI_Finalize();
+}
+\end{verbatim}
+\end{breakbox}

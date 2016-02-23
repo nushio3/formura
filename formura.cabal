@@ -24,19 +24,27 @@ source-repository head
 library
   exposed-modules:
                   Formura.Language.Combinator
+                  Formura.Language.TExpr
                   Formura.Annotation
+                  Formura.Annotation.Boundary
                   Formura.Annotation.Representation
                   Formura.Compiler
+                  Formura.CommandLineOption
+                  Formura.Geometry
                   Formura.GlobalEnvironment
-                  Formura.Parser
-                  Formura.Syntax
-                  Formura.Type
+                  Formura.NumericalConfig
                   Formura.Vec
+                  Formura.Type
+                  Formura.Syntax
+                  Formura.Parser
+                  Formura.Desugar
                   Formura.Interpreter.Value
                   Formura.Interpreter.Eval
                   Formura.OrthotopeMachine.Graph
                   Formura.OrthotopeMachine.Translate
-                  Formura.Cxx.Translate
+                  Formura.OrthotopeMachine.Manifestation
+                  Formura.MPICxx.Cut
+                  Formura.MPICxx.Translate
 
 
   -- other-modules:
@@ -45,22 +53,53 @@ library
                 base == 4.*
               , aeson
               , ansi-wl-pprint
+              , binary-search >= 1.0.0.3
               , bytestring
+              , cases
               , containers
+              , directory
               , either
+              , filepath
               , lattices
               , lens
               , mmorph
               , mtl
+              , optparse-applicative
               , parsers
+              , process
               , QuickCheck
+              , sbv
+              , syb
               , text
+              , transformers
               , trifecta
               , vector
+              , yaml
 
   hs-source-dirs:      src
   default-language:    Haskell2010
   ghc-options:         -O3 -Wall  -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+
+
+executable formura
+  hs-source-dirs: exe-src
+  main-is: formura.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+--  ld-options: -static -pthread
+  build-depends:
+                base == 4.*
+              , formura
+              , aeson
+              , ansi-wl-pprint
+              , bytestring
+              , containers
+              , lens
+              , text
+              , trifecta
+              , yaml
+
+
 
 
 
@@ -88,6 +127,7 @@ executable formura-eval
               , trifecta
 
 executable formura-gen
+  buildable: False
   hs-source-dirs: exe-src
   main-is: formura-gen.hs
   default-language:    Haskell2010
@@ -122,4 +162,23 @@ test-suite test-region-plan
               , test-framework-hunit
               , HUnit
               , QuickCheck
-              , sbv >= 5.9
+              , sbv
+
+test-suite test-geometry
+  type:         exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is: test-geometry.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+                base == 4.*
+              , containers
+              , formura
+              , lattices
+              , mtl
+              , test-framework
+              , test-framework-quickcheck2
+              , test-framework-hunit
+              , HUnit
+              , QuickCheck
+              , transformers

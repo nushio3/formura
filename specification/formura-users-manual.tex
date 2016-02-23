@@ -1,0 +1,506 @@
+\documentclass{jsarticle}
+\usepackage{atbegshi}
+\ifnum 42146=\euc"A4A2
+  \AtBeginShipoutFirst{\special{pdf:tounicode EUC-UCS2}}
+\else
+  \AtBeginShipoutFirst{\special{pdf:tounicode 90ms-RKSJ-UCS2}}
+\fi
+\usepackage[utf8]{inputenc}
+\usepackage{listings,jlisting}
+\usepackage{natbib}
+\usepackage{colortbl}
+\usepackage{ascmac}
+\usepackage{ulem}
+\usepackage{eclbkbox}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{syntax}
+\usepackage[dvipdfmx]{hyperref}
+\usepackage[dvipdfmx]{graphicx}
+
+
+%\def\dtime{\frac{\partial}{\partial t}}
+\def\dtime{\partial_t}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\bbZ}{\mathbb{Z}}
+\newcommand{\formura}{{\texttt{formura}}}
+
+\newcommand{\checkpoint}[1]{\uline{{\huge\makebox[0pt][l]{$\square$}\raisebox{.15ex}{\hspace{0.1em}$\checkmark$}} #1}}
+
+\lstset{language=Ruby, frame=single,morekeywords={
+    define,
+    function,
+    out,fun,
+    complex_float, complex_double,
+    dimension,axes,intra_node_shape,mpi_grid_shape,temporal_blocking_interval,
+    monitor_interval
+}}
+
+% grammar settings
+\setlength{\grammarparsep}{20pt plus 1pt minus 1pt} % increase separation between rules
+\setlength{\grammarindent}{12em} % increase separation between LHS/RHS
+\renewcommand{\grammarlabel}[2]{\makebox[11.5em][r]{\synt{#1} #2}} % right align symbol names.
+%\shortverb{\|}
+\def\<#1>{\synt{#1}}
+
+\makeindex
+
+\begin{document}
+
+\title{\formura ユーザーマニュアル}
+
+\author{構造格子サブワーキンググループ}
+
+\maketitle
+
+
+\begin{abstract}
+  \formura は、構造格子上の近接相互作用に帰着されるような系のシミュレーションを対象とし、
+  離散化されたアルゴリズムの数学的・簡潔な記述から、フラッグシップ的大規模並列計算機に最適化されたコードを
+  生成するような
+  ドメイン特化言語です。
+  この文書では、
+  \formura の使い方を、例を挙げながら説明します。
+\end{abstract}
+
+
+\newpage
+
+\tableofcontents
+
+
+\newpage
+\section{\formura のインストールと使用方法}
+
+\subsection{バイナリインストール}
+
+\formura の公式サイト
+\href{https://github.com/nushio3/formura}
+{https://github.com/nushio3/formura}
+に行き、案内に従って最新のreleaseをダウンロードしてください。
+
+\subsection{ソースインストール}
+
+\formura はプログラミング言語Haskellで書かれています。そこで、Haskellプログラムの開発環境を整える
+ためのプログラム、\verb`stack`を使います。\verb`stack`はWindows, Mac OS X, 様々なLinuxディストリビューションに対応しています。
+
+\verb`stack`の公式サイト\href{http://docs.haskellstack.org/en/stable/README.html}
+    {http://docs.haskellstack.org/en/stable/README.html}
+に行き、指示に従って\verb`stack`をインストールしてください。
+
+次に、\formura のレポジトリからソースコードをダウンロードし、レポジトリのルートディレクトリ内で\verb`stack install`コマンドを実行してください。
+
+\begin{verbatim}
+$ git clone git@github.com:nushio3/formura.git
+$ cd formura
+$ stack install
+\end{verbatim}
+
+\formura の実行ファイル群が\verb`stack`のインストール先（デフォルトではホームディレクトリの\verb+.local/bin+以下）にインストールされます。
+
+
+\subsection{使用方法}
+
+コマンドラインプログラム\formura に\formura ソースコードを渡すと、C++言語のコードとヘッダが生成されます。
+生成するコードのファイル名は
+\verb`-o`オプションで指定できます。
+
+\begin{verbatim}
+$ formura example/diffusion.fmr -o output/diffusion.c
+\end{verbatim}
+
+上記のコマンドにより、
+\verb`output/diffusion.h`および
+\verb`output/diffusion.c`が生成されます。
+生成されるコードの内容については
+\S \ref{sec:formura-generated-code}で詳しく解説します。
+
+
+\newpage
+
+\section{\formura の生成するコード}\label{sec:formura-generated-code}
+
+\subsection{コード実行の流れ}
+
+C言語のプログラムが\lit{main}関数から開始するように、
+\formura のプログラムでは、
+\lit{init}と
+\lit{step}という名前の関数が、コード生成の起点として特別な意味を持ちます。
+
+\formura のプログラムは、最初に\lit{init}関数を一つ呼び出してシミュレーションの初期状態を作り、その後
+\lit{step}関数を繰り返し呼び出して状態を更新していきます。C言語の擬似コードで書けば、次のようになります。
+
+\begin{screen}
+\begin{verbatim}
+  simulation_state = init();
+  fun (t = 0; t < T_MAX; ++t) {
+    simulation_state = step(simulation_state);
+  }
+\end{verbatim}
+\end{screen}
+
+
+\lit{init}関数は0個の引数をとり、グリッド型の値、またはいくつかのグリッドを含むタプルを返すような関数でなくてはなりません。
+\lit{step}関数は\lit{init}関数が返す型を受け取り、同じ型を返す関数である必要があります。
+
+\formura は、コード生成にあたって、
+シミュレーションの独立変数を保持する配列変数を名付けるとき、\lit{step}関数の引数に使われた名前を採用します。
+なぜなら、\formura プログラムの中でシミュレーションの全状態がひとかたまりになっている箇所は三つ
+（\lit{init}関数の返り値、
+\lit{step}関数の引数
+\lit{step}関数の返り値）ありますが、このうち「\lit{step}関数の引数」だけが左辺式であって、各変数に独立な名前がついていることが保証されているからです。
+
+
+\subsection{C/C++言語からの呼び出し規約}
+
+\formura　の生成するコードの命名規約は、MPIライブラリと違和感なく使えるように定めることにします。
+\formura　はC++のヘッダとソースコードを組で生成します。
+ユーザーは通常の方法でコンパイル・自身のプログラムとリンクして実行ファイルを作ってください。
+
+\formura が生成したコードを利用するユーザー側のプログラムは次のようになります。
+
+\begin{screen}
+\begin{verbatim}
+  #include "mpi.h"
+  #include "output.h"
+
+  int main (int argc, char **argv) {
+    Formura_Navigator navi;
+
+    MPI_Init(argc, argv);
+    Formura_Init(&navi, MPI_WORLD_COMM);
+
+    while(navi.time_step < T_MAX) {
+      Formura_Forward(&navi);
+    }
+
+    MPI_Finalize(argc, argv);
+  }
+\end{verbatim}
+\end{screen}
+
+\paragraph{生成されるコードの内容} \leavevmode\\
+
+
+\formura　の生成するヘッダには、次のものが含まれます。
+
+\begin{itemize}
+\item シミュレーションの独立変数に対応する配列変数（以下、状態配列 state array と呼びます）
+\item \verb`Formura_Navigator`構造体
+\item \verb`Formura_Init`関数
+\item \verb`Formura_Forward`、関数
+\end{itemize}
+
+
+状態配列は、\formura が生成したコードからも、ユーザーからも読み書きされることを想定しています。
+\formura の生成した関数を呼び出していないとき、ユーザーは状態配列を自由に更新することができます。
+
+\verb`Formura_Navigator`構造体は、\formura の関数からユーザーに対し、いま状態配列に、どの時点・どの範囲の物理量が
+入っているのか通知するために使います。
+
+たとえば、
+\verb`dimension :: 2; `
+\verb`axes :: x, y`
+が指定されている場合、
+\verb`Formura_Navigator`構造体は次のようになります。
+
+\begin{screen}
+\begin{verbatim}
+  struct Formura_Navigator {
+    int time_step;
+    int offset_x;
+    int lower_x;
+    int upper_x;
+    int offset_y;
+    int lower_y;
+    int upper_y;
+  };
+\end{verbatim}
+\end{screen}
+
+これは、状態配列の添字
+$\mathrm{lower\_x} \leq x < \mathrm{upper\_x}$,
+$\mathrm{lower\_y} \leq y < \mathrm{upper\_y}$
+の範囲に、シミュレーションの
+$t = \mathrm{time\_step}$,
+$\mathrm{lower\_x} + \mathrm{offset\_x} \leq x < \mathrm{upper\_x} + \mathrm{offset\_x}$,
+$\mathrm{lower\_y} + \mathrm{offset\_y} \leq y < \mathrm{upper\_y} + \mathrm{offset\_y}$
+の範囲の値が格納されていることを意味しています。
+
+
+
+\formura は次のことを保証します：\verb`monitor_interval`タイムステップごとの、計算領域内の物理量は、
+少なくとも１つのMPIノードから読むことができる。
+
+
+\paragraph{\texttt{Formura\_Init}関数} \leavevmode\\
+
+\begin{screen}
+\begin{verbatim}
+int Formura_Init (Formura_Navigator *navi, MPI_Comm comm)
+\end{verbatim}
+\end{screen}
+\verb`Formura_Init`関数は、\formura ソースコードの\lit{init}関数に対応する計算を行い、結果を状態配列に書き込みます。
+
+\verb`Formura_Init`関数が返すナビゲータは、必ず
+$\mathrm{time\_step} = 0$を満たします。
+
+
+\verb`Formura_Init`関数は
+\verb`MPI_Comm`型の引数をひとつ取ります。\formura が行う通信は、ここの
+\verb`Formura_Init`で指定されたMPIコミュニケータを使います。
+
+
+\paragraph{\texttt{Formura\_Forward}関数} \leavevmode\\
+
+\begin{screen}
+\begin{verbatim}
+int Formura_Forward (Formura_Navigator *navi)
+\end{verbatim}
+\end{screen}
+\verb`Formura_Forward`関数は、
+状態配列を読み取り、
+\formura ソースコードの\lit{step}関数に対応する計算を
+\verb`monitor_interval`回繰り返し
+行い、結果を状態配列に書き込みます。
+
+ \verb`Formura_Forward`関数が返すナビゲータの
+ $\mathrm{time\_step}$は、直前の値より
+\verb`monitor_interval`だけ増加しています。
+
+\paragraph{\formura の生成するコードの並列度や解像度} \leavevmode\\
+
+\formura の生成するコードの並列度や解像度は、
+\formura の特殊宣言での指定から決まります。以下に、
+\formura の特殊宣言の例を示します。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 3
+  axes :: x, y, z
+  intra_node_shape :: 64, 64, 64
+  mpi_grid_shape :: 40, 20, 5
+  temporal_blocking_interval :: 3
+  monitor_interval :: 72
+\end{lstlisting}
+
+各ノードが担当する状態配列の大きさは、およそ
+\lit{intra_node_shape}程度の大きさになります。但し、temporal blockingや通信の都合上、この大きさは多少変更されることがあります。
+これらのノードを、\lit{mpi_grid_shape}で指定された数だけ$x,y,z$方向に並べた領域が計算領域となります。したがって、上記の例では
+計算の解像度は$2560 \times 1280 \times 320$となります。
+さらに、\lit{step}関数の計算をtemporal blockingで3ステップ一気に計算するコードを生成すること、
+\verb`Formura_Forward`は72ステップ(temporal blockingされたコードを24回呼び出すことに相当)の計算を一気に行うことが指定されています。
+
+この仕様にともない、\verb`Formura_Init`関数に渡すMPIコミュニケータ内にあるMPIランクの数は、
+\lit{mpi_grid_shape}の積と一致している必要があります。
+
+
+\subsection{Fortranからの呼び出し規約}
+
+\formura は将来的にFortranからも使えるようにする予定です。ここで障害となるのは、Fortran処理系ごとに配列変数のメモリ上での表現が異なっている場合がある、ということです。
+
+このため、
+Fortran版では、\verb`monitor_interval`ごとに、物理量をFortran形式の配列に変換して書き込んでユーザーに見せ、変更があった場合はその配列から再度読み込んでシミュレーションを継続する方式を予定しています。
+
+\newpage
+\section{\formura コード例}
+
+\subsection{コード例への導入}
+
+この節では、簡単なアプリケーションに対する\formura のサンプルコードを例示し、使用方法を解説していきます。
+
+なお、この節のサンプルコードや生成されたコードは以下のURL
+からも参照することができます。併せてご覧ください。
+
+\href{https://github.com/nushio3/formura/tree/master/examples-generated}
+{https://github.com/nushio3/formura/tree/master/examples-generated}
+
+
+\subsection{3次元拡散方程式}
+
+\formura の構文を用いて、ステンシル計算を書いてみます。
+
+
+\formura は、シンプルなグリッド変数どうしの演算を組み合わせることで、ステンシル計算に必要な以下のような計算を記述することができます。
+
+\begin{enumerate}
+\item グリッドの次元とサイズをを宣言する
+\item 各グリッド点にある変数の値を計算する
+\item 差分スキームを記述する（空間的に隣接するセルの値を取ってくる）
+\item 時間積分スキームを記述する（時間的に次のセルに値を渡す）
+\end{enumerate}
+
+
+以下に、\formura を使って記述した拡散方程式のプログラムを示します。
+
+\begin{lstlisting}[mathescape]
+dimension :: 3
+axes :: x, y, z
+
+begin function ddx(a) returns b
+      b = (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+end function
+
+begin function ddy(a) returns b
+      b = (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+end function
+
+begin function ddz(a) returns b
+      b = (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+end function
+
+∂ = (ddx,ddy,ddz)
+
+begin function Σ(e) returns sum
+      sum = e(0) + e(1) + e(2)
+end function
+
+begin function init() returns dens_init
+      float [] :: dens_init = 0
+end function
+
+begin function dens_next = step(dens)
+  float :: Dx, Dt
+  Dx = 4.2
+  Dt = 0.1
+  dens_next = dens + Dx ** 2/Dt * Σ fun(i) ∂ i (∂ i dens)
+end function
+\end{lstlisting}
+
+短い関数定義が並ぶと、やや冗長に感じられるでしょうか？例えば、次の関数定義
+
+\begin{lstlisting}[mathescape]
+begin function ddx(a) returns b
+      b = (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+end function
+\end{lstlisting}
+
+は、\verb`returns`の後ろには式が書けることを利用して、二行で書いてしまうこともできます。
+
+\begin{lstlisting}[mathescape]
+begin function ddx(a) returns (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+end function
+\end{lstlisting}
+
+さらに、\verb`fun (a) expr`の形式を利用して次のように書くこともできます。
+ここで、\verb`fun (a) expr`は、
+\verb`a`を引数にとって、
+\verb`expr`を返す関数、という意味です。プログラミング言語の用語でいえばラムダ式です。
+
+\begin{lstlisting}[mathescape]
+ddx(a) = fun (a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+\end{lstlisting}
+
+
+
+さきほどの拡散方程式のコードを、ラムダ式を活用して書き直すと、次のようになります。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 3
+  axes :: x, y, z
+
+  ddx = fun(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/2
+  ddy = fun(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/2
+  ddz = fun(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/2
+
+  ∂ = (ddx,ddy,ddz)
+
+  Σ = fun (e) e(0) + e(1) + e(2)
+
+  begin function init() returns dens_init
+        float [] :: dens_init = 0
+  end function
+
+  begin function dens_next = step(dens)
+    float :: Dx, Dt
+    Dx = 4.2
+    Dt = 0.1
+    dens_next = dens + Dt / Dx**2 * Σ fun(i) (∂ i . ∂ i) dens
+  end function
+\end{lstlisting}
+
+
+\paragraph{生成されたcプログラム}
+
+\verb`diffusion.h`
+
+\input{input-diffusion.tex}
+
+\subsection{2次元反応拡散方程式}
+
+もう少し複雑な例として、\citet{pearson1993complex}による反応拡散方程式を取り上げます。
+\citet{pearson1993complex}によれば、次のような2変数偏微分方程式
+
+\begin{eqnarray}
+  \frac{\partial U}{\partial t} &=& D_u \nabla^2 U - UV^2 + F(1-U)\\
+  \frac{\partial V}{\partial t} &=& D_v \nabla^2 V + UV^2 - (F+k)V
+\end{eqnarray}
+
+は、パラメータによっては時間依存する複雑な挙動を示します。今回は次のパラメータを採用します。
+
+\begin{eqnarray}
+  k &=& 0.05\\
+  F &=& 0.015\\
+  D_u &=& 2 \times 10^{-5}\\
+  D_v &=& 10^{-5}
+\end{eqnarray}
+
+これを実装した\formura プログラムは次のようになります。
+
+\begin{lstlisting}[mathescape]
+  dimension :: 2
+  axes :: x, y
+  intra_node_shape :: 256, 256
+  mpi_grid_shape :: 1, 1
+  temporal_blocking_interval :: 4
+  monitor_interval :: 20
+
+  ddx = fun(a) (a[i+1/2,j] - a[i-1/2,j])
+  ddy = fun(a) (a[i,j+1/2] - a[i,j-1/2])
+
+  ∂ = (ddx,ddy)
+
+  Σ = fun (e) e(0) + e(1)
+
+  begin function init() returns (U,V)
+    float [] :: U = 0, V = 0
+  end function
+
+  begin function step(U,V) returns (U_next, V_next)
+    float :: k = 0.05, F = 0.015, Du = 2e-5, Dv = 1e-5
+    float :: dt = 1.0, dx = 1.0
+
+    dU_dt = -U * V**2 + F * (1-U) + Du/dx**2 * Σ fun(i) (∂ i . ∂ i) U
+    dV_dt =  U * V**2 - (F+k) * V + Dv/dx**2 * Σ fun(i) (∂ i . ∂ i) V
+
+    U_next = U + dt * dU_dt
+    V_next = V + dt * dV_dt
+  end function
+\end{lstlisting}
+
+
+上記のformuraソースコードから生成されるCコードは次のようになります。
+
+\paragraph{生成されたcプログラム}
+
+\input{input-pearson.tex}
+
+
+
+
+
+\newpage
+
+
+
+\section*{Acknowledgements}
+
+タプル型の設計にあたっては\citet{pierce2002types}を参考にしました。
+また、タプルの言語への組み込みにあたっては\citet{oliveira2015modular}を参考にしました。
+
+\bibliographystyle{abbrvnat}
+
+
+\bibliography{reference}
+
+
+\end{document}

@@ -4,6 +4,7 @@ sudo: false
 before_install:
   # stack
   - mkdir -p ~/.local/bin
+  - ln -s  $HOME/.local/bin bin
   - mkdir -p ~/.local/lib
   - export PATH=~/.local/bin:$PATH
   - export LD_LIBRARY_PATH=~/.local/lib:$LD_LIBRARY_PATH
@@ -18,9 +19,12 @@ addons:
     packages:
     - ghc-7.10.3
     - libgmp-dev
-
+    - openmpi-bin
+    - libopenmpi-dev
 script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
-  - stack exec formura-parser example/diffusion.f31
-  - stack exec formura-gen example/diffusion.f31
+  - stack install .
+  - ./cmake-for-x86.sh
+  - make
   - stack test
+  - echo "done test"

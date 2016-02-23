@@ -1,4 +1,0 @@
-begin function z = main(x)
-    y = x + -44
-    z = 526 + y * y
-end function

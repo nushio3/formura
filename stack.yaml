@@ -1,12 +1,7 @@
 flags: {}
 packages:
 - .
-extra-deps:
-  - hoopl-3.10.2.0
-  - lattices-1.4.1
-  - universe-base-1.0.2.1
-  - universe-instances-base-1.0
-  - universe-reverse-instances-1.0
+extra-deps: []
 
-resolver: lts-4.0
+resolver: lts-5.3
 # skip-ghc-check: True

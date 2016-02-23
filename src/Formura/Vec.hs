@@ -7,7 +7,7 @@ Stability   : experimental
 ZipList treated as mathematical vectors, to deal with multidimensionality in stencil computation.
 -}
 
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, TypeFamilies #-}
+{-# LANGUAGE DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveTraversable, TypeFamilies #-}
 
 module Formura.Vec where
 
@@ -15,13 +15,20 @@ import           Control.Applicative
 import           Control.Lens
 import qualified Data.Aeson as J
 import           Data.Char (toLower)
+import           Data.Data
+import           Data.List (intercalate)
 import           Data.Monoid
 
+-- | The maximal dimension formura can handle
 formuraMaxDimension :: Int
 formuraMaxDimension = 26
 
 data Vec a = Vec { getVec :: [a] } | PureVec a
-           deriving (Functor, Foldable, Traversable)
+           deriving (Read, Functor, Traversable, Typeable, Data)
+instance Foldable Vec where
+  foldMap m (Vec xs) = foldMap m xs
+  foldMap m (PureVec x) = foldMap m $ replicate formuraMaxDimension x
+
 instance J.ToJSON a => J.ToJSON (Vec a) where
   toJSON (Vec xs) = J.toJSON xs
 
@@ -40,14 +47,13 @@ instance Ixed (Vec a) where
        in myIso . ix i
 
 instance Show a => Show (Vec a) where
-  show (Vec xs) = show xs
-  show (PureVec x) = "[" ++ show x ++ "..]"
+  show (Vec xs) = "(" ++ (intercalate "," $ map show xs) ++ ")"
+  show (PureVec x) = "(" ++ show x ++ "..)"
 
--- | Equality of vector requires the knowledge of how to zero-fill
-instance (Num a, Eq a) => Eq (Vec a) where
+instance Eq a => Eq (Vec a) where
   a == b = and $ liftVec2 (==) a b
 
-instance (Num a, Ord a) => Ord (Vec a) where
+instance Ord a => Ord (Vec a) where
   compare a b = foldr (<>) EQ $ liftVec2 compare a b
 
 instance Applicative Vec where
@@ -71,9 +77,9 @@ instance Fractional a => Fractional (Vec a) where
   recip = fmap recip
   fromRational = pure .fromRational
 
-liftVec2 :: (Num a, Num b) => (a -> b -> c) -> Vec a -> Vec b -> Vec c
+liftVec2 :: (a -> b -> c) -> Vec a -> Vec b -> Vec c
 liftVec2 f (PureVec x) (PureVec y) = PureVec $ f x y
 liftVec2 f (PureVec x) (Vec ys   ) = Vec $ fmap (f x) ys
 liftVec2 f (Vec xs   ) (PureVec y) = Vec $ fmap (flip f y) xs
 liftVec2 f (Vec xs   ) (Vec ys   ) = let n = max (length xs) (length ys) in
-  Vec $ take n $ zipWith f (xs ++ replicate formuraMaxDimension 0) (ys ++ replicate formuraMaxDimension 0)
+  Vec $ take n $ zipWith f xs ys

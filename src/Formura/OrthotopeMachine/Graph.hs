@@ -8,14 +8,16 @@ A virtual machine with multidimensional vector instructions that operates on str
 in http://arxiv.org/abs/1204.4779 .
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveDataTypeable, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, FunctionalDependencies, GeneralizedNewtypeDeriving, MultiParamTypeClasses, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Graph where
 
 import           Algebra.Lattice
 import           Control.Lens
-import qualified Data.IntMap as G
+import           Data.Data
 import qualified Data.Map as M
+import           Text.Read (Read(..))
+
 import qualified Formura.Annotation as A
 import           Formura.GlobalEnvironment
 import           Formura.Language.Combinator
@@ -25,12 +27,22 @@ import           Formura.Vec
 
 -- | The functor for orthotope machine-specific instructions. Note that arithmetic operations are outsourced.
 
+data LoadUncursoredF x = LoadF IdentName
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
 data DataflowInstF x
-  = LoadF IdentName
-  | StoreF IdentName x
+  = StoreF IdentName x
   | LoadIndexF Int
   | LoadExtentF Int
-  | ShiftF (Vec Int) x
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+-- | The functor for language that support shift operations.
+data ShiftF x = ShiftF (Vec Int) x
+  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+
+-- | The functor for language that support cursored load of graph nodes.
+data LoadCursorF x = LoadCursorF (Vec Int) OMNodeID
+                   | LoadCursorStaticF (Vec Int) IdentName
   deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 
@@ -45,25 +57,54 @@ pattern LoadExtent n <- ((^? match) -> Just (LoadExtentF n)) where
   LoadExtent n = match # LoadExtentF n
 pattern Shift v x <- ((^? match) -> Just (ShiftF v x)) where
   Shift v x = match # ShiftF v x
-
-type OMInstF = Sum '[DataflowInstF, OperatorF, ImmF]
-type OMInst  = Fix OMInstF
-
-type NodeType  = Fix NodeTypeF
-type NodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
+pattern LoadCursor v x <- ((^? match) -> Just (LoadCursorF v x)) where
+  LoadCursor v x = match # LoadCursorF v x
+pattern LoadCursorStatic v x <- ((^? match) -> Just (LoadCursorStaticF v x)) where
+  LoadCursorStatic v x = match # LoadCursorStaticF v x
 
 
-instance MeetSemiLattice NodeType where
-  (/\) = semiLatticeOfNodeType
+newtype OMNodeID = OMNodeID Int deriving (Eq, Ord, Num, Data)
+instance Show OMNodeID where
+  showsPrec n (OMNodeID x) = showsPrec n x
+instance Read OMNodeID where
+  readPrec = fmap OMNodeID  readPrec
+newtype MMNodeID = MMNodeID Int deriving (Eq, Ord, Num, Data)
+instance Show MMNodeID where
+  showsPrec n (MMNodeID x) = showsPrec n x
+instance Read MMNodeID where
+  readPrec = fmap MMNodeID  readPrec
 
-semiLatticeOfNodeType :: NodeType -> NodeType -> NodeType
-semiLatticeOfNodeType a b = case go a b of
+-- | The instruction type for Orthotope Machine.
+type OMInstF = Sum '[DataflowInstF, LoadUncursoredF, ShiftF, OperatorF, ImmF]
+type OMInstruction = OMInstF OMNodeID
+
+-- | The instruction type for Manifest Machine, where every node is manifest,
+--   and each instruction is actually a subgraph for delayed computation
+type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
+type MMInstruction = M.Map MMNodeID (Node (MMInstF MMNodeID) MicroNodeType)
+
+mmInstTail :: MMInstruction -> MMInstF MMNodeID
+mmInstTail = _nodeInst . snd . M.findMax
+
+
+type OMNodeType  = Fix OMNodeTypeF
+type OMNodeTypeF = Sum '[ TopTypeF, GridTypeF, ElemTypeF ]
+
+type MicroNodeType  = Fix MicroNodeTypeF
+type MicroNodeTypeF = Sum '[ ElemTypeF ]
+
+
+instance MeetSemiLattice OMNodeType where
+  (/\) = semiLatticeOfOMNodeType
+
+semiLatticeOfOMNodeType :: OMNodeType -> OMNodeType -> OMNodeType
+semiLatticeOfOMNodeType a b = case go a b of
   TopType -> case go b a of
     TopType -> TopType
     c -> c
   c       -> c
   where
-    go :: NodeType -> NodeType -> NodeType
+    go :: OMNodeType -> OMNodeType -> OMNodeType
     go a b | a == b = a
     go (ElemType ea) (ElemType eb) = subFix (ElemType ea /\ ElemType eb :: ElementalType)
     go a@(ElemType _) b@(GridType v c) = let d = a /\ c in
@@ -71,24 +112,27 @@ semiLatticeOfNodeType a b = case go a b of
     go (GridType v1 c1) (GridType v2 c2) = (if v1 == v2 then GridType v1 (c1 /\ c2) else TopType)
     go _ _          = TopType
 
-mapElemType :: (IdentName -> IdentName) -> NodeType -> NodeType
+mapElemType :: (IdentName -> IdentName) -> OMNodeType -> OMNodeType
 mapElemType f (ElemType t) = ElemType $ f t
 mapElemType f (GridType v t) = GridType v $ mapElemType f t
 mapElemType _ TopType = TopType
 
-type NodeID  = G.Key
-data Node = Node {_nodeInst :: OMInstF NodeID, _nodeType :: NodeType, _nodeAnnot :: A.Annotation}
-instance Show Node where
-  show (Node i t _) = show i ++ " :: " ++ show t
+data Node instType typeType = Node {_nodeInst :: instType, _nodeType :: typeType, _nodeAnnot :: A.Annotation}
+instance (Show v, Show t) => Show (Node v t) where
+  show (Node v t _) = show v ++ " :: " ++ show t
 
+type OMNode = Node OMInstruction OMNodeType
+type MMNode = Node MMInstruction OMNodeType
 
 makeLenses ''Node
-instance A.Annotated Node where
+instance A.Annotated (Node v t) where
   annotation = nodeAnnot
 
-type Graph = G.IntMap Node
+type Graph instType typeType = M.Map OMNodeID (Node instType typeType)
+type OMGraph = Graph OMInstruction OMNodeType
+type MMGraph = Graph MMInstruction OMNodeType
 
-data NodeValueF x = NodeValueF NodeID NodeType
+data NodeValueF x = NodeValueF OMNodeID OMNodeType
                  deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
 
 pattern NodeValue n t <- ((^? match) -> Just (NodeValueF n t)) where NodeValue n t = match # NodeValueF n t
@@ -116,14 +160,18 @@ instance Typed ValueExpr where
   typeExprOf (FunValue _ _) = FunType
   typeExprOf (Tuple xs) = Tuple $ map typeExprOf xs
 
-data OMProgram = OMProgram
+data MachineProgram instType typeType = MachineProgram
   { _omGlobalEnvironment :: GlobalEnvironment
-  , _omInitGraph :: Graph
-  , _omStepGraph :: Graph
+  , _omInitGraph :: Graph instType typeType
+  , _omStepGraph :: Graph instType typeType
   , _omStateSignature :: M.Map IdentName TypeExpr
   }
 
-makeLenses ''OMProgram
+makeClassy ''MachineProgram
 
-instance HasGlobalEnvironment OMProgram where
+
+type OMProgram = MachineProgram OMInstruction OMNodeType
+type MMProgram = MachineProgram MMInstruction OMNodeType
+
+instance HasGlobalEnvironment (MachineProgram v t) where
   globalEnvironment = omGlobalEnvironment

@@ -9,7 +9,7 @@ Stability   : experimental
 This module contains combinator for writing Formura parser, and also the parsers for Formura syntax.
 -}
 
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 module Formura.Parser where
 
 import Control.Applicative
@@ -65,17 +65,21 @@ keyword k = "keyword " ++ k ?> do
   when (k `S.notMember` keywordSet) $
     raiseErr $ failed $
     "Please report the compiler developer: \"" ++ k ++ "\" is not in a keyword list!"
-  symbol k
 
--- | The set of keywords. The string is not parsed as a identifier if it's in the keyword list.
+  let moreLikeThis = head $ filter ($ (last k)) [isIdentifierAlphabet1, isIdentifierSymbol]
+  token $ try $ string k <* notFollowedBy (satisfy moreLikeThis)
+
+-- | The set of reserved keywords. The string is not parsed as a identifier if it's in the keyword list.
 keywordSet :: S.Set IdentName
 keywordSet = S.fromList
-             ["begin", "end", "function", "returns", "let", "in", "lambda",
-              "for", "dimension", "axes",
+             ["begin", "end", "function", "returns", "let", "in",
+              "fun", "dimension", "axes",
               "if", "then", "else",
+              "const","extern","manifest",
               "+","-","*","/",".","**",
-              "::","=", ",",
-              "<", "<=", "==", "!=", ">=", ">"]
+              "::","=", ","]
+             <> minMaxOperatorNames
+             <> comparisonOperatorNames
 
 
 comment :: P ()
@@ -162,14 +166,17 @@ gridIndicesOf parseIdx = "grid index" ?> do
   return $ Vec xs
 
 nPlusK :: P NPlusK
-nPlusK = "n+k pattern" ?> do
+nPlusK = "n+k pattern" ?> abbreviatedNPlusK <|> do
   x <-  identName
   mn <- optional $ do
     s <- symbolic '+' <|> symbolic '-'
     n <- constRationalExpr
     if s == '+' then return n else return (negate n)
   return $ NPlusK x (maybe 0 id mn)
-
+  where
+    abbreviatedNPlusK = do
+      lookAhead $ symbolic ','
+      return $ NPlusK "" 0
 
 
 imm :: (ImmF ∈ fs) => P (Lang fs)
@@ -184,10 +191,19 @@ exprOf termParser = X.buildExpressionParser tbl termParser
            [binary "*" (Binop "*") X.AssocLeft, binary "/" (Binop "/") X.AssocLeft],
            [unary "+" (Uniop "+") , unary "-" (Uniop "-") ],
            [binary "+" (Binop "+") X.AssocLeft, binary "-" (Binop "-") X.AssocLeft],
+           [binary sym (catNary sym) X.AssocLeft | sym <- S.toList minMaxOperatorNames],
            [binary sym (Binop sym) X.AssocNone | sym <- S.toList comparisonOperatorNames]
           ]
     unary  name fun = X.Prefix (pUni name fun)
     binary name fun assoc = X.Infix (pBin name fun) assoc
+
+    catNary sim a b = let
+      aparts = case a of Naryop sim' xs | sim == sim' -> xs
+                         _                          -> [a]
+      bparts = case b of Naryop sim' xs | sim == sim' -> xs
+                         _                          -> [b]
+      in Naryop sim $ aparts ++ bparts
+
 
     pUni name fun = "unary operator " ++ name ?> do
       r1 <- rend
@@ -244,7 +260,7 @@ letExpr = "let expression" ?> parseIn $ do
 
 lambdaExpr :: P RExpr
 lambdaExpr = "lambda expression" ?> parseIn $ do
-  "keyword for" ?> try $ keyword "for"
+  "keyword fun" ?> try $ keyword "fun"
   x <- tupleOf lExpr
   y <- rExpr
   return $ Lambda x y
@@ -310,7 +326,7 @@ functionSyntaxSugar = "function definition" ?> do
 
 typeValueStatements :: P [StatementF RExpr]
 typeValueStatements = "type-decl and/or substitiution statement" ?> do
-  maybeType <- optional $ "statement start by type decl" ?> try $ typeExpr <* keyword "::"
+  maybeType <- optional $ "statement start by type decl" ?> try $ modTypeExpr <* keyword "::"
 
   let lhsAndMaybeRhs :: P (LExpr, Maybe RExpr)
       lhsAndMaybeRhs = do
@@ -321,7 +337,7 @@ typeValueStatements = "type-decl and/or substitiution statement" ?> do
     -- When there is type, we allow multiple substitutions, and lhs-only terms.
     Just _ -> lhsAndMaybeRhs `sepBy1` symbol ","
     -- When there is no type, we allow only one substitution.
-    Nothing -> do
+    Nothing -> "simple substitution expression" ?> do
       lhs <- lExpr
       keyword "="
       rhs <- rExpr
@@ -368,11 +384,22 @@ lFexpr = "applied l-expr" ?> do
 lExpr :: P LExpr
 lExpr = "l-expr" ?> lFexpr
 
-typeExpr :: P TypeExpr
-typeExpr = typeFexpr
+
+
+modTypeExpr :: P ModifiedTypeExpr
+modTypeExpr = do
+  tm1 <- many typeModifier
+  t <- optional typeFexpr
+  tm2 <- many typeModifier
+  return $ case t of
+   Nothing -> ModifiedTypeExpr (tm1 ++ tm2) TopType
+   Just t -> ModifiedTypeExpr (tm1 ++ tm2) t
+
+typeModifier :: P TypeModifier
+typeModifier = (TMConst <$ keyword "const") <|> (TMExtern <$ keyword "extern") <|> (TMManifest <$ keyword "manifest")
 
 typeAexpr :: P TypeExpr
-typeAexpr = "atomic type-expression" ?> tupleOf typeExpr <|> elemType <|> funType
+typeAexpr = "atomic type-expression" ?> tupleOf typeFexpr <|> elemType <|> funType
 
 typeFexpr :: P TypeExpr
 typeFexpr = "applied type-expression" ?> do
@@ -420,7 +447,7 @@ constIntExpr = fromInteger <$> natural
 
 
 specialDeclaration :: P SpecialDeclaration
-specialDeclaration = dd  <|> ad
+specialDeclaration = dd  <|> ad <|> od
   where
     dd = do
       "dimension declaration" ?> try $ keyword "dimension"
@@ -432,6 +459,14 @@ specialDeclaration = dd  <|> ad
       keyword "::"
       xs <- identName `sepBy` symbolic ','
       return $ AxesDeclaration xs
+    od = do
+      key <- "general special declaration" ?> try otherSDKeywords
+      keyword "::"
+      vals <- integer' `sepBy` symbolic ','
+      return $ OtherDeclaration key vals
+    otherSDKeywords =
+      choice [symbol x
+             | x <- ["mpi_grid_shape" , "intra_node_shape", "temporal_blocking_interval", "monitor_interval"]]
 
 program :: P Program
 program = do

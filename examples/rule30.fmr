@@ -1,0 +1,13 @@
+dimension :: 1
+axes :: x
+
+begin function init () returns a_init
+      float[] :: a_init
+      a_init[i] = if 5 == 0 then 1 else 0
+end function
+
+begin function step(a) returns a_next
+      b[i] = a[i-1]
+      c[i] = a[i+1]
+      a_next = 2*b*a*c - 2*b*a - 2*b*c - a*c +b+a+c
+end function

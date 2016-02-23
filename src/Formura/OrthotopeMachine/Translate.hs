@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable,
-DeriveTraversable, FlexibleContexts, FlexibleInstances, GADTs,  PatternSynonyms,
+DeriveTraversable, FlexibleContexts, FlexibleInstances, GADTs, PackageImports, PatternSynonyms,
 ScopedTypeVariables,
 TemplateHaskell, TypeOperators, ViewPatterns #-}
 module Formura.OrthotopeMachine.Translate where
@@ -8,14 +8,15 @@ import           Algebra.Lattice
 import           Control.Applicative
 import           Control.Lens hiding (op)
 import           Control.Monad
-import           Control.Monad.Reader hiding (fix)
-import qualified Data.IntMap as G
+import "mtl"     Control.Monad.Reader hiding (fix)
+import           Data.Foldable
 import qualified Data.Map as M
 import qualified Data.Set as S
 import           Data.Ratio
 import           Text.Trifecta (failed, raiseErr)
 
 import           Formura.Language.Combinator
+import           Formura.Language.TExpr
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Representation
 import           Formura.Compiler
@@ -38,7 +39,7 @@ instance HasBinding Binding where
 data CodegenState = CodegenState
   { _codegenSyntacticState :: CompilerSyntacticState
   , _codegenGlobalEnvironment :: GlobalEnvironment
-  , _theGraph :: Graph
+  , _theGraph :: OMGraph
   }
 makeClassy ''CodegenState
 
@@ -51,7 +52,7 @@ instance HasCompilerSyntacticState CodegenState where
 defaultCodegenState :: CodegenState
 defaultCodegenState = CodegenState
   { _codegenSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "codegen"}
-  , _theGraph = G.empty
+  , _theGraph = M.empty
   , _codegenGlobalEnvironment = defaultGlobalEnvironment
   }
 
@@ -77,7 +78,7 @@ setupGlobalEnvironment prog = do
     [] -> raiseErr $ failed "no axes declaration found."
     _  -> raiseErr $ failed "multiple axes declaration found."
   dimension .= dim
-  axesNames .= axs
+  axesNames .= Vec axs
   where
     spDecls = prog ^. programSpecialDeclarations
 
@@ -93,19 +94,19 @@ setupGlobalEnvironment prog = do
 class Generatable f where
   gen :: f (GenM ValueExpr) -> GenM ValueExpr
 
-freeNodeID :: GenM NodeID
+freeNodeID :: GenM OMNodeID
 freeNodeID = do
   g <- use theGraph
-  return $ G.size g
+  return $ fromIntegral $ M.size g
 
-insert :: OMInstF NodeID -> NodeType -> GenM ValueExpr
+insert :: OMInstruction -> OMNodeType -> GenM ValueExpr
 insert inst typ = do
   n0 <- freeNodeID
   foc <- use compilerFocus
   let a = case foc of
         Just meta -> A.singleton meta
         Nothing   -> A.empty
-  theGraph %= G.insert n0 (Node inst typ a)
+  theGraph %= M.insert n0 (Node inst typ a)
   mmeta <- use compilerFocus
   case mmeta of
        Just meta -> theGraph . ix n0 . A.annotation %= A.set meta
@@ -136,14 +137,51 @@ castVal t1 vx = let t0 = typeOfVal vx in case (t1, t0, vx) of
 instance Generatable ImmF where
   gen (Imm r) = insert (Imm r) (ElemType "Rational")
 
+spoonTExpr :: (TupleF ∈ fs) => TExpr (Lang fs) -> GenM (Lang fs)
+spoonTExpr x = case x ^? tExpr of
+  Nothing -> raiseErr $ failed $ "Tuple length mismatch"
+  Just y -> return y
+
 instance Generatable OperatorF where
   gen (Uniop op gA)       = do a <- gA                  ; goUniop op a
   gen (Binop op gA gB)    = do a <- gA; b <- gB         ; goBinop op a b
-  gen (Triop op gA gB gC) = do a <- gA; b <- gB; c <- gC; goTriop op a b c
+  gen (Triop op gA gB gC) = do
+    a <- gA; b <- gB; c <- gC;
+    ret <- sequence $ goTriop op <$> tExpr # a <*> tExpr # b <*> tExpr # c
+    spoonTExpr ret
+  gen (Naryop op gXs) = do
+    xs <- sequence gXs
+    let list_texpr_vals = map (tExpr#) xs :: [TExpr ValueExpr]
+        texpr_list_vals = sequenceA list_texpr_vals :: TExpr [ValueExpr]
+    ret <- sequence $ goNaryop op <$> texpr_list_vals
+    spoonTExpr ret
+
+
+type MVsT = Maybe ([OMNodeID], OMNodeType)
+goNaryop :: IdentName -> [ValueExpr] -> GenM ValueExpr
+goNaryop op xs = do
+  mvst <- foldrM foldVT Nothing xs
+  case mvst of
+    Nothing -> raiseErr $ failed $ "unexpected N-ary operator with 0 argument"
+    Just (vs,t) -> insert (Naryop op vs) t
+
+  where
+    foldVT :: ValueExpr -> MVsT -> GenM MVsT
+    foldVT (av :. at) Nothing = return $ Just ([av], at)
+    foldVT (av :. at) (Just (bvs,bt)) = case at /\ bt of
+      TopType -> raiseErr $ failed $ unwords
+             ["there is no common type that can accomodate both hand side:", op, show at , show bt]
+      ct -> return $ Just (av:bvs, ct)
+    foldVT _ _ = raiseErr $ failed $ "unexpected path in N-ary operator"
 
 goUniop :: IdentName -> ValueExpr -> GenM ValueExpr
 goUniop op (av :. at) = insert (Uniop op av) at
-goUniop _ _  = raiseErr $ failed $ "unimplemented path in unary operator"
+goUniop op (f@(FunValue _ _)) =
+  return $ FunValue (Ident "x") (Uniop op (Apply (subFix f) (Ident "x")))
+goUniop op (Tuple xs) = do
+  vs <- traverse (goUniop op) xs
+  return $ Tuple vs
+goUniop _ _  = raiseErr $ failed $ "unexpected path in unary operator"
 
 goBinop :: IdentName -> ValueExpr -> ValueExpr -> GenM ValueExpr
 goBinop (".") a b = return $ FunValue (Ident "x") (Apply (subFix a) (Apply (subFix b) (Ident "x")))
@@ -158,9 +196,21 @@ goBinop op ax@(av :. at) bx@(bv :. bt) = case at /\ bt of
     (bv2 :. _) <- castVal (subFix ct) bx
     insert (Binop op av2 bv2) (typeModifier ct)
 
-goBinop o a b  = raiseErr $ failed $ "unimplemented path in binary operator: " ++ show (o,a,b)
+goBinop op (f@(FunValue _ _)) (g@(FunValue _ _)) =
+  return $ FunValue (Ident "x") (Binop op (Apply (subFix f) (Ident "x")) (Apply (subFix g) (Ident "x")))
+goBinop op (f@(FunValue _ _)) (x@(_ :. _)) =
+  return $ FunValue (Ident "x") (Binop op (Apply (subFix f) (Ident "x")) (subFix x))
+goBinop op (x@(_ :. _)) (g@(FunValue _ _)) =
+  return $ FunValue (Ident "x") (Binop op (subFix x) (Apply (subFix g) (Ident "x")))
+goBinop op (Tuple xs) (Tuple ys) | length xs == length ys = do
+                                     zs <- zipWithM (goBinop op) xs ys
+                                     return $ Tuple zs
+goBinop op (Tuple xs) (Tuple ys) = raiseErr $ failed "tuple length mismatch."
+goBinop op (x@(_ :. _)) (Tuple ys) = Tuple <$> sequence [goBinop op x y | y <- ys]
+goBinop op (Tuple xs) (y@(_ :. _)) = Tuple <$> sequence [goBinop op x y | x <- xs]
+goBinop o a b  = raiseErr $ failed $ unlines ["unexpected path in binary operator: ", "OP:",  show o,"LHS:",show a,"RHS:",show b]
 
-isBoolishType :: NodeType -> Bool
+isBoolishType :: OMNodeType -> Bool
 isBoolishType (ElemType "bool") = True
 isBoolishType (GridType _ x) = isBoolishType x
 isBoolishType _ = False
@@ -175,7 +225,7 @@ goTriop op (av :. at) (bv :. bt) (cv :. ct)
         TopType -> raiseErr $ failed $ unwords $
                    ["Type mismatch in if-then-else expr:", show at, show bt, show ct]
         _ -> insert (Triop op av bv cv) bct
-goTriop _ _ _ _ = raiseErr $ failed $ "unimplemented path in trinary operator"
+goTriop op _ _ _ = raiseErr $ failed $ "unexpected path in trinary operator" ++ show op
 
 instance Generatable IdentF where
   gen (Ident n) = do
@@ -193,20 +243,26 @@ instance Generatable TupleF where
 
 instance Generatable GridF where
   gen (Grid npks gen0) = do
-    vt0@(val0 :. typ0) <- gen0
-    case typ0 of
-      ElemType _   -> return vt0
-      GridType offs0 etyp0 -> do
-        let
-            patK   = fmap (^. _2) (npks :: Vec NPlusK)
-            newPos = offs0 - patK
-            intOff = fmap floor newPos
-            newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
-            typ1 = GridType newOff etyp0
-        if intOff == 0
-                then return (val0 :. typ1)
-                else insert (Shift intOff val0) typ1
+    vex <- gen0
+    case vex of
+      vt0@(val0 :. typ0) -> case typ0 of
+        ElemType _   -> return vt0
+        GridType offs0 etyp0 -> do
+          let
+              patK   = fmap (^. _2) (npks :: Vec NPlusK)
+              newPos = offs0 - patK
+              intOff = fmap floor newPos
+              newOff = liftA2 (\r n -> r - fromIntegral n) newPos intOff
+              typ1 = GridType newOff etyp0
 
+          if intOff == 0
+                  then return (val0 :. typ1)
+                  else insert (Shift (negate intOff) val0) typ1
+      Tuple vs -> do
+        xs <- sequence [gen $ GridF npks (return v :: GenM ValueExpr) | v <- vs]
+        return $ Tuple xs
+
+      _ -> raiseErr $ failed $ "unexpected pattern in gen of grid" ++ show vex
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
 instance Generatable ApplyF where
@@ -220,7 +276,7 @@ evalToImm x = do
   g <- use theGraph
   case x of
     Imm r -> return $ Just r
-    n :. _ -> case G.lookup n g of
+    n :. _ -> case M.lookup n g of
       Just (Node (Imm r) _ _) -> return $ Just r
     _ -> return Nothing
 
@@ -231,6 +287,7 @@ goApply (Tuple xs) (Imm r) = do
       l = length xs
   when (n < 0 || n >= l) $ raiseErr $ failed "tuple access out of bounds"
   return $ xs!!n
+
 goApply x@(Tuple xs) arg0 = do
   i <- evalToImm arg0
   case i of
@@ -238,6 +295,7 @@ goApply x@(Tuple xs) arg0 = do
     _ -> do
       g <- use theGraph
       raiseErr $ failed $ "tuple applied to non-constant integer: " ++ show arg0 ++ show g
+
 goApply (FunValue l r) x = do
   lrs <- matchToLhs l x
   let x2 :: Binding
@@ -303,6 +361,17 @@ matchToIdents = go
     go (Tuple _) _         = raiseErr $ failed "the LHS expects a tuple, but RHS is not a tuple."
     go (Ident x) y = return [(x,y)]
 
+
+matchValueExprToLhs :: LExpr -> ValueExpr -> GenM [(IdentName, ValueExpr)]
+matchValueExprToLhs (Grid npk lx) vx = do
+  ivx <- matchToLhs lx vx
+  forM ivx $ \(i,v) -> do
+    v2 <- gen (GridF (negate npk) (return v))
+    return (i,v2)
+
+matchValueExprToLhs lx vx = matchToLhs lx vx
+
+-- | Create a Binding so that names in the LExpr become free variables,
 lexicalScopeHolder :: LExpr -> LexBinding
 lexicalScopeHolder l =
   let xs :: [TupleOfIdents]
@@ -335,8 +404,15 @@ withBindings b1 genX = do
 
   let evalTypeDecl :: (LExpr, TypeExpr) -> GenM [(IdentName, TypeExpr)]
       evalTypeDecl (l, t) = matchToLhs l t
+  let evalTypeModDecl :: (LExpr, TypeModifier) -> [(IdentName, TypeModifier)]
+      evalTypeModDecl (l, tm) = [(n, tm) | Ident n <- tupleContents $ namesOfLhs l]
+
   (typeDict :: M.Map IdentName TypeExpr)
     <- (M.fromList . concat) <$> mapM evalTypeDecl typeDecls0
+  let typeModDict :: M.Map IdentName [TypeModifier]
+      typeModDict = M.unionsWith (++) $
+                    map (\(ident, tm) -> M.singleton ident [tm]) $
+                    (typeModifiers b1) >>= evalTypeModDecl
 
   let
     -- make bindings enter scope one by one, not simultaneously
@@ -344,18 +420,27 @@ withBindings b1 genX = do
     graduallyBind [] = return []
     graduallyBind ((l0,genV): restOfBinds) = do
       v0 <- genV
-      lvs <- matchToLhs l0 v0
+      lvs <- matchValueExprToLhs l0 v0
       nvs <- forM lvs $ \ (name0, v1) -> do
         v <- case M.lookup (name0) typeDict of
           Nothing -> return v1
           Just t  -> castVal t v1
-        -- TODO: LHS grid pattern must be taken care of.
 
-        case v of
-           (n :. _) -> do
-             theGraph . ix n . A.annotation %= A.set (SourceName $ name0)
-             theGraph . ix n . A.annotation %= A.set Manifest
-           _        -> return ()
+        let
+          annV (n :. _) = do
+             theGraph . ix n . A.annotation %= A.weakSet (SourceName $ name0)
+             let isManifest = do
+                   ms <- M.lookup name0 typeModDict
+                   return $ TMManifest `elem` ms
+             when (isManifest == Just True) $ do
+               theGraph . ix n . A.annotation %= A.set Manifest
+               theGraph . ix n . A.annotation %= A.set (SourceName $ name0)
+
+          annV (Tuple xs) = mapM_ annV xs
+          annV _ = return ()
+
+        annV v
+
         return (name0, v)
 
       nvs2 <- local (binding %~ M.union (M.fromList nvs)) $ graduallyBind restOfBinds
@@ -384,13 +469,12 @@ instance (Generatable f, Generatable (Sum fs)) => Generatable (Sum (f ': fs)) wh
 genRhs :: RXExpr -> GenM ValueExpr
 genRhs r = compilerFoldout gen r
 
-toNodeType :: TypeExpr -> GenM NodeType
+toNodeType :: TypeExpr -> GenM OMNodeType
 toNodeType (ElemType x) = return $ ElemType x
 toNodeType (GridType v x) = do
   x2 <- toNodeType x
   return $ GridType v x2
 toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encountered in conversion to node type."
-
 
 -- | Generate code for a global function. This generates 'Load' and 'Store' nodes,
 --   in addition to all the usual computation nodes.
@@ -398,15 +482,11 @@ toNodeType t = raiseErr $ failed $ "incompatible type `" ++ show t ++ "` encount
 genGlobalFunction :: BindingF RExpr -> TypeExpr -> LExpr -> RExpr -> GenM TypeExpr
 genGlobalFunction globalBinding inputType outputPattern (Lambda l r) =  bindThemAll $ do
   typedLhs <- matchToLhs l inputType
-  liftIO $ putStrLn $ "input type: " ++ show inputType
   initBinds <- forM typedLhs $ \(name1, t1) -> do
 
     t1d <- toNodeType t1
     v1 <- insert (Load name1) t1d
     let (n :. _ ) = v1
-    theGraph . ix n . A.annotation %= A.set Manifest
-
-    liftIO $ putStrLn $ "introduce binding: " ++ name1 ++ " = " ++ show v1
 
     return (name1, v1)
 
@@ -419,12 +499,14 @@ genGlobalFunction globalBinding inputType outputPattern (Lambda l r) =  bindThem
       (n99 :. _ ) -> do
         (n100 :. _) <- insert (Store name1 n99) unitType
         theGraph . ix n100 . A.annotation %= A.set Manifest
-        theGraph . ix n100 . A.annotation %= A.set (SourceName $ name1 ++ "_next")
+        theGraph . ix n100 . A.annotation %= A.weakSet (SourceName $ name1 ++ "_next")
       _           -> raiseErr $ failed "The return type of a global function must be a tuple of grids."
 
   return $ typeExprOf returnValueExpr
   where
     bindThemAll = withBindings $ fmap (genRhs .subFix) globalBinding
+
+
 genGlobalFunction _ _ _ _ = raiseErr $ failed "Identifier specified for function generation is not of function type."
 
 lookupToplevelIdents :: Program -> IdentName -> GenM RExpr
@@ -440,8 +522,8 @@ lookupToplevelIdents fprog name0 =  case lup stmts of
     lup (SubstF (Ident nam) rhs : xs) | nam == name0 = rhs : lup xs
     lup (_:xs) = lup xs
 
-genProgram :: Program -> IO OMProgram
-genProgram fprog = do
+genOMProgram :: Program -> IO OMProgram
+genOMProgram fprog = do
   let run g = runCompilerRight g defaultCodegenRead defaultCodegenState
       gbinds = fprog ^. programBinding
   (lhsOfStep,_,_) <- run $ do
@@ -463,7 +545,7 @@ genProgram fprog = do
     bs99 <- matchToLhs lhsOfStep stepType
     return $ M.fromList bs99
 
-  return OMProgram
+  return MachineProgram
     { _omGlobalEnvironment = stInit ^. globalEnvironment
     , _omInitGraph = stInit ^. theGraph
     , _omStepGraph = stStep ^. theGraph

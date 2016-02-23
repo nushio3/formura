@@ -1,0 +1,31 @@
+name:                combinator-NT
+version:             0.1.0.0
+synopsis:            Simple project template from stack
+description:         Please see README.md
+homepage:            http://github.com/nushio3/combinator-NT#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Takayuki Muranushi
+maintainer:          muranushi@gmail.com
+copyright:           Copyright (c) 2016, Takayuki Muranushi
+category:            Testing
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable combinator-NT
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
+                     , lens
+                     , mtl
+                     , trifecta
+                     , QuickCheck
+
+executable ps-test
+  hs-source-dirs:      src
+  main-is:             pattern-synonym-test.hs
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
+                     , mtl
+                     , transformers
