@@ -29,6 +29,7 @@ import           Data.Monoid
 import qualified Data.Sequence as Q
 import qualified Data.Set as S
 import           Data.Maybe
+import qualified Data.Text as T
 import           Text.Trifecta (failed, raiseErr)
 
 
@@ -78,6 +79,8 @@ data MPIPlan = MPIPlan
   , _planRegionAlloc :: M.Map (IRank, OMNodeID) Box
   , _planDistributedProgram :: [DistributedInst]
   , _planSystemOffset :: Vec Int
+  , _planResourceNames :: M.Map ArrayResourceKey T.Text
+  , _planRidgeNames :: M.Map RidgeID T.Text
   }
 makeClassy ''MPIPlan
 
@@ -171,7 +174,15 @@ initialWalls = do
     case M.lookup x iwparam of
      Nothing -> raiseErr $ failed $ "cannot find initial_wall numerical configuration for axis: " ++ x
      Just [] -> raiseErr $ failed $ "at least 1 element is needed for initial_wall numerical configuration for axis: " ++ x
-     Just ws -> return $ [mkWall x True 0] ++ map (mkWall x False) ws ++ [mkWall x True (intraShape ! x)]
+     Just ws -> do
+       let ws2
+             | inverted0 = reverse $ map (upperWall-) ws
+             | otherwise = ws
+           upperWall = intraShape ! x
+       return $
+         [mkWall x True 0] ++
+         map (mkWall x False) ws2 ++
+         [mkWall x True upperWall]
 
 evalPartition :: Partition -> Int
 evalPartition w = case foldMap (maybeToList . touchdown) w of
@@ -446,4 +457,6 @@ cut = do
       ]
     , _planDistributedProgram = dProg0
     , _planSystemOffset = systemOffset0
+  , _planResourceNames = M.empty
+  , _planRidgeNames = M.empty
     }

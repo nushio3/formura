@@ -10,6 +10,7 @@ import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
 import qualified Data.Map as M
+import           Data.Maybe
 import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.Lens as T
@@ -54,29 +55,29 @@ newtype VariableName = VariableName T.Text
 data NamingState = NamingState
   { _alreadyGivenNames :: S.Set T.Text
   , _alreadyGivenLocalNames :: S.Set T.Text
+  , _alreadyDeclaredResourceNames :: S.Set T.Text
   , _freeNameCounter :: Integer
   , _freeLocalNameCounter :: Integer
   , _nodeIDtoLocalName :: M.Map MMNodeID T.Text
   , _loopIndexNames :: Vec T.Text
   , _loopIndexOffset :: Vec Int
   , _loopExtentNames :: Vec T.Text
-  , _resourceNames :: M.Map (ResourceT () IRank) T.Text
-  , _ridgeNames :: M.Map RidgeID T.Text
   }
 makeClassy ''NamingState
 
 defaultNamingState = NamingState
   { _alreadyGivenNames = S.empty
   , _alreadyGivenLocalNames = S.empty
+  , _alreadyDeclaredResourceNames = S.empty
   , _freeNameCounter = 0
   , _freeLocalNameCounter = 0
   , _nodeIDtoLocalName = M.empty
   , _loopIndexNames = PureVec ""
   , _loopIndexOffset = 0
   , _loopExtentNames = PureVec ""
-  , _resourceNames = M.empty
-  , _ridgeNames = M.empty
   }
+
+type MPIPlanSelector = Bool
 
 data TranState = TranState
   { _tranSyntacticState :: CompilerSyntacticState
@@ -85,7 +86,8 @@ data TranState = TranState
   , _theProgram :: Program
   , _theMMProgram :: MMProgram
   , _theGraph :: MMGraph
-  , _theMPIPlan :: MPIPlan
+  , _tsMPIPlanSelection :: MPIPlanSelector
+  , _tsMPIPlanMap :: M.Map MPIPlanSelector MPIPlan
   }
 makeClassy ''TranState
 
@@ -99,7 +101,11 @@ instance HasMachineProgram TranState MMInstruction OMNodeType where
 instance HasNamingState TranState where
   namingState = tsNamingState
 instance HasMPIPlan TranState where
-  mPIPlan = theMPIPlan
+  mPIPlan =
+    let
+      gettr s = fromJust $ M.lookup (s^.tsMPIPlanSelection) (s^.tsMPIPlanMap)
+      settr s a = s & tsMPIPlanMap %~ M.insert (s^.tsMPIPlanSelection) a
+    in lens gettr settr
 
 data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text}
                 deriving (Eq, Ord, Show)
@@ -240,17 +246,31 @@ elemTypeOfResource (ResourceOMNode nid _) = do
     GridType _ etyp -> return $ subFix etyp
 
 
-genResourceDecl :: T.Text -> ResourceT a b -> Box -> TranM T.Text
-genResourceDecl name rsc box0 = do
-  typ <- elemTypeOfResource rsc
-  let szpt = foldMap (brackets . showC) sz
-      sz = box0 ^.upperVertex - box0 ^. lowerVertex
+tellResourceDecl :: T.Text -> ResourceT a b -> Box -> TranM ()
+tellResourceDecl name rsc box0 = do
+  adrn <- use alreadyDeclaredResourceNames
+  case S.member name adrn of
+    True -> return ()
+    False -> do
+      alreadyDeclaredResourceNames %= S.insert name
 
-  case typ of
-    ElemType "void" -> return ""
-    ElemType "Rational" -> return $ "double " <> name <> szpt
-    ElemType x -> return $ T.pack  x <> " " <> name <> szpt
-    _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
+      typ <- elemTypeOfResource rsc
+      let szpt = foldMap (brackets . showC) sz
+          sz = box0 ^.upperVertex - box0 ^. lowerVertex
+
+      decl <- case typ of
+        ElemType "void" -> return ""
+        ElemType "Rational" -> return $ "double " <> name <> szpt
+        ElemType x -> return $ T.pack  x <> " " <> name <> szpt
+        _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
+      case rsc of
+        ResourceStatic _ _ -> do
+            tellH "extern "
+            tellBoth decl
+            tellBothLn ";"
+        _ -> do
+          when (decl /= "") $ tellCLn $ decl <> ";"
+
 
 
 toCName :: Show a => a -> IdentName
@@ -281,26 +301,26 @@ nameArrayResource :: (ResourceT () IRank) -> TranM T.Text
 nameArrayResource rsc = case rsc of
   ResourceStatic sn _ -> do
     let ret = T.pack sn
-    resourceNames %= M.insert rsc ret
+    planResourceNames %= M.insert rsc ret
     return ret
   _ -> do
-    dict <- use resourceNames
+    dict <- use planResourceNames
     case M.lookup rsc dict of
       Just ret -> return ret
       Nothing -> do
         ret <- genFreeName $ toCName rsc
-        resourceNames %= M.insert rsc ret
+        planResourceNames %= M.insert rsc ret
         return ret
 
 
 nameRidgeResource :: RidgeID -> TranM T.Text
 nameRidgeResource r = do
-  dict <- use ridgeNames
+  dict <- use planRidgeNames
   case M.lookup r dict of
     Just ret -> return ret
     Nothing -> do
       ret <- genFreeName $ toCName r
-      ridgeNames %= M.insert r ret
+      planRidgeNames %= M.insert r ret
       return ret
 
 
@@ -310,20 +330,11 @@ tellArrayDecls = do
   aalloc <- use planArrayAlloc
   forM_ (M.toList aalloc) $ \(rsc, box0) -> do
     name <- nameArrayResource rsc
-    decl <- genResourceDecl name rsc box0
-    case rsc of
-      ResourceStatic _ _ -> do
-        tellH "extern "
-        tellBoth decl
-        tellBothLn ";"
-      _ -> do
-        when (decl /= "") $ tellCLn $ decl <> ";"
-
+    tellResourceDecl name rsc box0
   ralloc <- use planRidgeAlloc
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
     name <- nameRidgeResource rk
-    decl <- genResourceDecl name rsc box0
-    tellCLn $ decl <> ";"
+    tellResourceDecl name rsc box0
 
 
 -- | Generate Declarations for intermediate variables
@@ -358,7 +369,7 @@ genMMInstruction ir0 mminst = do
   indNames <- use loopIndexNames
   indOffset <- use loopIndexOffset -- indNames + indOffset = real addr
   arrayDict <- use planArrayAlloc
-  resourceDict <- use resourceNames
+  resourceDict <- use planResourceNames
 
 
   let
@@ -593,6 +604,13 @@ tellProgram = do
   nc <- use tsNumericalConfig
   mmprog <- use theMMProgram
 
+  tsMPIPlanSelection .= True
+  plan <- liftIO $ makePlan (nc & ncWallInverted .~ Just True) mmprog
+  mPIPlan .= plan
+
+  tsMPIPlanSelection .= False
+  plan <- liftIO $ makePlan nc mmprog
+  mPIPlan .= plan
 
   tellH $ T.unlines
     [ ""
@@ -648,8 +666,6 @@ tellProgram = do
   tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
   tellH ";"
 
-  plan <- liftIO $ makePlan nc mmprog
-  theMPIPlan .= plan
   dProg <- use planDistributedProgram
   con <- genDistributedProgram dProg
   monitorInterval0 <- use ncMonitorInterval
@@ -680,7 +696,8 @@ genCxxFiles formuraProg mmProg = do
       , _theMMProgram = mmProg
       , _tsNumericalConfig = defaultNumericalConfig
       , _theGraph = M.empty
-      , _theMPIPlan = defaultMPIPlan
+      , _tsMPIPlanSelection = False
+      , _tsMPIPlanMap = M.empty
       }
 
 
