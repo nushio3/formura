@@ -5,7 +5,7 @@ import subprocess
 # ident = sys.argv[1]
 
 
-for i in range(0,1000,20):
+for i in range(0,10000,20):
     ident = "{:06d}".format(i)
     print ident
     with open('scripts/plot.gnu', 'w') as fp:
