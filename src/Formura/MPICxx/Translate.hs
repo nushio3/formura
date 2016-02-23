@@ -471,6 +471,8 @@ genComputation (ir0, nid0) destRsc0 = do
 
   loopIndexOffset .= marginBox^. lowerVertex
 
+  systemOffset0 <- use planSystemOffset
+
   let
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
@@ -485,7 +487,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
       let bodyExpr = lhsName2 <> foldMap brackets ivarExpr <> "=" <> rhs <> ";"
           ivarExpr
-            | useSystemOffset = (\i d -> i <> "-" <> showC d) <$> ivars <*> Vec [1,1] -- TODO: calculate system offset!
+            | useSystemOffset = (\i d -> i <> "-" <> showC d) <$> ivars <*> systemOffset0
             | otherwise       = ivars
 
       return $ T.unlines $

@@ -77,6 +77,7 @@ data MPIPlan = MPIPlan
   , _planRidgeAlloc :: M.Map RidgeID Box
   , _planRegionAlloc :: M.Map (IRank, OMNodeID) Box
   , _planDistributedProgram :: [DistributedInst]
+  , _planSystemOffset :: Vec Int
   }
 makeClassy ''MPIPlan
 
@@ -87,6 +88,7 @@ defaultMPIPlan =
   , _planRidgeAlloc = M.empty
   , _planRegionAlloc = M.empty
   , _planDistributedProgram = []
+  , _planSystemOffset = 0
   }
 
 data PlanRead = PlanRead
@@ -171,8 +173,8 @@ initialWalls = do
      Just [] -> raiseErr $ failed $ "at least 1 element is needed for initial_wall numerical configuration for axis: " ++ x
      Just ws -> return $ [mkWall x True 0] ++ map (mkWall x False) ws ++ [mkWall x True (intraShape ! x)]
 
-evalWall :: Partition -> Int
-evalWall w = case foldMap (maybeToList . touchdown) w of
+evalPartition :: Partition -> Int
+evalPartition w = case foldMap (maybeToList . touchdown) w of
   [x] -> x
   _   -> error $ "malformed wall: " ++ show w
 
@@ -185,7 +187,7 @@ cut = do
 
   walls0 <- initialWalls
   -- liftIO $ print (walls0 :: Walls)
-  let wvs = fmap (fmap evalWall) walls0
+  let wvs = fmap (fmap evalPartition) walls0
   -- liftIO $ print (wvs :: Vec [Int])
 
   stepGraph <- view omStepGraph
@@ -221,11 +223,14 @@ cut = do
         , Store _ _ <- [mmInstTail $ mmNode ^. nodeInst]
         ]
 
+      staticWallConsensus :: Walls
       staticWallConsensus = minimum staticWalls
 
+      systemOffset0 :: Vec Int
+      systemOffset0 = fmap head $ fmap (fmap evalPartition) staticWallConsensus
 
   let wallEvolution :: M.Map OMNodeID (Vec [Int])
-      wallEvolution = fmap (fmap (fmap evalWall)) wallMap2
+      wallEvolution = fmap (fmap (fmap evalPartition)) wallMap2
 
   -- liftIO $ print (wallEvolution :: M.Map OMNodeID (Vec [Int]))
 
@@ -440,4 +445,5 @@ cut = do
       , nid <- M.keys stepGraph
       ]
     , _planDistributedProgram = dProg0
+    , _planSystemOffset = systemOffset0
     }
