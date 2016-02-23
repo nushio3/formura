@@ -498,7 +498,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
       let bodyExpr = lhsName2 <> foldMap brackets ivarExpr <> "=" <> rhs <> ";"
           ivarExpr
-            | useSystemOffset = (\i d -> i <> "-" <> showC d) <$> ivars <*> systemOffset0
+            | useSystemOffset = (\i d -> i <> "+" <> showC d) <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
 
       return $ T.unlines $
@@ -579,14 +579,8 @@ genDistributedProgram insts = do
   ps <- mapM go insts
 
   monitorInterval0 <- use ncMonitorInterval
-  timeStepVarName <- genFreeName "timestep"
 
-  let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
-                     timeStepVarName <> "<" <> showC monitorInterval0  <> ";" <>
-                     "++" <> timeStepVarName <>  "){"
-      closeTimeLoop = "}"
-
-  return $ openTimeLoop <> mconcat ps <> closeTimeLoop
+  return $  mconcat ps
     where
       go :: DistributedInst -> TranM T.Text
       go (Computation cmp destRsc) = genComputation cmp destRsc
@@ -604,13 +598,14 @@ tellProgram = do
   nc <- use tsNumericalConfig
   mmprog <- use theMMProgram
 
+  tsMPIPlanSelection .= False
+  plan <- liftIO $ makePlan nc mmprog
+  mPIPlan .= plan
+
   tsMPIPlanSelection .= True
   plan <- liftIO $ makePlan (nc & ncWallInverted .~ Just True) mmprog
   mPIPlan .= plan
 
-  tsMPIPlanSelection .= False
-  plan <- liftIO $ makePlan nc mmprog
-  mPIPlan .= plan
 
   tellH $ T.unlines
     [ ""
@@ -632,7 +627,9 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  tellArrayDecls
+  forM_ [False, True] $ \ mps -> do
+    tsMPIPlanSelection .= mps
+    tellArrayDecls
 
   tellBoth "\n"
 
@@ -666,13 +663,29 @@ tellProgram = do
   tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
   tellH ";"
 
-  dProg <- use planDistributedProgram
-  con <- genDistributedProgram dProg
+  cprogcon <- forM [False, True] $ \ mps -> do
+    tsMPIPlanSelection .= mps
+    dProg <- use planDistributedProgram
+    genDistributedProgram dProg
+
+
   monitorInterval0 <- use ncMonitorInterval
+  timeStepVarName <- genFreeName "timestep"
+
+
+  when ((monitorInterval0`mod`2)/=0) $ raiseErr $ failed "Monitor interval must be multiple of 2"
+
+  let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
+                     timeStepVarName <> "<" <> showC (monitorInterval0`div`2)  <> ";" <>
+                     "++" <> timeStepVarName <>  "){"
+      closeTimeLoop = "}"
+
 
   tellC $ T.unlines
     [ "{"
-    , con
+    , openTimeLoop
+    , T.unlines [cprogcon!!0,"/* HALFWAYS */" , cprogcon!!1]
+    , closeTimeLoop
     , "navi->time_step += "  <> showC monitorInterval0  <> ";"
     , "return 0;}"
     ]
