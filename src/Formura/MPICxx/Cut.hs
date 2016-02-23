@@ -67,6 +67,7 @@ data DistributedInst
   = CommunicationRecv (MPIRank, IRank, IRank)      -- receive a facet via MPI
   | Unstage RidgeID                                -- copy from ridge to slice
   | Computation (IRank, OMNodeID) ArrayResourceKey -- compute a region slice and store them into the resource
+  | FreeResource ArrayResourceKey                  -- mark the end of use for given resource
   | Stage RidgeID                                  -- copy from slice to ridge
   | CommunicationSend (MPIRank, IRank, IRank)      -- send a facet via MPI
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
@@ -188,6 +189,9 @@ evalPartition :: Partition -> Int
 evalPartition w = case foldMap (maybeToList . touchdown) w of
   [x] -> x
   _   -> error $ "malformed wall: " ++ show w
+
+
+
 
 
 
@@ -434,6 +438,22 @@ cut = do
 
   dProg0 <- toList <$> use psDistributedProgramQ
 
+  -- insert Free
+  let numberedProg :: [(Double, DistributedInst)]
+      numberedProg = zip [0..] dProg0
+
+      lastUsed :: M.Map ArrayResourceKey Double
+      lastUsed = M.unionsWith max
+        [ M.singleton (ResourceOMNode nid2 ir) ln
+        | (ln, Computation (ir,nid) _) <- numberedProg
+        , Just rscmap <- [M.lookup (ir,nid) supportMap]
+        , ResourceOMNode nid2 () <- M.keys rscmap
+        ]
+
+      numberedFrees = [ (ln+0.5, FreeResource ark)
+                      | (ark, ln) <- M.toList lastUsed]
+      dProg1 = map snd $ sort $ numberedProg ++ numberedFrees
+
   when (?commandLineOption ^. verbose) $ liftIO $ do
     putStrLn "#### Allocation List ####"
     forM_ (M.toList allAllocs) $ \(rsc, box0) -> do
@@ -444,7 +464,7 @@ cut = do
       putStrLn $ show rid
       putStrLn $ "  " ++ show box
     putStrLn "#### Program ####"
-    mapM_ print dProg0
+    mapM_ print dProg1
 
 
   return MPIPlan
@@ -455,7 +475,7 @@ cut = do
       | ir <- iRanks0
       , nid <- M.keys stepGraph
       ]
-    , _planDistributedProgram = dProg0
+    , _planDistributedProgram = dProg1
     , _planSystemOffset = systemOffset0
   , _planResourceNames = M.empty
   , _planRidgeNames = M.empty

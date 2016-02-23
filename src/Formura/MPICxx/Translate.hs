@@ -416,10 +416,6 @@ genMMInstruction ir0 mminst = do
 
       doesBind' :: Int -> MicroInstruction -> Bool
       doesBind' _ (Imm _) = False
-      -- doesBind' _ (LoadIndex _) = False
-      -- doesBind' _ (LoadExtent _) = False
-      -- doesBind' _ (LoadCursor _ _) = False
-      -- doesBind' _ (LoadCursorStatic _ _) = False
       doesBind' _ (Store _ x) = False
       doesBind' n _ = n > 1
 
@@ -625,7 +621,7 @@ genDistributedProgram insts = do
       go (Computation cmp destRsc) = genComputation cmp destRsc
       go (Unstage rid) = genStagingCode False rid
       go (Stage rid) = genStagingCode True rid
-
+      go (FreeResource _) = return ""
 
 -- | Let the plans collaborate
 
