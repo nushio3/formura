@@ -593,9 +593,6 @@ tellProgram = do
   nc <- use tsNumericalConfig
   mmprog <- use theMMProgram
 
-  plan <- liftIO $ makePlan nc mmprog
-
-  theMPIPlan .= plan
 
   tellH $ T.unlines
     [ ""
@@ -651,6 +648,8 @@ tellProgram = do
   tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
   tellH ";"
 
+  plan <- liftIO $ makePlan nc mmprog
+  theMPIPlan .= plan
   dProg <- use planDistributedProgram
   con <- genDistributedProgram dProg
   monitorInterval0 <- use ncMonitorInterval
