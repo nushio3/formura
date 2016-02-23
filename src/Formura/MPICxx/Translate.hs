@@ -389,8 +389,11 @@ genMMInstruction ir0 mminst = do
   freeLocalNameCounter .= 0
   nodeIDtoLocalName .= M.empty
 
-  let referenceCount :: M.Map MMNodeID Int
-      referenceCount = M.unionsWith (+) $
+  let refCount :: MMNodeID -> Int
+      refCount nid = fromMaybe 0 $ M.lookup nid refCntMap
+
+      refCntMap :: M.Map MMNodeID Int
+      refCntMap = M.unionsWith (+) $
         concat $
         map (map (flip M.singleton 1) . genRefCnt . _nodeInst) $
         M.elems mminst
@@ -408,12 +411,31 @@ genMMInstruction ir0 mminst = do
       genRefCnt (LoadCursor _ _) = []
       genRefCnt (LoadCursorStatic _ _) = []
 
+      doesBind :: MMNodeID -> Bool
+      doesBind nid = doesBind' (refCount nid) (fromJust (M.lookup nid mminst) ^. nodeInst)
+
+      doesBind' :: Int -> MicroInstruction -> Bool
+      doesBind' _ (Imm _) = False
+      doesBind' _ (LoadIndex _) = False
+      doesBind' _ (LoadExtent _) = False
+      doesBind' _ (LoadCursor _ _) = False
+      doesBind' _ (LoadCursorStatic _ _) = False
+      doesBind' _ (Store _ x) = False
+      doesBind' n _ = n > 1
+
+
   txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
-    thisName <- genFreeLocalName "a"
-    nodeIDtoLocalName %= M.insert nid0 thisName
     microTypDecl <- genTypeDecl "" (subFix microTyp)
     let thisEq :: T.Text -> TranM T.Text
-        thisEq code = return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";"
+        thisEq code =
+          case doesBind nid0 of
+            True ->  do
+              thisName <- genFreeLocalName "a"
+              nodeIDtoLocalName %= M.insert nid0 thisName
+              return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";"
+            False -> do
+              nodeIDtoLocalName %= M.insert nid0 code
+              return ""
 
         query :: MMNodeID -> TranM T.Text
         query nid1 = do
@@ -464,8 +486,7 @@ genMMInstruction ir0 mminst = do
           _ -> thisEq $ rscName <> accAtMargin abox vi
       Store _ x -> do
         x_code <- query x
-        nodeIDtoLocalName %= M.insert nid0 x_code
-        return ""
+        thisEq x_code
       x -> raiseErr $ failed $ "mpicxx codegen unimplemented for keyword: " ++ show x
 
   nmap <- use nodeIDtoLocalName
