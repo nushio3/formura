@@ -12,6 +12,7 @@ import           Data.Foldable (toList)
 import qualified Data.Map as M
 import qualified Data.Set as S
 import qualified Data.Text as T
+import qualified Data.Text.Lens as T
 import qualified Data.Text.IO as T
 import qualified Data.Yaml as Y
 import           System.Directory
@@ -253,12 +254,20 @@ genResourceDecl name rsc box0 = do
 
 
 toCName :: Show a => a -> IdentName
-toCName a = go False $ show a
+toCName a = fix $ go False $ show a
   where
     go _ [] = []
     go b (x:xs) = case isAlphaNum x of
       True -> x : go False xs
       False -> if b then go b xs else '_' : go True xs
+
+    fix :: IdentName -> IdentName
+    fix = T.packed %~ (T.replace "ResourceOMNode" "Om" .
+                       T.replace "ResourceStatic" "St" .
+                      T.replace "IRank" "r".
+                      T.replace "ridgeDelta_" "".
+                      T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge"
+                      )
 
 
 -- | Give name to Resources
@@ -432,8 +441,8 @@ genMMInstruction ir0 mminst = do
 
 -- | generate a formura function body.
 
-genComputation :: (IRank, OMNodeID) -> TranM T.Text
-genComputation (ir0, nid0) = do
+genComputation :: (IRank, OMNodeID) -> ArrayResourceKey -> TranM T.Text
+genComputation (ir0, nid0) destRsc0 = do
   ivars <- use loopIndexNames
   regionDict <- use planRegionAlloc
   arrayDict <- use planArrayAlloc
@@ -443,7 +452,7 @@ genComputation (ir0, nid0) = do
       regionBox :: Box
       marginBox :: Box
       Just regionBox = M.lookup (ir0, nid0) regionDict
-      Just marginBox = M.lookup (ResourceOMNode nid0 ir0) arrayDict
+      Just marginBox = M.lookup destRsc0 arrayDict
 
       loopFroms :: Vec Int
       loopFroms = regionBox^.lowerVertex - marginBox^.lowerVertex
@@ -547,7 +556,7 @@ genDistributedProgram insts = do
   return $ openTimeLoop <> mconcat ps <> closeTimeLoop
     where
       go :: DistributedInst -> TranM T.Text
-      go (Computation cmp) = genComputation cmp
+      go (Computation cmp destRsc) = genComputation cmp destRsc
       go (Unstage rid) = genStagingCode False rid
       go (Stage rid) = genStagingCode True rid
 

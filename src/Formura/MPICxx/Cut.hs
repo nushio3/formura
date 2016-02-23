@@ -60,11 +60,11 @@ data RidgeID = RidgeID { _ridgeDeltaMPI :: MPIRank, _ridgeDelta :: ResourceT () 
 type Ridge = (RidgeID, Box)
 
 data DistributedInst
-  = CommunicationRecv (MPIRank, IRank, IRank)
-  | Unstage RidgeID
-  | Computation (IRank, OMNodeID)
-  | Stage RidgeID
-  | CommunicationSend (MPIRank, IRank, IRank)
+  = CommunicationRecv (MPIRank, IRank, IRank)      -- receive a facet via MPI
+  | Unstage RidgeID                                -- copy from ridge to slice
+  | Computation (IRank, OMNodeID) ArrayResourceKey -- compute a region slice and store them into the resource
+  | Stage RidgeID                                  -- copy from slice to ridge
+  | CommunicationSend (MPIRank, IRank, IRank)      -- send a facet via MPI
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 
 type ArrayResourceKey = ResourceT () IRank
@@ -360,7 +360,14 @@ cut = do
 
       forM_ inRidges $ \rdg0 -> insertOnce $ Unstage rdg0
 
-      insert $ Computation (ir, nid)
+      let tailRsc :: ArrayResourceKey
+          tailRsc = case mmInstTail mmInst of
+            Store snName _ -> ResourceStatic snName ()
+            _              -> ResourceOMNode nid ir
+
+          mmInst = fromJust (M.lookup nid stepGraph) ^. nodeInst
+
+      insert $ Computation (ir, nid) tailRsc
 
       forM_ outRidges $ \rdg0 -> insertOnce $ Stage rdg0
 

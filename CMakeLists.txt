@@ -18,6 +18,7 @@ add_custom_command(
   OUTPUT examples/pearson.c
   COMMAND stack exec formura -- examples/pearson.fmr
   DEPENDS examples/pearson.fmr
+  DEPENDS examples/pearson.nc
   DEPENDS bin/formura
   )
 add_custom_command(
