@@ -317,7 +317,7 @@ tellArrayDecls = do
         tellBoth decl
         tellBothLn ";"
       _ -> do
-        tellCLn $ decl <> ";"
+        when (decl /= "") $ tellCLn $ decl <> ";"
 
   ralloc <- use planRidgeAlloc
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
