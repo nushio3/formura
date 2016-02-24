@@ -1,28 +1,26 @@
 dimension :: 2
 axes :: x, y
-intra_node_shape :: 256, 256
-mpi_grid_shape :: 1, 1
-temporal_blocking_interval :: 4
-monitor_interval :: 20
 
-ddx = for(a) (a[i+1/2,j] - a[i-1/2,j])
-ddy = for(a) (a[i,j+1/2] - a[i,j-1/2])
+ddx = fun(a) (a[i+1/2,j] - a[i-1/2,j])
+ddy = fun(a) (a[i,j+1/2] - a[i,j-1/2])
 
 ∂ = (ddx,ddy)
 
-Σ = for (e) e(0) + e(1)
+Σ = fun (e) e(0) + e(1)
 
 begin function init() returns (U,V)
-  float [] :: U = 0, V = 0
+  double [] :: U = 0, V = 0
 end function
 
 begin function step(U,V) returns (U_next, V_next)
-  float :: k = 0.05, F = 0.015, Du = 2e-5, Dv = 1e-5
-  float :: dt = 1, dx = 0.01
+  double :: k = 0.05, F = 0.015, Du = 2e-5, Dv = 1e-5
+  double :: dt = 1, dx = 0.01
 
-  dU_dt = -U * V**2 + F * (1-U) + Du/dx**2 * Σ for(i) (∂ i . ∂ i) U
-  dV_dt =  U * V**2 - (F+k) * V + Dv/dx**2 * Σ for(i) (∂ i . ∂ i) V
+  manifest :: dU_dt, dV_dt
 
-  U_next = U + dt * dU_dt
-  V_next = V + dt * dV_dt
+  dU_dt = -U * V*V + F * (1-U) + Du/(dx*dx) * Σ fun(i) (∂ i . ∂ i) U
+  dV_dt =  U * V*V - (F+k) * V + Dv/(dx*dx) * Σ fun(i) (∂ i . ∂ i) V
+
+  manifest :: U_next = U + dt * dU_dt
+  manifest :: V_next = V + dt * dV_dt
 end function

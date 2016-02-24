@@ -1,3 +1,4 @@
+
 #pragma once
 #ifdef __cplusplus
 extern "C"
@@ -6,8 +7,20 @@ extern "C"
 #include <mpi.h>
 
 
-  extern float U[256][256];
-  extern float V[256][256];
+  extern double U[604][604];
+  extern double V[604][604];
+  extern double Ridge_0_1_St_U[600][2];
+  extern double Ridge_0_1_St_V[600][2];
+  extern double Ridge_1_0_St_U[2][600];
+  extern double Ridge_1_0_St_V[2][600];
+  extern double Ridge_1_1_St_U[2][2];
+  extern double Ridge_1_1_St_V[2][2];
+  extern double Ridge_m1_m1_St_U[2][2];
+  extern double Ridge_m1_m1_St_V[2][2];
+  extern double Ridge_m1_0_St_U[2][600];
+  extern double Ridge_m1_0_St_V[2][600];
+  extern double Ridge_0_m1_St_U[600][2];
+  extern double Ridge_0_m1_St_V[600][2];
 
   struct Formura_Navigator
   {
