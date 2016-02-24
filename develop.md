@@ -78,5 +78,5 @@ $ mpiFCCpx 2d-mhd.c  2d-mhd-main.cpp
 
 ## 資料
 
-[C言語ユーザズマニュアル](file:///home/nushio/nushiolib/hardware/K-computer/manual/C_Users_Guide.pdf)
+<a href='file:///home/nushio/nushiolib/hardware/K-computer/manual/C_Users_Guide.pdf'>C言語ユーザズマニュアル</a>
 [PJMマニュアル](file:///home/nushio/nushiolib/hardware/K-computer/Pnavi_End_Users_Guide_z20151218_j.pdf)
