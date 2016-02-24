@@ -117,7 +117,13 @@ isIdentifierSymbol c = isPrint c &&
       c `elem` "\"#();[\\]{}")
 
 identName :: P IdentName
-identName = "identifier" ?> try $ do
+identName = identNameWith "SA"
+
+alphabetIdentName :: P IdentName
+alphabetIdentName = identNameWith "A"
+
+identNameWith :: String -> P IdentName
+identNameWith sw = "identifier" ?> try $ do
   let s :: P String
       s = some $ "symbolic character" ?> satisfy isIdentifierSymbol
       a0 :: P Char
@@ -126,7 +132,10 @@ identName = "identifier" ?> try $ do
       a1 = "identifier alphabet character" ?> satisfy isIdentifierAlphabet1
       a :: P String
       a = (:) <$> a0 <*> many a1
-  str <- s <|> a
+  str <- case sw of
+    "S" -> s
+    "A" -> a
+    _ -> s <|> a
   guard $  str `S.notMember` keywordSet
   whiteSpace
   return str
@@ -166,17 +175,14 @@ gridIndicesOf parseIdx = "grid index" ?> do
   return $ Vec xs
 
 nPlusK :: P NPlusK
-nPlusK = "n+k pattern" ?> abbreviatedNPlusK <|> do
-  x <-  identName
+nPlusK = "n+k pattern" ?>  do
+  mx <- optional alphabetIdentName
   mn <- optional $ do
     s <- symbolic '+' <|> symbolic '-'
     n <- constRationalExpr
     if s == '+' then return n else return (negate n)
-  return $ NPlusK x (maybe 0 id mn)
-  where
-    abbreviatedNPlusK = do
-      lookAhead $ (symbolic ',' <|> symbolic ']')
-      return $ NPlusK "" 0
+  lookAhead $ (symbolic ',' <|> symbolic ']')
+  return $ NPlusK (maybe "" id mx) (maybe 0 id mn)
 
 
 imm :: (ImmF ∈ fs) => P (Lang fs)
