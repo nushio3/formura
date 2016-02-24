@@ -74,3 +74,9 @@ $ mpiFCCpx 2d-mhd.c  2d-mhd-main.cpp
 
 
 ![Fig17](https://github.com/nushio3/formura/blob/master/reference/Hotta.2015-Fig17.png)
+
+
+## 資料
+
+[C言語ユーザズマニュアル](file:///home/nushio/nushiolib/hardware/K-computer/manual/C_Users_Guide.pdf)
+[PJMマニュアル](file:///home/nushio/nushiolib/hardware/K-computer/Pnavi_End_Users_Guide_z20151218_j.pdf)
