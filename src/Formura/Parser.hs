@@ -175,7 +175,7 @@ nPlusK = "n+k pattern" ?> abbreviatedNPlusK <|> do
   return $ NPlusK x (maybe 0 id mn)
   where
     abbreviatedNPlusK = do
-      lookAhead $ symbolic ','
+      lookAhead $ (symbolic ',' <|> symbolic ']')
       return $ NPlusK "" 0
 
 
