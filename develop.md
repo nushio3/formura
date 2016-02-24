@@ -61,16 +61,16 @@ $ mpiFCCpx 2d-mhd.c  2d-mhd-main.cpp
 ## TODO
 
 - MHDを可能にする
-  - 京でコンパイルできるようにコードをダウンサイズ・分割
-  - RidgeをFacetにまとめて、MPI経由で送受信するようにする
+    - 京でコンパイルできるようにコードをダウンサイズ・分割
+    - RidgeをFacetにまとめて、MPI経由で送受信するようにする
 - 堀田MHDの実装と再現・検証
-  - div B cleaningを追加
-  - Brio-Wu test, Orszag-Tangテストを実行
-  - 重力加速度、加熱項を追加
-  - http://arxiv.org/pdf/1502.03846v1.pdf Fig17を再現
+    - div B cleaningを追加
+    - Brio-Wu test, Orszag-Tangテストを実行
+    - 重力加速度、加熱項を追加
+    - http://arxiv.org/pdf/1502.03846v1.pdf Fig17を再現
 - 大規模ジョブに向けて
-  - 電力測定
-  - 解像度・実行時間策定
+    - 電力測定
+    - 解像度・実行時間策定
 
 
 ![Fig17](https://github.com/nushio3/formura/blob/master/reference/Hotta.2015-Fig17.png)
@@ -78,5 +78,5 @@ $ mpiFCCpx 2d-mhd.c  2d-mhd-main.cpp
 
 ## 資料
 
-<a href='file:///home/nushio/nushiolib/hardware/K-computer/manual/C_Users_Guide.pdf'>C言語ユーザズマニュアル</a>
+[C言語ユーザズマニュアル](file:///home/nushio/nushiolib/hardware/K-computer/manual/C_Users_Guide.pdf)
 [PJMマニュアル](file:///home/nushio/nushiolib/hardware/K-computer/Pnavi_End_Users_Guide_z20151218_j.pdf)
