@@ -1,0 +1,45 @@
+dimension :: 3
+axes :: x, y, z
+intra_node_shape :: 64, 64, 64
+mpi_grid_shape :: 2, 2, 2
+temporal_blocking_interval :: 4
+monitor_interval :: 20
+
+
+ddx = fun(a) (a[i+1,j,k] - a[i-1,j,k])/2
+ddy = fun(a) (a[i,j+1,k] - a[i,j-1,k])/2
+ddz = fun(a) (a[i,j,k+1] - a[i,j,k-1])/2
+
+∂ = (ddx,ddy,ddz)
+
+Σ = fun (e) e(0) + e(1) + e(2)
+
+δ = ((1,0,0),(0,1,0),(0,0,1))
+
+
+begin function init() returns (dens, vx, vy, vz, s)
+      float [] :: dens = 0, vx = 0, vy = 0, vz = 0, s = 0
+end function
+
+begin function step(dens, vx, vy, vz, s) returns (dens_next, vx_next, vy_next, vz_next, s_next)
+      float :: dens0 = 1.5
+      float :: dp_ddens = 5/3
+      float :: dp_ds = 9/7
+      float :: dt = 0.01
+
+
+      v = (vx, vy, vz)
+
+      ddt_dens = Σ fun(i) ∂ i (dens0 * v i)
+
+      ddt_v = fun(i)  -(Σ fun(j) v j * ∂ i (v i))  - ∂ i (dp_ddens * dens + dp_ds * s)
+
+      ddt_s = Σ fun(j) (v j * ∂ j s)
+
+
+      dens_next = dens + dt * ddt_dens
+      v_next = fun(i) v i + dt * ddt_v i
+      s_next = s + dt * ddt_s
+
+      (vx_next, vy_next, vz_next) = (v_next 0, v_next 1, v_next 2)
+end function
