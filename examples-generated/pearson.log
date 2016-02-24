@@ -1,0 +1,466 @@
+## Debug print: global environment of the simulation
+GlobalEnvironment {_dimension = 2, _axesNames = ("x","y")}
+
+## Debug print: simulation state
+fromList [("U",double(0 % 1,0 % 1)),("V",double(0 % 1,0 % 1))]
+
+## Debug print: init graph
+  U        (0,ImmF (0 % 1) :: Rational)
+  V        (1,ImmF (0 % 1) :: Rational)
+M U_next   (2,StoreF "U" 0 :: void)
+M V_next   (3,StoreF "V" 1 :: void)
+
+## Debug print: step graph
+           (0,LoadF "U" :: double(0 % 1,0 % 1))
+           (1,LoadF "V" :: double(0 % 1,0 % 1))
+  k        (2,ImmF (1 % 20) :: Rational)
+  F        (3,ImmF (3 % 200) :: Rational)
+  Du       (4,ImmF (1 % 50000) :: Rational)
+  Dv       (5,ImmF (1 % 100000) :: Rational)
+  dt       (6,ImmF (1 % 1) :: Rational)
+  dx       (7,ImmF (1 % 100) :: Rational)
+           (8,BinopF "*" 0 1 :: double(0 % 1,0 % 1))
+           (9,BinopF "*" 8 1 :: double(0 % 1,0 % 1))
+           (10,UniopF "-" 9 :: double(0 % 1,0 % 1))
+           (11,ImmF (1 % 1) :: Rational)
+           (12,BinopF "-" 11 0 :: double(0 % 1,0 % 1))
+           (13,BinopF "*" 3 12 :: double(0 % 1,0 % 1))
+           (14,BinopF "+" 10 13 :: double(0 % 1,0 % 1))
+           (15,BinopF "*" 7 7 :: Rational)
+           (16,BinopF "/" 4 15 :: Rational)
+           (17,ImmF (0 % 1) :: Rational)
+           (18,ShiftF (1,0) 0 :: double(1 % 2,0 % 1))
+           (19,BinopF "-" 18 0 :: double(1 % 2,0 % 1))
+           (20,ShiftF (-1,0) 19 :: double(0 % 1,0 % 1))
+           (21,BinopF "-" 19 20 :: double(0 % 1,0 % 1))
+           (22,ImmF (1 % 1) :: Rational)
+           (23,ShiftF (0,1) 0 :: double(0 % 1,1 % 2))
+           (24,BinopF "-" 23 0 :: double(0 % 1,1 % 2))
+           (25,ShiftF (0,-1) 24 :: double(0 % 1,0 % 1))
+           (26,BinopF "-" 24 25 :: double(0 % 1,0 % 1))
+           (27,BinopF "+" 21 26 :: double(0 % 1,0 % 1))
+           (28,BinopF "*" 16 27 :: double(0 % 1,0 % 1))
+M dU_dt    (29,BinopF "+" 14 28 :: double(0 % 1,0 % 1))
+           (30,BinopF "*" 0 1 :: double(0 % 1,0 % 1))
+           (31,BinopF "*" 30 1 :: double(0 % 1,0 % 1))
+           (32,BinopF "+" 3 2 :: Rational)
+           (33,BinopF "*" 32 1 :: double(0 % 1,0 % 1))
+           (34,BinopF "-" 31 33 :: double(0 % 1,0 % 1))
+           (35,BinopF "*" 7 7 :: Rational)
+           (36,BinopF "/" 5 35 :: Rational)
+           (37,ImmF (0 % 1) :: Rational)
+           (38,ShiftF (1,0) 1 :: double(1 % 2,0 % 1))
+           (39,BinopF "-" 38 1 :: double(1 % 2,0 % 1))
+           (40,ShiftF (-1,0) 39 :: double(0 % 1,0 % 1))
+           (41,BinopF "-" 39 40 :: double(0 % 1,0 % 1))
+           (42,ImmF (1 % 1) :: Rational)
+           (43,ShiftF (0,1) 1 :: double(0 % 1,1 % 2))
+           (44,BinopF "-" 43 1 :: double(0 % 1,1 % 2))
+           (45,ShiftF (0,-1) 44 :: double(0 % 1,0 % 1))
+           (46,BinopF "-" 44 45 :: double(0 % 1,0 % 1))
+           (47,BinopF "+" 41 46 :: double(0 % 1,0 % 1))
+           (48,BinopF "*" 36 47 :: double(0 % 1,0 % 1))
+M dV_dt    (49,BinopF "+" 34 48 :: double(0 % 1,0 % 1))
+           (50,BinopF "*" 6 29 :: double(0 % 1,0 % 1))
+M U_next   (51,BinopF "+" 0 50 :: double(0 % 1,0 % 1))
+           (52,BinopF "*" 6 49 :: double(0 % 1,0 % 1))
+M V_next   (53,BinopF "+" 1 52 :: double(0 % 1,0 % 1))
+M U_next   (54,StoreF "U" 51 :: void)
+M V_next   (55,StoreF "V" 53 :: void)
+
+manifest node ID: [2,3]
+manifest node ID: [29,49,51,53,54,55]
+## Debug print: manifested init graph
+U_next   (2,fromList [(0,ImmF (0 % 1) :: Rational),(1,StoreF "U" 0 :: void)] :: void) ((0..),(0..))
+V_next   (3,fromList [(0,ImmF (0 % 1) :: Rational),(1,StoreF "V" 0 :: void)] :: void) ((0..),(0..))
+
+## Debug print: manifested step graph
+dU_dt    (29,fromList [(0,LoadCursorStaticF (0,0) "U" :: double),(1,LoadCursorStaticF (0..) "V" :: double),(2,BinopF "*" 0 1 :: double),(3,BinopF "*" 2 1 :: double),(4,UniopF "-" 3 :: double),(5,ImmF (3 % 200) :: Rational),(6,ImmF (1 % 1) :: Rational),(7,BinopF "-" 6 0 :: double),(8,BinopF "*" 5 7 :: double),(9,BinopF "+" 4 8 :: double),(10,ImmF (1 % 50000) :: Rational),(11,ImmF (1 % 100) :: Rational),(12,BinopF "*" 11 11 :: Rational),(13,BinopF "/" 10 12 :: Rational),(14,LoadCursorStaticF (1,0) "U" :: double),(15,BinopF "-" 14 0 :: double),(16,LoadCursorStaticF (-1,0) "U" :: double),(17,BinopF "-" 0 16 :: double),(18,BinopF "-" 15 17 :: double),(19,LoadCursorStaticF (0,1) "U" :: double),(20,BinopF "-" 19 0 :: double),(21,LoadCursorStaticF (0,-1) "U" :: double),(22,BinopF "-" 0 21 :: double),(23,BinopF "-" 20 22 :: double),(24,BinopF "+" 18 23 :: double),(25,BinopF "*" 13 24 :: double),(26,BinopF "+" 9 25 :: double)] :: double(0 % 1,0 % 1)) ((1,1),(-1,-1))
+dV_dt    (49,fromList [(0,LoadCursorStaticF (0..) "U" :: double),(1,LoadCursorStaticF (0,0) "V" :: double),(2,BinopF "*" 0 1 :: double),(3,BinopF "*" 2 1 :: double),(4,ImmF (3 % 200) :: Rational),(5,ImmF (1 % 20) :: Rational),(6,BinopF "+" 4 5 :: Rational),(7,BinopF "*" 6 1 :: double),(8,BinopF "-" 3 7 :: double),(9,ImmF (1 % 100000) :: Rational),(10,ImmF (1 % 100) :: Rational),(11,BinopF "*" 10 10 :: Rational),(12,BinopF "/" 9 11 :: Rational),(13,LoadCursorStaticF (1,0) "V" :: double),(14,BinopF "-" 13 1 :: double),(15,LoadCursorStaticF (-1,0) "V" :: double),(16,BinopF "-" 1 15 :: double),(17,BinopF "-" 14 16 :: double),(18,LoadCursorStaticF (0,1) "V" :: double),(19,BinopF "-" 18 1 :: double),(20,LoadCursorStaticF (0,-1) "V" :: double),(21,BinopF "-" 1 20 :: double),(22,BinopF "-" 19 21 :: double),(23,BinopF "+" 17 22 :: double),(24,BinopF "*" 12 23 :: double),(25,BinopF "+" 8 24 :: double)] :: double(0 % 1,0 % 1)) ((1,1),(-1,-1))
+U_next   (51,fromList [(0,LoadCursorStaticF (0..) "U" :: double),(1,ImmF (1 % 1) :: Rational),(2,LoadCursorF (0..) 29 :: double),(3,BinopF "*" 1 2 :: double),(4,BinopF "+" 0 3 :: double)] :: double(0 % 1,0 % 1)) ((1,1),(-1,-1))
+V_next   (53,fromList [(0,LoadCursorStaticF (0..) "V" :: double),(1,ImmF (1 % 1) :: Rational),(2,LoadCursorF (0..) 49 :: double),(3,BinopF "*" 1 2 :: double),(4,BinopF "+" 0 3 :: double)] :: double(0 % 1,0 % 1)) ((1,1),(-1,-1))
+U_next   (54,fromList [(0,LoadCursorF (0..) 51 :: double),(1,StoreF "U" 0 :: void)] :: void) ((1,1),(-1,-1))
+V_next   (55,fromList [(0,LoadCursorF (0..) 53 :: double),(1,StoreF "V" 0 :: void)] :: void) ((1,1),(-1,-1))
+
+#### Allocation List ####
+ResourceStatic "U" ()
+  「(0,0) (602,602)」
+ResourceStatic "V" ()
+  「(0,0) (602,602)」
+ResourceOMNode 29 (IRank (0,0))
+  「(1,1) (199,299)」
+ResourceOMNode 29 (IRank (1,0))
+  「(199,1) (399,299)」
+ResourceOMNode 29 (IRank (2,0))
+  「(399,1) (601,299)」
+ResourceOMNode 29 (IRank (0,1))
+  「(1,299) (199,601)」
+ResourceOMNode 29 (IRank (1,1))
+  「(199,299) (399,601)」
+ResourceOMNode 29 (IRank (2,1))
+  「(399,299) (601,601)」
+ResourceOMNode 49 (IRank (0,0))
+  「(1,1) (199,299)」
+ResourceOMNode 49 (IRank (1,0))
+  「(199,1) (399,299)」
+ResourceOMNode 49 (IRank (2,0))
+  「(399,1) (601,299)」
+ResourceOMNode 49 (IRank (0,1))
+  「(1,299) (199,601)」
+ResourceOMNode 49 (IRank (1,1))
+  「(199,299) (399,601)」
+ResourceOMNode 49 (IRank (2,1))
+  「(399,299) (601,601)」
+ResourceOMNode 51 (IRank (0,0))
+  「(1,1) (199,299)」
+ResourceOMNode 51 (IRank (1,0))
+  「(199,1) (399,299)」
+ResourceOMNode 51 (IRank (2,0))
+  「(399,1) (601,299)」
+ResourceOMNode 51 (IRank (0,1))
+  「(1,299) (199,601)」
+ResourceOMNode 51 (IRank (1,1))
+  「(199,299) (399,601)」
+ResourceOMNode 51 (IRank (2,1))
+  「(399,299) (601,601)」
+ResourceOMNode 53 (IRank (0,0))
+  「(1,1) (199,299)」
+ResourceOMNode 53 (IRank (1,0))
+  「(199,1) (399,299)」
+ResourceOMNode 53 (IRank (2,0))
+  「(399,1) (601,299)」
+ResourceOMNode 53 (IRank (0,1))
+  「(1,299) (199,601)」
+ResourceOMNode 53 (IRank (1,1))
+  「(199,299) (399,601)」
+ResourceOMNode 53 (IRank (2,1))
+  「(399,299) (601,601)」
+ResourceOMNode 54 (IRank (0,0))
+  「(1,1) (199,299)」
+ResourceOMNode 54 (IRank (1,0))
+  「(199,1) (399,299)」
+ResourceOMNode 54 (IRank (2,0))
+  「(399,1) (601,299)」
+ResourceOMNode 54 (IRank (0,1))
+  「(1,299) (199,601)」
+ResourceOMNode 54 (IRank (1,1))
+  「(199,299) (399,601)」
+ResourceOMNode 54 (IRank (2,1))
+  「(399,299) (601,601)」
+ResourceOMNode 55 (IRank (0,0))
+  「(1,1) (199,299)」
+ResourceOMNode 55 (IRank (1,0))
+  「(199,1) (399,299)」
+ResourceOMNode 55 (IRank (2,0))
+  「(399,1) (601,299)」
+ResourceOMNode 55 (IRank (0,1))
+  「(1,299) (199,601)」
+ResourceOMNode 55 (IRank (1,1))
+  「(199,299) (399,601)」
+ResourceOMNode 55 (IRank (2,1))
+  「(399,299) (601,601)」
+#### Resource Sharing ####
+0
+  ResourceOMNode 29 (IRank (0,0))
+  ResourceOMNode 29 (IRank (1,0))
+  ResourceOMNode 29 (IRank (2,0))
+  ResourceOMNode 29 (IRank (0,1))
+  ResourceOMNode 29 (IRank (1,1))
+  ResourceOMNode 29 (IRank (2,1))
+  ResourceOMNode 53 (IRank (0,0))
+  ResourceOMNode 53 (IRank (1,0))
+  ResourceOMNode 53 (IRank (2,0))
+  ResourceOMNode 53 (IRank (0,1))
+  ResourceOMNode 53 (IRank (1,1))
+  ResourceOMNode 53 (IRank (2,1))
+1
+  ResourceOMNode 49 (IRank (0,0))
+  ResourceOMNode 49 (IRank (2,0))
+  ResourceOMNode 49 (IRank (1,1))
+  ResourceOMNode 51 (IRank (1,0))
+  ResourceOMNode 51 (IRank (0,1))
+  ResourceOMNode 51 (IRank (2,1))
+2
+  ResourceOMNode 49 (IRank (1,0))
+  ResourceOMNode 49 (IRank (0,1))
+  ResourceOMNode 49 (IRank (2,1))
+  ResourceOMNode 51 (IRank (0,0))
+  ResourceOMNode 51 (IRank (2,0))
+  ResourceOMNode 51 (IRank (1,1))
+#### Ridge List ####
+RidgeID {_ridgeDeltaMPI = MPIRank (0,1), _ridgeDelta = ResourceStatic "U" ()}
+  「(0,600) (600,602)」
+RidgeID {_ridgeDeltaMPI = MPIRank (0,1), _ridgeDelta = ResourceStatic "V" ()}
+  「(0,600) (600,602)」
+RidgeID {_ridgeDeltaMPI = MPIRank (1,0), _ridgeDelta = ResourceStatic "U" ()}
+  「(600,0) (602,600)」
+RidgeID {_ridgeDeltaMPI = MPIRank (1,0), _ridgeDelta = ResourceStatic "V" ()}
+  「(600,0) (602,600)」
+RidgeID {_ridgeDeltaMPI = MPIRank (1,1), _ridgeDelta = ResourceStatic "U" ()}
+  「(600,600) (602,602)」
+RidgeID {_ridgeDeltaMPI = MPIRank (1,1), _ridgeDelta = ResourceStatic "V" ()}
+  「(600,600) (602,602)」
+#### Program ####
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (0,1), _ridgeDelta = ResourceStatic "U" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (1,0), _ridgeDelta = ResourceStatic "U" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (1,1), _ridgeDelta = ResourceStatic "U" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (0,1), _ridgeDelta = ResourceStatic "V" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (1,0), _ridgeDelta = ResourceStatic "V" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (1,1), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (0,0),29) (ResourceOMNode 29 (IRank (0,0)))
+Computation (IRank (0,0),49) (ResourceOMNode 49 (IRank (0,0)))
+Computation (IRank (0,0),51) (ResourceOMNode 51 (IRank (0,0)))
+FreeResource (ResourceOMNode 29 (IRank (0,0)))
+Computation (IRank (0,0),53) (ResourceOMNode 53 (IRank (0,0)))
+FreeResource (ResourceOMNode 49 (IRank (0,0)))
+Computation (IRank (0,0),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (0,0)))
+Computation (IRank (0,0),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (0,0)))
+Computation (IRank (1,0),29) (ResourceOMNode 29 (IRank (1,0)))
+Computation (IRank (1,0),49) (ResourceOMNode 49 (IRank (1,0)))
+Computation (IRank (1,0),51) (ResourceOMNode 51 (IRank (1,0)))
+FreeResource (ResourceOMNode 29 (IRank (1,0)))
+Computation (IRank (1,0),53) (ResourceOMNode 53 (IRank (1,0)))
+FreeResource (ResourceOMNode 49 (IRank (1,0)))
+Computation (IRank (1,0),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (1,0)))
+Computation (IRank (1,0),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (1,0)))
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (1,0), _ridgeDelta = ResourceStatic "U" ()})
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (1,0), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (2,0),29) (ResourceOMNode 29 (IRank (2,0)))
+Computation (IRank (2,0),49) (ResourceOMNode 49 (IRank (2,0)))
+Computation (IRank (2,0),51) (ResourceOMNode 51 (IRank (2,0)))
+FreeResource (ResourceOMNode 29 (IRank (2,0)))
+Computation (IRank (2,0),53) (ResourceOMNode 53 (IRank (2,0)))
+FreeResource (ResourceOMNode 49 (IRank (2,0)))
+Computation (IRank (2,0),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (2,0)))
+Computation (IRank (2,0),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (2,0)))
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (0,1), _ridgeDelta = ResourceStatic "U" ()})
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (0,1), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (0,1),29) (ResourceOMNode 29 (IRank (0,1)))
+Computation (IRank (0,1),49) (ResourceOMNode 49 (IRank (0,1)))
+Computation (IRank (0,1),51) (ResourceOMNode 51 (IRank (0,1)))
+FreeResource (ResourceOMNode 29 (IRank (0,1)))
+Computation (IRank (0,1),53) (ResourceOMNode 53 (IRank (0,1)))
+FreeResource (ResourceOMNode 49 (IRank (0,1)))
+Computation (IRank (0,1),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (0,1)))
+Computation (IRank (0,1),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (0,1)))
+Computation (IRank (1,1),29) (ResourceOMNode 29 (IRank (1,1)))
+Computation (IRank (1,1),49) (ResourceOMNode 49 (IRank (1,1)))
+Computation (IRank (1,1),51) (ResourceOMNode 51 (IRank (1,1)))
+FreeResource (ResourceOMNode 29 (IRank (1,1)))
+Computation (IRank (1,1),53) (ResourceOMNode 53 (IRank (1,1)))
+FreeResource (ResourceOMNode 49 (IRank (1,1)))
+Computation (IRank (1,1),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (1,1)))
+Computation (IRank (1,1),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (1,1)))
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (1,1), _ridgeDelta = ResourceStatic "U" ()})
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (1,1), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (2,1),29) (ResourceOMNode 29 (IRank (2,1)))
+Computation (IRank (2,1),49) (ResourceOMNode 49 (IRank (2,1)))
+Computation (IRank (2,1),51) (ResourceOMNode 51 (IRank (2,1)))
+FreeResource (ResourceOMNode 29 (IRank (2,1)))
+Computation (IRank (2,1),53) (ResourceOMNode 53 (IRank (2,1)))
+FreeResource (ResourceOMNode 49 (IRank (2,1)))
+Computation (IRank (2,1),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (2,1)))
+Computation (IRank (2,1),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (2,1)))
+#### Allocation List ####
+ResourceStatic "U" ()
+  「(-2,-2) (600,600)」
+ResourceStatic "V" ()
+  「(-2,-2) (600,600)」
+ResourceOMNode 29 (IRank (0,0))
+  「(-1,-1) (201,301)」
+ResourceOMNode 29 (IRank (1,0))
+  「(201,-1) (401,301)」
+ResourceOMNode 29 (IRank (2,0))
+  「(401,-1) (599,301)」
+ResourceOMNode 29 (IRank (0,1))
+  「(-1,301) (201,599)」
+ResourceOMNode 29 (IRank (1,1))
+  「(201,301) (401,599)」
+ResourceOMNode 29 (IRank (2,1))
+  「(401,301) (599,599)」
+ResourceOMNode 49 (IRank (0,0))
+  「(-1,-1) (201,301)」
+ResourceOMNode 49 (IRank (1,0))
+  「(201,-1) (401,301)」
+ResourceOMNode 49 (IRank (2,0))
+  「(401,-1) (599,301)」
+ResourceOMNode 49 (IRank (0,1))
+  「(-1,301) (201,599)」
+ResourceOMNode 49 (IRank (1,1))
+  「(201,301) (401,599)」
+ResourceOMNode 49 (IRank (2,1))
+  「(401,301) (599,599)」
+ResourceOMNode 51 (IRank (0,0))
+  「(-1,-1) (201,301)」
+ResourceOMNode 51 (IRank (1,0))
+  「(201,-1) (401,301)」
+ResourceOMNode 51 (IRank (2,0))
+  「(401,-1) (599,301)」
+ResourceOMNode 51 (IRank (0,1))
+  「(-1,301) (201,599)」
+ResourceOMNode 51 (IRank (1,1))
+  「(201,301) (401,599)」
+ResourceOMNode 51 (IRank (2,1))
+  「(401,301) (599,599)」
+ResourceOMNode 53 (IRank (0,0))
+  「(-1,-1) (201,301)」
+ResourceOMNode 53 (IRank (1,0))
+  「(201,-1) (401,301)」
+ResourceOMNode 53 (IRank (2,0))
+  「(401,-1) (599,301)」
+ResourceOMNode 53 (IRank (0,1))
+  「(-1,301) (201,599)」
+ResourceOMNode 53 (IRank (1,1))
+  「(201,301) (401,599)」
+ResourceOMNode 53 (IRank (2,1))
+  「(401,301) (599,599)」
+ResourceOMNode 54 (IRank (0,0))
+  「(-1,-1) (201,301)」
+ResourceOMNode 54 (IRank (1,0))
+  「(201,-1) (401,301)」
+ResourceOMNode 54 (IRank (2,0))
+  「(401,-1) (599,301)」
+ResourceOMNode 54 (IRank (0,1))
+  「(-1,301) (201,599)」
+ResourceOMNode 54 (IRank (1,1))
+  「(201,301) (401,599)」
+ResourceOMNode 54 (IRank (2,1))
+  「(401,301) (599,599)」
+ResourceOMNode 55 (IRank (0,0))
+  「(-1,-1) (201,301)」
+ResourceOMNode 55 (IRank (1,0))
+  「(201,-1) (401,301)」
+ResourceOMNode 55 (IRank (2,0))
+  「(401,-1) (599,301)」
+ResourceOMNode 55 (IRank (0,1))
+  「(-1,301) (201,599)」
+ResourceOMNode 55 (IRank (1,1))
+  「(201,301) (401,599)」
+ResourceOMNode 55 (IRank (2,1))
+  「(401,301) (599,599)」
+#### Resource Sharing ####
+0
+  ResourceOMNode 29 (IRank (0,0))
+  ResourceOMNode 29 (IRank (1,0))
+  ResourceOMNode 29 (IRank (2,0))
+  ResourceOMNode 29 (IRank (0,1))
+  ResourceOMNode 29 (IRank (1,1))
+  ResourceOMNode 29 (IRank (2,1))
+  ResourceOMNode 53 (IRank (0,0))
+  ResourceOMNode 53 (IRank (1,0))
+  ResourceOMNode 53 (IRank (2,0))
+  ResourceOMNode 53 (IRank (0,1))
+  ResourceOMNode 53 (IRank (1,1))
+  ResourceOMNode 53 (IRank (2,1))
+1
+  ResourceOMNode 49 (IRank (1,0))
+  ResourceOMNode 49 (IRank (0,1))
+  ResourceOMNode 49 (IRank (2,1))
+  ResourceOMNode 51 (IRank (0,0))
+  ResourceOMNode 51 (IRank (2,0))
+  ResourceOMNode 51 (IRank (1,1))
+2
+  ResourceOMNode 49 (IRank (0,0))
+  ResourceOMNode 49 (IRank (2,0))
+  ResourceOMNode 49 (IRank (1,1))
+  ResourceOMNode 51 (IRank (1,0))
+  ResourceOMNode 51 (IRank (0,1))
+  ResourceOMNode 51 (IRank (2,1))
+#### Ridge List ####
+RidgeID {_ridgeDeltaMPI = MPIRank (-1,-1), _ridgeDelta = ResourceStatic "U" ()}
+  「(-2,-2) (0,0)」
+RidgeID {_ridgeDeltaMPI = MPIRank (-1,-1), _ridgeDelta = ResourceStatic "V" ()}
+  「(-2,-2) (0,0)」
+RidgeID {_ridgeDeltaMPI = MPIRank (-1,0), _ridgeDelta = ResourceStatic "U" ()}
+  「(-2,0) (0,600)」
+RidgeID {_ridgeDeltaMPI = MPIRank (-1,0), _ridgeDelta = ResourceStatic "V" ()}
+  「(-2,0) (0,600)」
+RidgeID {_ridgeDeltaMPI = MPIRank (0,-1), _ridgeDelta = ResourceStatic "U" ()}
+  「(0,-2) (600,0)」
+RidgeID {_ridgeDeltaMPI = MPIRank (0,-1), _ridgeDelta = ResourceStatic "V" ()}
+  「(0,-2) (600,0)」
+#### Program ####
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,-1), _ridgeDelta = ResourceStatic "U" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,0), _ridgeDelta = ResourceStatic "U" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (0,-1), _ridgeDelta = ResourceStatic "U" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,-1), _ridgeDelta = ResourceStatic "V" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,0), _ridgeDelta = ResourceStatic "V" ()})
+Stage (RidgeID {_ridgeDeltaMPI = MPIRank (0,-1), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (2,1),29) (ResourceOMNode 29 (IRank (2,1)))
+Computation (IRank (2,1),49) (ResourceOMNode 49 (IRank (2,1)))
+Computation (IRank (2,1),51) (ResourceOMNode 51 (IRank (2,1)))
+FreeResource (ResourceOMNode 29 (IRank (2,1)))
+Computation (IRank (2,1),53) (ResourceOMNode 53 (IRank (2,1)))
+FreeResource (ResourceOMNode 49 (IRank (2,1)))
+Computation (IRank (2,1),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (2,1)))
+Computation (IRank (2,1),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (2,1)))
+Computation (IRank (1,1),29) (ResourceOMNode 29 (IRank (1,1)))
+Computation (IRank (1,1),49) (ResourceOMNode 49 (IRank (1,1)))
+Computation (IRank (1,1),51) (ResourceOMNode 51 (IRank (1,1)))
+FreeResource (ResourceOMNode 29 (IRank (1,1)))
+Computation (IRank (1,1),53) (ResourceOMNode 53 (IRank (1,1)))
+FreeResource (ResourceOMNode 49 (IRank (1,1)))
+Computation (IRank (1,1),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (1,1)))
+Computation (IRank (1,1),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (1,1)))
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,0), _ridgeDelta = ResourceStatic "U" ()})
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,0), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (0,1),29) (ResourceOMNode 29 (IRank (0,1)))
+Computation (IRank (0,1),49) (ResourceOMNode 49 (IRank (0,1)))
+Computation (IRank (0,1),51) (ResourceOMNode 51 (IRank (0,1)))
+FreeResource (ResourceOMNode 29 (IRank (0,1)))
+Computation (IRank (0,1),53) (ResourceOMNode 53 (IRank (0,1)))
+FreeResource (ResourceOMNode 49 (IRank (0,1)))
+Computation (IRank (0,1),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (0,1)))
+Computation (IRank (0,1),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (0,1)))
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (0,-1), _ridgeDelta = ResourceStatic "U" ()})
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (0,-1), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (2,0),29) (ResourceOMNode 29 (IRank (2,0)))
+Computation (IRank (2,0),49) (ResourceOMNode 49 (IRank (2,0)))
+Computation (IRank (2,0),51) (ResourceOMNode 51 (IRank (2,0)))
+FreeResource (ResourceOMNode 29 (IRank (2,0)))
+Computation (IRank (2,0),53) (ResourceOMNode 53 (IRank (2,0)))
+FreeResource (ResourceOMNode 49 (IRank (2,0)))
+Computation (IRank (2,0),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (2,0)))
+Computation (IRank (2,0),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (2,0)))
+Computation (IRank (1,0),29) (ResourceOMNode 29 (IRank (1,0)))
+Computation (IRank (1,0),49) (ResourceOMNode 49 (IRank (1,0)))
+Computation (IRank (1,0),51) (ResourceOMNode 51 (IRank (1,0)))
+FreeResource (ResourceOMNode 29 (IRank (1,0)))
+Computation (IRank (1,0),53) (ResourceOMNode 53 (IRank (1,0)))
+FreeResource (ResourceOMNode 49 (IRank (1,0)))
+Computation (IRank (1,0),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (1,0)))
+Computation (IRank (1,0),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (1,0)))
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,-1), _ridgeDelta = ResourceStatic "U" ()})
+Unstage (RidgeID {_ridgeDeltaMPI = MPIRank (-1,-1), _ridgeDelta = ResourceStatic "V" ()})
+Computation (IRank (0,0),29) (ResourceOMNode 29 (IRank (0,0)))
+Computation (IRank (0,0),49) (ResourceOMNode 49 (IRank (0,0)))
+Computation (IRank (0,0),51) (ResourceOMNode 51 (IRank (0,0)))
+FreeResource (ResourceOMNode 29 (IRank (0,0)))
+Computation (IRank (0,0),53) (ResourceOMNode 53 (IRank (0,0)))
+FreeResource (ResourceOMNode 49 (IRank (0,0)))
+Computation (IRank (0,0),54) (ResourceStatic "U" ())
+FreeResource (ResourceOMNode 51 (IRank (0,0)))
+Computation (IRank (0,0),55) (ResourceStatic "V" ())
+FreeResource (ResourceOMNode 53 (IRank (0,0)))
