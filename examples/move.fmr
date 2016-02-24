@@ -1,0 +1,14 @@
+dimension :: 2
+axes :: x,y
+
+begin function smear(A) returns B
+  manifest :: B = A[,-1]+A[,+1]+A[+1,]+A[-1,]
+end function
+
+begin function init() returns A
+  float[] :: A = 0
+end function
+
+begin function step(A) returns A9
+  A9 = smear(smear(smear(smear(A))))
+end function
