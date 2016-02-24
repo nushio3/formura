@@ -417,7 +417,7 @@ genMMInstruction ir0 mminst = do
       doesBind' :: Int -> MicroInstruction -> Bool
       doesBind' _ (Imm _) = False
       doesBind' _ (Store _ x) = False
-      doesBind' n _ = n > 1
+      doesBind' n _ = n >= 1 -- TODO : Implement CSE and then reduce n
 
 
   txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
