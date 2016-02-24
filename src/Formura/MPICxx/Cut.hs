@@ -73,6 +73,10 @@ data DistributedInst
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 
 type ArrayResourceKey = ResourceT () IRank
+newtype ResourceSharingID = ResourceSharingID {fromResourceSharingID :: Int}
+                          deriving (Eq, Ord, Read, Data, Num, Enum)
+instance Show ResourceSharingID where show = show . fromResourceSharingID
+
 
 data MPIPlan = MPIPlan
   { _planArrayAlloc :: M.Map ArrayResourceKey Box
@@ -80,20 +84,12 @@ data MPIPlan = MPIPlan
   , _planRegionAlloc :: M.Map (IRank, OMNodeID) Box
   , _planDistributedProgram :: [DistributedInst]
   , _planSystemOffset :: Vec Int
+  , _planResourceSharing :: M.Map ArrayResourceKey ResourceSharingID
   , _planResourceNames :: M.Map ArrayResourceKey T.Text
   , _planRidgeNames :: M.Map RidgeID T.Text
   }
 makeClassy ''MPIPlan
 
-defaultMPIPlan :: MPIPlan
-defaultMPIPlan =
-  MPIPlan
-  { _planArrayAlloc = M.empty
-  , _planRidgeAlloc = M.empty
-  , _planRegionAlloc = M.empty
-  , _planDistributedProgram = []
-  , _planSystemOffset = 0
-  }
 
 data PlanRead = PlanRead
   { _prNumericalConfig :: NumericalConfig
@@ -114,6 +110,8 @@ data PlanState = PlanState
   { _psSyntacticState :: CompilerSyntacticState
   , _psDistributedProgramQ :: Q.Seq DistributedInst
   , _psAlreadyIssuedInst :: S.Set DistributedInst
+  , _psResourceSharing :: M.Map ArrayResourceKey ResourceSharingID
+  , _psFreeResourceSharingID :: [ResourceSharingID]
   }
 makeClassy ''PlanState
 
@@ -132,6 +130,8 @@ makePlan nc prog = do
            { _psSyntacticState = defaultCompilerSyntacticState {_compilerStage = "MPI Planning"}
            , _psDistributedProgramQ = Q.empty
            , _psAlreadyIssuedInst = S.empty
+           , _psResourceSharing = M.empty
+           , _psFreeResourceSharingID = [0..]
            }
 
 
@@ -454,17 +454,46 @@ cut = do
                       | (ark, ln) <- M.toList lastUsed]
       dProg1 = map snd $ sort $ numberedProg ++ numberedFrees
 
+  -- simulate resource alloc/free and assign ResourceSharingID
+  forM_ dProg1 $ \case
+    FreeResource rsc -> do
+      rsmap <- use psResourceSharing
+      case M.lookup rsc rsmap of
+        Just id0 -> psFreeResourceSharingID %= (id0:)
+        Nothing -> return ()
+    Computation _ destRsc@(ResourceOMNode _ _) -> do
+      rsmap <- use psResourceSharing
+      case M.lookup destRsc rsmap of
+        Just _ ->  return ()
+        Nothing -> do
+          (id0:ids) <- use psFreeResourceSharingID
+          psResourceSharing %= M.insert destRsc id0
+          psFreeResourceSharingID .= ids
+
+    _ -> return ()
+
+  resourceSharing0 <- use psResourceSharing
+
   when (?commandLineOption ^. verbose) $ liftIO $ do
     putStrLn "#### Allocation List ####"
     forM_ (M.toList allAllocs) $ \(rsc, box0) -> do
       print rsc
       putStrLn $ "  " ++ show box0
+
+    putStrLn "#### Resource Sharing ####"
+    let s = M.unionsWith (++) [ M.singleton i [r] | (r,i) <- M.toList resourceSharing0]
+    forM_ (M.toList s) $ \(i, rs) -> do
+      print i
+      forM_ rs $ \rsc -> putStrLn $ "  " ++ show rsc
+
     putStrLn "#### Ridge List ####"
     forM_ (M.toList allRidges) $ \(rid, box) -> do
       putStrLn $ show rid
       putStrLn $ "  " ++ show box
+
     putStrLn "#### Program ####"
     mapM_ print dProg1
+
 
 
   return MPIPlan
@@ -477,6 +506,7 @@ cut = do
       ]
     , _planDistributedProgram = dProg1
     , _planSystemOffset = systemOffset0
-  , _planResourceNames = M.empty
-  , _planRidgeNames = M.empty
+    , _planResourceSharing = resourceSharing0
+    , _planResourceNames = M.empty
+    , _planRidgeNames = M.empty
     }
