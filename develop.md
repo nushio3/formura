@@ -1,5 +1,7 @@
-# 2016-02-24 経過報告
+# 開発経過
 
+
+## 2016-02-24
 
 時空をRegionに分割し、Region間で送受信すべき値を転送するアルゴリズムを生成できるようになった。
 周期境界条件がシミュレーションできるようになった。
@@ -20,7 +22,7 @@ Pearson方程式でデモを行った。
 - 京でPearson方程式のシミュレーションを実行できた。
 
 
-## 手法
+### 手法
 
 https://github.com/nushio3/formura/blob/master/examples-generated/pearson.log
 
@@ -28,7 +30,7 @@ https://github.com/nushio3/formura/blob/master/examples-generated/pearson.log
 
 ![IMG1](https://github.com/nushio3/formura/blob/master/reference/IMG_5285.JPG)
 
-## 課題
+### 課題
 
 2次元MHDをテストしようとしたところ、生成するコードが大きすぎて、京でコンパイル出来ない模様
 
