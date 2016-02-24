@@ -73,14 +73,16 @@ end function
 
 
 
-begin function ddt_sys(dens, v, B, s)\
+begin function ddt_sys(dens1, v, B, s)\
   returns (ddt_dens, ddt_v, ddt_B, ddt_s)
 
-  ddt_dens = - Σ fun(i) ∂ i (dens0 * v i)
+  dens = dens0 + dens1
+
+  ddt_dens = - Σ fun(i) ∂ i (dens * v i)
 
   ddt_v = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
-         - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens0 \
-         + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens0
+         - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens \
+         + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens
 
   ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
 
