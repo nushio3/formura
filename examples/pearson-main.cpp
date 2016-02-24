@@ -32,6 +32,10 @@ int main (int argc, char **argv) {
   MPI_Init(&argc, &argv);
   Formura_Init(&navi, MPI_COMM_WORLD);
 
+  if (argc <= 1) {
+    T_MAX=10000;
+  }
+
   sscanf(argv[1], "%d",  &T_MAX);
 
   init();

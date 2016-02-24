@@ -618,7 +618,13 @@ genDistributedProgram insts = do
   return $  mconcat ps
     where
       go :: DistributedInst -> TranM T.Text
-      go (Computation cmp destRsc) = genComputation cmp destRsc
+      go (Computation cmp destRsc) = do
+        funName <- genFreeName "fun"
+        body <- genComputation cmp destRsc
+        tellC $ T.unlines ["void "<> funName <> "(){"
+                        ,body
+                        ,"}"]
+        return $ funName <> "();"
       go (Unstage rid) = genStagingCode False rid
       go (Stage rid) = genStagingCode True rid
       go (FreeResource _) = return ""
@@ -720,8 +726,6 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
-  tellH ";"
 
   cprogcon <- forM [False, True] $ \ mps -> do
     tsMPIPlanSelection .= mps
@@ -740,6 +744,8 @@ tellProgram = do
                      "++" <> timeStepVarName <>  "){"
       closeTimeLoop = "}"
 
+  tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
+  tellH ";"
 
   tellC $ T.unlines
     [ "{"
