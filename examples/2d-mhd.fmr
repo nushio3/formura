@@ -86,7 +86,7 @@ begin function ddt_sys(dens1, v, B, s, Psi)\
          - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens \
          + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens
 
-  ddt_B = vec fun(i) Σ fun(j) ∂ j ((del i j) * Psi + v i * B j - v j * B i)
+  ddt_B = vec fun(i) Σ fun(j) ∂ j (-0*(del i j) * Psi + v i * B j - v j * B i)
 
   ddt_s = Σ fun(j) v j * ∂ j s
 
