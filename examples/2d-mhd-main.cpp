@@ -54,18 +54,28 @@ int main (int argc, char **argv)
       FILE *fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          fprintf(fp, "%d %d %f\n", x, y, dens[x][y]);
+          fprintf(fp, "%d %d %f %f %f\n", x, y, dens[x][y], s[x][y], Psi[x][y]);
         }
         fprintf(fp, "\n");
       }
       fclose(fp);
 
 
-      sprintf(fn, "out-2d-mhd/vx-%06d.txt", navi.time_step);
+      sprintf(fn, "out-2d-mhd/v-%06d.txt", navi.time_step);
       fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          fprintf(fp, "%d %d %f\n", x, y, vx[x][y]);
+          fprintf(fp, "%d %d %f\n", x, y, vx[x][y], vy[x][y], vz[x][y]);
+        }
+        fprintf(fp, "\n");
+      }
+      fclose(fp);
+
+      sprintf(fn, "out-2d-mhd/B-%06d.txt", navi.time_step);
+      fp = fopen(fn,"w");
+      for(int x = navi.lower_x; x < navi.upper_x; ++x) {
+        for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+          fprintf(fp, "%d %d %f %f %f\n", x, y, Bx[x][y], By[x][y], Bz[x][y]);
         }
         fprintf(fp, "\n");
       }
