@@ -5,7 +5,7 @@
 #include <time.h>
 #include "2d-mhd.h"
 
-const int T_MAX=5000;
+int T_MAX=5000;
 
 const int NX=600, NY=600;
 const double PI = 3.141592653589793;
@@ -17,21 +17,20 @@ float frand() {
 }
 
 void init() {
-  for(int ix = navi.offset_x + 8+navi.lower_x; ix < navi.upper_x; ++ix) {
-    for(int iy = navi.offset_y + 8+navi.lower_y; iy < navi.upper_y; ++iy) {
+  for(int ix = navi.offset_x + 8+navi.lower_x; ix < 8+navi.upper_x; ++ix) {
+    for(int iy = navi.offset_y + 8+navi.lower_y; iy < 8+navi.upper_y; ++iy) {
       double x = ix/(double)NX, y = iy/(double)NY;
-      dens[ix][iy] = 1; // 0;
-      vx[ix][iy]   = 0; // -sin(2 * PI * y);
-      vy[ix][iy]   = 0; //  sin(2 * PI * x);
-      vz[ix][iy]   = 0; // 0;
-      Bx[ix][iy]   = 0; // -sin(2 * PI * y);
-      By[ix][iy]   = 0; //  sin(4 * PI * x);
-      Bz[ix][iy]   = 0; // 0;
-      s[ix][iy]    = 0; // 0;
+      dens[ix][iy] = 0;
+      vx[ix][iy]   = -sin(2 * PI * y);
+      vy[ix][iy]   =  sin(2 * PI * x);
+      vz[ix][iy]   = 0;
+      Bx[ix][iy]   = -sin(2 * PI * y);
+      By[ix][iy]   =  sin(4 * PI * x);
+      Bz[ix][iy]   = 0;
+      s[ix][iy]    = 0;
     }
   }
 }
-
 
 
 int main (int argc, char **argv)
@@ -39,6 +38,11 @@ int main (int argc, char **argv)
   srand(time(NULL));
   MPI_Init(&argc, &argv);
   Formura_Init(&navi, MPI_COMM_WORLD);
+  if (argc <= 1) {
+    T_MAX=100;
+  }else{
+    sscanf(argv[1], "%d",  &T_MAX);
+  }
 
   init();
 
