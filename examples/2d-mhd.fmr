@@ -7,7 +7,8 @@ double :: dp_ddens = 1
 double :: dp_ds    = 2/5
 double :: dt = 1e-4
 double :: dx = 1/600, dy = 1/600, dz = 1/600
-
+double :: c_h = dx/dt
+double :: ch2_cp2 = c_h / 0.18
 
 ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
 ddy = fun(a) (a[,i-2] + 8*a[,i+1] - 8*a[,i-1] - a[,i+2])/(12*dy)
@@ -25,8 +26,8 @@ partial2nd = (ddx2nd, ddy2nd, ddz2nd)
 Σ = fun (e) e(0)+e(1)+e(2)
 
 
-begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s)
-      double [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0
+begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s, Psi)
+      double [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0,Psi=0
 end function
 
 vec = fun (e) (e 0, e 1, e 2)
@@ -73,8 +74,8 @@ end function
 
 
 
-begin function ddt_sys(dens1, v, B, s)\
-  returns (ddt_dens, ddt_v, ddt_B, ddt_s)
+begin function ddt_sys(dens1, v, B, s, Psi)\
+  returns (ddt_dens, ddt_v, ddt_B, ddt_s, ddt_Psi)
 
   dens = dens0 + dens1
 
@@ -87,15 +88,17 @@ begin function ddt_sys(dens1, v, B, s)\
   ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
 
   ddt_s = Σ fun(j) v j * ∂ j s
+
+  ddt_Psi = - c_h*c_h * (Σ fun(i) ∂ i (B i)) - ch2_cp2 * Psi
 end function
 
-begin function step(dens, vx, vy, vz, Bx,By,Bz, s) \
-  returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next)
+begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
+  returns (dens_next, vx_next, vy_next, vz_next, Bx_next, By_next, Bz_next, s_next, Psi_next)
 
       v = (vx, vy, vz)
       B = (Bx, By, Bz)
 
-      sys_0 = (dens, v, B, s)
+      sys_0 = (dens, v, B, s, Psi)
 
       manifest :: sys_q4 = sys_0 + dt/4 * ddt_sys(sys_0)
 
@@ -113,7 +116,7 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s) \
       manifest :: sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]
       manifest :: sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
 
-      (dens_next, v_next, B_next, s_next) = sys_avz
+      (dens_next, v_next, B_next, s_next, Psi_next) = sys_avz
       (vx_next, vy_next, vz_next) = v_next
       (Bx_next, By_next, Bz_next) = B_next
 end function

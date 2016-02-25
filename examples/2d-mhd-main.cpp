@@ -47,7 +47,7 @@ int main (int argc, char **argv)
   init();
 
   while(navi.time_step < T_MAX) {
-    if(navi.time_step % 10 == 0) {
+    if(navi.time_step % 100 == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
       sprintf(fn, "out-2d-mhd/dens-%06d.txt", navi.time_step);
