@@ -17,8 +17,8 @@ float frand() {
 }
 
 void init() {
-  for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
-    for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
+  for(int ix = navi.offset_x + 8+navi.lower_x; ix < navi.upper_x; ++ix) {
+    for(int iy = navi.offset_y + 8+navi.lower_y; iy < navi.upper_y; ++iy) {
       double x = ix/(double)NX, y = iy/(double)NY;
       dens[ix][iy] = 1; // 0;
       vx[ix][iy]   = 0; // -sin(2 * PI * y);
