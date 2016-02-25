@@ -18,6 +18,7 @@ ddx2nd = fun(a) (a[i+1/2] - a[i-1/2]) / dx
 ddy2nd = fun(a) (a[,i+1/2] - a[,i-1/2])/dy
 ddz2nd = fun(a) 0
 
+del=((1,0,0),(0,1,0),(0,0,1))
 
 ∂ = (ddx,ddy,ddz)
 
@@ -85,7 +86,7 @@ begin function ddt_sys(dens1, v, B, s, Psi)\
          - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens \
          + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens
 
-  ddt_B = vec fun(i) Σ fun(j) ∂ j (v i * B j - v j * B i)
+  ddt_B = vec fun(i) Σ fun(j) ∂ j ((del i j) * Psi + v i * B j - v j * B i)
 
   ddt_s = Σ fun(j) v j * ∂ j s
 
