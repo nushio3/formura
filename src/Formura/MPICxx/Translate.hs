@@ -313,14 +313,17 @@ nameArrayResource rsc = case rsc of
         return ret
 
 
-nameRidgeResource :: RidgeID -> TranM T.Text
-nameRidgeResource r = do
+nameRidgeResource :: RidgeID -> SendOrRecv -> TranM T.Text
+nameRidgeResource r sr0 = do
   dict <- use planRidgeNames
-  case M.lookup r dict of
+  let (sr1, suffix) = case r^.ridgeDeltaMPI == MPIRank 0 of
+        True -> (SendRecv, "")
+        False -> (sr0, show sr0)
+  case M.lookup (r,sr1) dict of
     Just ret -> return ret
     Nothing -> do
-      ret <- genFreeName $ toCName r
-      planRidgeNames %= M.insert r ret
+      ret <- genFreeName $ toCName r ++ suffix
+      planRidgeNames %= M.insert (r,sr1) ret
       return ret
 
 
@@ -333,8 +336,9 @@ tellArrayDecls = do
     tellResourceDecl name rsc box0
   ralloc <- use planRidgeAlloc
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
-    name <- nameRidgeResource rk
-    tellResourceDecl name rsc box0
+    forM_ [Send,Recv] $ \sr -> do
+      name <- nameRidgeResource rk sr
+      tellResourceDecl name rsc box0
 
 
 -- | Generate Declarations for intermediate variables
@@ -572,7 +576,8 @@ genStagingCode isStaging rid = do
 
       MPIRank mpivec = rid ^. ridgeDeltaMPI
   arrName <- nameArrayResource src
-  rdgName <- nameRidgeResource rid
+  rdgNameSend <- nameRidgeResource rid Send
+  rdgNameRecv <- nameRidgeResource rid Recv
   ivars <- use loopIndexNames
   let offset :: Vec Int
       offset = box0^.lowerVertex
@@ -595,6 +600,8 @@ genStagingCode isStaging rid = do
       closeLoops =
         ["}" | _ <- toList ivars]
 
+
+      rdgName = if isStaging then rdgNameSend else rdgNameRecv
       rdgTerm = rdgName <> foldMap brackets ivars
       arrTerm = arrName  <> foldMap brackets (liftVec2 (\i n -> i <> "+" <> showC n) ivars otherOffset)
 
