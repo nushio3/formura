@@ -77,6 +77,8 @@ newtype ResourceSharingID = ResourceSharingID {fromResourceSharingID :: Int}
                           deriving (Eq, Ord, Read, Data, Num, Enum)
 instance Show ResourceSharingID where show = show . fromResourceSharingID
 
+data SendRecv = Send | Recv
+                deriving (Eq, Ord, Read, Data, Enum)
 
 data MPIPlan = MPIPlan
   { _planArrayAlloc :: M.Map ArrayResourceKey Box

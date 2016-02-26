@@ -29,6 +29,7 @@ void init() {
       By[ix][iy]   =  sin(4 * PI * x);
       Bz[ix][iy]   = 0;
       s[ix][iy]    = 0;
+      Psi[ix][iy]    = 0;
     }
   }
 }
