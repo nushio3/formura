@@ -5,8 +5,8 @@
 #include <time.h>
 #include "2d-mhd.h"
 
-int T_MAX=100;
-int T_MONITOR=10;
+int T_MAX;
+int T_MONITOR;
 
 const int NX=600, NY=600;
 const double PI = 3.141592653589793;
@@ -44,6 +44,11 @@ int main (int argc, char **argv)
     T_MAX=100;
   }else{
     sscanf(argv[1], "%d",  &T_MAX);
+  }
+  if (argc <= 2) {
+    T_MONITOR=10;
+  }else{
+    sscanf(argv[2], "%d",  &T_MONITOR);
   }
 
   init();
