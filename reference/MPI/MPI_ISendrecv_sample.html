@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>MPI_Isend(void *buf, 
+  int count, 
+  MPI_Datatype datatype, 
+  int dest, 
+  int tag,
+  MPI_Comm comm, 
+  MPI_Request *request
+) function</title>
+<link rel="stylesheet" href="MPI_ISendrecv_sample_files/style.css" type="text/css" charset="utf-8">
+<script src="MPI_ISendrecv_sample_files/ca-pub-0347391630140593.js"></script><script src="MPI_ISendrecv_sample_files/ga.js" async="" type="text/javascript"></script><script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-17730670-1']);
+  _gaq.push(['_setDomainName', '.deino.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</head>
+
+<body>
+	<div class="background">
+    	<div class="tab_box">
+       	  <div class="tab_box_top">
+           	<div class="tab_box_text">
+                	<h1>DeinoMPI</h1>
+                    <p>The Great and Terrible implementation of MPI-2</p>
+                    <p>
+</p><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input name="cmd" value="_s-xclick" type="hidden">
+<input name="hosted_button_id" value="LZGFCBHWCPE68" type="hidden">
+<input src="MPI_ISendrecv_sample_files/btn_donate_SM.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" type="image" border="0">
+<img alt="" src="MPI_ISendrecv_sample_files/pixel.gif" height="1" width="1" border="0">
+</form>
+            <p></p>
+              </div>
+              <div class="navigation">
+               	  <ul>
+                   	  <li><a href="http://mpi.deino.net/index.htm">MAIN PAGE</a></li>
+                      <li><a href="http://mpi.deino.net/features.htm">FEATURES</a> </li>
+                      <li><a href="http://mpi.deino.net/documentation.htm">DOCUMENTATION</a></li>
+                      <li><a href="http://mpi.deino.net/download.htm">DOWNLOAD</a></li>
+                      <li><a href="http://mpi.deino.net/forum.htm">FORUM</a></li>
+                      <li><a href="http://mpi.deino.net/contact.htm">CONTACT US</a></li>
+                  </ul>
+              </div>
+            </div>
+            <div class="tab_box_middle">
+            	<div class="main_box">
+                	<div class="text_box">
+                    	<div class="text_box_top">
+                        </div>
+                        <div class="text_box_middle">
+                        	<div class="text_box_middle_text">
+		    <a href="http://mpi.deino.net/mpi_functions/index.htm">function index</a><br>
+<a name="MPI_Isend"><h1><font size="5">MPI_Isend</font></h1></a>
+Begins a nonblocking send 
+<font size="3">
+<pre class="syntax" xml:space="preserve" style="background-color: #DDDDDD"><b>int MPI_Isend(</b>
+  <b>void</b> *<i>buf</i><b>,</b>
+  <b>int</b> <i>count</i><b>,</b>
+  <b>MPI_Datatype</b> <i>datatype</i><b>,</b>
+  <b>int</b> <i>dest</i><b>,</b>
+  <b>int</b> <i>tag</i><b>,</b>
+  <b>MPI_Comm</b> <i>comm</i><b>,</b>
+  <b>MPI_Request</b> *<i>request</i>
+<b>);</b>
+</pre></font>
+<h4>Parameters</h4>
+<dl>
+<dt><i>buf </i></dt><dd>[in] initial address of send buffer (choice) 
+
+</dd><dt><i>count </i></dt><dd>[in] number of elements in send buffer (integer) 
+
+</dd><dt><i>datatype </i></dt><dd>[in] datatype of each send buffer element (handle) 
+
+</dd><dt><i>dest </i></dt><dd>[in] rank of destination (integer) 
+
+</dd><dt><i>tag </i></dt><dd>[in] message tag (integer) 
+
+</dd><dt><i>comm </i></dt><dd>[in] communicator (handle) 
+</dd><dt><i>request </i></dt>
+<dd>[out] communication request (handle) 
+</dd></dl>
+<p>
+</p><h4>Remarks</h4>
+		<p>Start a standard mode, nonblocking send.</p>
+		<h4>Notes for Fortran</h4>
+All MPI routines in Fortran (except for <tt><font size="2">MPI_WTIME</font></tt> and <tt><font size="2">MPI_WTICK</font></tt>) have
+an additional argument <tt><font size="2">ierr</font></tt> at the end of the argument list.  <tt><font size="2">ierr
+</font></tt>is an integer and has the same meaning as the return value of the routine
+in C.  In Fortran, MPI routines are subroutines, and are invoked with the
+<tt><font size="2">call</font></tt> statement.
+<p>
+All MPI objects (e.g., <tt><font size="2">MPI_Datatype</font></tt>, <tt><font size="2">MPI_Comm</font></tt>) are of type <tt><font size="2">INTEGER
+</font></tt>in Fortran.
+</p><p>
+</p><h4>Errors</h4>
+<p>
+All MPI routines (except <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Wtime.html">MPI_Wtime</a></font></tt> and <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Wtick.html">MPI_Wtick</a></font></tt>) return an error value;
+C routines as the value of the function and Fortran routines in the last
+argument.  Before the value is returned, the current MPI error handler is
+called.  By default, this error handler aborts the MPI job.  The error handler
+may be changed with <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Comm_set_errhandler.html">MPI_Comm_set_errhandler</a></font></tt> (for communicators),
+<tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_File_set_errhandler.html">MPI_File_set_errhandler</a></font></tt> (for files), and <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Win_set_errhandler.html">MPI_Win_set_errhandler</a></font></tt> (for
+RMA windows).  The MPI-1 routine <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Errhandler_set.html">MPI_Errhandler_set</a></font></tt> may be used but
+its use is deprecated.  The predefined error handler
+<tt><font size="2">MPI_ERRORS_RETURN</font></tt> may be used to cause error values to be returned.
+Note that MPI does <em>not</em> guarentee that an MPI program can continue past
+an error; however, MPI implementations will attempt to continue whenever
+possible.
+</p><p>
+</p><dl><dt><i>MPI_SUCCESS </i></dt> <dd> No error; MPI routine completed successfully.
+</dd></dl>
+<dl><dt><i>MPI_ERR_COMM </i></dt> <dd> Invalid communicator.  A common error is to use a null
+communicator in a call (not even allowed in <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Comm_rank.html">MPI_Comm_rank</a></font></tt>).
+</dd></dl>
+<dl><dt><i>MPI_ERR_COUNT </i></dt> <dd> Invalid count argument.  Count arguments must be 
+non-negative; a count of zero is often valid.
+</dd></dl>
+<dl><dt><i>MPI_ERR_TYPE </i></dt> <dd> Invalid datatype argument.  May be an uncommitted 
+MPI_Datatype (see <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Type_commit.html">MPI_Type_commit</a></font></tt>).
+</dd></dl>
+<dl><dt><i>MPI_ERR_TAG </i></dt> <dd> Invalid tag argument.  Tags must be non-negative; tags
+in a receive (<tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Recv.html">MPI_Recv</a></font></tt>, <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Irecv.html">MPI_Irecv</a></font></tt>, <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Sendrecv.html">MPI_Sendrecv</a></font></tt>, etc.) may
+also be <tt><font size="2">MPI_ANY_TAG</font></tt>.  The largest tag value is available through the 
+the attribute <tt><font size="2">MPI_TAG_UB</font></tt>.
+</dd></dl>
+<dl><dt><i>MPI_ERR_RANK </i></dt> <dd> Invalid source or destination rank.  Ranks must be between
+zero and the size of the communicator minus one; ranks in a receive
+(<tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Recv.html">MPI_Recv</a></font></tt>, <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Irecv.html">MPI_Irecv</a></font></tt>, <tt><font size="2"><a href="http://mpi.deino.net/mpi_functions/MPI_Sendrecv.html">MPI_Sendrecv</a></font></tt>, etc.) may also be <tt><font size="2">MPI_ANY_SOURCE</font></tt>.
+</dd></dl>
+<dl><dt><i>MPI_ERR_INTERN </i></dt> <dd> This error is returned when some part of the MPICH 
+implementation is unable to acquire memory.  
+</dd></dl>
+<p>
+
+</p><h4>Example Code</h4>
+<p>The following sample code illustrates <a href="http://mpi.deino.net/mpi_functions/MPI_Isend.html">MPI_Isend</a>.
+</p>
+<p>
+<font size="2" color="#0000ff">
+#include</font><font size="2"> "mpi.h"<br>
+</font><font size="2" color="#0000ff">
+#include</font><font size="2"> &lt;stdio.h&gt;<br>
+</font><font size="2" color="#0000ff">
+int</font><font size="2"> main(</font><font size="2" color="#0000ff">int</font><font size="2"> 
+argc, </font><font size="2" color="#0000ff">char</font><font size="2"> *argv[])<br>
+{<br>
+</font><font size="2" color="#0000ff">&nbsp;&nbsp;&nbsp; int</font><font size="2"> myid, 
+numprocs, left, right;<br>
+</font><font size="2" color="#0000ff">&nbsp;&nbsp;&nbsp; int</font><font size="2"> buffer[10], 
+buffer2[10];<br>
+&nbsp;&nbsp;&nbsp;
+MPI_Request request, request2;<br>
+&nbsp;&nbsp;&nbsp;
+MPI_Status status;<br>
+<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Init.html">MPI_Init</a>(&amp;argc,&amp;argv);<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Comm_size.html">MPI_Comm_size</a>(MPI_COMM_WORLD, &amp;numprocs);<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Comm_rank.html">MPI_Comm_rank</a>(MPI_COMM_WORLD, &amp;myid);<br>
+&nbsp;&nbsp;&nbsp;
+right = (myid + 1) % numprocs;<br>
+&nbsp;&nbsp;&nbsp;
+left = myid - 1;<br>
+&nbsp;&nbsp;&nbsp;
+</font><font size="2" color="#0000ff">if</font><font size="2"> (left &lt; 0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+left = numprocs - 1;<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Irecv.html">MPI_Irecv</a>(buffer, 10, MPI_INT, left, 123, MPI_COMM_WORLD, &amp;request);<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Isend.html">MPI_Isend</a>(buffer2, 10, MPI_INT, right, 123, MPI_COMM_WORLD, &amp;request2);<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Wait.html">MPI_Wait</a>(&amp;request, &amp;status);<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Wait.html">MPI_Wait</a>(&amp;request2, &amp;status);<br>
+&nbsp;&nbsp;&nbsp;
+<a href="http://mpi.deino.net/mpi_functions/MPI_Finalize.html">MPI_Finalize</a>();<br>
+&nbsp;&nbsp;&nbsp; </font><font size="2" color="#0000ff">return</font><font size="2"> 0;<br>
+}<br>
+</font>
+</p>
+
+</div>
+                        </div>
+                        <div class="text_box_bottom">
+                        </div>
+                    </div>
+                    <div class="note_text_box">
+                        <div class="note_text_box_top"></div>
+                        <div class="note_text_box_middle">
+                            <div class="note_text_box_middle_text">
+                                <h2>DOWNLOAD</h2>
+                                <p>
+                                    Win32 <a href="http://mpi.deino.net/DeinoMPI.2.0.1.msi">DeinoMPI.2.0.1.msi</a><br>
+                                    Win64 <a href="http://mpi.deino.net/DeinoMPI.x64.2.0.1.msi">DeinoMPI.x64.2.0.1.msi</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="note_text_box_bottom"></div>
+                    </div>
+                    <div class="ad_under_text_box">
+                        <div class="ad_under_text_box_top"></div>
+                        <div class="ad_under_text_box_middle">
+                            <div class="ad_under_text_box_middle_text">
+                            <script type="text/javascript"><!--
+google_ad_client = "pub-0347391630140593";
+/* Right panel wide skyscraper ad */
+google_ad_slot = "3437924454";
+google_ad_width = 160;
+google_ad_height = 600;
+//-->
+</script>
+<script type="text/javascript" src="MPI_ISendrecv_sample_files/show_ads.js">
+</script><ins id="aswift_0_expand" style="display:inline-table;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:160px;background-color:transparent"><ins id="aswift_0_anchor" style="display:block;border:none;height:600px;margin:0;padding:0;position:relative;visibility:visible;width:160px;background-color:transparent"><iframe marginwidth="0" marginheight="0" vspace="0" hspace="0" allowtransparency="true" scrolling="no" allowfullscreen="true" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){setTimeout(h,0)}else if(h.match){try{h=s.upd(h,i)}catch(e){}w.location.replace(h)}}" id="aswift_0" name="aswift_0" style="left:0;position:absolute;top:0;" frameborder="0" height="600" width="160"></iframe></ins></ins>
+                            </div>
+                        </div>
+                        <div class="ad_under_text_box_bottom"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab_box_bottom">
+            </div>
+        </div>
+        <div class="copyright">
+        	© Copyright 2009 Deino Software. All rights reserved.
+        </div>
+	</div>
+
+
+</body></html>
