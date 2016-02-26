@@ -5,7 +5,8 @@
 #include <time.h>
 #include "2d-mhd.h"
 
-int T_MAX=5000;
+int T_MAX=100;
+int T_MONITOR=2;
 
 const int NX=600, NY=600;
 const double PI = 3.141592653589793;
@@ -47,7 +48,7 @@ int main (int argc, char **argv)
   init();
 
   while(navi.time_step < T_MAX) {
-    if(navi.time_step % 100 == 0) {
+    if(navi.time_step % T_MONITOR == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
       sprintf(fn, "out-2d-mhd/dens-%06d.txt", navi.time_step);
@@ -65,7 +66,7 @@ int main (int argc, char **argv)
       fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          fprintf(fp, "%d %d %f\n", x, y, vx[x][y], vy[x][y], vz[x][y]);
+          fprintf(fp, "%d %d %f %f %f\n", x, y, vx[x][y], vy[x][y], vz[x][y]);
         }
         fprintf(fp, "\n");
       }

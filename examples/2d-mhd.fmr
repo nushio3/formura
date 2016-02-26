@@ -7,7 +7,8 @@ double :: dp_ddens = 1
 double :: dp_ds    = 2/5
 double :: dt = 1e-4
 double :: dx = 1/600, dy = 1/600, dz = 1/600
-double :: c_h = dx/dt
+double :: c_h = dx/dt/3
+# double :: ch2_cp2 = c_h*c_h / (0.18 * c_h)
 double :: ch2_cp2 = c_h / 0.18
 
 ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
@@ -86,7 +87,7 @@ begin function ddt_sys(dens1, v, B, s, Psi)\
          - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens \
          + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens
 
-  ddt_B = vec fun(i) Σ fun(j) ∂ j (-0*(del i j) * Psi + v i * B j - v j * B i)
+  ddt_B = vec fun(i) Σ fun(j) ∂ j (-(del i j) * Psi + v i * B j - v j * B i)
 
   ddt_s = Σ fun(j) v j * ∂ j s
 

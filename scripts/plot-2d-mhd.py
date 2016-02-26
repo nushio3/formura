@@ -12,7 +12,7 @@ for fn in fns[1:]:
     with open(fn,'r') as fp:
         with open(fn_in,'w') as fp2:
             con = fp.read()
-            fp2.write(con.replace('nan','0'))
+            fp2.write(con.replace('nan','-1'))
     with open('scripts/plot.gnu', 'w') as fp:
         fp.write("""
         set term png
