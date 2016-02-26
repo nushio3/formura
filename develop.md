@@ -154,6 +154,16 @@ $ mpiFCCpx 2d-mhd.c  2d-mhd-main.cpp
 正常にコンパイルが実行されている。
 2月24日時点でコンパイル開始＞結果待ち
 
+
+```
+...
+2d-mhd.c:
+//opt/FJSVtclang/GM-1.2.0-19/bin/../lib/ccpcompx: virtual memory exhausted
+...
+real	74m26.638s
+user	0m0.040s
+sys	0m0.016s
+```
 ### 課題２
 
 div-B cleaningを入れて
