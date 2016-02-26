@@ -6,7 +6,7 @@
 #include "2d-mhd.h"
 
 int T_MAX=100;
-int T_MONITOR=2;
+int T_MONITOR=10;
 
 const int NX=600, NY=600;
 const double PI = 3.141592653589793;

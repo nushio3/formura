@@ -317,6 +317,7 @@ nameRidgeResource :: RidgeID -> SendOrRecv -> TranM T.Text
 nameRidgeResource r sr0 = do
   dict <- use planRidgeNames
   let (sr1, suffix) = case r^.ridgeDeltaMPI == MPIRank 0 of
+        _ -> (SendRecv, "")
         True -> (SendRecv, "")
         False -> (sr0, show sr0)
   case M.lookup (r,sr1) dict of
