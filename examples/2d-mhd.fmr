@@ -42,7 +42,7 @@ end function
 begin function av_flux_x(u) returns (av_flux(num,den))
   um[i] = u[i-1]
   up[i] = u[i+1]
-  delta_u[i] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+  delta_u[i] = (up-um)/2 <% 1.4*(up-u) <% 1.4*(u-um)
   u_l[i+1/2] = u[i] + 0.5 * delta_u[i]
   u_r[i-1/2] = u[i] - 0.5 * delta_u[i]
 
@@ -53,7 +53,7 @@ end function
 begin function av_flux_y(u) returns (av_flux(num,den))
   um[i,j] = u[i,j-1]
   up[i,j] = u[i,j+1]
-  delta_u[i,j] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+  delta_u[i,j] = (up-um)/2 <% 1.4*(up-u) <% 1.4*(u-um)
   u_l[i,j+1/2] = u[i,j] + 0.5 * delta_u[i,j]
   u_r[i,j-1/2] = u[i,j] - 0.5 * delta_u[i,j]
 
@@ -64,7 +64,7 @@ end function
 begin function av_flux_z(u) returns (av_flux(num,den))
   um[i,j,k] = u[i,j,k-1]
   up[i,j,k] = u[i,j,k+1]
-  delta_u[i,j,k] = (up-um)/2 <% 2*(up-u) <% 2*(u-um)
+  delta_u[i,j,k] = (up-um)/2 <% 1.4*(up-u) <% 1.4*(u-um)
   u_l[i,j,k+1/2] = u[i,j,k] + 0.5 * delta_u[i,j,k]
   u_r[i,j,k-1/2] = u[i,j,k] - 0.5 * delta_u[i,j,k]
 
@@ -120,4 +120,5 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
       (dens_next, v_next, B_next, s_next, Psi_next) = sys_avz
       (vx_next, vy_next, vz_next) = v_next
       (Bx_next, By_next, Bz_next) = B_next
+
 end function
