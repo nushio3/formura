@@ -245,6 +245,14 @@ elemTypeOfResource (ResourceOMNode nid _) = do
     ElemType x -> return $ ElemType x
     GridType _ etyp -> return $ subFix etyp
 
+tellMPIRequestDecl :: T.Text -> TranM ()
+tellMPIRequestDecl name = do
+  adrn <- use alreadyDeclaredResourceNames
+  case S.member name adrn of
+    True -> return ()
+    False -> do
+      alreadyDeclaredResourceNames %= S.insert name
+      tellC $ "MPI_Request "<>name<>";\n"
 
 tellResourceDecl :: T.Text -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl name rsc box0 = do
@@ -326,6 +334,16 @@ nameRidgeResource r sr0 = do
       planRidgeNames %= M.insert (r,sr1) ret
       return ret
 
+nameRidgeRequest :: RidgeID -> TranM T.Text
+nameRidgeRequest r  = do
+  dict <- use planMPIRequestNames
+  case M.lookup r dict of
+    Just ret -> return ret
+    Nothing -> do
+      ret <- genFreeName $ "request_" ++ toCName r
+      planMPIRequestNames %= M.insert r ret
+      return ret
+
 
 -- | Generate Declaration for State Arrays
 tellArrayDecls :: TranM ()
@@ -336,6 +354,8 @@ tellArrayDecls = do
     tellResourceDecl name rsc box0
   ralloc <- use planRidgeAlloc
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
+    name <- nameRidgeRequest rk
+    tellMPIRequestDecl name
     forM_ [Send,Recv] $ \sr -> do
       name <- nameRidgeResource rk sr
       tellResourceDecl name rsc box0
@@ -579,6 +599,7 @@ genStagingCode isStaging rid = do
   arrName <- nameArrayResource src
   rdgNameSend <- nameRidgeResource rid Send
   rdgNameRecv <- nameRidgeResource rid Recv
+  reqName <- nameRidgeRequest rid
   ivars <- use loopIndexNames
   let offset :: Vec Int
       offset = box0^.lowerVertex
@@ -621,7 +642,7 @@ genStagingCode isStaging rid = do
           , "rank_dest,"
           , let Just t = M.lookup rid mpiTagDict in showC t, ","
           , "MPI_COMM_WORLD," -- TODO: use MPI_COMM given by Formura_Init
-          , "&request );\n"]
+          , "&" <> reqName <> " );\n"]
           ++
           [ "MPI_Irecv( (void*) &" <> rdgNameRecv <> T.unwords (replicate dim "[0]") , ","
           , showC $ volume box0 , ","
@@ -629,13 +650,13 @@ genStagingCode isStaging rid = do
           , "rank_src,"
           , let Just t = M.lookup rid mpiTagDict in showC t, ","
           , "MPI_COMM_WORLD," -- TODO: use MPI_COMM given by Formura_Init
-          , "&request );\n"]
+          , "&" <> reqName <> " );\n"]
 
       mpiWait :: T.Text
       mpiWait =  case  doesRidgeNeedMPI rid && not isStaging of
         False -> ""
         True -> T.unwords $
-          ["MPI_Wait(&request,MPI_STATUS_IGNORE);\n"]
+          ["MPI_Wait(&" <> reqName <>  ",MPI_STATUS_IGNORE);\n"]
 
   return $
     mpiIsendIrecv <>
@@ -859,6 +880,5 @@ hxxFileName = hxxFilePath ^. filename
 cxxTemplate :: T.Text
 cxxTemplate = T.unlines
   [ ""
-  , "MPI_Request request;"
-  , "int rank_src, rank_dest;"
+  , "int rank_src=0, rank_dest=0;"
   ]

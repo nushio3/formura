@@ -92,6 +92,7 @@ data MPIPlan = MPIPlan
   , _planResourceNames :: M.Map ArrayResourceKey T.Text
   , _planRidgeNames :: M.Map (RidgeID, SendOrRecv) T.Text
   , _planRidgeMPITag :: M.Map RidgeID Int
+  , _planMPIRequestNames :: M.Map RidgeID T.Text
   }
 makeClassy ''MPIPlan
 
@@ -515,4 +516,5 @@ cut = do
     , _planResourceNames = M.empty
     , _planRidgeNames = M.empty
     , _planRidgeMPITag = M.fromList $ zip (M.keys allRidges) [0..]
+    , _planMPIRequestNames = M.empty
     }
