@@ -6,7 +6,7 @@ endif()
 project (formura_examples)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -std=c99 -Wall -mcmodel=large")
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall -mcmodel=large")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Wall -mcmodel=large")
 
 add_custom_command(
   OUTPUT examples/diffusion.c
