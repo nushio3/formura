@@ -115,6 +115,9 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
 
       manifest :: sys_next = sys_0 + dt * ddt_sys(sys_q2)
 
+      v_rk = sys_next(1)
+      B_rk = sys_next(2)
+
       manifest :: avf_x = av_flux_x(sys_next)
       manifest :: avf_y = av_flux_y(sys_next)
       manifest :: avf_z = av_flux_z(sys_next)
@@ -123,8 +126,6 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
       manifest :: sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]
       manifest :: sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
 
-      avf_vel = (avf_x(1), avf_y(1), avf_z(1))
-      avf_B   = (avf_x(2), avf_y(2), avf_z(2))
 
       (dens_next, v_next, B_next, s_unheated, Psi_next) = sys_avz
       (vx_next, vy_next, vz_next) = v_next
@@ -132,8 +133,8 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
 
 
       numerical_heat =\
-              - (Σ fun(i) ( Σ fun(j) average j (avf_vel j i * partial2nd j (v i)  ))) \
-              - 1/(4*π)*(Σ fun(i) ( Σ fun(j) average j (avf_B   j i * partial2nd j (B i)  )))
-      s_next = s_unheated + numerical_heat/(dens0 + dens)
+              1/2 * ( (Σ fun(i) v_rk i * v_rk i) - (Σ fun(i) v_next i * v_next i) )   \
+             + 1/(8*π*(dens0 + dens)) * ( (Σ fun(i) B_rk i * B_rk i) - (Σ fun(i) B_next i * B_next i) )
+      s_next = s_unheated + numerical_heat
 
 end function
