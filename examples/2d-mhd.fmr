@@ -41,8 +41,10 @@ vec = fun (e) (e 0, e 1, e 2)
 
 
 begin function av_flux(uu_num, uu_den) returns f
-  Phi = if uu_num * uu_den <= 0 then 0 else (1 <? (0 >? 1 + 0.75 *(uu_num / uu_den - 1)))
-  f = -0.15*Phi*uu_num
+#  Phi = if uu_num * uu_den <= 0 then 0 else (1 <? (0 >? 1 + 0.75 *(uu_num / uu_den - 1)))
+#  f = -0.15*Phi*uu_num
+  Phi = if uu_num * uu_den <= 0 then 0 else (1 <? (0 >? 1 + 2 *(uu_num / uu_den - 1)))
+  f = -0.5*Phi*uu_num
 end function
 
 begin function av_flux_x(u) returns (av_flux(num,den))
