@@ -660,9 +660,9 @@ genStagingCode isStaging rid = do
           ["MPI_Wait(&" <> reqName <>  ",MPI_STATUS_IGNORE);\n"]
 
   return $
-    mpiIsendIrecv <>
+    mpiWait <>
     T.unlines openLoops <> body <> ";" <> T.unlines closeLoops <>
-    mpiWait
+    mpiIsendIrecv
 
 
 -- | generate a distributed program
