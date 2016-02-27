@@ -25,8 +25,8 @@ void init() {
       vx[ix][iy]   = -sin(2 * PI * y);
       vy[ix][iy]   =  sin(2 * PI * x);
       vz[ix][iy]   = 0;
-      Bx[ix][iy]   = 0;-sin(2 * PI * y);
-      By[ix][iy]   = 0; sin(4 * PI * x);
+      Bx[ix][iy]   = 0*-sin(2 * PI * y);
+      By[ix][iy]   = 0* sin(4 * PI * x);
       Bz[ix][iy]   = 0;
       s[ix][iy]    = 0;
       //Psi[ix][iy]    = 0;
