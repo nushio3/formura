@@ -21,7 +21,7 @@ for fn in fns[1:]:
         set size ratio -1
         set cbrange [-1:1]
         set out "{fn_out}"
-        splot "{fn_in}"
+        splot "{fn_in}" u 1:2:3
 """.format(fn_in=fn_in, fn_out=fn_out))
 
     subprocess.call("gnuplot scripts/plot.gnu", shell=True)
