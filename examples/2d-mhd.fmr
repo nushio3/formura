@@ -14,15 +14,21 @@ ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
 ddy = fun(a) (a[,i-2] + 8*a[,i+1] - 8*a[,i-1] - a[,i+2])/(12*dy)
 ddz = fun(a) 0
 
+∂ = (ddx,ddy,ddz)
+
 ddx2nd = fun(a) (a[i+1/2] - a[i-1/2]) / dx
 ddy2nd = fun(a) (a[,i+1/2] - a[,i-1/2])/dy
 ddz2nd = fun(a) 0
 
-del=((1,0,0),(0,1,0),(0,0,1))
-
-∂ = (ddx,ddy,ddz)
-
 partial2nd = (ddx2nd, ddy2nd, ddz2nd)
+
+average_x = fun(a) (a[i+1/2]  + a[i-1/2]) / 2
+average_y = fun(a) (a[,i+1/2] + a[,i-1/2])/2
+average_z = fun(a) 0
+
+average = (average_x, average_y, average_z)
+
+del=((1,0,0),(0,1,0),(0,0,1))
 
 Σ = fun (e) e(0)+e(1)+e(2)
 
@@ -117,8 +123,17 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
       manifest :: sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]
       manifest :: sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
 
-      (dens_next, v_next, B_next, s_next, Psi_next) = sys_avz
+      avf_vel = (avf_x(1), avf_y(1), avf_z(1))
+      avf_B   = (avf_x(2), avf_y(2), avf_z(2))
+
+      (dens_next, v_next, B_next, s_unheated, Psi_next) = sys_avz
       (vx_next, vy_next, vz_next) = v_next
       (Bx_next, By_next, Bz_next) = B_next
+
+
+      numerical_heat =\
+              - (Σ fun(i) ( Σ fun(j) average j (avf_vel j i * partial2nd j (v i)  ))) \
+              - 1/(4*π)*(Σ fun(i) ( Σ fun(j) average j (avf_B   j i * partial2nd j (B i)  )))
+      s_next = s_unheated + numerical_heat/(dens0 + dens)
 
 end function
