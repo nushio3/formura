@@ -60,6 +60,8 @@ data RidgeID = RidgeID { _ridgeDeltaMPI :: MPIRank, _ridgeDelta :: ResourceT () 
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 makeLenses ''RidgeID
 
+doesRidgeNeedMPI :: RidgeID -> Bool
+doesRidgeNeedMPI r = r ^.ridgeDeltaMPI /= MPIRank 0
 
 type Ridge = (RidgeID, Box)
 
@@ -89,6 +91,7 @@ data MPIPlan = MPIPlan
   , _planResourceSharing :: M.Map ArrayResourceKey ResourceSharingID
   , _planResourceNames :: M.Map ArrayResourceKey T.Text
   , _planRidgeNames :: M.Map (RidgeID, SendOrRecv) T.Text
+  , _planRidgeMPITag :: M.Map RidgeID Int
   }
 makeClassy ''MPIPlan
 
@@ -511,4 +514,5 @@ cut = do
     , _planResourceSharing = resourceSharing0
     , _planResourceNames = M.empty
     , _planRidgeNames = M.empty
+    , _planRidgeMPITag = M.fromList $ zip (M.keys allRidges) [0..]
     }

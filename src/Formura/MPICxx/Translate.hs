@@ -316,10 +316,9 @@ nameArrayResource rsc = case rsc of
 nameRidgeResource :: RidgeID -> SendOrRecv -> TranM T.Text
 nameRidgeResource r sr0 = do
   dict <- use planRidgeNames
-  let (sr1, suffix) = case r^.ridgeDeltaMPI == MPIRank 0 of
-        _ -> (SendRecv, "")
-        True -> (SendRecv, "")
-        False -> (sr0, show sr0)
+  let (sr1, suffix) = case doesRidgeNeedMPI r of
+        True  -> (sr0, "_" ++ show sr0)
+        False -> (SendRecv, "")
   case M.lookup (r,sr1) dict of
     Just ret -> return ret
     Nothing -> do
@@ -563,10 +562,11 @@ genComputation (ir0, nid0) destRsc0 = do
 
 genStagingCode :: Bool -> RidgeID -> TranM T.Text
 genStagingCode isStaging rid = do
+  dim <- view dimension
   ridgeDict <- use planRidgeAlloc
   arrDict   <- use planArrayAlloc
   intraShape <- use ncIntraNodeShape
-
+  mpiTagDict <- use planRidgeMPITag
 
   let Just box0 = M.lookup rid ridgeDict
       src :: ArrayResourceKey
@@ -610,7 +610,37 @@ genStagingCode isStaging rid = do
         | isStaging = rdgTerm <> "=" <> arrTerm
         | otherwise = arrTerm <> "=" <> rdgTerm
 
-  return $ T.unlines openLoops <> body <> ";" <> T.unlines closeLoops
+
+  let mpiIsendIrecv :: T.Text
+      mpiIsendIrecv = case  doesRidgeNeedMPI rid && isStaging of
+        False -> ""
+        True  -> T.unwords $
+          [ "MPI_Isend( (void*) &" <> rdgNameSend <> T.unwords (replicate dim "[0]") , ","
+          , showC $ volume box0 , ","
+          , "MPI_DOUBLE," -- TODO: Check Ridge type!!
+          , "rank_dest,"
+          , let Just t = M.lookup rid mpiTagDict in showC t, ","
+          , "MPI_COMM_WORLD," -- TODO: use MPI_COMM given by Formura_Init
+          , "&request );\n"]
+          ++
+          [ "MPI_Irecv( (void*) &" <> rdgNameRecv <> T.unwords (replicate dim "[0]") , ","
+          , showC $ volume box0 , ","
+          , "MPI_DOUBLE," -- TODO: Check Ridge type!!
+          , "rank_src,"
+          , let Just t = M.lookup rid mpiTagDict in showC t, ","
+          , "MPI_COMM_WORLD," -- TODO: use MPI_COMM given by Formura_Init
+          , "&request );\n"]
+
+      mpiWait :: T.Text
+      mpiWait =  case  doesRidgeNeedMPI rid && not isStaging of
+        False -> ""
+        True -> T.unwords $
+          ["MPI_Wait(&request,MPI_STATUS_IGNORE);\n"]
+
+  return $
+    mpiIsendIrecv <>
+    T.unlines openLoops <> body <> ";" <> T.unlines closeLoops <>
+    mpiWait
 
 
 -- | generate a distributed program
@@ -829,5 +859,6 @@ hxxFileName = hxxFilePath ^. filename
 cxxTemplate :: T.Text
 cxxTemplate = T.unlines
   [ ""
-  , ""
+  , "MPI_Request request;"
+  , "int rank_src, rank_dest;"
   ]
