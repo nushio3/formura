@@ -127,10 +127,11 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
       manifest :: sys_avz = sys_avy + avf_z[,,k-1/2] - avf_z[,,k+1/2]
 
 
-      (dens_next, v_next, B_next, s_unheated, Psi_next) = sys_avz
+      (dens_next2, v_next, B_next, s_unheated, Psi_next) = sys_avz
       (vx_next, vy_next, vz_next) = v_next
       (Bx_next, By_next, Bz_next) = B_next
 
+      dens_next = dens_next2 >? (-0.9)
 
       numerical_heat =\
               1/2 * ( (Σ fun(i) v_rk i * v_rk i) - (Σ fun(i) v_next i * v_next i) )   \
