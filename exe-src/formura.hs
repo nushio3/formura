@@ -1,7 +1,7 @@
 {-# LANGUAGE ImplicitParams #-}
 module Main where
 
-import           Control.Concurrent(threadDelay)
+
 import           Control.Lens
 import           Control.Monad
 import qualified Data.ByteString.Char8 as BS
@@ -35,8 +35,6 @@ main = do
 
   mapM_ process (opts ^. inputFilenames)
 
-  let wait = ?commandLineOption ^. sleepAfterGen
-  when (wait>0) $ threadDelay (1000000 * wait)
 
 process :: WithCommandLineOption => FilePath -> IO ()
 process fn = do

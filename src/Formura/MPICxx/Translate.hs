@@ -3,6 +3,7 @@
 module Formura.MPICxx.Translate where
 
 import           Control.Applicative
+import           Control.Concurrent(threadDelay)
 import qualified Control.Exception as X
 import           Control.Lens
 import           Control.Monad
@@ -849,6 +850,10 @@ genCxxFiles formuraProg mmProg = do
 
   T.writeFile hxxFilePath hxxContent
   T.writeFile cxxFilePath cxxContent
+
+  let wait = ?commandLineOption ^. sleepAfterGen
+  when (wait>0) $ threadDelay (1000000 * wait)
+
 
   mapM_ indent [hxxFilePath, cxxFilePath]
   where
