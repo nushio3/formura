@@ -25,11 +25,11 @@ void init() {
       vx[ix][iy]   = -sin(2 * PI * y);
       vy[ix][iy]   =  sin(2 * PI * x);
       vz[ix][iy]   = 0;
-      Bx[ix][iy]   = 0*-sin(2 * PI * y);
-      By[ix][iy]   = 0* sin(4 * PI * x);
+      Bx[ix][iy]   = -sin(2 * PI * y);
+      By[ix][iy]   =  sin(4 * PI * x);
       Bz[ix][iy]   = 0;
       s[ix][iy]    = 0;
-      //Psi[ix][iy]    = 0;
+      Psi[ix][iy]    = 0;
     }
   }
 }
@@ -61,7 +61,7 @@ int main (int argc, char **argv)
       FILE *fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          fprintf(fp, "%d %d %f %f %f\n", x, y, dens[x][y], s[x][y], s[x][y]);
+          fprintf(fp, "%d %d %f %f %f\n", x, y, dens[x][y], s[x][y], Psi[x][y]);
         }
         fprintf(fp, "\n");
       }
