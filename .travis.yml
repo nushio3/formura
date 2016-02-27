@@ -25,6 +25,8 @@ script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
   - stack install .
   - ./cmake-for-x86.sh
-  - make
+  - make bin/pearson.out
+  - make examples/2d-mhd.c
+  - mpicxx -c examples/2d-mhd.c
   - stack test
   - echo "done test"
