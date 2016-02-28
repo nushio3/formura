@@ -258,7 +258,7 @@ tellMPIRequestDecl name = do
 tellResourceDecl :: T.Text -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl name rsc box0 = do
   adrn <- use alreadyDeclaredResourceNames
-  case S.member name adrn of
+  case S.member name adrn || name == "" of
     True -> return ()
     False -> do
       alreadyDeclaredResourceNames %= S.insert name
@@ -313,13 +313,20 @@ nameArrayResource rsc = case rsc of
     planResourceNames %= M.insert rsc ret
     return ret
   _ -> do
+    sharing <- use planResourceSharing
     dict <- use planResourceNames
-    case M.lookup rsc dict of
-      Just ret -> return ret
-      Nothing -> do
-        ret <- genFreeName $ toCName rsc
-        planResourceNames %= M.insert rsc ret
+    sdict <- use planSharedResourceNames
+    ret <- case M.lookup rsc sharing of
+      Nothing -> return "" -- These are OMNode for Store instruction; do not need array decl
+      Just rsid -> do
+        ret <- case M.lookup rsid sdict of
+          Just ret -> return ret
+          Nothing -> do
+            genFreeName $ "Rsc" ++ show (fromResourceSharingID rsid)
+        planSharedResourceNames %= M.insert rsid ret
         return ret
+    planResourceNames %= M.insert rsc ret
+    return ret
 
 
 nameRidgeResource :: RidgeID -> SendOrRecv -> TranM T.Text
@@ -352,7 +359,10 @@ tellArrayDecls = do
   aalloc <- use planArrayAlloc
   forM_ (M.toList aalloc) $ \(rsc, box0) -> do
     name <- nameArrayResource rsc
-    tellResourceDecl name rsc box0
+    box1 <- case rsc of
+      ResourceOMNode _ _ -> use planSharedResourceExtent
+      _ -> return box0
+    tellResourceDecl name rsc box1
   ralloc <- use planRidgeAlloc
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
     name <- nameRidgeRequest rk
@@ -753,9 +763,13 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  forM_ [False, True] $ \ mps -> do
-    tsMPIPlanSelection .= mps
-    tellArrayDecls
+  tsMPIPlanSelection .= False
+  tellArrayDecls
+  srmap0 <- use planSharedResourceNames
+  tsMPIPlanSelection .= True
+  planSharedResourceNames .= srmap0 -- share the shared resource among plans
+  tellArrayDecls
+
 
   tellBoth "\n"
 

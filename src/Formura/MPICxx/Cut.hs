@@ -89,7 +89,9 @@ data MPIPlan = MPIPlan
   , _planDistributedProgram :: [DistributedInst]
   , _planSystemOffset :: Vec Int
   , _planResourceSharing :: M.Map ArrayResourceKey ResourceSharingID
+  , _planSharedResourceExtent :: Box
   , _planResourceNames :: M.Map ArrayResourceKey T.Text
+  , _planSharedResourceNames :: M.Map ResourceSharingID T.Text
   , _planRidgeNames :: M.Map (RidgeID, SendOrRecv) T.Text
   , _planRidgeMPITag :: M.Map RidgeID Int
   , _planMPIRequestNames :: M.Map RidgeID T.Text
@@ -480,6 +482,11 @@ cut = do
 
   resourceSharing0 <- use psResourceSharing
 
+  let largestBox :: Box
+      largestBox = maximum
+        [ Orthotope 0 (u-l)
+        | (ResourceOMNode _ _, Orthotope l u) <- M.toList allAllocs ]
+
   when (?commandLineOption ^. verbose) $ liftIO $ do
     putStrLn "#### Allocation List ####"
     forM_ (M.toList allAllocs) $ \(rsc, box0) -> do
@@ -513,7 +520,9 @@ cut = do
     , _planDistributedProgram = dProg1
     , _planSystemOffset = systemOffset0
     , _planResourceSharing = resourceSharing0
+    , _planSharedResourceExtent = largestBox
     , _planResourceNames = M.empty
+    , _planSharedResourceNames = M.empty
     , _planRidgeNames = M.empty
     , _planRidgeMPITag = M.fromList $ zip (M.keys allRidges) [0..]
     , _planMPIRequestNames = M.empty
