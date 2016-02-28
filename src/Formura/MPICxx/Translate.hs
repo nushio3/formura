@@ -108,29 +108,33 @@ instance HasMPIPlan TranState where
       settr s a = s & tsMPIPlanMap %~ M.insert (s^.tsMPIPlanSelection) a
     in lens gettr settr
 
-data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text}
+data CProgram = CProgram { _headerFileContent :: T.Text, _sourceFileContent :: T.Text,
+                         _auxFilesContent :: M.Map FilePath T.Text}
                 deriving (Eq, Ord, Show)
 makeLenses ''CProgram
 
 tellH :: (MonadWriter CProgram m) => T.Text -> m ()
-tellH txt = tell $ CProgram txt ""
+tellH txt = tell $ CProgram txt "" M.empty
 tellC :: (MonadWriter CProgram m) => T.Text -> m ()
-tellC txt = tell $ CProgram "" txt
+tellC txt = tell $ CProgram "" txt M.empty
 tellBoth :: (MonadWriter CProgram m) => T.Text -> m ()
-tellBoth txt = tell $ CProgram txt txt
+tellBoth txt = tell $ CProgram txt txt  M.empty
+tellF :: (MonadWriter CProgram m) => FilePath -> T.Text -> m ()
+tellF fn txt = tell $ CProgram "" ""  (M.singleton fn txt)
 
 tellHLn :: (MonadWriter CProgram m) => T.Text -> m ()
-tellHLn txt = tell $ CProgram (txt <> "\n") ""
+tellHLn txt = tellH $ txt <> "\n"
 tellCLn :: (MonadWriter CProgram m) => T.Text -> m ()
-tellCLn txt = tell $ CProgram "" (txt <> "\n")
+tellCLn txt = tellC $ txt <> "\n"
 tellBothLn :: (MonadWriter CProgram m) => T.Text -> m ()
-tellBothLn txt = tell $ CProgram (txt <> "\n")(txt <> "\n")
-
+tellBothLn txt = tellBoth $ txt <> "\n"
+tellFLn :: (MonadWriter CProgram m) => FilePath -> T.Text -> m ()
+tellFLn fn txt = tellF fn $ txt <> "\n"
 
 
 instance Monoid CProgram where
-  mempty = CProgram "" ""
-  mappend (CProgram h1 c1) (CProgram h2 c2) = CProgram (h1 <> h2) (c1 <> c2)
+  mempty = CProgram "" "" M.empty
+  mappend (CProgram h1 c1 f1) (CProgram h2 c2 f2) = CProgram (h1 <> h2) (c1 <> c2) (M.unionWith (<>) f1 f2)
 
 
 type TranM = CompilerMonad GlobalEnvironment CProgram TranState
@@ -272,13 +276,19 @@ tellResourceDecl name rsc box0 = do
         ElemType "Rational" -> return $ "double " <> name <> szpt
         ElemType x -> return $ T.pack  x <> " " <> name <> szpt
         _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
-      case rsc of
-        ResourceStatic _ _ -> do
-            tellH "extern "
-            tellBoth decl
-            tellBothLn ";"
-        _ -> do
-          when (decl /= "") $ tellCLn $ decl <> ";"
+      when (decl /= "") $ do
+        tellH "extern "
+        tellBoth decl
+        tellBothLn ";"
+
+
+--       case rsc of
+--         ResourceStatic _ _ -> do
+--             tellH "extern "
+--             tellBoth decl
+--             tellBothLn ";"
+--         _ -> do
+--           when (decl /= "") $ tellCLn $ decl <> ";"
 
 
 
@@ -689,11 +699,12 @@ genDistributedProgram insts = do
     where
       go :: DistributedInst -> TranM T.Text
       go (Computation cmp destRsc) = do
-        funName <- genFreeName "fun"
+        funName <- genFreeName "Formura_internal"
         body <- genComputation cmp destRsc
-        tellC $ T.unlines ["void "<> funName <> "(){"
+        tellF (T.unpack funName <> ".c") $ T.unlines ["void "<> funName <> "(){"
                         ,body
                         ,"}"]
+        tellH $ "void "<> funName <> "();\n"
         return $ funName <> "();"
       go (Unstage rid) = genStagingCode False rid
       go (Stage rid) = genStagingCode True rid
@@ -755,10 +766,6 @@ tellProgram = do
   intraExtents <- use ncIntraNodeShape
 
   tellH $ T.unlines ["#include <mpi.h>"]
-  tellC $ T.unlines ["#include <mpi.h>" ,
-                     "#include <math.h>" ,
-                     "#include <stdbool.h>" ,
-                     "#include \"" <> T.pack hxxFileName <> "\""]
   tellC $ cxxTemplate
 
   tellBoth "\n\n"
@@ -854,7 +861,7 @@ genCxxFiles formuraProg mmProg = do
       }
 
 
-  (_, _, CProgram hxxContent cxxContent)
+  (_, _, CProgram hxxContent cxxContent auxFilesContent)
     <- runCompilerRight tellProgram
        (mmProg ^. omGlobalEnvironment)
        tranState0
@@ -865,11 +872,26 @@ genCxxFiles formuraProg mmProg = do
   T.writeFile hxxFilePath hxxContent
   T.writeFile cxxFilePath cxxContent
 
+  let funcs = cluster [] $ M.elems auxFilesContent
+      cluster :: [T.Text] -> [T.Text] -> [T.Text]
+      cluster accum [] = reverse accum
+      cluster [] (x:xs) = cluster [x] xs
+      cluster (ac:acs) (x:xs)
+        | T.length ac > 10000 = cluster ("":ac:acs)  (x:xs)
+        | otherwise           = cluster (ac <> x : acs) xs
+
+      writeAuxFile i con = do
+        let fn = cxxFileBodyPath ++ "_" ++ show i ++ ".c"
+        T.writeFile fn $  cxxTemplate <> con
+        return fn
+
+  auxFilePaths <- zipWithM writeAuxFile [0..] funcs
+
   let wait = ?commandLineOption ^. sleepAfterGen
   when (wait>0) $ threadDelay (1000000 * wait)
 
 
-  mapM_ indent [hxxFilePath, cxxFilePath]
+  mapM_ indent ([hxxFilePath, cxxFilePath] ++ auxFilePaths)
   where
     indent fn = X.handle ignore $ callProcess "indent" ["-gnu", "-i2", "-nut","-br", "-nlp","-ip0","-l80", fn]
 
@@ -887,6 +909,12 @@ cxxFilePath = case ?commandLineOption ^. outputFilename of
   "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".c"
   x  -> x
 
+cxxFileBodyPath :: WithCommandLineOption => FilePath
+cxxFileBodyPath = case ?commandLineOption ^. outputFilename of
+  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ""
+  x  -> x & extension .~ ""
+
+
 hxxFilePath :: WithCommandLineOption => FilePath
 hxxFilePath = cxxFilePath & extension .~ ".h"
 
@@ -896,8 +924,13 @@ cxxFileName = cxxFilePath ^. filename
 hxxFileName :: WithCommandLineOption => FilePath
 hxxFileName = hxxFilePath ^. filename
 
-cxxTemplate :: T.Text
+cxxTemplate ::  WithCommandLineOption => T.Text
 cxxTemplate = T.unlines
   [ ""
+  , "#include <mpi.h>"
+  , "#include <math.h>"
+  , "#include <stdbool.h>"
+  , "#include \"" <> T.pack hxxFileName <> "\""
   , "int rank_src=0, rank_dest=0;"
+  , ""
   ]
