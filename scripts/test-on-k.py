@@ -30,8 +30,8 @@ with(open(submit_script_path,'w')) as fp:
 #!/bin/sh -x
 #PJM --rsc-list "node=2"
 
-#time limit: 1hour
-#PJM --rsc-list "elapse=00:30:00"
+#time limit: 24hour
+#PJM --rsc-list "elapse=24:00:00"
 #PJM --mpi "use-rankdir"
 #PJM --stg-transfiles all
 
@@ -52,5 +52,5 @@ cmd('chmod 755 '+submit_script_path)
 
 cmd('scp {}/*  {}:{}'.format(tmpdir, host,tmpdir))
 on_k('mpiFCCpx 2d-mhd*.c 2d-mhd-main.cpp')
-# on_k('mpiFCCpx 2d-mhd.c 2d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
+#on_k('mpiFCCpx 2d-mhd*.c 2d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
 on_k('pjsub submit.sh')

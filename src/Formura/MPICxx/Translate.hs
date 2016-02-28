@@ -931,6 +931,7 @@ cxxTemplate = T.unlines
   , "#include <math.h>"
   , "#include <stdbool.h>"
   , "#include \"" <> T.pack hxxFileName <> "\""
-  , "int rank_src=0, rank_dest=0;"
+  , "#DEFINE rank_src 0"
+  , "#DEFINE rank_dest 0"
   , ""
   ]
