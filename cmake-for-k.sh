@@ -1,0 +1,2 @@
+cmake -D CMAKE_C_COMPILER=mpifccpx -D CMAKE_CXX_COMPILER=mpiFCCpx -D CMAKE_C_FLAGS='-Xg'  -D CMAKE_CXX_FLAGS='-Xg' .
+

@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 2.4)
+if(POLICY CMP0037)
+  cmake_policy(SET CMP0037 OLD)
+endif()
+
+project (formura_examples)
+
+set(OPT_FLAGS " -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2")
+set(CMAKE_C_FLAGS "${OPT_FLAGS}")
+set(CMAKE_CXX_FLAGS "${OPT_FLAGS}")
+
+
+
+add_executable(a.out 2d-mhd-main.cpp 2d-mhd.c 2d-mhd_0.c 2d-mhd_1.c 2d-mhd_10.c 2d-mhd_100.c 2d-mhd_101.c 2d-mhd_102.c 2d-mhd_103.c 2d-mhd_104.c 2d-mhd_105.c 2d-mhd_106.c 2d-mhd_107.c 2d-mhd_108.c 2d-mhd_109.c 2d-mhd_11.c 2d-mhd_110.c 2d-mhd_111.c 2d-mhd_112.c 2d-mhd_113.c 2d-mhd_114.c 2d-mhd_115.c 2d-mhd_116.c 2d-mhd_117.c 2d-mhd_118.c 2d-mhd_119.c 2d-mhd_12.c 2d-mhd_120.c 2d-mhd_121.c 2d-mhd_122.c 2d-mhd_123.c 2d-mhd_124.c 2d-mhd_125.c 2d-mhd_126.c 2d-mhd_127.c 2d-mhd_128.c 2d-mhd_129.c 2d-mhd_13.c 2d-mhd_130.c 2d-mhd_131.c 2d-mhd_132.c 2d-mhd_133.c 2d-mhd_134.c 2d-mhd_135.c 2d-mhd_136.c 2d-mhd_137.c 2d-mhd_138.c 2d-mhd_139.c 2d-mhd_14.c 2d-mhd_140.c 2d-mhd_141.c 2d-mhd_142.c 2d-mhd_143.c 2d-mhd_144.c 2d-mhd_15.c 2d-mhd_16.c 2d-mhd_17.c 2d-mhd_18.c 2d-mhd_19.c 2d-mhd_2.c 2d-mhd_20.c 2d-mhd_21.c 2d-mhd_22.c 2d-mhd_23.c 2d-mhd_24.c 2d-mhd_25.c 2d-mhd_26.c 2d-mhd_27.c 2d-mhd_28.c 2d-mhd_29.c 2d-mhd_3.c 2d-mhd_30.c 2d-mhd_31.c 2d-mhd_32.c 2d-mhd_33.c 2d-mhd_34.c 2d-mhd_35.c 2d-mhd_36.c 2d-mhd_37.c 2d-mhd_38.c 2d-mhd_39.c 2d-mhd_4.c 2d-mhd_40.c 2d-mhd_41.c 2d-mhd_42.c 2d-mhd_43.c 2d-mhd_44.c 2d-mhd_45.c 2d-mhd_46.c 2d-mhd_47.c 2d-mhd_48.c 2d-mhd_49.c 2d-mhd_5.c 2d-mhd_50.c 2d-mhd_51.c 2d-mhd_52.c 2d-mhd_53.c 2d-mhd_54.c 2d-mhd_55.c 2d-mhd_56.c 2d-mhd_57.c 2d-mhd_58.c 2d-mhd_59.c 2d-mhd_6.c 2d-mhd_60.c 2d-mhd_61.c 2d-mhd_62.c 2d-mhd_63.c 2d-mhd_64.c 2d-mhd_65.c 2d-mhd_66.c 2d-mhd_67.c 2d-mhd_68.c 2d-mhd_69.c 2d-mhd_7.c 2d-mhd_70.c 2d-mhd_71.c 2d-mhd_72.c 2d-mhd_73.c 2d-mhd_74.c 2d-mhd_75.c 2d-mhd_76.c 2d-mhd_77.c 2d-mhd_78.c 2d-mhd_79.c 2d-mhd_8.c 2d-mhd_80.c 2d-mhd_81.c 2d-mhd_82.c 2d-mhd_83.c 2d-mhd_84.c 2d-mhd_85.c 2d-mhd_86.c 2d-mhd_87.c 2d-mhd_88.c 2d-mhd_89.c 2d-mhd_9.c 2d-mhd_90.c 2d-mhd_91.c 2d-mhd_92.c 2d-mhd_93.c 2d-mhd_94.c 2d-mhd_95.c 2d-mhd_96.c 2d-mhd_97.c 2d-mhd_98.c 2d-mhd_99.c) 

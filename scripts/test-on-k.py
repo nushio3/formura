@@ -37,14 +37,14 @@ with(open(submit_script_path,'w')) as fp:
 
 # stage in  hello.out.
 #PJM --stgin "./a.out %r:./a.out"
-#PJM --stgout "%r:./frames/* ./frames-%r-%j/"
+#PJM --stgout "%r:./out-2d-mhd/* ./out-2d-mhd-%r-%j/"
 
 #statistics output
 #PJM -s
 
 # config environmental variables
 . /work/system/Env_base
-mpiexec /work/system/bin/msh "mkdir ./frames"
+mpiexec /work/system/bin/msh "mkdir ./out-2d-mhd"
 
 mpirun -n 2 ./a.out
 """)
