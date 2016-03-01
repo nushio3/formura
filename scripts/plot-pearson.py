@@ -19,7 +19,7 @@ for fn in fns[1:]:
         set pm3d
         set pm3d map
         set size ratio -1
-        set cbrange [-1:1]
+        set cbrange [0:1]
         set out "{fn_out}"
         splot "{fn_in}" u 1:2:3
 """.format(fn_in=fn_in, fn_out=fn_out))

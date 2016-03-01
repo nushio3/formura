@@ -49,7 +49,7 @@ int main (int argc, char **argv) {
     if(navi.time_step % 1000 == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
-      sprintf(fn, "frames/%d-%06d.txt", mpi_my_rank, navi.time_step);
+      sprintf(fn, "frames/%06d-%d.txt", navi.time_step, mpi_my_rank);
       FILE *fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
