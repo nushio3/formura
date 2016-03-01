@@ -311,6 +311,7 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
                        T.replace "ResourceStatic" "St" .
                       T.replace "IRank" "r".
                       T.replace "ridgeDelta_" "".
+                      T.replace "_MPIRank" "".
                       T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge"
                       )
 
@@ -362,6 +363,8 @@ nameRidgeRequest r  = do
       planMPIRequestNames %= M.insert r ret
       return ret
 
+nameDeltaMPIRank :: MPIRank -> T.Text
+nameDeltaMPIRank r = "mpi_rank_" <> T.pack (toCName r)
 
 -- | Generate Declaration for State Arrays
 tellArrayDecls :: TranM ()
@@ -407,6 +410,12 @@ lookupNode i = do
      return n
 
 
+nPlusK :: T.Text -> Int -> T.Text
+nPlusK i d | d == 0 = i
+           | d <  0 = i <> showC d
+           | otherwise = i <> "+" <> showC d
+
+
 -- | generate bindings, and the final expression that contains the result of evaluation.
 
 genMMInstruction :: IRank -> MMInstruction -> TranM (T.Text, T.Text)
@@ -424,10 +433,7 @@ genMMInstruction ir0 mminst = do
     accAtMargin box0 vi = accAt (indOffset + vi - (box0 ^. lowerVertex))
 
     accAt :: Vec Int -> T.Text
-    accAt v = foldMap brackets $ kutukeru  <$> indNames <*> v
-    kutukeru i d | d == 0 = i
-                 | d <  0 = i <> showC d
-                 | otherwise = i <> "+" <> showC d
+    accAt v = foldMap brackets $ nPlusK  <$> indNames <*> v
 
 
   alreadyGivenLocalNames .= S.empty
@@ -653,24 +659,25 @@ genStagingCode isStaging rid = do
         | otherwise = arrTerm <> "=" <> rdgTerm
 
 
-  let mpiIsendIrecv :: T.Text
+  let dmpi = rid ^. ridgeDeltaMPI
+      mpiIsendIrecv :: T.Text
       mpiIsendIrecv = case  doesRidgeNeedMPI rid && isStaging of
         False -> ""
         True  -> T.unwords $
           [ "MPI_Isend( (void*) &" <> rdgNameSend <> T.unwords (replicate dim "[0]") , ","
           , showC $ volume box0 , ","
           , "MPI_DOUBLE," -- TODO: Check Ridge type!!
-          , "rank_dest,"
+          , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup rid mpiTagDict in showC t, ","
-          , "MPI_COMM_WORLD," -- TODO: use MPI_COMM given by Formura_Init
+          , "navi->mpi_comm," -- TODO: use MPI_COMM given by Formura_Init
           , "&" <> reqName <> " );\n"]
           ++
           [ "MPI_Irecv( (void*) &" <> rdgNameRecv <> T.unwords (replicate dim "[0]") , ","
           , showC $ volume box0 , ","
           , "MPI_DOUBLE," -- TODO: Check Ridge type!!
-          , "rank_src,"
+          , "navi->" <> nameDeltaMPIRank dmpi <> ","
           , let Just t = M.lookup rid mpiTagDict in showC t, ","
-          , "MPI_COMM_WORLD," -- TODO: use MPI_COMM given by Formura_Init
+          , "navi->mpi_comm," -- TODO: use MPI_COMM given by Formura_Init
           , "&" <> reqName <> " );\n"]
 
       mpiWait :: T.Text
@@ -780,27 +787,52 @@ tellProgram = do
 
   tellBoth "\n"
 
+  allRidges0 <- use planRidgeAlloc
+  let deltaMPIs :: [MPIRank]
+      deltaMPIs = S.toList $ S.fromList $ concat [ [dmpi, negate dmpi]
+        | rdg <- M.keys allRidges0
+        , let dmpi = rdg ^. ridgeDeltaMPI]
+
   tellHLn $ "struct Formura_Navigator {"
   tellHLn $ "int time_step;"
   forM_ ivars $ \i -> do
     tellHLn $ "int lower_" <> i <> ";"
     tellHLn $ "int upper_" <> i <> ";"
     tellHLn $ "int offset_" <> i <> ";"
-
+  tellHLn $ "int mpi_comm;"
+  tellHLn $ "int mpi_my_rank;"
+  forM_ deltaMPIs $ \r -> do
+    tellHLn $ "int " <> nameDeltaMPIRank r <> ";"
   tellHLn $ "};"
 
   tellBoth "\n\n"
+
+  tellCLn $ "void Formura_decode_mpi_rank (int r" <> T.unwords[", int *" <> x | x<-toList ivars] <>  "){"
+
+  tellCLn "}"
+
+  tellCLn $ "int Formura_encode_mpi_rank (" <> T.intercalate "," [" int " <> x | x<-toList ivars] <>  "){"
+
+  tellCLn "}"
 
   tellBoth "int Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm)"
   tellH ";"
 
 
   tellCLn "{"
+  tellCLn $ "int " <> T.intercalate "," (toList ivars) <> ";"
   tellCLn "navi->time_step=0;"
   forM_ (zip (toList ivars) (toList intraExtents)) $ \(i, e) -> do
     tellCLn $ "navi->lower_" <> i <> "=0;"
     tellCLn $ "navi->offset_" <> i <> "=0;"
     tellCLn $ "navi->upper_" <> i <> "=" <> showC e <> ";"
+  tellCLn $ "navi->mpi_comm = comm;"
+  tellCLn $ "{int r; MPI_Comm_rank(comm,&r);navi->mpi_my_rank = r;}"
+  tellCLn $ "Formura_decode_mpi_rank( navi->mpi_my_rank" <> T.unwords [ ", &" <> x| x<- toList ivars]  <> ");"
+  forM_ deltaMPIs $ \r@(MPIRank rv) -> do
+    let terms = zipWith nPlusK (toList ivars) (toList rv)
+    tellC $ "navi->" <> nameDeltaMPIRank r <> "="
+    tellCLn $ "Formura_encode_mpi_rank( " <> T.intercalate "," terms  <> ");"
   tellCLn "return 0;}"
 
 
@@ -931,7 +963,5 @@ cxxTemplate = T.unlines
   , "#include <math.h>"
   , "#include <stdbool.h>"
   , "#include \"" <> T.pack hxxFileName <> "\""
-  , "#define rank_src 0"
-  , "#define rank_dest 0"
   , ""
   ]
