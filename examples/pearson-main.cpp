@@ -16,14 +16,18 @@ float frand() {
 void init() {
   for(int x = navi.lower_x; x < navi.upper_x; ++x) {
     for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+      int x1 = x + navi.offset_x;
+      int y1 = y + navi.offset_y;
       U[x][y] = 1;
       V[x][y] = 0;
     }
   }
-  for (int x = 18; x < 38; ++x) {
-    for (int y = 58; y < 78; ++y) {
-      U[x][y] = 0.5+0.01*frand();
-      V[x][y] = 0.25+0.01*frand();
+  if(mpi_my_rank==0){
+    for (int x = 18; x < 38; ++x) {
+      for (int y = 58; y < 78; ++y) {
+        U[x][y] = 0.5+0.01*frand();
+        V[x][y] = 0.25+0.01*frand();
+      }
     }
   }
 }
