@@ -803,7 +803,7 @@ tellProgram = do
     tellHLn $ "int lower_" <> i <> ";"
     tellHLn $ "int upper_" <> i <> ";"
     tellHLn $ "int offset_" <> i <> ";"
-  tellHLn $ "int mpi_comm;"
+  tellHLn $ "MPI_Comm mpi_comm;"
   tellHLn $ "int mpi_my_rank;"
   forM_ deltaMPIs $ \r -> do
     tellHLn $ "int " <> nameDeltaMPIRank r <> ";"
