@@ -7,8 +7,8 @@
 
 int T_MAX;
 int T_MONITOR;
+int mpi_my_rank;
 
-const int NX=1200, NY=1200;
 const double PI = 3.141592653589793;
 
 Formura_Navigator navi;
@@ -39,7 +39,9 @@ int main (int argc, char **argv)
 {
   srand(time(NULL));
   MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_my_rank);
   Formura_Init(&navi, MPI_COMM_WORLD);
+
   if (argc <= 1) {
     T_MAX=100;
   }else{
@@ -57,7 +59,7 @@ int main (int argc, char **argv)
     if(navi.time_step % T_MONITOR == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
-      sprintf(fn, "out-2d-mhd/dens-%06d.txt", navi.time_step);
+      sprintf(fn, "out-2d-mhd/dens-%06d-%d.txt", navi.time_step, mpi_my_rank);
       FILE *fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {

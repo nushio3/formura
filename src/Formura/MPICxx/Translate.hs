@@ -91,6 +91,7 @@ data TranState = TranState
   , _tsMPIPlanSelection :: MPIPlanSelector
   , _tsMPIPlanMap :: M.Map MPIPlanSelector MPIPlan
   , _tsCommonStaticBox :: Box
+  , _tsCxxTemplateWithMacro :: T.Text
   }
 makeClassy ''TranState
 
@@ -696,28 +697,50 @@ genStagingCode isStaging rid = do
 
 -- | generate a distributed program
 genDistributedProgram :: [DistributedInst] -> TranM T.Text
-genDistributedProgram insts = do
+genDistributedProgram insts0 = do
   stepGraph <- use omStepGraph
   theGraph .= stepGraph
 
-  ps <- mapM go insts
+  bodies <- mapM (mapM go) $ grp [] $ filter (not . isNop) insts0
+  ps <- mapM genCall bodies
 
-  monitorInterval0 <- use ncMonitorInterval
 
   return $  mconcat ps
     where
+      isNop (FreeResource _) = True
+      isNop _ = False
+
+      sticks :: DistributedInst -> DistributedInst -> Bool
+      sticks (Unstage _) (Unstage _ ) = True
+      sticks (Unstage _) (Computation _ _ ) = True
+      sticks (Computation _ _ ) (Stage _) = True
+      sticks (Stage _) (Stage _) = True
+      sticks _ _ = False
+
+      grp :: [DistributedInst] -> [DistributedInst] -> [[DistributedInst]]
+      grp accum [] = [reverse accum]
+      grp [] (x:xs) = grp [x] xs
+      grp accum@(a:aa) (x:xs)
+        | sticks a x = grp (x:accum) xs
+        | otherwise  = reverse accum : grp [] xs
+
+
       go :: DistributedInst -> TranM T.Text
-      go (Computation cmp destRsc) = do
-        funName <- genFreeName "Formura_internal"
-        body <- genComputation cmp destRsc
-        tellF (T.unpack funName <> ".c") $ T.unlines ["void "<> funName <> "(){"
-                        ,body
-                        ,"}"]
-        tellH $ "void "<> funName <> "();\n"
-        return $ funName <> "();"
+      go (Computation cmp destRsc) = genComputation cmp destRsc
       go (Unstage rid) = genStagingCode False rid
       go (Stage rid) = genStagingCode True rid
       go (FreeResource _) = return ""
+
+      genCall :: [T.Text] -> TranM T.Text
+      genCall body = do
+        funName <- genFreeName "Formura_internal"
+        tellF (T.unpack funName <> ".c") $ T.unlines $
+          ["void "<> funName <> "(){"]
+          ++ map braces body ++
+          ["}"]
+        tellH $ "void "<> funName <> "();\n"
+        return $ funName <> "();"
+
 
 -- | Let the plans collaborate
 
@@ -752,6 +775,12 @@ tellProgram = do
   nc <- use tsNumericalConfig
   mpiGrid0 <- use ncMPIGridShape
   mmprog <- use theMMProgram
+  ivars <- fmap T.pack <$> view axesNames
+  intraExtents <- use ncIntraNodeShape
+
+  let cxxTemplateWithMacro :: T.Text
+      cxxTemplateWithMacro = cxxTemplate
+  tsCxxTemplateWithMacro .= cxxTemplateWithMacro
 
   tsMPIPlanSelection .= False
   plan <- liftIO $ makePlan nc mmprog
@@ -772,13 +801,17 @@ tellProgram = do
     , "#endif"
     ]
 
-  ivars <- fmap T.pack <$> view axesNames
-  intraExtents <- use ncIntraNodeShape
+
 
   tellH $ T.unlines ["#include <mpi.h>"]
-  tellC $ cxxTemplate
+  tellC $ cxxTemplateWithMacro
 
   tellBoth "\n\n"
+  tellH $ T.unlines
+        [ "#define " <> nx <> " = " <> showC (i*g)
+        | (x,i,g) <- zip3 (toList ivars) (toList intraExtents) (toList mpiGrid0)
+        , let nx = "N" <> T.map toUpper x
+        ]
 
   tsMPIPlanSelection .= False
   tellArrayDecls
@@ -906,10 +939,11 @@ genCxxFiles formuraProg mmProg = do
       , _tsMPIPlanSelection = False
       , _tsMPIPlanMap = M.empty
       , _tsCommonStaticBox = error "_tsCommonStaticBox is unset"
+      , _tsCxxTemplateWithMacro = error "_tsCxxTemplateWithMacro is unset"
       }
 
 
-  (_, _, CProgram hxxContent cxxContent auxFilesContent)
+  (_, tranState1 , CProgram hxxContent cxxContent auxFilesContent)
     <- runCompilerRight tellProgram
        (mmProg ^. omGlobalEnvironment)
        tranState0
@@ -925,12 +959,12 @@ genCxxFiles formuraProg mmProg = do
       cluster accum [] = reverse accum
       cluster [] (x:xs) = cluster [x] xs
       cluster (ac:acs) (x:xs)
-        | T.length ac > 10000 = cluster ("":ac:acs)  (x:xs)
+        | T.length ac > 64000 = cluster ("":ac:acs)  (x:xs)
         | otherwise           = cluster (ac <> x : acs) xs
 
       writeAuxFile i con = do
         let fn = cxxFileBodyPath ++ "_" ++ show i ++ ".c"
-        T.writeFile fn $  cxxTemplate <> con
+        T.writeFile fn $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
         return fn
 
   auxFilePaths <- zipWithM writeAuxFile [0..] funcs
