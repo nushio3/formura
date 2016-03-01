@@ -40,14 +40,13 @@ int main (int argc, char **argv) {
 
   if (argc <= 1) {
     T_MAX=10000;
+  }else{
+    sscanf(argv[1], "%d",  &T_MAX);
   }
-
-  sscanf(argv[1], "%d",  &T_MAX);
-
   init();
 
   while(navi.time_step < T_MAX) {
-    if(navi.time_step % 20 == 0) {
+    if(navi.time_step % 1000 == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
       sprintf(fn, "frames/%d-%06d.txt", mpi_my_rank, navi.time_step);
