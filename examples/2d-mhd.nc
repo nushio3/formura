@@ -3,5 +3,5 @@ initial_walls:
   y: [300]
 intra_node_shape: [600,600]
 monitor_interval: 2
-mpi_grid_shape: [1,1]
+mpi_grid_shape: [2,2]
 temporal_blocking_interval: 1

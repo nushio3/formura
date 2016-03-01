@@ -8,7 +8,7 @@
 int T_MAX;
 int T_MONITOR;
 
-const int NX=600, NY=600;
+const int NX=1200, NY=1200;
 const double PI = 3.141592653589793;
 
 Formura_Navigator navi;

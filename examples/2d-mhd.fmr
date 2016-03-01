@@ -6,7 +6,7 @@ double :: dens0 = 1.0
 double :: dp_ddens = 1
 double :: dp_ds    = 2/5
 double :: dt = 1e-4
-double :: dx = 1/600, dy = 1/600, dz = 1/600
+double :: dx = 1/1200, dy = 1/1200, dz = 1/1200
 double :: c_h = dx/dt
 double :: ch2_cp2 = c_h / 0.18
 
