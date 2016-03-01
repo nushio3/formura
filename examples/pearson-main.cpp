@@ -53,7 +53,9 @@ int main (int argc, char **argv) {
       FILE *fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          fprintf(fp, "%d %d %f\n", x, y, U[x][y]);
+          int x1 = x + navi.offset_x;
+          int y1 = y + navi.offset_y;
+          fprintf(fp, "%d %d %f\n", x1, y1, U[x][y]);
         }
         fprintf(fp, "\n");
       }
