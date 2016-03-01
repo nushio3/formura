@@ -10,6 +10,7 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
+import           Data.List (zip4,zip5, zip6)
 import qualified Data.Map as M
 import           Data.Maybe
 import qualified Data.Set as S
@@ -89,6 +90,7 @@ data TranState = TranState
   , _theGraph :: MMGraph
   , _tsMPIPlanSelection :: MPIPlanSelector
   , _tsMPIPlanMap :: M.Map MPIPlanSelector MPIPlan
+  , _tsCommonStaticBox :: Box
   }
 makeClassy ''TranState
 
@@ -311,7 +313,7 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
                        T.replace "ResourceStatic" "St" .
                       T.replace "IRank" "r".
                       T.replace "ridgeDelta_" "".
-                      T.replace "_MPIRank" "".
+                      T.replace "MPIRank" "".
                       T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge"
                       )
 
@@ -723,9 +725,9 @@ collaboratePlans :: TranM ()
 collaboratePlans = do
   plans0 <- use tsMPIPlanMap
 
-  let commonStaticBox :: M.Map IdentName Box
-      commonStaticBox = M.unionsWith (|||)
-        [ M.singleton snName b
+  let commonStaticBox :: Box
+      commonStaticBox = foldr1 (|||)
+        [ b
         | p <- M.elems plans0
         , (ResourceStatic snName (), b)  <- M.toList $ p ^. planArrayAlloc
         ]
@@ -735,9 +737,9 @@ collaboratePlans = do
       rewritePlan :: MPIPlan -> MPIPlan
       rewritePlan = planArrayAlloc %~ M.mapWithKey go
 
-      go (ResourceStatic snName ()) _ = fromJust $ M.lookup snName commonStaticBox
+      go (ResourceStatic snName ()) _ = commonStaticBox
       go _ b = b
-
+  tsCommonStaticBox .= commonStaticBox
   tsMPIPlanMap .= newPlans
 
 
@@ -748,6 +750,7 @@ tellProgram = do
   setNamingState
 
   nc <- use tsNumericalConfig
+  mpiGrid0 <- use ncMPIGridShape
   mmprog <- use theMMProgram
 
   tsMPIPlanSelection .= False
@@ -793,6 +796,7 @@ tellProgram = do
         | rdg <- M.keys allRidges0
         , let dmpi = rdg ^. ridgeDeltaMPI]
 
+
   tellHLn $ "struct Formura_Navigator {"
   tellHLn $ "int time_step;"
   forM_ ivars $ \i -> do
@@ -807,32 +811,43 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  tellCLn $ "void Formura_decode_mpi_rank (int r" <> T.unwords[", int *" <> x | x<-toList ivars] <>  "){"
-
+  tellCLn $ "void Formura_decode_mpi_rank (int r" <> T.unwords[", int *i" <> x | x<-toList ivars] <>  "){"
+  tellCLn "int s=r;"
+  forM_ (zip (reverse $ toList ivars) (reverse $ toList mpiGrid0)) $ \(x, g) -> do
+    tellCLn $ "*i" <> x <> "=s%" <> showC g <> ";"
+    tellCLn $ "s=s/" <> showC g <> ";"
   tellCLn "}"
 
-  tellCLn $ "int Formura_encode_mpi_rank (" <> T.intercalate "," [" int " <> x | x<-toList ivars] <>  "){"
-
-  tellCLn "}"
+  tellCLn $ "int Formura_encode_mpi_rank (" <> T.intercalate "," [" int i" <> x | x<-toList ivars] <>  "){"
+  tellCLn "int s = 0;"
+  forM_ (zip (toList ivars) (toList mpiGrid0)) $ \(x, ig) -> do
+    let g=showC ig
+    tellCLn $ "s *= " <>g<>";"
+    tellCLn $ "s += (i"<>x<>"%"<>g<>"+"<>g<>")%"<>g<>";"
+  tellCLn "return s;}"
 
   tellBoth "int Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm)"
   tellH ";"
 
 
+
+  csb0 <- use tsCommonStaticBox
+  let mpiivars = fmap ("i"<>) ivars
+      lower_offset = negate $ csb0 ^.lowerVertex
   tellCLn "{"
-  tellCLn $ "int " <> T.intercalate "," (toList ivars) <> ";"
-  tellCLn "navi->time_step=0;"
-  forM_ (zip (toList ivars) (toList intraExtents)) $ \(i, e) -> do
-    tellCLn $ "navi->lower_" <> i <> "=0;"
-    tellCLn $ "navi->offset_" <> i <> "=0;"
-    tellCLn $ "navi->upper_" <> i <> "=" <> showC e <> ";"
+  tellCLn $ "int " <> T.intercalate "," (toList mpiivars) <> ";"
   tellCLn $ "navi->mpi_comm = comm;"
   tellCLn $ "{int r; MPI_Comm_rank(comm,&r);navi->mpi_my_rank = r;}"
-  tellCLn $ "Formura_decode_mpi_rank( navi->mpi_my_rank" <> T.unwords [ ", &" <> x| x<- toList ivars]  <> ");"
+  tellCLn $ "Formura_decode_mpi_rank( navi->mpi_my_rank" <> T.unwords [ ", &" <> x| x<- toList mpiivars]  <> ");"
   forM_ deltaMPIs $ \r@(MPIRank rv) -> do
-    let terms = zipWith nPlusK (toList ivars) (toList rv)
+    let terms = zipWith nPlusK (toList mpiivars) (toList rv)
     tellC $ "navi->" <> nameDeltaMPIRank r <> "="
     tellCLn $ "Formura_encode_mpi_rank( " <> T.intercalate "," terms  <> ");"
+  tellCLn "navi->time_step=0;"
+  forM_ (zip3 (toList ivars) (toList intraExtents) (toList lower_offset)) $ \(x, e, o) -> do
+    tellCLn $ "navi->offset_" <> x <> "=" <> "i"<> x <> "*"<>showC e <> "-" <> showC o <> ";"
+    tellCLn $ "navi->lower_" <> x <> "=" <> showC o<>";"
+    tellCLn $ "navi->upper_" <> x <> "=" <> showC o <> "+"<>showC e <> ";"
   tellCLn "return 0;}"
 
 
@@ -890,6 +905,7 @@ genCxxFiles formuraProg mmProg = do
       , _theGraph = M.empty
       , _tsMPIPlanSelection = False
       , _tsMPIPlanMap = M.empty
+      , _tsCommonStaticBox = error "_tsCommonStaticBox is unset"
       }
 
 

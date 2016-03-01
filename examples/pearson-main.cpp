@@ -5,6 +5,7 @@
 #include "pearson.h"
 
 int T_MAX;
+int mpi_my_rank;
 
 Formura_Navigator navi;
 
@@ -31,6 +32,7 @@ int main (int argc, char **argv) {
   srand(time(NULL));
   MPI_Init(&argc, &argv);
   Formura_Init(&navi, MPI_COMM_WORLD);
+  MPI_Comm_rank(MPI_COMM_WORLD, &mpi_my_rank);
 
   if (argc <= 1) {
     T_MAX=10000;
@@ -44,7 +46,7 @@ int main (int argc, char **argv) {
     if(navi.time_step % 20 == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
-      sprintf(fn, "frames/%06d.txt", navi.time_step);
+      sprintf(fn, "frames/%d-%06d.txt", mpi_my_rank, navi.time_step);
       FILE *fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
