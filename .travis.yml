@@ -25,6 +25,7 @@ script:
   - stack --no-terminal --skip-ghc-check build --ghc-options=-ferror-spans
   - stack install .
   - ./cmake-for-x86.sh
+  - stack exec formura -- examples/pearson.fmr
   - make bin/pearson.out
   - stack exec formura -- examples/2d-mhd.fmr
   - mpicxx -c examples/2d-mhd.c
