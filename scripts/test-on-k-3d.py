@@ -8,7 +8,7 @@ tmpdir = 'work/{}-{:08}'.format(datetime.datetime.now().strftime('%Y-%m-%d/%H-%M
 #tmpdir = 'work/experimental'
 
 
-srcfiles = ['2d-mhd.h', '2d-mhd*.c', '2d-mhd-main.cpp']
+srcfiles = ['3d-mhd.h', '3d-mhd*.c', '3d-mhd-main.cpp']
 srcdir = 'examples/'
 srcpaths = [srcdir + fn for fn in srcfiles]
 
@@ -32,27 +32,27 @@ with(open(submit_script_path,'w')) as fp:
 #!/bin/sh -x
 #PJM --rsc-list "node=4"
 
-#time limit: 24hour
-#PJM --rsc-list "elapse=24:00:00"
+#time limit: 20min
+#PJM --rsc-list "elapse=00:20:00"
 #PJM --mpi "use-rankdir"
 #PJM --stg-transfiles all
 
 # stage in  hello.out.
 #PJM --stgin "./a.out %r:./a.out"
-#PJM --stgout "%r:./out-2d-mhd/* ./out-2d-mhd-%r-%j/"
+#PJM --stgout "%r:./out-3d-mhd/* ./out-3d-mhd-%r-%j/"
 
 #statistics output
 #PJM -s
 
 # config environmental variables
 . /work/system/Env_base
-mpiexec /work/system/bin/msh "mkdir ./out-2d-mhd"
+mpiexec /work/system/bin/msh "mkdir ./out-3d-mhd"
 
-mpirun -n 4 ./a.out
+mpirun -n 10648 ./a.out
 """)
 cmd('chmod 755 '+submit_script_path)
 
 cmd('scp {}/*  {}:{}'.format(tmpdir, host,tmpdir))
-#on_k('mpiFCCpx 2d-mhd*.c 2d-mhd-main.cpp')
-on_k('mpiFCCpx 2d-mhd*.c 2d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
+on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp')
+#on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
 on_k('pjsub submit.sh')
