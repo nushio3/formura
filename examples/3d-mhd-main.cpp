@@ -33,6 +33,7 @@ void init() {
         Bz[ix][iy][iz]   = 0;
         s[ix][iy][iz]    = 0;
         Psi[ix][iy][iz]  = 0;
+      }
     }
   }
 }
