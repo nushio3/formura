@@ -4,8 +4,8 @@ import datetime, random, subprocess, sys
 
 host = 'a03209@k.aics.riken.jp'
 
-#tmpdir = 'work/{}-{:08}'.format(datetime.datetime.now().strftime('%Y-%m-%d/%H-%M-%S'), random.randint(0,99999999))
-tmpdir = 'work/experimental'
+tmpdir = 'work/{}-{:08}'.format(datetime.datetime.now().strftime('%Y-%m-%d/%H-%M-%S'), random.randint(0,99999999))
+#tmpdir = 'work/experimental'
 
 
 srcfiles = ['2d-mhd.h', '2d-mhd*.c', '2d-mhd-main.cpp']
@@ -54,5 +54,5 @@ cmd('chmod 755 '+submit_script_path)
 
 cmd('scp {}/*  {}:{}'.format(tmpdir, host,tmpdir))
 on_k('mpiFCCpx 2d-mhd*.c 2d-mhd-main.cpp')
-#on_k('mpiFCCpx 2d-mhd*.c 2d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
+# on_k('mpiFCCpx 2d-mhd*.c 2d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
 on_k('pjsub submit.sh')

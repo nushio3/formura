@@ -740,11 +740,11 @@ genDistributedProgram insts0 = do
       genCall :: [T.Text] -> TranM T.Text
       genCall body = do
         funName <- genFreeName "Formura_internal"
+        tellH $ "void "<> funName <> "(struct Formura_Navigator *navi);\n"
         tellF (T.unpack funName <> ".c") $ T.unlines $
           ["void "<> funName <> "(struct Formura_Navigator *navi){"]
           ++ map braces body ++
           ["}"]
-        tellH $ "void "<> funName <> "();\n"
         return $ funName <> "(navi);"
 
 
@@ -969,7 +969,7 @@ genCxxFiles formuraProg mmProg = do
         | otherwise           = cluster (ac <> x : acs) xs
 
       writeAuxFile i con = do
-        let fn = cxxFileBodyPath ++ "_" ++ show i ++ ".c"
+        let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".c"
         T.writeFile fn $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
         return fn
 

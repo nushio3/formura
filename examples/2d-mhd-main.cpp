@@ -43,12 +43,12 @@ int main (int argc, char **argv)
   Formura_Init(&navi, MPI_COMM_WORLD);
 
   if (argc <= 1) {
-    T_MAX=100;
+    T_MAX=10000;
   }else{
     sscanf(argv[1], "%d",  &T_MAX);
   }
   if (argc <= 2) {
-    T_MONITOR=10;
+    T_MONITOR=1000;
   }else{
     sscanf(argv[2], "%d",  &T_MONITOR);
   }
