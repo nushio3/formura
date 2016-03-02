@@ -5,6 +5,9 @@
 #include <time.h>
 #include <sys/time.h>
 #include <fj_tool/fapp.h>
+#include <fjcoll.h>
+
+
 #include "3d-mhd.h"
 
 int T_MAX;
