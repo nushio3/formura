@@ -70,7 +70,7 @@ int main (int argc, char **argv)
       fclose(fp);
 
 
-      sprintf(fn, "out-2d-mhd/v-%06d.txt", navi.time_step);
+      sprintf(fn, "out-2d-mhd/v-%06d-%d.txt", navi.time_step, mpi_my_rank);
       fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
@@ -80,7 +80,7 @@ int main (int argc, char **argv)
       }
       fclose(fp);
 
-      sprintf(fn, "out-2d-mhd/B-%06d.txt", navi.time_step);
+      sprintf(fn, "out-2d-mhd/B-%06d-%d.txt", navi.time_step, mpi_my_rank);
       fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {

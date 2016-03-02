@@ -260,7 +260,8 @@ tellMPIRequestDecl name = do
     True -> return ()
     False -> do
       alreadyDeclaredResourceNames %= S.insert name
-      tellC $ "MPI_Request "<>name<>";\n"
+      tellH "extern "
+      tellBothLn $ "MPI_Request "<>name<>";\n"
 
 tellResourceDecl :: T.Text -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl name rsc box0 = do
@@ -701,7 +702,12 @@ genDistributedProgram insts0 = do
   stepGraph <- use omStepGraph
   theGraph .= stepGraph
 
-  bodies <- mapM (mapM go) $ grp [] $ filter (not . isNop) insts0
+  let insts1 = filter (not . isNop) insts0
+      insts2 = grp [] $ insts1
+  when (insts1 /= concat insts2) $
+    raiseErr $ failed $ "Instruction order mismatch!"
+
+  bodies <- mapM (mapM go) $ insts2
   ps <- mapM genCall bodies
 
 
@@ -735,11 +741,11 @@ genDistributedProgram insts0 = do
       genCall body = do
         funName <- genFreeName "Formura_internal"
         tellF (T.unpack funName <> ".c") $ T.unlines $
-          ["void "<> funName <> "(){"]
+          ["void "<> funName <> "(struct Formura_Navigator *navi){"]
           ++ map braces body ++
           ["}"]
         tellH $ "void "<> funName <> "();\n"
-        return $ funName <> "();"
+        return $ funName <> "(navi);"
 
 
 -- | Let the plans collaborate
@@ -808,7 +814,7 @@ tellProgram = do
 
   tellBoth "\n\n"
   tellH $ T.unlines
-        [ "#define " <> nx <> " = " <> showC (i*g)
+        [ "#define " <> nx <> "  " <> showC (i*g)
         | (x,i,g) <- zip3 (toList ivars) (toList intraExtents) (toList mpiGrid0)
         , let nx = "N" <> T.map toUpper x
         ]
