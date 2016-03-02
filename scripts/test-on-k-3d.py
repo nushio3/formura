@@ -30,7 +30,7 @@ submit_script_path = '{}/submit.sh'.format(tmpdir)
 with(open(submit_script_path,'w')) as fp:
     fp.write("""
 #!/bin/sh -x
-#PJM --rsc-list "node=4"
+#PJM --rsc-list "node=10648"
 
 #time limit: 20min
 #PJM --rsc-list "elapse=00:20:00"
@@ -53,6 +53,6 @@ mpirun -n 10648 ./a.out
 cmd('chmod 755 '+submit_script_path)
 
 cmd('scp {}/*  {}:{}'.format(tmpdir, host,tmpdir))
-on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp')
-#on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
+#on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp')
+on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
 on_k('pjsub submit.sh')

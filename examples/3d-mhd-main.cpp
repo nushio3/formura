@@ -24,7 +24,7 @@ void init() {
         double x = (navi.offset_x + ix)/(double)NX;
         double y = (navi.offset_y + iy)/(double)NY;
         double z = (navi.offset_z + iz)/(double)NZ;
-        dens[ix][iy][iz] = 0;
+        dens[ix][iy][iz] = 0.1*sin(2*PI*z);
         vx[ix][iy][iz]   = -sin(2 * PI * y);
         vy[ix][iy][iz]   =  sin(2 * PI * x);
         vz[ix][iy][iz]   = 0;
