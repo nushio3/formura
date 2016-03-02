@@ -27,7 +27,7 @@ script:
   - stack exec formura -- examples/pearson.fmr
   - ./cmake-for-x86.sh
   - make bin/pearson.out
-  - stack exec formura -- examples/2d-mhd.fmr
+  - stack exec formura -- examples/2d-mhd.fmr -v
   - mpicxx -c examples/2d-mhd.c
   - stack test
   - echo "done test"
