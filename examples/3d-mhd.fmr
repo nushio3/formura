@@ -1,30 +1,31 @@
-dimension :: 2
-axes :: x,y
+dimension :: 3
+axes :: x,y,z
 
 double :: π = 3.141592653589793
 double :: dens0 = 1.0
 double :: dp_ddens = 1
 double :: dp_ds    = 2/5
-double :: dt = 1e-4
-double :: dx = 1/1200, dy = 1/1200, dz = 1/1200
+double :: N = 64*22
+double :: dt = 0.1/N
+double :: dx = 1/N, dy = 1/N, dz = 1/N
 double :: c_h = dx/dt
 double :: ch2_cp2 = c_h / 0.18
 
 ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
 ddy = fun(a) (a[,i-2] + 8*a[,i+1] - 8*a[,i-1] - a[,i+2])/(12*dy)
-ddz = fun(a) 0
+ddz = fun(a) (a[,,i-2] + 8*a[,,i+1] - 8*a[,,i-1] - a[,,i+2])/(12*dy)
 
 ∂ = (ddx,ddy,ddz)
 
-ddx2nd = fun(a) (a[i+1/2] - a[i-1/2]) / dx
-ddy2nd = fun(a) (a[,i+1/2] - a[,i-1/2])/dy
-ddz2nd = fun(a) 0
+ddx2nd = fun(a) (a[i+1/2] - a[i-1/2])    /dx
+ddy2nd = fun(a) (a[,i+1/2] - a[,i-1/2])  /dy
+ddz2nd = fun(a) (a[,,i+1/2] - a[,,i-1/2])/dz
 
 partial2nd = (ddx2nd, ddy2nd, ddz2nd)
 
-average_x = fun(a) (a[i+1/2]  + a[i-1/2]) / 2
-average_y = fun(a) (a[,i+1/2] + a[,i-1/2])/2
-average_z = fun(a) 0
+average_x = fun(a) (a[i+1/2]   + a[i-1/2])  /2
+average_y = fun(a) (a[,i+1/2]  + a[,i-1/2]) /2
+average_z = fun(a) (a[,,i+1/2] + a[,,i-1/2])/2
 
 average = (average_x, average_y, average_z)
 
