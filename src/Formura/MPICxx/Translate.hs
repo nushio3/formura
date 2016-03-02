@@ -705,7 +705,7 @@ genDistributedProgram insts0 = do
   let insts1 = filter (not . isNop) insts0
       insts2 = grp [] $ insts1
   when (insts1 /= concat insts2) $
-    raiseErr $ failed $ "Instruction order mismatch!"
+    raiseErr $ failed $ "Detected instruction order mismatch!"
 
   bodies <- mapM (mapM go) $ insts2
   ps <- mapM genCall bodies
@@ -728,7 +728,7 @@ genDistributedProgram insts0 = do
       grp [] (x:xs) = grp [x] xs
       grp accum@(a:aa) (x:xs)
         | sticks a x = grp (x:accum) xs
-        | otherwise  = reverse accum : grp [] xs
+        | otherwise  = reverse accum : grp [] (x:xs)
 
 
       go :: DistributedInst -> TranM T.Text
