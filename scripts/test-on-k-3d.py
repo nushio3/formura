@@ -4,8 +4,10 @@ import datetime, random, subprocess, sys
 
 host = 'a03209@k.aics.riken.jp'
 
-tmpdir = 'work/{}-{:08}'.format(datetime.datetime.now().strftime('%Y-%m-%d/%H-%M-%S'), random.randint(0,99999999))
+uniqkey = '{}-{:08}'.format(datetime.datetime.now().strftime('%Y-%m-%d/%H-%M-%S'), random.randint(0,99999999))
+tmpdir = 'work/' + uniqkey
 #tmpdir = 'work/experimental'
+destdir = '/volume81/data/ra000008/nushio/' + uniqkey
 
 
 srcfiles = ['3d-mhd.h', '3d-mhd*.c', '3d-mhd-main.cpp']
@@ -17,10 +19,10 @@ def cmd(str):
     subprocess.call(str, shell=True)
 
 def on_k(str):
-    cmd("ssh {} '(cd {}; {})'".format(host, tmpdir,str))
+    cmd("ssh {} '(cd {}; {})'".format(host, destdir,str))
 
 cmd('mkdir -p {}'.format(tmpdir))
-cmd('ssh {} mkdir -p {}'.format(host,tmpdir))
+cmd('ssh {} mkdir -p {}'.format(host,destdir))
 cmd('cp {} {}'.format(' '.join(srcpaths),tmpdir))
 cmd('cp cmake-for-k.sh {}/cmake.sh'.format(tmpdir))
 cmd('cp CMakeLists-for-k.txt {}/CMakeLists.txt'.format(tmpdir))
@@ -30,10 +32,12 @@ submit_script_path = '{}/submit.sh'.format(tmpdir)
 with(open(submit_script_path,'w')) as fp:
     fp.write("""
 #!/bin/sh -x
-#PJM --rsc-list "node=10648"
+#PJM --rsc-list "node=64"
 
 #time limit: 20min
-#PJM --rsc-list "elapse=00:20:00"
+#PJM --rsc-list "elapse=24:00:00"
+#PJM --rsc-list "rscgrp=small"
+# #PJM --rsc-list "rscgrp=large"
 #PJM --mpi "use-rankdir"
 #PJM --stg-transfiles all
 
@@ -48,11 +52,11 @@ with(open(submit_script_path,'w')) as fp:
 . /work/system/Env_base
 mpiexec /work/system/bin/msh "mkdir ./out-3d-mhd"
 
-mpirun -n 10648 ./a.out
+mpirun -n 64 ./a.out
 """)
 cmd('chmod 755 '+submit_script_path)
 
-cmd('scp {}/*  {}:{}'.format(tmpdir, host,tmpdir))
+cmd('scp {}/*  {}:{}'.format(tmpdir, host,destdir))
 #on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp')
 on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
 on_k('pjsub submit.sh')
