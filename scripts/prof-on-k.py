@@ -21,6 +21,8 @@ def cmd(str):
 def on_k(str):
     cmd("ssh {} '(cd {}; {})'".format(host, destdir,str))
 
+cmd('rm {}/3d-mhd_internal_*.c'.format(srcdir))
+cmd('stack exec formura -- {}/3d-mhd.fmr'.format(srcdir))
 cmd('mkdir -p {}'.format(tmpdir))
 cmd('ssh {} mkdir -p {}'.format(host,destdir))
 cmd('cp {} {}'.format(' '.join(srcpaths),tmpdir))
