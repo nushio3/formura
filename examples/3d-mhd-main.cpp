@@ -81,9 +81,9 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            int gx = navi.offset_x + ix;
-            int gy = navi.offset_y + iy;
-            int gz = navi.offset_z + iz;
+            int gx = navi.offset_x + x;
+            int gy = navi.offset_y + y;
+            int gz = navi.offset_z + z;
             fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, dens[x][y][z], s[x][y][z], Psi[x][y][z]);
           }
         }
@@ -96,9 +96,9 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            int gx = navi.offset_x + ix;
-            int gy = navi.offset_y + iy;
-            int gz = navi.offset_z + iz;
+            int gx = navi.offset_x + x;
+            int gy = navi.offset_y + y;
+            int gz = navi.offset_z + z;
             fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, vx[x][y][z], vy[x][y][z], vz[x][y][z]);
           }
         }
@@ -110,9 +110,9 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            int gx = navi.offset_x + ix;
-            int gy = navi.offset_y + iy;
-            int gz = navi.offset_z + iz;
+            int gx = navi.offset_x + x;
+            int gy = navi.offset_y + y;
+            int gz = navi.offset_z + z;
             fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, Bx[x][y][z], By[x][y][z], Bz[x][y][z]);
           }
         }
