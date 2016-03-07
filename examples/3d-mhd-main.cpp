@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/time.h>
 #include "3d-mhd.h"
 
 int T_MAX;
@@ -15,6 +16,12 @@ Formura_Navigator navi;
 
 float frand() {
   return rand() / float(RAND_MAX);
+}
+
+double wctime() {
+  struct timeval tv;
+  gettimeofday(&tv,NULL);
+  return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
 }
 
 void init() {
@@ -47,19 +54,25 @@ int main (int argc, char **argv)
   Formura_Init(&navi, MPI_COMM_WORLD);
 
   if (argc <= 1) {
-    T_MAX=10000;
+    T_MAX=1000;
   }else{
     sscanf(argv[1], "%d",  &T_MAX);
   }
   if (argc <= 2) {
-    T_MONITOR=1000;
+    T_MONITOR=200;
   }else{
     sscanf(argv[2], "%d",  &T_MONITOR);
   }
 
   init();
 
+  double t_begin = wctime();
+
   while(navi.time_step < T_MAX) {
+    double t = wctime();
+    if(navi.time_step % T_MONITOR == 0 || navi.time_step <= 3 * T_MONITOR ) {
+      printf("%d step @ %lf sec\n", navi.time_step, t-t_begin);
+    }
     if(navi.time_step % T_MONITOR == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
@@ -68,7 +81,10 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            fprintf(fp, "%d %d %f %f %f\n", x, y, dens[x][y][z], s[x][y][z], Psi[x][y][z]);
+            int gx = navi.offset_x + ix;
+            int gy = navi.offset_y + iy;
+            int gz = navi.offset_z + iz;
+            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, dens[x][y][z], s[x][y][z], Psi[x][y][z]);
           }
         }
       }
@@ -80,7 +96,10 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            fprintf(fp, "%d %d %f %f %f\n", x, y, vx[x][y][z], vy[x][y][z], vz[x][y][z]);
+            int gx = navi.offset_x + ix;
+            int gy = navi.offset_y + iy;
+            int gz = navi.offset_z + iz;
+            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, vx[x][y][z], vy[x][y][z], vz[x][y][z]);
           }
         }
       }
@@ -91,7 +110,10 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            fprintf(fp, "%d %d %f %f %f\n", x, y, Bx[x][y][z], By[x][y][z], Bz[x][y][z]);
+            int gx = navi.offset_x + ix;
+            int gy = navi.offset_y + iy;
+            int gz = navi.offset_z + iz;
+            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, Bx[x][y][z], By[x][y][z], Bz[x][y][z]);
           }
         }
       }

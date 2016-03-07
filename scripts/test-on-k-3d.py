@@ -32,11 +32,11 @@ submit_script_path = '{}/submit.sh'.format(tmpdir)
 with(open(submit_script_path,'w')) as fp:
     fp.write("""
 #!/bin/sh -x
-#PJM --rsc-list "node=64"
+#PJM --rsc-list "node=48x54x32"
 
-#time limit: 20min
-#PJM --rsc-list "elapse=24:00:00"
-#PJM --rsc-list "rscgrp=small"
+#time limit: 30min
+#PJM --rsc-list "elapse=00:30:00"
+#PJM --rsc-list "rscgrp=huge"
 # #PJM --rsc-list "rscgrp=large"
 #PJM --mpi "use-rankdir"
 #PJM --stg-transfiles all
@@ -52,7 +52,7 @@ with(open(submit_script_path,'w')) as fp:
 . /work/system/Env_base
 mpiexec /work/system/bin/msh "mkdir ./out-3d-mhd"
 
-mpirun -n 64 ./a.out
+mpirun -n 82944 ./a.out
 """)
 cmd('chmod 755 '+submit_script_path)
 
