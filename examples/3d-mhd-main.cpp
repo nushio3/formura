@@ -90,7 +90,6 @@ int main (int argc, char **argv)
       }
       fclose(fp);
 
-
       sprintf(fn, "out-3d-mhd/v-%06d-%d.txt", navi.time_step, mpi_my_rank);
       fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
