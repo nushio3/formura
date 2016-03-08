@@ -5,9 +5,12 @@ module Main where
 import           Cases (snakify)
 import           Control.Lens
 import           Data.Aeson.TH
+import qualified Data.ByteString as BS
 import qualified Data.Yaml as Y
+import qualified Data.Yaml.Pretty as Y
 import           Data.Text.Lens (packed)
-
+import           System.Directory
+import           System.Process
 import           Formura.NumericalConfig
 
 data Task = Codegen
@@ -15,23 +18,31 @@ data Task = Codegen
           | Benchmark
           | Visualize
 
-data IncubatorConfig =
-  IncubatorConfig
+data QBConfig =
+  QBConfig
   { _qbHostName :: String
   , _qbWorkDir :: String
   , _qbLabNotePath :: String
   }
 
-makeLenses ''IncubatorConfig
+makeLenses ''QBConfig
 
 $(deriveJSON (let toSnake = packed %~ snakify in
                defaultOptions{fieldLabelModifier = toSnake . drop 3,
                               constructorTagModifier = toSnake,
                               omitNothingFields = True})
-  ''IncubatorConfig)
+  ''QBConfig)
 
 
-type WithIncubatorConfig = ?qbc :: IncubatorConfig
+qbConfigFilePath :: FilePath
+qbConfigFilePath = ".qb/config"
+
+qbDefaultConfig = QBConfig
+  { _qbHostName = "greatwave"
+  , _qbWorkDir = ".qb"
+  , _qbLabNotePath = "/home/nushio/hub/"}
+
+type WithQBConfig = ?qbc :: QBConfig
 
 data Individual =
   Individual
@@ -56,7 +67,7 @@ $(deriveJSON (let toSnake = packed %~ snakify in
   ''Individual)
 
 
-codegen :: WithIncubatorConfig => Individual -> IO Individual
+codegen :: WithQBConfig => Individual -> IO Individual
 codegen idv = do
   let git = ?qbc ^. qbLabNotePath
   return idv
@@ -72,8 +83,13 @@ visualize = return
 
 main :: IO ()
 main = do
+  x <- doesFileExist qbConfigFilePath
+  if not x then do
+    system "mkdir -p .qb"
+    BS.writeFile qbConfigFilePath $ Y.encodePretty (Y.setConfCompare compare Y.defConfig) qbDefaultConfig
+  else
+    putStrLn "Qppy!"
 
-  putStrLn "Qppy!"
 
 {- note: to submit interactive job on greatwave:
 

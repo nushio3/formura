@@ -54,25 +54,25 @@ with(open(submit_script_path,'w')) as fp:
 . /work/system/Env_base
 mpiexec /work/system/bin/msh "mkdir ./out"
 
-mpirun -n 4 fapp -C -d out/prof-01 -Hpa=1 ./a.out
-mpirun -n 4 fapp -C -d out/prof-02 -Hpa=2 ./a.out
-mpirun -n 4 fapp -C -d out/prof-03 -Hpa=3 ./a.out
-mpirun -n 4 fapp -C -d out/prof-04 -Hpa=4 ./a.out
-mpirun -n 4 fapp -C -d out/prof-05 -Hpa=5 ./a.out
-mpirun -n 4 fapp -C -d out/prof-06 -Hpa=6 ./a.out
-mpirun -n 4 fapp -C -d out/prof-07 -Hpa=7 ./a.out
-mpirun -n 4 fapp -C -d out/prof-08 -Hpa=8 ./a.out
-mpirun -n 4 fapp -C -d out/prof-09 -Hpa=9 ./a.out
-mpirun -n 4 fapp -C -d out/prof-10 -Hpa=10 ./a.out
-mpirun -n 4 fapp -C -d out/prof-11 -Hpa=11 ./a.out
+fapp -C -d out/prof-01 -Hpa=1  mpirun -n 4 ./a.out
+fapp -C -d out/prof-02 -Hpa=2  mpirun -n 4 ./a.out
+fapp -C -d out/prof-03 -Hpa=3  mpirun -n 4 ./a.out
+fapp -C -d out/prof-04 -Hpa=4  mpirun -n 4 ./a.out
+fapp -C -d out/prof-05 -Hpa=5  mpirun -n 4 ./a.out
+fapp -C -d out/prof-06 -Hpa=6  mpirun -n 4 ./a.out
+fapp -C -d out/prof-07 -Hpa=7  mpirun -n 4 ./a.out
+fapp -C -d out/prof-08 -Hpa=8  mpirun -n 4 ./a.out
+fapp -C -d out/prof-09 -Hpa=9  mpirun -n 4 ./a.out
+fapp -C -d out/prof-10 -Hpa=10 mpirun -n 4 ./a.out
+fapp -C -d out/prof-11 -Hpa=11 mpirun -n 4 ./a.out
 
-fapppx -A -p all -l0 -d out/prof-01 -o out/prof-1.csv -tcsv -Hpa
-fapppx -A -p all -l0 -d out/prof-02 -o out/prof-2.csv -tcsv -Hpa
-fapppx -A -p all -l0 -d out/prof-03 -o out/prof-3.csv -tcsv -Hpa
-fapppx -A -p all -l0 -d out/prof-04 -o out/prof-4.csv -tcsv -Hpa
-fapppx -A -p all -l0 -d out/prof-05 -o out/prof-5.csv -tcsv -Hpa
-fapppx -A -p all -l0 -d out/prof-06 -o out/prof-6.csv -tcsv -Hpa
-fapppx -A -p all -l0 -d out/prof-07 -o out/prof-7.csv -tcsv -Hpa
+fapppx -A -p all -l0 -d out/prof-01 -o out-csv/prof-1.csv -tcsv -Hpa
+fapppx -A -p all -l0 -d out/prof-02 -o out-csv/prof-2.csv -tcsv -Hpa
+fapppx -A -p all -l0 -d out/prof-03 -o out-csv/prof-3.csv -tcsv -Hpa
+fapppx -A -p all -l0 -d out/prof-04 -o out-csv/prof-4.csv -tcsv -Hpa
+fapppx -A -p all -l0 -d out/prof-05 -o out-csv/prof-5.csv -tcsv -Hpa
+fapppx -A -p all -l0 -d out/prof-06 -o out-csv/prof-6.csv -tcsv -Hpa
+fapppx -A -p all -l0 -d out/prof-07 -o out-csv/prof-7.csv -tcsv -Hpa
 
 
 
