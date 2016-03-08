@@ -11,6 +11,6 @@ extra-deps:
 # - conversion-bytestring-1.0.0.1
 # - record-syntax-0.1.0.2
 # - haskell-src-exts-1.16.0.1
-
+local-bin-path: ./bin
 resolver: lts-5.5
 # skip-ghc-check: True

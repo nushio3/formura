@@ -3,14 +3,14 @@ sudo: false
 
 before_install:
   # stack
+  - mkdir bin
   - mkdir -p ~/.local/bin
-  - ln -s  $HOME/.local/bin bin
   - mkdir -p ~/.local/lib
   - export PATH=~/.local/bin:$PATH
   - export LD_LIBRARY_PATH=~/.local/lib:$LD_LIBRARY_PATH
   - ./scripts/install-z3.sh
   - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-  - export PATH=/opt/ghc/7.10.3/bin:$PATH
+  - export PATH=/opt/ghc/7.10.3/bin:./bin/:$PATH
 
 addons:
   apt:

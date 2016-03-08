@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, ImplicitParams, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, ImplicitParams, LambdaCase, TemplateHaskell #-}
 
 module Main where
 
@@ -10,13 +10,20 @@ import qualified Data.Yaml as Y
 import qualified Data.Yaml.Pretty as Y
 import           Data.Text.Lens (packed)
 import           System.Directory
+import           System.FilePath ((</>))
+import           System.IO.Temp (withSystemTempDirectory)
 import           System.Process
 import           Formura.NumericalConfig
 
-data Task = Codegen
-          | Compile
-          | Benchmark
-          | Visualize
+data Action = Codegen
+            | Compile
+            | Benchmark
+            | Visualize
+            | Done
+            | Failed
+
+deriveJSON defaultOptions ''Action
+
 
 data QBConfig =
   QBConfig
@@ -39,14 +46,15 @@ qbConfigFilePath = ".qb/config"
 
 qbDefaultConfig = QBConfig
   { _qbHostName = "greatwave"
-  , _qbWorkDir = ".qb-work"
+  , _qbWorkDir = ".qb/work"
   , _qbLabNotePath = "/home/nushio/hub/3d-mhd/log"}
 
 type WithQBConfig = ?qbc :: QBConfig
 
 data Individual =
   Individual
-  { _idvName :: String
+  { _idvAction :: Action
+  , _idvName :: String
   , _idvFormuraVersion :: String
   , _idvSourcecodeURL :: String
   , _idvNumericalConfig :: NumericalConfig
@@ -68,7 +76,8 @@ $(deriveJSON (let toSnake = packed %~ snakify in
 
 defaultIndividual :: Individual
 defaultIndividual = Individual
-  { _idvName = "default"
+  { _idvAction = Codegen
+  , _idvName = "default"
   , _idvFormuraVersion = "c87433a2"
   , _idvSourcecodeURL = "https://raw.githubusercontent.com/nushio3/3d-mhd/c1901c5c8c0ebf711f84e3fefbdeb44fd94c97b1/src/3d-mhd.fmr"
   , _idvNumericalConfig = defaultNumericalConfig
@@ -80,6 +89,15 @@ defaultIndividual = Individual
   , _idvImagePath = Nothing
   }
 
+
+getCompiler :: WithQBConfig => String -> IO FilePath
+getCompiler gitkey = do
+  let fn = (?qbc ^. qbWorkDir) </> ("formura-" ++ gitkey)
+  doesFileExist fn >>= \case
+    True -> return fn
+    False -> do
+      withSystemTempDirectory "qb-codegen" $ \ dir -> do
+        return fn
 
 codegen :: WithQBConfig => Individual -> IO Individual
 codegen idv = do
@@ -95,14 +113,18 @@ benchmark idv = return idv
 visualize :: Individual -> IO Individual
 visualize = return
 
+writeYaml :: Y.ToJSON a => FilePath -> a -> IO ()
+writeYaml fn obj = BS.writeFile fn $ Y.encodePretty (Y.setConfCompare compare Y.defConfig) obj
+
 main :: IO ()
 main = do
   x <- doesFileExist qbConfigFilePath
   if not x then do
     system "mkdir -p .qb"
-    BS.writeFile qbConfigFilePath $ Y.encodePretty (Y.setConfCompare compare Y.defConfig) qbDefaultConfig
-  else
+    writeYaml qbConfigFilePath qbDefaultConfig
+  else do
     putStrLn "Qppy!"
+    writeYaml "izanagi.yaml" defaultIndividual
 
 
 {- note: to submit interactive job on greatwave:

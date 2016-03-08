@@ -32,8 +32,8 @@ $(deriveJSON (let toSnake = packed %~ snakify in
 defaultNumericalConfig :: NumericalConfig
 defaultNumericalConfig =
   NumericalConfig
-  { _ncIntraNodeShape = 0
-  , _ncMPIGridShape = 0
+  { _ncIntraNodeShape = Vec []
+  , _ncMPIGridShape = Vec []
   , _ncTemporalBlockingInterval = 1
   , _ncMonitorInterval = 1
   , _ncInitialWalls = M.empty

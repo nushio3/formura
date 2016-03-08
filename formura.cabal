@@ -116,8 +116,8 @@ executable incubator
               , formura
               , lens
               , process
+              , temporary
               , yaml
-              , extensible
 
 
 
