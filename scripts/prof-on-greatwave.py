@@ -2,12 +2,12 @@
 
 import datetime, random, subprocess, sys
 
-host = 'a03209@k.aics.riken.jp'
+host = 'greatwave'
 
 uniqkey = '{}-{:08}'.format(datetime.datetime.now().strftime('%Y-%m-%d/%H-%M-%S'), random.randint(0,99999999))
 tmpdir = 'work/' + uniqkey
 #tmpdir = 'work/experimental'
-destdir = '/volume81/data/ra000008/nushio/' + uniqkey
+destdir = '/home/nushio/work/' + uniqkey
 
 
 srcfiles = ['3d-mhd.h', '3d-mhd*.c', '3d-mhd-main-prof.cpp']
@@ -34,7 +34,7 @@ submit_script_path = '{}/submit.sh'.format(tmpdir)
 with(open(submit_script_path,'w')) as fp:
     fp.write("""
 #!/bin/sh -x
-#PJM --rsc-list "node=8"
+#PJM --rsc-list "node=1"
 
 #time limit
 #PJM --rsc-list "elapse=12:00:00"
@@ -77,6 +77,6 @@ fapppx -A -p all -l0 -d prof-3dmhd-07 -o prof-csv-3dmhd/output_prof_7.csv -tcsv 
 cmd('chmod 755 '+submit_script_path)
 
 cmd('scp {}/*  {}:{}'.format(tmpdir, host,destdir))
-on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main-prof.cpp')
-#on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main-prof.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
+#on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main-prof.cpp')
+on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main-prof.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
 on_k('pjsub submit.sh')
