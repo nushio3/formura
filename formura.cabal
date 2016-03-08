@@ -108,6 +108,8 @@ executable incubator
 --  ld-options: -static -pthread
   build-depends:
                 base == 4.*
+              , aeson
+              , cases
               , formura
               , lens
 

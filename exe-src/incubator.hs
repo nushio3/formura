@@ -2,8 +2,12 @@
 
 module Main where
 
-import Control.Lens
-import Formura.NumericalConfig
+import           Cases (snakify)
+import           Control.Lens
+import           Data.Aeson.TH
+import           Data.Text.Lens (packed)
+
+import           Formura.NumericalConfig
 
 data Task = Codegen
           | Compile
@@ -12,14 +16,21 @@ data Task = Codegen
 
 data IncubatorConfig =
   IncubatorConfig
-  { _icHostName :: String
-  , _icWorkDir :: String
-  , _icLabNotePath :: String
+  { _qbHostName :: String
+  , _qbWorkDir :: String
+  , _qbLabNotePath :: String
   }
 
 makeLenses ''IncubatorConfig
 
-type WithIncubatorConfig = ?icc :: IncubatorConfig
+$(deriveJSON (let toSnake = packed %~ snakify in
+               defaultOptions{fieldLabelModifier = toSnake . drop 3,
+                              constructorTagModifier = toSnake,
+                              omitNothingFields = True})
+  ''IncubatorConfig)
+
+
+type WithIncubatorConfig = ?qbc :: IncubatorConfig
 
 data Individual =
   Individual
@@ -37,9 +48,16 @@ data Individual =
 
 makeLenses ''Individual
 
+$(deriveJSON (let toSnake = packed %~ snakify in
+               defaultOptions{fieldLabelModifier = toSnake . drop 4,
+                              constructorTagModifier = toSnake,
+                              omitNothingFields = True})
+  ''Individual)
+
+
 codegen :: WithIncubatorConfig => Individual -> IO Individual
 codegen idv = do
-  let git = ?icc ^. icLabNotePath
+  let git = ?qbc ^. qbLabNotePath
   return idv
 
 compile :: Individual -> IO Individual

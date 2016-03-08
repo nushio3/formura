@@ -21,8 +21,8 @@ def cmd(str):
 def on_k(str):
     cmd("ssh {} '(cd {}; {})'".format(host, destdir,str))
 
-#cmd('rm {}/3d-mhd_internal_*.c'.format(srcdir))
-#cmd('stack exec formura -- {}/3d-mhd.fmr'.format(srcdir))
+cmd('rm {}/3d-mhd_internal_*.c'.format(srcdir))
+cmd('stack exec formura -- {}/3d-mhd.fmr'.format(srcdir))
 cmd('mkdir -p {}'.format(tmpdir))
 cmd('ssh {} mkdir -p {}'.format(host,destdir))
 cmd('cp {} {}'.format(' '.join(srcpaths),tmpdir))
@@ -34,18 +34,18 @@ submit_script_path = '{}/submit.sh'.format(tmpdir)
 with(open(submit_script_path,'w')) as fp:
     fp.write("""
 #!/bin/sh -x
-#PJM --rsc-list "node=8"
+#PJM -L rscunit=gwmpc
+#PJM -L node=1
 
 #time limit
 #PJM --rsc-list "elapse=12:00:00"
-#PJM --rsc-list "rscgrp=small"
 # #PJM --rsc-list "rscgrp=large"
 #PJM --mpi "use-rankdir"
-#PJM --stg-transfiles all
+# #PJM --stg-transfiles all
 
-# stage in  hello.out.
-#PJM --stgin "./a.out %r:./a.out"
-#PJM --stgout "%r:./out/* ./out-%r-%j/"
+#  # stage in  hello.out.
+#  #PJM --stgin "./a.out %r:./a.out"
+#  #PJM --stgout "%r:./out/* ./out-%r-%j/"
 
 #statistics output
 #PJM -s
@@ -54,17 +54,17 @@ with(open(submit_script_path,'w')) as fp:
 . /work/system/Env_base
 mpiexec /work/system/bin/msh "mkdir ./out"
 
-mpirun -n 8 fapp -C -d out/prof-01 -Hpa=1 ./a.out
-mpirun -n 8 fapp -C -d out/prof-02 -Hpa=2 ./a.out
-mpirun -n 8 fapp -C -d out/prof-03 -Hpa=3 ./a.out
-mpirun -n 8 fapp -C -d out/prof-04 -Hpa=4 ./a.out
-mpirun -n 8 fapp -C -d out/prof-05 -Hpa=5 ./a.out
-mpirun -n 8 fapp -C -d out/prof-06 -Hpa=6 ./a.out
-mpirun -n 8 fapp -C -d out/prof-07 -Hpa=7 ./a.out
-mpirun -n 8 fapp -C -d out/prof-08 -Hpa=8 ./a.out
-mpirun -n 8 fapp -C -d out/prof-09 -Hpa=9 ./a.out
-mpirun -n 8 fapp -C -d out/prof-10 -Hpa=10 ./a.out
-mpirun -n 8 fapp -C -d out/prof-11 -Hpa=11 ./a.out
+mpirun -n 4 fapp -C -d out/prof-01 -Hpa=1 ./a.out
+mpirun -n 4 fapp -C -d out/prof-02 -Hpa=2 ./a.out
+mpirun -n 4 fapp -C -d out/prof-03 -Hpa=3 ./a.out
+mpirun -n 4 fapp -C -d out/prof-04 -Hpa=4 ./a.out
+mpirun -n 4 fapp -C -d out/prof-05 -Hpa=5 ./a.out
+mpirun -n 4 fapp -C -d out/prof-06 -Hpa=6 ./a.out
+mpirun -n 4 fapp -C -d out/prof-07 -Hpa=7 ./a.out
+mpirun -n 4 fapp -C -d out/prof-08 -Hpa=8 ./a.out
+mpirun -n 4 fapp -C -d out/prof-09 -Hpa=9 ./a.out
+mpirun -n 4 fapp -C -d out/prof-10 -Hpa=10 ./a.out
+mpirun -n 4 fapp -C -d out/prof-11 -Hpa=11 ./a.out
 
 fapppx -A -p all -l0 -d out/prof-01 -o out/prof-1.csv -tcsv -Hpa
 fapppx -A -p all -l0 -d out/prof-02 -o out/prof-2.csv -tcsv -Hpa
