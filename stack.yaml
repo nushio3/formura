@@ -3,14 +3,6 @@ packages:
 - .
 extra-deps:
 - extensible-0.3.5
-# - record-0.4.0.2
-# - record-preprocessor-0.1.0.3
-# - basic-lens-0.0.0
-# - conversion-1.2
-# - conversion-text-1.0.0.2
-# - conversion-bytestring-1.0.0.1
-# - record-syntax-0.1.0.2
-# - haskell-src-exts-1.16.0.1
 local-bin-path: ./bin
 resolver: lts-5.5
 # skip-ghc-check: True
