@@ -75,8 +75,12 @@ int main (int argc, char **argv)
 
   double t_begin, t_end;
 
-  while(true) {
-    if(navi.time_step == 0 || navi.time_step >= T_MAX) {
+  while(navi.time_step < T_MAX) {
+    double t = wctime();
+    if(navi.time_step % T_MONITOR == 0 || navi.time_step <= 3 * T_MONITOR ) {
+      printf("%d step @ %lf sec\n", navi.time_step, t-t_begin);
+    }
+    if(navi.time_step % T_MONITOR == 0) {
       printf("t = %d\n", navi.time_step);
       char fn[256];
       sprintf(fn, "out-3d-mhd/dens-%06d-%d.txt", navi.time_step, mpi_my_rank);
@@ -84,19 +88,24 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            fprintf(fp, "%d %d %f %f %f\n", x, y, dens[x][y][z], s[x][y][z], Psi[x][y][z]);
+            int gx = navi.offset_x + x;
+            int gy = navi.offset_y + y;
+            int gz = navi.offset_z + z;
+            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, dens[x][y][z], s[x][y][z], Psi[x][y][z]);
           }
         }
       }
       fclose(fp);
-
 
       sprintf(fn, "out-3d-mhd/v-%06d-%d.txt", navi.time_step, mpi_my_rank);
       fp = fopen(fn,"w");
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            fprintf(fp, "%d %d %f %f %f\n", x, y, vx[x][y][z], vy[x][y][z], vz[x][y][z]);
+            int gx = navi.offset_x + x;
+            int gy = navi.offset_y + y;
+            int gz = navi.offset_z + z;
+            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, vx[x][y][z], vy[x][y][z], vz[x][y][z]);
           }
         }
       }
@@ -107,7 +116,10 @@ int main (int argc, char **argv)
       for(int x = navi.lower_x; x < navi.upper_x; ++x) {
         for(int y = navi.lower_y; y < navi.upper_y; ++y) {
           for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            fprintf(fp, "%d %d %f %f %f\n", x, y, Bx[x][y][z], By[x][y][z], Bz[x][y][z]);
+            int gx = navi.offset_x + x;
+            int gy = navi.offset_y + y;
+            int gz = navi.offset_z + z;
+            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, Bx[x][y][z], By[x][y][z], Bz[x][y][z]);
           }
         }
       }
