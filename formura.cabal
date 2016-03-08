@@ -110,6 +110,7 @@ executable incubator
                 base == 4.*
               , formura
               , lens
+              , records
 
 
 
