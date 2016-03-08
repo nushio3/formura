@@ -83,7 +83,7 @@ defaultIndividual :: Individual
 defaultIndividual = Individual
   { _idvAction = Codegen
   , _idvName = "default"
-  , _idvFormuraVersion = "c87433a2"
+  , _idvFormuraVersion = "3aed540676dca114e9367ef1d94b0b3ca00ea8f4"
   , _idvSourcecodeURL = "https://raw.githubusercontent.com/nushio3/3d-mhd/c1901c5c8c0ebf711f84e3fefbdeb44fd94c97b1/src/3d-mhd.fmr"
   , _idvNumericalConfig = defaultNumericalConfig
   , _idvLocalWorkDir = Nothing
