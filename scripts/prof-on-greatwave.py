@@ -80,6 +80,6 @@ fapppx -A -p all -l0 -d out/prof-07 -o out/prof-7.csv -tcsv -Hpa
 cmd('chmod 755 '+submit_script_path)
 
 cmd('scp {}/*  {}:{}'.format(tmpdir, host,destdir))
-on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main-prof.cpp')
+on_k('mpiFCCpx -O1 3d-mhd*.c 3d-mhd-main-prof.cpp')
 #on_k('mpiFCCpx 3d-mhd*.c 3d-mhd-main-prof.cpp -o a.out -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2')
 on_k('pjsub submit.sh')
