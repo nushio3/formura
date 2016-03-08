@@ -3,14 +3,17 @@
 module Main where
 
 import           Cases (snakify)
+import           Control.Concurrent (threadDelay)
 import           Control.Lens
 import           Data.Aeson.TH
 import qualified Data.ByteString as BS
 import qualified Data.Yaml as Y
 import qualified Data.Yaml.Pretty as Y
 import           Data.Text.Lens (packed)
+import           GHC.IO.Exception (ExitCode)
 import           System.Directory
 import           System.FilePath ((</>))
+import           System.IO
 import           System.IO.Temp (withSystemTempDirectory)
 import           System.Process
 import           Formura.NumericalConfig
@@ -24,6 +27,8 @@ data Action = Codegen
 
 deriveJSON defaultOptions ''Action
 
+data WaitFile = WaitLocalFile FilePath
+              | WaitRemoteFile FilePath
 
 data QBConfig =
   QBConfig
@@ -90,18 +95,37 @@ defaultIndividual = Individual
   }
 
 
+----------------------------------------------------------------
+-- Utility Functions
+----------------------------------------------------------------
+
+cmd :: String -> IO ExitCode
+cmd str = do
+  hPutStrLn stderr str
+  system str
+
+
 getCompiler :: WithQBConfig => String -> IO FilePath
-getCompiler gitkey = do
-  let fn = (?qbc ^. qbWorkDir) </> ("formura-" ++ gitkey)
+getCompiler gitKey = do
+  let fn = cpath </>("formura-" ++ gitKey)
+      cpath = (?qbc ^. qbWorkDir) </> "compilers"
+  cmd $ "mkdir -p " ++ cpath
   doesFileExist fn >>= \case
     True -> return fn
     False -> do
-      withSystemTempDirectory "qb-codegen" $ \ dir -> do
-        return fn
+      withSystemTempDirectory "qb-codegen" $ \dir -> do
+        withCurrentDirectory dir $ do
+          putStrLn dir
+          cmd $ "git clone /home/nushio/hub/formura ."
+          cmd $ "git checkout " ++ gitKey
+          cmd $ "stack install --local-bin-path ."
+          cmd $ "cp formura " ++ fn
+      return fn
 
 codegen :: WithQBConfig => Individual -> IO Individual
 codegen idv = do
   let git = ?qbc ^. qbLabNotePath
+  getCompiler $ idv ^. idvFormuraVersion
   return idv
 
 compile :: Individual -> IO Individual
@@ -116,16 +140,35 @@ visualize = return
 writeYaml :: Y.ToJSON a => FilePath -> a -> IO ()
 writeYaml fn obj = BS.writeFile fn $ Y.encodePretty (Y.setConfCompare compare Y.defConfig) obj
 
+readYaml :: Y.FromJSON a => FilePath -> IO a
+readYaml fn = do
+  Y.decodeFileEither fn >>= \case
+    Left msg -> do
+      hPutStrLn stderr $ "When reading " ++ fn
+      error $ Y.prettyPrintParseException msg
+    Right x -> return x
+
 main :: IO ()
 main = do
   x <- doesFileExist qbConfigFilePath
-  if not x then do
-    system "mkdir -p .qb"
-    writeYaml qbConfigFilePath qbDefaultConfig
-  else do
-    putStrLn "Qppy!"
-    writeYaml "izanagi.yaml" defaultIndividual
+  if not x then mainInit else mainServer
 
+mainInit :: IO ()
+mainInit = do
+  cmd "mkdir -p .qb"
+  writeYaml qbConfigFilePath qbDefaultConfig
+
+mainServer :: IO ()
+mainServer = do
+  putStrLn "Qppy!"
+  qbc0 <- readYaml qbConfigFilePath
+  let ?qbc = qbc0
+
+  writeYaml "izanagi.yaml" defaultIndividual
+
+  _ <- codegen $ defaultIndividual
+
+  return ()
 
 {- note: to submit interactive job on greatwave:
 

@@ -2,6 +2,7 @@ flags: {}
 packages:
 - .
 extra-deps:
+- directory-1.2.5.1 # required for `withCurrentDirectory`
 - extensible-0.3.5
 local-bin-path: ./bin
 resolver: lts-5.5
