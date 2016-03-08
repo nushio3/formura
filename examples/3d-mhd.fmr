@@ -5,9 +5,9 @@ double :: π = 3.141592653589793
 double :: dens0 = 1.0
 double :: dp_ddens = 1
 double :: dp_ds    = 2/5
-double :: N = 64*22
-double :: dt = 0.1/N
-double :: dx = 1/N, dy = 1/N, dz = 1/N
+double :: NX = 64*32, NY=64*54, NZ=64*48
+double :: dt = 0.1/(NX >? NY >? NZ)
+double :: dx = 1/NX, dy = 1/NY, dz = 1/NZ
 double :: c_h = dx/dt
 double :: ch2_cp2 = c_h / 0.18
 
@@ -121,9 +121,9 @@ begin function step(dens, vx, vy, vz, Bx,By,Bz, s, Psi) \
       v_rk = sys_next(1)
       B_rk = sys_next(2)
 
-      manifest :: avf_x = av_flux_x(sys_next)
-      manifest :: avf_y = av_flux_y(sys_next)
-      manifest :: avf_z = av_flux_z(sys_next)
+      avf_x = av_flux_x(sys_next)
+      avf_y = av_flux_y(sys_next)
+      avf_z = av_flux_z(sys_next)
 
       manifest :: sys_avx = sys_next + avf_x[i-1/2] - avf_x[i+1/2]
       manifest :: sys_avy = sys_avx + avf_y[,j-1/2] - avf_y[,j+1/2]

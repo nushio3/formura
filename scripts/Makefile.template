@@ -1,0 +1,234 @@
+all: a.out
+
+CC=mpiFCCpx -O3 -Kfast,parallel -Kocl -Klib -Koptmsg=2 -Karray_private -Kinstance=8 -Kdynamic_iteration -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Keval  -Kreduction -Ksimd=2
+
+OBJS= 3d-mhd-main.o           	       3d-mhd.o		  3d-mhd_internal_0.o	  3d-mhd_internal_1.o	  3d-mhd_internal_10.o	  3d-mhd_internal_100.o	  3d-mhd_internal_101.o	  3d-mhd_internal_102.o	  3d-mhd_internal_103.o	  3d-mhd_internal_104.o	  3d-mhd_internal_105.o	  3d-mhd_internal_106.o	  3d-mhd_internal_107.o	  3d-mhd_internal_108.o	  3d-mhd_internal_11.o	  3d-mhd_internal_12.o	  3d-mhd_internal_13.o	  3d-mhd_internal_14.o	  3d-mhd_internal_15.o	  3d-mhd_internal_16.o	  3d-mhd_internal_17.o	  3d-mhd_internal_18.o	  3d-mhd_internal_19.o	  3d-mhd_internal_2.o	  3d-mhd_internal_20.o	  3d-mhd_internal_21.o	  3d-mhd_internal_22.o	  3d-mhd_internal_23.o	  3d-mhd_internal_24.o	  3d-mhd_internal_25.o	  3d-mhd_internal_26.o	  3d-mhd_internal_27.o	  3d-mhd_internal_28.o	  3d-mhd_internal_29.o	  3d-mhd_internal_3.o	  3d-mhd_internal_30.o	  3d-mhd_internal_31.o	  3d-mhd_internal_32.o	  3d-mhd_internal_33.o	  3d-mhd_internal_34.o	  3d-mhd_internal_35.o	  3d-mhd_internal_36.o	  3d-mhd_internal_37.o	  3d-mhd_internal_38.o	  3d-mhd_internal_39.o	  3d-mhd_internal_4.o	  3d-mhd_internal_40.o	  3d-mhd_internal_41.o	  3d-mhd_internal_42.o	  3d-mhd_internal_43.o	  3d-mhd_internal_44.o	  3d-mhd_internal_45.o	  3d-mhd_internal_46.o	  3d-mhd_internal_47.o	  3d-mhd_internal_48.o	  3d-mhd_internal_49.o	  3d-mhd_internal_5.o	  3d-mhd_internal_50.o	  3d-mhd_internal_51.o	  3d-mhd_internal_52.o	  3d-mhd_internal_53.o	  3d-mhd_internal_54.o	  3d-mhd_internal_55.o	  3d-mhd_internal_56.o	  3d-mhd_internal_57.o	  3d-mhd_internal_58.o	  3d-mhd_internal_59.o	  3d-mhd_internal_6.o	  3d-mhd_internal_60.o	  3d-mhd_internal_61.o	  3d-mhd_internal_62.o	  3d-mhd_internal_63.o	  3d-mhd_internal_64.o	  3d-mhd_internal_65.o	  3d-mhd_internal_66.o	  3d-mhd_internal_67.o	  3d-mhd_internal_68.o	  3d-mhd_internal_69.o	  3d-mhd_internal_7.o	  3d-mhd_internal_70.o	  3d-mhd_internal_71.o	  3d-mhd_internal_72.o	  3d-mhd_internal_73.o	  3d-mhd_internal_74.o	  3d-mhd_internal_75.o	  3d-mhd_internal_76.o	  3d-mhd_internal_77.o	  3d-mhd_internal_78.o	  3d-mhd_internal_79.o	  3d-mhd_internal_8.o	  3d-mhd_internal_80.o	  3d-mhd_internal_81.o	  3d-mhd_internal_82.o	  3d-mhd_internal_83.o	  3d-mhd_internal_84.o	  3d-mhd_internal_85.o	  3d-mhd_internal_86.o	  3d-mhd_internal_87.o	  3d-mhd_internal_88.o	  3d-mhd_internal_89.o	  3d-mhd_internal_9.o	  3d-mhd_internal_90.o	  3d-mhd_internal_91.o	  3d-mhd_internal_92.o	  3d-mhd_internal_93.o	  3d-mhd_internal_94.o	  3d-mhd_internal_95.o	  3d-mhd_internal_96.o	  3d-mhd_internal_97.o	  3d-mhd_internal_98.o	  3d-mhd_internal_99.o	  
+
+a.out: $(OBJS)
+	$(CC) $(OBJS) -o a.out
+
+3d-mhd-main.o:           3d-mhd-main.cpp	      
+	$(CC) -c $^ -o $@
+3d-mhd.o:		 3d-mhd.c	      
+	$(CC) -c $^ -o $@
+3d-mhd_internal_0.o:	 3d-mhd_internal_0.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_1.o:	 3d-mhd_internal_1.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_10.o:	 3d-mhd_internal_10.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_100.o:	 3d-mhd_internal_100.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_101.o:	 3d-mhd_internal_101.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_102.o:	 3d-mhd_internal_102.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_103.o:	 3d-mhd_internal_103.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_104.o:	 3d-mhd_internal_104.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_105.o:	 3d-mhd_internal_105.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_106.o:	 3d-mhd_internal_106.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_107.o:	 3d-mhd_internal_107.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_108.o:	 3d-mhd_internal_108.c 
+	$(CC) -c $^ -o $@
+3d-mhd_internal_11.o:	 3d-mhd_internal_11.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_12.o:	 3d-mhd_internal_12.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_13.o:	 3d-mhd_internal_13.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_14.o:	 3d-mhd_internal_14.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_15.o:	 3d-mhd_internal_15.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_16.o:	 3d-mhd_internal_16.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_17.o:	 3d-mhd_internal_17.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_18.o:	 3d-mhd_internal_18.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_19.o:	 3d-mhd_internal_19.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_2.o:	 3d-mhd_internal_2.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_20.o:	 3d-mhd_internal_20.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_21.o:	 3d-mhd_internal_21.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_22.o:	 3d-mhd_internal_22.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_23.o:	 3d-mhd_internal_23.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_24.o:	 3d-mhd_internal_24.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_25.o:	 3d-mhd_internal_25.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_26.o:	 3d-mhd_internal_26.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_27.o:	 3d-mhd_internal_27.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_28.o:	 3d-mhd_internal_28.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_29.o:	 3d-mhd_internal_29.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_3.o:	 3d-mhd_internal_3.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_30.o:	 3d-mhd_internal_30.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_31.o:	 3d-mhd_internal_31.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_32.o:	 3d-mhd_internal_32.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_33.o:	 3d-mhd_internal_33.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_34.o:	 3d-mhd_internal_34.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_35.o:	 3d-mhd_internal_35.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_36.o:	 3d-mhd_internal_36.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_37.o:	 3d-mhd_internal_37.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_38.o:	 3d-mhd_internal_38.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_39.o:	 3d-mhd_internal_39.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_4.o:	 3d-mhd_internal_4.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_40.o:	 3d-mhd_internal_40.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_41.o:	 3d-mhd_internal_41.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_42.o:	 3d-mhd_internal_42.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_43.o:	 3d-mhd_internal_43.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_44.o:	 3d-mhd_internal_44.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_45.o:	 3d-mhd_internal_45.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_46.o:	 3d-mhd_internal_46.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_47.o:	 3d-mhd_internal_47.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_48.o:	 3d-mhd_internal_48.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_49.o:	 3d-mhd_internal_49.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_5.o:	 3d-mhd_internal_5.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_50.o:	 3d-mhd_internal_50.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_51.o:	 3d-mhd_internal_51.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_52.o:	 3d-mhd_internal_52.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_53.o:	 3d-mhd_internal_53.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_54.o:	 3d-mhd_internal_54.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_55.o:	 3d-mhd_internal_55.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_56.o:	 3d-mhd_internal_56.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_57.o:	 3d-mhd_internal_57.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_58.o:	 3d-mhd_internal_58.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_59.o:	 3d-mhd_internal_59.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_6.o:	 3d-mhd_internal_6.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_60.o:	 3d-mhd_internal_60.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_61.o:	 3d-mhd_internal_61.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_62.o:	 3d-mhd_internal_62.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_63.o:	 3d-mhd_internal_63.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_64.o:	 3d-mhd_internal_64.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_65.o:	 3d-mhd_internal_65.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_66.o:	 3d-mhd_internal_66.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_67.o:	 3d-mhd_internal_67.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_68.o:	 3d-mhd_internal_68.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_69.o:	 3d-mhd_internal_69.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_7.o:	 3d-mhd_internal_7.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_70.o:	 3d-mhd_internal_70.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_71.o:	 3d-mhd_internal_71.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_72.o:	 3d-mhd_internal_72.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_73.o:	 3d-mhd_internal_73.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_74.o:	 3d-mhd_internal_74.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_75.o:	 3d-mhd_internal_75.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_76.o:	 3d-mhd_internal_76.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_77.o:	 3d-mhd_internal_77.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_78.o:	 3d-mhd_internal_78.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_79.o:	 3d-mhd_internal_79.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_8.o:	 3d-mhd_internal_8.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_80.o:	 3d-mhd_internal_80.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_81.o:	 3d-mhd_internal_81.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_82.o:	 3d-mhd_internal_82.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_83.o:	 3d-mhd_internal_83.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_84.o:	 3d-mhd_internal_84.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_85.o:	 3d-mhd_internal_85.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_86.o:	 3d-mhd_internal_86.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_87.o:	 3d-mhd_internal_87.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_88.o:	 3d-mhd_internal_88.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_89.o:	 3d-mhd_internal_89.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_9.o:	 3d-mhd_internal_9.c   
+	$(CC) -c $^ -o $@
+3d-mhd_internal_90.o:	 3d-mhd_internal_90.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_91.o:	 3d-mhd_internal_91.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_92.o:	 3d-mhd_internal_92.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_93.o:	 3d-mhd_internal_93.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_94.o:	 3d-mhd_internal_94.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_95.o:	 3d-mhd_internal_95.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_96.o:	 3d-mhd_internal_96.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_97.o:	 3d-mhd_internal_97.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_98.o:	 3d-mhd_internal_98.c  
+	$(CC) -c $^ -o $@
+3d-mhd_internal_99.o:	 3d-mhd_internal_99.c  
+	$(CC) -c $^ -o $@
+
+
+

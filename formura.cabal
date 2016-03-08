@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                formura
-version:             1.0
+version:             2.0
 synopsis:            Formura is a simple language to describe stencil computation.
 -- description:
 homepage:            http://nushio3.github.io
@@ -81,6 +81,7 @@ library
   ghc-options:         -O3 -Wall  -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
 
 
+
 executable formura
   hs-source-dirs: exe-src
   main-is: formura.hs
@@ -99,6 +100,16 @@ executable formura
               , trifecta
               , yaml
 
+executable incubator
+  hs-source-dirs: exe-src
+  main-is: incubator.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+--  ld-options: -static -pthread
+  build-depends:
+                base == 4.*
+              , formura
+              , lens
 
 
 
