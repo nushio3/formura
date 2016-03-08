@@ -1,7 +1,8 @@
 flags: {}
 packages:
 - .
-extra-deps: []
+extra-deps:
+- extensible-0.3.5
 # - record-0.4.0.2
 # - record-preprocessor-0.1.0.3
 # - basic-lens-0.0.0

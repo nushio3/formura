@@ -117,6 +117,7 @@ executable incubator
               , lens
               , process
               , yaml
+              , extensible
 
 
 

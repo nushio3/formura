@@ -39,16 +39,16 @@ qbConfigFilePath = ".qb/config"
 
 qbDefaultConfig = QBConfig
   { _qbHostName = "greatwave"
-  , _qbWorkDir = ".qb"
-  , _qbLabNotePath = "/home/nushio/hub/"}
+  , _qbWorkDir = ".qb-work"
+  , _qbLabNotePath = "/home/nushio/hub/3d-mhd/log"}
 
 type WithQBConfig = ?qbc :: QBConfig
 
 data Individual =
   Individual
-  { _idvName
+  { _idvName :: String
   , _idvFormuraVersion :: String
-  , _idvFourcecodeURL :: String
+  , _idvSourcecodeURL :: String
   , _idvNumericalConfig :: NumericalConfig
   , _idvLocalWorkDir :: Maybe String
   , _idvLocalCodePaths :: Maybe [String]
@@ -65,6 +65,20 @@ $(deriveJSON (let toSnake = packed %~ snakify in
                               constructorTagModifier = toSnake,
                               omitNothingFields = True})
   ''Individual)
+
+defaultIndividual :: Individual
+defaultIndividual = Individual
+  { _idvName = "default"
+  , _idvFormuraVersion = "c87433a2"
+  , _idvSourcecodeURL = "https://raw.githubusercontent.com/nushio3/3d-mhd/c1901c5c8c0ebf711f84e3fefbdeb44fd94c97b1/src/3d-mhd.fmr"
+  , _idvNumericalConfig = defaultNumericalConfig
+  , _idvLocalWorkDir = Nothing
+  , _idvLocalCodePaths = Nothing
+  , _idvRemoteWorkDir = Nothing
+  , _idvRemoteExecPath = Nothing
+  , _idvRemoteOutputPath = Nothing
+  , _idvImagePath = Nothing
+  }
 
 
 codegen :: WithQBConfig => Individual -> IO Individual
@@ -94,6 +108,5 @@ main = do
 {- note: to submit interactive job on greatwave:
 
  pjsub --interact -L node=4 -L elapse=2:00:00 -L rscunit=gwmpc
-
 
 -}
