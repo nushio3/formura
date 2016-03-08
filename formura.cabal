@@ -111,6 +111,7 @@ executable incubator
               , formura
               , lens
               , record
+              , record-preprocessor
 
 
 
