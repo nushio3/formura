@@ -5,6 +5,7 @@ module Main where
 import           Cases (snakify)
 import           Control.Lens
 import           Data.Aeson.TH
+import qualified Data.Yaml as Y
 import           Data.Text.Lens (packed)
 
 import           Formura.NumericalConfig
@@ -70,4 +71,13 @@ visualize :: Individual -> IO Individual
 visualize = return
 
 main :: IO ()
-main = putStrLn "Qppy!"
+main = do
+
+  putStrLn "Qppy!"
+
+{- note: to submit interactive job on greatwave:
+
+ pjsub --interact -L node=4 -L elapse=2:00:00 -L rscunit=gwmpc
+
+
+-}
