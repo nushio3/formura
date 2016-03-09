@@ -107,8 +107,9 @@ cmd str = do
 
 getCompiler :: WithQBConfig => String -> IO FilePath
 getCompiler gitKey = do
+  absPath <- getCurrentDirectory
   let fn = cpath </>("formura-" ++ gitKey)
-      cpath = (?qbc ^. qbWorkDir) </> "compilers"
+      cpath = absPath </> (?qbc ^. qbWorkDir) </> "compilers"
   cmd $ "mkdir -p " ++ cpath
   doesFileExist fn >>= \case
     True -> return fn
@@ -118,14 +119,22 @@ getCompiler gitKey = do
           putStrLn dir
           cmd $ "git clone /home/nushio/hub/formura ."
           cmd $ "git checkout " ++ gitKey
-          cmd $ "stack install --local-bin-path ."
-          cmd $ "cp formura " ++ fn
+          cmd $ "stack install --local-bin-path ./bin"
+          cmd $ "cp ./bin/formura " ++ fn
       return fn
 
 codegen :: WithQBConfig => Individual -> IO Individual
 codegen idv = do
   let git = ?qbc ^. qbLabNotePath
-  getCompiler $ idv ^. idvFormuraVersion
+  codegenFn <- getCompiler $ idv ^. idvFormuraVersion
+  absPath <- getCurrentDirectory
+  withSystemTempDirectory "qb-codegen" $ \dir -> do
+    withCurrentDirectory dir $ do
+      cmd $ "wget " ++ idv ^. idvSourcecodeURL ++ " -O main.fmr"
+      writeYaml "main.nc" $ idv ^. idvNumericalConfig
+
+
+
   return idv
 
 compile :: Individual -> IO Individual

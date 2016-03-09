@@ -3,7 +3,7 @@ sudo: false
 
 before_install:
   # stack
-  - mkdir bin
+  - mkdir -p bin
   - mkdir -p ~/.local/bin
   - mkdir -p ~/.local/lib
   - export PATH=~/.local/bin:$PATH
