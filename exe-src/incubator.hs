@@ -303,6 +303,23 @@ codegen it = do
     superCopy (it ^. idvSourcecodeURL) "main.fmr"
     writeYaml "main.yaml" $ it ^. idvNumericalConfig
     cmd $ codegenFn ++ " main.fmr"
+    foundFiles <- readCmd $ "find ."
+    let csrcFiles = [fn | fn <- lines foundFiles, elem (fn ^. extension) ["c", "cpp"]]
+        objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
+
+        c2oCmd fn = unlines
+          [ (fn & extension .~ "o") ++ ": " ++ fn
+          , "\t$(CC) -c $^ -o $@"]
+
+    writeFile "Makefile" $ unlines
+      [ "all: a.out"
+      , "CC=mpiFCCpx " ++ unwords (it ^. idvCompilerFlags)
+      , "OBJS=" ++ unwords objFiles
+      , "a.out: $(OBJS)"
+      , "\t$(CC) $(OBJS) -o a.out"
+      , unlines $ map c2oCmd csrcFiles]
+
+
   return $ it & xpAction .~ Compile
 
 
