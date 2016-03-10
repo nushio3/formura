@@ -10,7 +10,7 @@ import           Control.Monad.State
 import           Data.Aeson.TH
 import qualified Data.ByteString as BS
 import qualified Data.HashMap.Strict as HM
-import           Data.List (isPrefixOf)
+import           Data.List (isPrefixOf, sort)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.Time
@@ -308,8 +308,8 @@ codegen it = do
     superCopy (it ^. idvSourcecodeURL) "main.fmr"
     writeYaml "main.yaml" $ it ^. idvNumericalConfig
     cmd $ codegenFn ++ " main.fmr"
-    foundFiles <- readCmd $ "find ."
-    let csrcFiles = [fn | fn <- lines foundFiles, elem (fn ^. extension) [".c", ".cpp"]]
+    foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
+    let csrcFiles = [fn | fn <- foundFiles, elem (fn ^. extension) [".c", ".cpp"]]
         objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
         c2oCmd fn = unlines
