@@ -177,7 +177,7 @@ data Individual =
   { _idvFormuraVersion :: String
   , _idvSourcecodeURL :: String
   , _idvNumericalConfig :: NumericalConfig
-  , _idvCompilerFlags :: String
+  , _idvCompilerFlags :: [String]
   } deriving (Eq, Ord, Read, Show)
 
 makeClassy ''Individual
@@ -200,7 +200,8 @@ defaultIndividual = Individual
 data Experiment =
   Experiment
   { _xpAction :: Action
-  , _xpIndividualName :: String
+  , _xpIndividualFilePath :: FilePath
+  , _xpExperimentFilePath :: FilePath
   , _xpLocalWorkDir :: String
   , _xpLocalCodePaths :: [String]
   , _xpRemoteWorkDir :: String
@@ -221,7 +222,8 @@ $(deriveJSON (let toSnake = packed %~ snakify in
 defaultExperiment :: Experiment
 defaultExperiment = Experiment
   { _xpAction = Codegen
-  , _xpIndividualName = "default"
+  , _xpIndividualFilePath = ""
+  , _xpExperimentFilePath = ""
   , _xpLocalWorkDir = "/home/nushio/hub/formura-rawdata/"
   , _xpLocalCodePaths = [""]
   , _xpRemoteWorkDir = ""
@@ -268,6 +270,8 @@ readIndExp fn = do
       xp0 <- maybe defaultExperiment id <$> readYamlDef defaultExperiment xpfn
       let xp1 = xp0
             { _xpLocalWorkDir = fn ^. directory
+            , _xpIndividualFilePath = fn
+            , _xpExperimentFilePath = xpfn
             }
       return $ Just $ IndExp idv0 xp1
 
@@ -292,14 +296,15 @@ getCodegen gitKey = do
 codegen :: WithQBConfig => IndExp -> IO IndExp
 codegen it = do
   let labNote = ?qbc ^. qbLabNotePath
-      workDir = it ^. xpLocalWorkDir
-  cmd $ "mkdir -p " ++ workDir
+      codeDir = it ^. xpLocalWorkDir </> "src"
+  cmd $ "mkdir -p " ++ codeDir
   codegenFn <- getCodegen $ it ^. idvFormuraVersion
-  withCurrentDirectory workDir $ do
+  withCurrentDirectory codeDir $ do
     superCopy (it ^. idvSourcecodeURL) "main.fmr"
     writeYaml "main.nc" $ it ^. idvNumericalConfig
     cmd $ codegenFn ++ " main.fmr"
   return $ it & xpAction .~ Compile
+
 
 compile :: IndExp -> IO IndExp
 compile idv = return idv
