@@ -192,7 +192,7 @@ defaultIndividual :: Individual
 defaultIndividual = Individual
   { _idvFormuraVersion = "3aed540676dca114e9367ef1d94b0b3ca00ea8f4"
   , _idvSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd.fmr"
-  , _idvNumericalConfig = unsafePerformIO $ fromJust <$> readYaml "/home/nushio/hub/formura/examples/3d-mhd.nc"
+  , _idvNumericalConfig = unsafePerformIO $ fromJust <$> readYaml "/home/nushio/hub/formura/examples/3d-mhd.yaml"
   , _idvCompilerFlags = []
   }
 
@@ -301,7 +301,7 @@ codegen it = do
   codegenFn <- getCodegen $ it ^. idvFormuraVersion
   withCurrentDirectory codeDir $ do
     superCopy (it ^. idvSourcecodeURL) "main.fmr"
-    writeYaml "main.nc" $ it ^. idvNumericalConfig
+    writeYaml "main.yaml" $ it ^. idvNumericalConfig
     cmd $ codegenFn ++ " main.fmr"
   return $ it & xpAction .~ Compile
 

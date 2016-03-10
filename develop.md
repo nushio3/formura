@@ -9,7 +9,7 @@ Pearson方程式でデモを行った。
 
 - Pearson方程式のFormuraソースコード
     - 主ソースコード https://github.com/nushio3/formura/blob/master/examples-generated/pearson.fmr
-    - 数値計算設定ファイル https://github.com/nushio3/formura/blob/master/examples-generated/pearson.nc
+    - 数値計算設定ファイル https://github.com/nushio3/formura/blob/master/examples-generated/pearson.yaml
 
 - Formuraが生成したコード
     - https://github.com/nushio3/formura/blob/master/examples-generated/pearson.c

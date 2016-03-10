@@ -181,7 +181,7 @@ setNumericalConfig = do
 
   mnc <- liftIO $ Y.decodeFile ncFilePath
   nc <- case mnc of
-     Nothing -> raiseErr $ failed $ "cannot parse .nc file: " ++ show ncFilePath
+     Nothing -> raiseErr $ failed $ "cannot parse numerical config .yaml file: " ++ show ncFilePath
      Just x -> return x
 
   tsNumericalConfig .= nc
@@ -988,7 +988,7 @@ genCxxFiles formuraProg mmProg = do
 
 ncFilePath :: WithCommandLineOption => FilePath
 ncFilePath = case ?commandLineOption ^. numericalConfigFilename of
-  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".nc"
+  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".yaml"
   x  -> x
 
 
