@@ -214,7 +214,7 @@ data Experiment =
 makeClassy ''Experiment
 
 $(deriveJSON (let toSnake = packed %~ snakify in
-               defaultOptions{fieldLabelModifier = toSnake . drop 4,
+               defaultOptions{fieldLabelModifier = toSnake . drop 3,
                               constructorTagModifier = toSnake,
                               omitNothingFields = True})
   ''Experiment)
@@ -275,6 +275,11 @@ readIndExp fn = do
             }
       return $ Just $ IndExp idv0 xp1
 
+writeIndExp :: IndExp -> IO ()
+writeIndExp it = do
+  writeYaml (it ^. xpIndividualFilePath) (it ^. individual)
+  writeYaml (it ^. xpExperimentFilePath) (it ^. experiment)
+
 getCodegen :: WithQBConfig => String -> IO FilePath
 getCodegen gitKey = do
   absPath <- getCurrentDirectory
@@ -304,7 +309,7 @@ codegen it = do
     writeYaml "main.yaml" $ it ^. idvNumericalConfig
     cmd $ codegenFn ++ " main.fmr"
     foundFiles <- readCmd $ "find ."
-    let csrcFiles = [fn | fn <- lines foundFiles, elem (fn ^. extension) ["c", "cpp"]]
+    let csrcFiles = [fn | fn <- lines foundFiles, elem (fn ^. extension) [".c", ".cpp"]]
         objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
         c2oCmd fn = unlines
@@ -358,9 +363,15 @@ mainServer = do
 
   return ()
 
-proceed :: IndExp -> IO ()
-proceed idxp = do
-  print idxp
+proceed :: WithQBConfig => IndExp -> IO ()
+proceed it = do
+  print it
+  newIt <- case it ^. xpAction of
+    Codegen -> codegen it
+    x -> do
+      hPutStrLn stderr $ "Unimplemented Action: " ++ show x
+      return it
+  writeIndExp newIt
 
 {- note: to submit interactive job on greatwave:
 
