@@ -115,6 +115,7 @@ executable incubator
               , filepath
               , formura
               , lens
+              , mtl
               , process
               , temporary
               , yaml
