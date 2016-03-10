@@ -9,6 +9,7 @@ import           Control.Lens
 import           Control.Monad.State
 import           Data.Aeson.TH
 import qualified Data.ByteString as BS
+import qualified Data.HashMap.Strict as HM
 import           Data.List (isPrefixOf)
 import qualified Data.Map as M
 import           Data.Maybe
@@ -61,6 +62,34 @@ readYaml fn = do
       hPutStrLn stderr $ "When reading " ++ fn ++ "\n" ++ Y.prettyPrintParseException msg
       return Nothing
     Right x -> return $ Just x
+
+readYamlDef :: (Y.ToJSON a, Y.FromJSON a) => a -> FilePath -> IO (Maybe a)
+readYamlDef def fn = do
+  Y.decodeFileEither fn >>= \case
+    Left msg -> do
+      hPutStrLn stderr $ "When reading " ++ fn ++ "\n" ++ Y.prettyPrintParseException msg
+      return Nothing
+    Right v -> do
+      let v2 :: Y.Value
+          v2 = unionValue v (Y.toJSON def)
+      case (Y.decodeEither' $ Y.encode v2) of
+        Left msg -> do
+          hPutStrLn stderr $ "When merginf " ++ fn ++ "\n" ++ Y.prettyPrintParseException msg
+          return Nothing
+        Right x -> return $ Just x
+
+  where
+    unionValue :: Y.Value -> Y.Value -> Y.Value
+    unionValue (Y.Object hm1) (Y.Object hm2) = Y.Object $ HM.unionWith unionValue hm1 hm2
+    unionValue a _ = a
+
+-- Object !Object
+-- Array !Array
+-- String !Text
+-- Number !Scientific
+-- Bool !Bool
+-- Null
+
 
 readCmd :: String -> IO String
 readCmd str = interactCmd str ""
@@ -232,11 +261,11 @@ instance HasIndividual IncubatorState where
 
 readIndExp :: FilePath -> IO (Maybe IndExp)
 readIndExp fn = do
-  readYaml fn >>= \case
+  readYamlDef defaultIndividual fn >>= \case
     Nothing -> return Nothing
     Just idv0 -> do
       let xpfn = fn & extension .~ "exp"
-      xp0 <- maybe defaultExperiment id <$> readYaml xpfn
+      xp0 <- maybe defaultExperiment id <$> readYamlDef defaultExperiment xpfn
       let xp1 = xp0
             { _xpLocalWorkDir = fn ^. directory
             }
