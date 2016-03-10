@@ -20,6 +20,7 @@ data NumericalConfig = NumericalConfig
   , _ncInitialWalls :: M.Map String [Int]
   , _ncWallInverted :: Maybe Bool
   }
+ deriving (Eq, Ord, Read, Show)
 makeClassy ''NumericalConfig
 
 

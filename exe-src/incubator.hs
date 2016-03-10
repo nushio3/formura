@@ -8,19 +8,19 @@ import qualified Control.Exception as C
 import           Control.Lens
 import           Control.Monad.State
 import           Data.Aeson.TH
-import           Data.List (isPrefixOf)
-import           Data.Maybe
 import qualified Data.ByteString as BS
+import           Data.List (isPrefixOf)
+import qualified Data.Map as M
+import           Data.Maybe
+import           Data.Time
 import qualified Data.Yaml as Y
 import qualified Data.Yaml.Pretty as Y
 import           Data.Text.Lens (packed)
-import           GHC.IO.Exception (ExitCode)
 import           System.Directory
 import           System.Exit
 import           System.FilePath ((</>))
 import           System.FilePath.Lens
 import           System.IO
-import           System.IO.Error
 import           System.IO.Temp
 import           System.IO.Unsafe
 import           System.Process
@@ -109,11 +109,13 @@ data Action = Codegen
             | Visualize
             | Done
             | Failed
+              deriving (Eq, Ord, Show, Read)
 
 deriveJSON defaultOptions ''Action
 
 data WaitFile = WaitLocalFile FilePath
               | WaitRemoteFile FilePath
+              deriving (Eq, Ord, Show, Read)
 
 data QBConfig =
   QBConfig
@@ -143,18 +145,11 @@ type WithQBConfig = ?qbc :: QBConfig
 
 data Individual =
   Individual
-  { _idvAction :: Action
-  , _idvName :: String
-  , _idvFormuraVersion :: String
+  { _idvFormuraVersion :: String
   , _idvSourcecodeURL :: String
   , _idvNumericalConfig :: NumericalConfig
-  , _idvLocalWorkDir :: Maybe String
-  , _idvLocalCodePaths :: Maybe [String]
-  , _idvRemoteWorkDir :: Maybe String
-  , _idvRemoteExecPath :: Maybe String
-  , _idvRemoteOutputPath :: Maybe String
-  , _idvImagePath :: Maybe String
-  }
+  , _idvCompilerFlags :: String
+  } deriving (Eq, Ord, Read, Show)
 
 makeClassy ''Individual
 
@@ -166,18 +161,55 @@ $(deriveJSON (let toSnake = packed %~ snakify in
 
 defaultIndividual :: Individual
 defaultIndividual = Individual
-  { _idvAction = Codegen
-  , _idvName = "default"
-  , _idvFormuraVersion = "3aed540676dca114e9367ef1d94b0b3ca00ea8f4"
+  { _idvFormuraVersion = "3aed540676dca114e9367ef1d94b0b3ca00ea8f4"
   , _idvSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd.fmr"
   , _idvNumericalConfig = unsafePerformIO $ fromJust <$> readYaml "/home/nushio/hub/formura/examples/3d-mhd.nc"
-  , _idvLocalWorkDir = Just "/home/nushio/hub/formura-rawdata/"
-  , _idvLocalCodePaths = Nothing
-  , _idvRemoteWorkDir = Nothing
-  , _idvRemoteExecPath = Nothing
-  , _idvRemoteOutputPath = Nothing
-  , _idvImagePath = Nothing
+  , _idvCompilerFlags = []
   }
+
+
+data Experiment =
+  Experiment
+  { _xpAction :: Action
+  , _xpIndividualName :: String
+  , _xpLocalWorkDir :: String
+  , _xpLocalCodePaths :: [String]
+  , _xpRemoteWorkDir :: String
+  , _xpRemoteExecPath :: String
+  , _xpRemoteOutputPath :: String
+  , _xpImagePath :: String
+  , _xpTimeStamps :: [(UTCTime,Action)]
+  } deriving (Eq, Ord, Read, Show)
+
+makeClassy ''Experiment
+
+$(deriveJSON (let toSnake = packed %~ snakify in
+               defaultOptions{fieldLabelModifier = toSnake . drop 4,
+                              constructorTagModifier = toSnake,
+                              omitNothingFields = True})
+  ''Experiment)
+
+defaultExperiment :: Experiment
+defaultExperiment = Experiment
+  { _xpAction = Codegen
+  , _xpIndividualName = "default"
+  , _xpLocalWorkDir = "/home/nushio/hub/formura-rawdata/"
+  , _xpLocalCodePaths = [""]
+  , _xpRemoteWorkDir = ""
+  , _xpRemoteExecPath = ""
+  , _xpRemoteOutputPath = ""
+  , _xpImagePath = ""
+  , _xpTimeStamps = []
+  }
+
+
+data IndExp = IndExp Individual Experiment
+            deriving (Eq, Ord, Show, Read)
+
+instance HasIndividual IndExp where
+  individual f (IndExp i x) = (\i -> IndExp i x) <$> f i
+instance HasExperiment IndExp where
+  experiment f (IndExp i x) = (\x -> IndExp i x) <$> f x
 
 
 data IncubatorState =
@@ -198,16 +230,20 @@ instance HasIndividual IncubatorState where
 -- Incubator functions
 ----------------------------------------------------------------
 
-readIndividual :: FilePath -> IO (Maybe Individual)
-readIndividual fn = do
+readIndExp :: FilePath -> IO (Maybe IndExp)
+readIndExp fn = do
   readYaml fn >>= \case
     Nothing -> return Nothing
-    Just x -> return $ Just $ x
-      { _idvLocalWorkDir = Just $ fn ^. directory
-      }
+    Just idv0 -> do
+      let xpfn = fn & extension .~ "exp"
+      xp0 <- maybe defaultExperiment id <$> readYaml xpfn
+      let xp1 = xp0
+            { _xpLocalWorkDir = fn ^. directory
+            }
+      return $ Just $ IndExp idv0 xp1
 
-getCompiler :: WithQBConfig => String -> IO FilePath
-getCompiler gitKey = do
+getCodegen :: WithQBConfig => String -> IO FilePath
+getCodegen gitKey = do
   absPath <- getCurrentDirectory
   let fn = cpath </>("formura-" ++ gitKey)
       cpath = absPath </> (?qbc ^. qbWorkDir) </> "compilers"
@@ -224,25 +260,25 @@ getCompiler gitKey = do
           cmd $ "cp ./bin/formura " ++ fn
       return fn
 
-codegen :: WithQBConfig => Individual -> IO Individual
-codegen idv = do
+codegen :: WithQBConfig => IndExp -> IO IndExp
+codegen it = do
   let labNote = ?qbc ^. qbLabNotePath
-      Just workDir = idv ^. idvLocalWorkDir
+      workDir = it ^. xpLocalWorkDir
   cmd $ "mkdir -p " ++ workDir
-  codegenFn <- getCompiler $ idv ^. idvFormuraVersion
+  codegenFn <- getCodegen $ it ^. idvFormuraVersion
   withCurrentDirectory workDir $ do
-    superCopy (idv ^. idvSourcecodeURL) "main.fmr"
-    writeYaml "main.nc" $ idv ^. idvNumericalConfig
+    superCopy (it ^. idvSourcecodeURL) "main.fmr"
+    writeYaml "main.nc" $ it ^. idvNumericalConfig
     cmd $ codegenFn ++ " main.fmr"
-  return $ idv & idvAction .~ Compile
+  return $ it & xpAction .~ Compile
 
-compile :: Individual -> IO Individual
+compile :: IndExp -> IO IndExp
 compile idv = return idv
 
-benchmark :: Individual -> IO Individual
+benchmark :: IndExp -> IO IndExp
 benchmark idv = return idv
 
-visualize :: Individual -> IO Individual
+visualize :: IndExp -> IO IndExp
 visualize = return
 
 
@@ -265,15 +301,15 @@ mainServer = do
   findIdvs <- readCmd $ "find " ++ noteDir ++ " -name '*.idv'"
   let idvFns = lines findIdvs
 
-  idvs <- catMaybes <$> mapM readIndividual idvFns
+  idxps <- catMaybes <$> mapM readIndExp idvFns
 
-  mapM_ proceed idvs
+  mapM_ proceed idxps
 
   return ()
 
-proceed :: Individual -> IO ()
-proceed idv = do
-  return ()
+proceed :: IndExp -> IO ()
+proceed idxp = do
+  print idxp
 
 {- note: to submit interactive job on greatwave:
 

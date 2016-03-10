@@ -111,6 +111,7 @@ executable incubator
               , aeson
               , bytestring
               , cases
+              , containers
               , directory
               , filepath
               , formura
@@ -118,6 +119,7 @@ executable incubator
               , mtl
               , process
               , temporary
+              , time
               , yaml
 
 
