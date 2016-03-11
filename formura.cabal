@@ -119,6 +119,7 @@ executable incubator
               , mtl
               , process
               , temporary
+              , text
               , time
               , unordered-containers
               , yaml

@@ -16,7 +16,8 @@ import           Data.Maybe
 import           Data.Time
 import qualified Data.Yaml as Y
 import qualified Data.Yaml.Pretty as Y
-import           Data.Text.Lens (packed)
+import qualified Data.Text as T
+import qualified Data.Text.Lens as T (packed)
 import           System.Directory
 import           System.Exit
 import           System.FilePath ((</>))
@@ -49,7 +50,7 @@ superCopy src dest = do
             k fn
         | otherwise = k src
   go $ \fn -> do
-    cmd $ unwords ["scp", fn, dest]
+    cmd $ unwords ["scp -r ", fn, dest]
     return ()
 
 writeYaml :: Y.ToJSON a => FilePath -> a -> IO ()
@@ -151,12 +152,12 @@ data QBConfig =
   { _qbHostName :: String
   , _qbWorkDir :: String
   , _qbLabNotePath :: String
-  , _qbRemoteWorkdir :: String
+  , _qbRemoteLabNotePath :: String
   }
 
 makeClassy ''QBConfig
 
-$(deriveJSON (let toSnake = packed %~ snakify in
+$(deriveJSON (let toSnake = T.packed %~ snakify in
                defaultOptions{fieldLabelModifier = toSnake . drop 3,
                               constructorTagModifier = toSnake,
                               omitNothingFields = True})
@@ -168,9 +169,9 @@ qbConfigFilePath = ".qb/config"
 
 qbDefaultConfig = QBConfig
   { _qbHostName = "K"
-  , _qbWorkDir = ".qb/work"
+  , _qbWorkDir = ".qb/"
   , _qbLabNotePath = "/home/nushio/hub/3d-mhd/individuals"
-  , _qbRemoteWorkdir = "/volume81/data/ra000008/nushio/individuals"}
+  , _qbRemoteLabNotePath = "/volume81/data/ra000008/nushio/individuals"}
 
 type WithQBConfig = ?qbc :: QBConfig
 
@@ -184,7 +185,7 @@ data Individual =
 
 makeClassy ''Individual
 
-$(deriveJSON (let toSnake = packed %~ snakify in
+$(deriveJSON (let toSnake = T.packed %~ snakify in
                defaultOptions{fieldLabelModifier = toSnake . drop 4,
                               constructorTagModifier = toSnake,
                               omitNothingFields = True})
@@ -215,7 +216,7 @@ data Experiment =
 
 makeClassy ''Experiment
 
-$(deriveJSON (let toSnake = packed %~ snakify in
+$(deriveJSON (let toSnake = T.packed %~ snakify in
                defaultOptions{fieldLabelModifier = toSnake . drop 3,
                               constructorTagModifier = toSnake,
                               omitNothingFields = True})
@@ -226,7 +227,7 @@ defaultExperiment = Experiment
   { _xpAction = Codegen
   , _xpIndividualFilePath = ""
   , _xpExperimentFilePath = ""
-  , _xpLocalWorkDir = "/home/nushio/hub/formura-rawdata/"
+  , _xpLocalWorkDir = ""
   , _xpLocalCodePaths = [""]
   , _xpRemoteWorkDir = ""
   , _xpRemoteExecPath = ""
@@ -262,6 +263,12 @@ instance HasIndividual IncubatorState where
 ----------------------------------------------------------------
 -- Incubator functions
 ----------------------------------------------------------------
+
+remoteCmd :: WithQBConfig => String -> IO ExitCode
+remoteCmd str = do
+  let host = ?qbc ^. qbHostName
+  cmd $ "ssh " ++ host ++ " '(" ++ str ++ ")'"
+
 
 readIndExp :: FilePath -> IO (Maybe IndExp)
 readIndExp fn = do
@@ -327,11 +334,21 @@ codegen it = do
       , unlines $ map c2oCmd csrcFiles]
 
 
-  return $ it & xpAction .~ Compile
+  return $ it
+    & xpAction .~ Compile
+    & xpLocalCodePaths .~ [codeDir]
 
-
-compile :: IndExp -> IO IndExp
-compile idv = return idv
+compile :: WithQBConfig => IndExp -> IO IndExp
+compile it = do
+  let localWD = it ^. xpLocalWorkDir
+      localLN  = ?qbc ^. qbLabNotePath
+      remoteLN = ?qbc ^. qbRemoteLabNotePath
+  forM (it ^. xpLocalCodePaths) $ \srcdir -> do
+    let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
+    remoteCmd $ "mkdir -p " ++ remotedir
+    cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
+    remoteCmd $ "cd " ++ remotedir ++ ";make -j8"
+  return it
 
 benchmark :: IndExp -> IO IndExp
 benchmark idv = return idv
@@ -370,9 +387,11 @@ proceed it = do
   print it
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
+    Compile -> compile it
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
       return it
+
   writeIndExp newIt
 
 {- note: to submit interactive job on greatwave:
