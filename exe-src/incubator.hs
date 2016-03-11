@@ -320,7 +320,7 @@ codegen it = do
     superCopy (it ^. idvFmrSourcecodeURL) "3d-mhd.fmr"
     superCopy (it ^. idvCppSourcecodeURL) "3d-mhd-main.cpp"
     writeYaml "3d-mhd.yaml" $ it ^. idvNumericalConfig
-    cmd $ codegenFn ++ " main.fmr"
+    cmd $ codegenFn ++ " 3d-mhd.fmr"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
           [fn | fn <- foundFiles, fn ^. extension == ".cpp"] ++
