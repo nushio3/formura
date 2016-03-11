@@ -127,14 +127,13 @@ int main (int argc, char **argv)
 
     }
 
+    if (navi.time_step >= T_MAX) break;
     if (navi.time_step == 0) {
       t_begin = wctime();
       start_collection("main");
     }
-    if (navi.time_step >= T_MAX) break;
 
-
-    Formura_Forward(&navi);
+    Formura_Forward(&navi); // navi.time_step increases
 
     if (navi.time_step >= T_MAX) {
       t_end = wctime();

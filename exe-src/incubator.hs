@@ -178,7 +178,8 @@ type WithQBConfig = ?qbc :: QBConfig
 data Individual =
   Individual
   { _idvFormuraVersion :: String
-  , _idvSourcecodeURL :: String
+  , _idvFmrSourcecodeURL :: String
+  , _idvCppSourcecodeURL :: String
   , _idvNumericalConfig :: NumericalConfig
   , _idvCompilerFlags :: [String]
   } deriving (Eq, Ord, Read, Show)
@@ -194,7 +195,8 @@ $(deriveJSON (let toSnake = T.packed %~ snakify in
 defaultIndividual :: Individual
 defaultIndividual = Individual
   { _idvFormuraVersion = "3aed540676dca114e9367ef1d94b0b3ca00ea8f4"
-  , _idvSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd.fmr"
+  , _idvFmrSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd.fmr"
+  , _idvCppSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd-main-prof.cpp"
   , _idvNumericalConfig = unsafePerformIO $ fromJust <$> readYaml "/home/nushio/hub/formura/examples/3d-mhd.yaml"
   , _idvCompilerFlags = []
   }
@@ -314,11 +316,15 @@ codegen it = do
   cmd $ "mkdir -p " ++ codeDir
   codegenFn <- getCodegen $ it ^. idvFormuraVersion
   withCurrentDirectory codeDir $ do
-    superCopy (it ^. idvSourcecodeURL) "main.fmr"
-    writeYaml "main.yaml" $ it ^. idvNumericalConfig
+    superCopy (it ^. idvFmrSourcecodeURL) "3d-mhd.fmr"
+    superCopy (it ^. idvCppSourcecodeURL) "3d-mhd-main.cpp"
+    writeYaml "3d-mhd.yaml" $ it ^. idvNumericalConfig
+    cmd $ "rm *.c *.cpp *.h"
     cmd $ codegenFn ++ " main.fmr"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
-    let csrcFiles = [fn | fn <- foundFiles, elem (fn ^. extension) [".c", ".cpp"]]
+    let csrcFiles =
+          [fn | fn <- foundFiles, fn ^. extension == ".cpp"] ++
+          [fn | fn <- foundFiles, fn ^. extension == ".c"]
         objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
         c2oCmd fn = unlines
