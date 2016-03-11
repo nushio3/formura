@@ -137,6 +137,7 @@ data Action = Codegen
             | Compile
             | Benchmark
             | Visualize
+            | Wait [([FilePath], Action)] -- Wait for certain files to appear, then transit to next action
             | Done
             | Failed
               deriving (Eq, Ord, Show, Read)
@@ -338,8 +339,13 @@ codegen it = do
       , "a.out: $(OBJS)"
       , "\t$(CC) $(OBJS) -o a.out"
       , unlines $ map c2oCmd csrcFiles]
-
-
+    writeFile "make.sh" $ unlines
+      [ "make -j8"
+      , "make -j4"
+      , "make -j2"
+      , "make"
+      , "touch make.done"]
+    cmd "chmod 755 make.sh"
   return $ it
     & xpAction .~ Compile
     & xpLocalCodePaths .~ [codeDir]
@@ -353,7 +359,7 @@ compile it = do
     let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
     remoteCmd $ "mkdir -p " ++ remotedir
     cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
-    remoteCmd $ "cd " ++ remotedir ++ ";make -j8"
+    remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
   return it
 
 benchmark :: IndExp -> IO IndExp
