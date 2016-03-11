@@ -151,6 +151,7 @@ data QBConfig =
   { _qbHostName :: String
   , _qbWorkDir :: String
   , _qbLabNotePath :: String
+  , _qbRemoteWorkdir :: String
   }
 
 makeClassy ''QBConfig
@@ -166,9 +167,10 @@ qbConfigFilePath :: FilePath
 qbConfigFilePath = ".qb/config"
 
 qbDefaultConfig = QBConfig
-  { _qbHostName = "greatwave"
+  { _qbHostName = "K"
   , _qbWorkDir = ".qb/work"
-  , _qbLabNotePath = "/home/nushio/hub/3d-mhd/individuals"}
+  , _qbLabNotePath = "/home/nushio/hub/3d-mhd/individuals"
+  , _qbRemoteWorkdir = "/volume81/data/ra000008/nushio/individuals"}
 
 type WithQBConfig = ?qbc :: QBConfig
 
