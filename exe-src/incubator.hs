@@ -194,11 +194,11 @@ $(deriveJSON (let toSnake = T.packed %~ snakify in
 
 defaultIndividual :: Individual
 defaultIndividual = Individual
-  { _idvFormuraVersion = "3aed540676dca114e9367ef1d94b0b3ca00ea8f4"
+  { _idvFormuraVersion = "2f8eb9c50669914e17ba24105380d0f4f631ea59"
   , _idvFmrSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd.fmr"
   , _idvCppSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd-main-prof.cpp"
   , _idvNumericalConfig = unsafePerformIO $ fromJust <$> readYaml "/home/nushio/hub/formura/examples/3d-mhd.yaml"
-  , _idvCompilerFlags = []
+  , _idvCompilerFlags = ["-O3", "-Kfast,parallel", "-Kocl", "-Klib", "-Koptmsg=2", "-Karray_private", "-Kinstance=8", "-Kdynamic_iteration", "-Kloop_fission", "-Kloop_part_parallel", "-Kloop_part_simd", "-Keval", "-Kreduction", "-Ksimd=2"]
   }
 
 
@@ -329,7 +329,7 @@ codegen it = do
 
         c2oCmd fn = unlines
           [ (fn & extension .~ "o") ++ ": " ++ fn
-          , "\t$(CC) -c $^ -o $@"]
+          , "\t$(CC) -c $^ -o $@ 2> $@.optmsg"]
 
     writeFile "Makefile" $ unlines
       [ "all: a.out"
@@ -376,6 +376,7 @@ mainInit = do
 mainServer :: IO ()
 mainServer = do
   putStrLn "Qppy!"
+  writeYaml "izanagi.idv" defaultIndividual
   Just qbc0 <- readYaml qbConfigFilePath
   let ?qbc = qbc0 :: QBConfig
   let noteDir = ?qbc ^. qbLabNotePath
