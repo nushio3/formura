@@ -453,7 +453,7 @@ constIntExpr = fromInteger <$> natural
 
 
 specialDeclaration :: P SpecialDeclaration
-specialDeclaration = dd  <|> ad <|> od
+specialDeclaration = dd  <|> ad
   where
     dd = do
       "dimension declaration" ?> try $ keyword "dimension"
@@ -465,14 +465,6 @@ specialDeclaration = dd  <|> ad <|> od
       keyword "::"
       xs <- identName `sepBy` symbolic ','
       return $ AxesDeclaration xs
-    od = do
-      key <- "general special declaration" ?> try otherSDKeywords
-      keyword "::"
-      vals <- integer' `sepBy` symbolic ','
-      return $ OtherDeclaration key vals
-    otherSDKeywords =
-      choice [symbol x
-             | x <- ["mpi_grid_shape" , "intra_node_shape", "temporal_blocking_interval", "monitor_interval"]]
 
 program :: P Program
 program = do

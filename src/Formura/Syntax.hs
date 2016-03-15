@@ -289,7 +289,6 @@ type RExprF = Sum '[ LetF, LambdaF, ApplyF, GridF, TupleF, OperatorF, IdentF, Im
 
 data SpecialDeclaration = DimensionDeclaration Int
                         | AxesDeclaration [IdentName]
-                        | OtherDeclaration String [Integer]
              deriving (Eq, Ord, Show, Data)
 
 data Program = Program
