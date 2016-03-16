@@ -474,7 +474,7 @@ visualize it = do
     cmd $ "chmod 755 " ++ "postprocess.sh"
   cmd $ "rsync -avz " ++ (exeDir ++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
   remoteCmd $ "cd " ++ remotedir ++ ";./postprocess.sh"
-  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/") ++ " " ++ (exeDir ++"/")
+  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/") ++ " " ++ (exeDir ++"/out/")
   return $ it
     & xpAction .~ Done
 
