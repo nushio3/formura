@@ -707,7 +707,7 @@ genDistributedProgram insts0 = do
   when (insts1 /= concat insts2) $
     raiseErr $ failed $ "Detected instruction order mismatch!"
 
-  bodies <- mapM (mapM go) $ insts2
+  bodies <- mapM (mapM go2) $ insts2
   ps <- mapM genCall bodies
 
 
@@ -731,6 +731,11 @@ genDistributedProgram insts0 = do
         | otherwise  = reverse accum : grp [] (x:xs)
 
 
+      go2 :: DistributedInst -> TranM (DistributedInst, T.Text)
+      go2 i = do
+        j <- go i
+        return (i,j)
+
       go :: DistributedInst -> TranM T.Text
       go (Computation cmp destRsc) = genComputation cmp destRsc
       go (Unstage rid) = genStagingCode False rid
@@ -739,16 +744,25 @@ genDistributedProgram insts0 = do
       go (CommunicationSendRecv f) = return $ "// sndrcv " <> showC f <> "\n"
       go (CommunicationWait f)     = return $ "// wait "   <> showC f <> "\n"
 
-      genCall :: [T.Text] -> TranM T.Text
-      genCall body = do
-        funName <- genFreeName "Formura_internal"
-        tellH $ "void "<> funName <> "(struct Formura_Navigator *navi);\n"
-        tellF (T.unpack funName <> ".c") $ T.unlines $
-          ["void "<> funName <> "(struct Formura_Navigator *navi){"]
-          ++ map braces body ++
-          ["}"]
-        return $ funName <> "(navi);"
+      genCall :: [(DistributedInst, T.Text)] -> TranM T.Text
+      genCall instPairs = do
+        let body = map snd instPairs
+            isGenerateFunction = case map fst instPairs of
+              [(CommunicationWait     _)] -> False
+              [(CommunicationSendRecv _)] -> False
+              _                           -> True
 
+        case isGenerateFunction of
+          True -> do
+            funName <- genFreeName "Formura_internal"
+            tellH $ "void "<> funName <> "(struct Formura_Navigator *navi);\n"
+            tellF (T.unpack funName <> ".c") $ T.unlines $
+              ["void "<> funName <> "(struct Formura_Navigator *navi){"]
+              ++ map braces body ++
+              ["}"]
+            return $ funName <> "(navi);"
+          False -> do
+            return $ T.unlines $ map braces body
 
 -- | Let the plans collaborate
 
