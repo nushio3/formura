@@ -65,15 +65,17 @@ doesRidgeNeedMPI r = r ^.ridgeDeltaMPI /= MPIRank 0
 
 type Ridge = (RidgeID, Box)
 
-type FacetID = (MPIRank, IRank, IRank)
+data FacetID = FacetID { _facetDeltaMPI :: MPIRank, _facetIRSrc :: IRank, _facetIRDest :: IRank}
+                   deriving (Eq, Ord, Show, Read, Typeable, Data)
+makeLenses ''FacetID
 
 data DistributedInst
-  = CommunicationRecv FacetID                      -- receive a facet via MPI
+  = CommunicationWait FacetID                      -- receive a facet via MPI
   | Unstage RidgeID                                -- copy from ridge to slice
   | Computation (IRank, OMNodeID) ArrayResourceKey -- compute a region slice and store them into the resource
   | FreeResource ArrayResourceKey                  -- mark the end of use for given resource
   | Stage RidgeID                                  -- copy from slice to ridge
-  | CommunicationSend FacetID                      -- send a facet via MPI
+  | CommunicationSendRecv FacetID                  -- send a facet via MPI
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 
 type ArrayResourceKey = ResourceT () IRank
@@ -374,10 +376,10 @@ cut = do
 
       ridgeFirstNeededAt :: M.Map RidgeID IRank
       ridgeFirstNeededAt = M.unionsWith (\a _ -> a)
-        [ (rid,ir)
+        [ M.singleton rid ir
         | ir <- iRanks0
         , nid <- M.keys stepGraph
-        , rid <- maybe [] id $ M.lookup ridgeAndBoxRequest (ir, nid)
+        , rid <- maybe [] id $ M.lookup (ir, nid) ridgeRequest
         ]
 
 
@@ -403,6 +405,20 @@ cut = do
         ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) [ridge0]
         ResourceOMNode nid (iSrc,_) -> M.singleton (ResourceOMNode nid iSrc) [ridge0]
 
+      facetAssignment :: M.Map RidgeID FacetID
+      facetAssignment = M.fromList
+        [ (r, FacetID (r ^. ridgeDeltaMPI) irSrc irDest)
+        | r <- M.keys allRidges
+        , doesRidgeNeedMPI r
+        , let Just irDest = M.lookup r ridgeFirstNeededAt
+        , let irSrc = case r ^. ridgeDelta of
+                ResourceStatic _ _     -> head $ iRanks0
+                ResourceOMNode _ (x,_) -> x]
+
+      allFacets :: M.Map FacetID [RidgeID]
+      allFacets = M.unionsWith (++) [M.singleton f [r] | (r,f) <- M.toList facetAssignment]
+
+
   let insert :: DistributedInst -> PlanM ()
       insert inst = do
         psAlreadyIssuedInst %= (S.insert inst)
@@ -423,6 +439,9 @@ cut = do
 
 
   forM_ iRanks0 $ \ir -> do
+    sequence [ insert $ CommunicationWait f
+             | f <- M.keys allFacets
+             , f ^. facetIRDest == ir]
     forM_ (M.keys stepGraph) $ \nid -> do
       let inRidges  = fromMaybe [] $ M.lookup (ir,nid) ridgeRequest
           outRidges = fromMaybe [] $ M.lookup (ResourceOMNode nid ir) ridgeProvide
@@ -439,6 +458,10 @@ cut = do
       insert $ Computation (ir, nid) tailRsc
 
       forM_ outRidges $ \rdg0 -> insertOnce $ Stage rdg0
+
+    sequence [ insert $ CommunicationSendRecv f
+             | f <- M.keys allFacets
+             , f ^. facetIRSrc == ir]
 
 
 
@@ -457,18 +480,6 @@ cut = do
         ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) box0
         ResourceOMNode nid (_,iDest) -> M.singleton (ResourceOMNode nid iDest) box0
 
-      facetAssignment :: M.Map RidgeID FacetID
-      facetAssignment = M.fromList
-        [ (r, (r ^. ridgeDeltaMPI, irSrc, irDest))
-        | r <- allRidges
-        , True <- doesRidgeNeedMPI r
-        , let Just irDest = M.lookup r ridgeFirstNeededAt
-        , let irSrc = case r of
-                ResourceStatic _ _     -> head $ iRanks0
-                ResourceOMNode _ (x,_) -> x]
-
-      allFacets :: M.Map FacetID [RidgeID]
-      allFacets = M.unionsWith (++) [M.singleton f [r] | (r,f) <- M.toList facetAssignment]
 
   dProg0 <- toList <$> use psDistributedProgramQ
 
@@ -529,6 +540,11 @@ cut = do
     forM_ (M.toList allRidges) $ \(rid, box) -> do
       putStrLn $ show rid
       putStrLn $ "  " ++ show box
+
+    putStrLn "#### Facet List ####"
+    forM_ (M.toList allFacets) $ \(f,rs) -> do
+      putStrLn $ show f
+      putStrLn $ "  " ++ show rs
 
     putStrLn "#### Program ####"
     mapM_ print dProg1

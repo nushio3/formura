@@ -736,6 +736,8 @@ genDistributedProgram insts0 = do
       go (Unstage rid) = genStagingCode False rid
       go (Stage rid) = genStagingCode True rid
       go (FreeResource _) = return ""
+      go (CommunicationSendRecv f) = return $ "// sndrcv " <> showC f <> "\n"
+      go (CommunicationWait f)     = return $ "// wait "   <> showC f <> "\n"
 
       genCall :: [T.Text] -> TranM T.Text
       genCall body = do
