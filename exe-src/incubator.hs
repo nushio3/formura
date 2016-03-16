@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, ImplicitParams, LambdaCase, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, ImplicitParams, LambdaCase, MultiWayIf, TemplateHaskell #-}
 
 module Main where
 
@@ -144,12 +144,13 @@ interactCmd cmdstr input = do
 -- Incubator Datatypes
 ----------------------------------------------------------------
 
+type WaitList = [([FilePath], Action)]
 
 data Action = Codegen
             | Compile
             | Benchmark
             | Visualize
-            | Wait [([FilePath], Action)] -- Wait for certain files to appear, then transit to next action
+            | Wait Action WaitList -- Wait for certain files to appear, then transit to next action
             | Done
             | Failed Action
               deriving (Eq, Ord, Show, Read)
@@ -370,17 +371,25 @@ compile it = do
   let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
-  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
+  --remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
 
   return $ it
-    & xpAction .~ Wait [([host ++ ":" ++ remotedir ++ "/a.out"], Benchmark)
-                       ,([host ++ ":" ++ remotedir ++ "/make.done"], Failed Compile)]
+    & xpAction .~ Wait Compile
+    [ ([host ++ ":" ++ remotedir ++ "/a.out"], Benchmark)
+    , ([host ++ ":" ++ remotedir ++ "/make.done"], Failed Compile)]
 
 benchmark :: IndExp -> IO IndExp
 benchmark idv = return idv
 
 visualize :: IndExp -> IO IndExp
 visualize = return
+
+waits :: WaitList -> IndExp -> IO IndExp
+waits [] it = return it
+waits ((fs,a):ws) it = do
+  es <- mapM superDoesFileExist fs
+  if and es then return $ it & xpAction .~ a
+    else waits ws it
 
 
 main :: IO ()
@@ -416,6 +425,7 @@ proceed it = do
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
     Compile -> compile it
+    Wait _ waitlist -> waits waitlist it
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
       return it
