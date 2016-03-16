@@ -65,13 +65,15 @@ doesRidgeNeedMPI r = r ^.ridgeDeltaMPI /= MPIRank 0
 
 type Ridge = (RidgeID, Box)
 
+type FacetID = (MPIRank, IRank, IRank)
+
 data DistributedInst
-  = CommunicationRecv (MPIRank, IRank, IRank)      -- receive a facet via MPI
+  = CommunicationRecv FacetID                      -- receive a facet via MPI
   | Unstage RidgeID                                -- copy from ridge to slice
   | Computation (IRank, OMNodeID) ArrayResourceKey -- compute a region slice and store them into the resource
   | FreeResource ArrayResourceKey                  -- mark the end of use for given resource
   | Stage RidgeID                                  -- copy from slice to ridge
-  | CommunicationSend (MPIRank, IRank, IRank)      -- send a facet via MPI
+  | CommunicationSend FacetID                      -- send a facet via MPI
                    deriving (Eq, Ord, Show, Read, Typeable, Data)
 
 type ArrayResourceKey = ResourceT () IRank
