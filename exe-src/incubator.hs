@@ -151,7 +151,7 @@ data Action = Codegen
             | Visualize
             | Wait [([FilePath], Action)] -- Wait for certain files to appear, then transit to next action
             | Done
-            | Failed
+            | Failed Action
               deriving (Eq, Ord, Show, Read)
 
 deriveJSON defaultOptions ''Action
@@ -218,12 +218,12 @@ data Experiment =
   , _xpIndividualFilePath :: FilePath
   , _xpExperimentFilePath :: FilePath
   , _xpLocalWorkDir :: String
-  , _xpLocalCodePaths :: [String]
+  , _xpLocalCodeDir :: String
   , _xpRemoteWorkDir :: String
   , _xpRemoteExecPath :: String
   , _xpRemoteOutputPath :: String
   , _xpImagePath :: String
-  , _xpTimeStamps :: [(UTCTime,Action)]
+  , _xpTimeStamps :: [(UTCTime,UTCTime,Action)]
   } deriving (Eq, Ord, Read, Show)
 
 makeClassy ''Experiment
@@ -240,7 +240,7 @@ defaultExperiment = Experiment
   , _xpIndividualFilePath = ""
   , _xpExperimentFilePath = ""
   , _xpLocalWorkDir = ""
-  , _xpLocalCodePaths = [""]
+  , _xpLocalCodeDir = ""
   , _xpRemoteWorkDir = ""
   , _xpRemoteExecPath = ""
   , _xpRemoteOutputPath = ""
@@ -358,19 +358,23 @@ codegen it = do
     cmd "chmod 755 make.sh"
   return $ it
     & xpAction .~ Compile
-    & xpLocalCodePaths .~ [codeDir]
+    & xpLocalCodeDir .~ codeDir
 
 compile :: WithQBConfig => IndExp -> IO IndExp
 compile it = do
   let localWD = it ^. xpLocalWorkDir
       localLN  = ?qbc ^. qbLabNotePath
       remoteLN = ?qbc ^. qbRemoteLabNotePath
-  forM (it ^. xpLocalCodePaths) $ \srcdir -> do
-    let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
-    remoteCmd $ "mkdir -p " ++ remotedir
-    cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
-    remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
-  return it
+      host = ?qbc ^. qbHostName
+  let srcdir = it ^. xpLocalCodeDir
+  let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
+  remoteCmd $ "mkdir -p " ++ remotedir
+  cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
+  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
+
+  return $ it
+    & xpAction .~ Wait [([host ++ ":" ++ remotedir ++ "/a.out"], Benchmark)
+                       ,([host ++ ":" ++ remotedir ++ "/make.done"], Failed Compile)]
 
 benchmark :: IndExp -> IO IndExp
 benchmark idv = return idv
@@ -408,15 +412,22 @@ mainServer = do
 proceed :: WithQBConfig => IndExp -> IO ()
 proceed it = do
   print it
+  t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
     Compile -> compile it
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
       return it
+  t_end <- getCurrentTime
+  writeIndExp $ newIt
+    & xpTimeStamps %~ insertTimeStamp (t_begin, t_end, it ^. xpAction)
 
-  writeIndExp newIt
-
+  where
+    insertTimeStamp ts [] = [ts]
+    insertTimeStamp ts@(_,te,a1) tss@((tb,_,a2):tstail)
+      | a1 == a2  = (tb,te,a1):tstail
+      | otherwise = ts:tss
 {- note: to submit interactive job on greatwave:
 
  pjsub --interact -L node=4 -L elapse=2:00:00 -L rscunit=gwmpc
