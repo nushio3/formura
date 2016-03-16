@@ -289,7 +289,8 @@ readIndExp fn = do
 
 writeIndExp :: IndExp -> IO ()
 writeIndExp it = do
-  writeYaml (it ^. xpIndividualFilePath) (it ^. individual)
+  -- Do not alter individual:
+  -- writeYaml (it ^. xpIndividualFilePath) (it ^. individual)
   writeYaml (it ^. xpExperimentFilePath) (it ^. experiment)
 
 getCodegen :: WithQBConfig => String -> IO FilePath
