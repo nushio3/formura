@@ -375,7 +375,7 @@ compile it = do
   let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
-  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
+  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.stdout 2> make.stderr &"
 
   return $ it
     & xpAction .~ Wait Compile
@@ -412,15 +412,15 @@ benchmark it = do
       , ""
       , "# stage in  a.out."
       , "#PJM --stgin \"./src/a.out %r:./a.out\""
-      , "#PJM --stgout \"%r:./out/* ./out-%r/\""
-      , "#PJM --stgout \"%r:./prof-ip/* ./prof-ip-%r/\""
-      , "#PJM --stgout \"%r:./prof-01/* ./prof-01-%r/\""
-      , "#PJM --stgout \"%r:./prof-02/* ./prof-02-%r/\""
-      , "#PJM --stgout \"%r:./prof-03/* ./prof-03-%r/\""
-      , "#PJM --stgout \"%r:./prof-04/* ./prof-04-%r/\""
-      , "#PJM --stgout \"%r:./prof-05/* ./prof-05-%r/\""
-      , "#PJM --stgout \"%r:./prof-06/* ./prof-06-%r/\""
-      , "#PJM --stgout \"%r:./prof-07/* ./prof-07-%r/\""
+      , "#PJM --stgout \"%r:./out/* ./out/out-%r/\""
+      , "#PJM --stgout \"%r:./prof-ip/* ./out/prof-ip-%r/\""
+      , "#PJM --stgout \"%r:./prof-01/* ./out/prof-01-%r/\""
+      , "#PJM --stgout \"%r:./prof-02/* ./out/prof-02-%r/\""
+      , "#PJM --stgout \"%r:./prof-03/* ./out/prof-03-%r/\""
+      , "#PJM --stgout \"%r:./prof-04/* ./out/prof-04-%r/\""
+      , "#PJM --stgout \"%r:./prof-05/* ./out/prof-05-%r/\""
+      , "#PJM --stgout \"%r:./prof-06/* ./out/prof-06-%r/\""
+      , "#PJM --stgout \"%r:./prof-07/* ./out/prof-07-%r/\""
       , ""
       , "#statistics output"
       , "#PJM -s"
@@ -461,14 +461,14 @@ visualize it = do
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   withCurrentDirectory exeDir $ do
     writeFile "postprocess.sh" $ unlines
-      [ printf "fipppx -A -p all -Icpu,balance,call,hwm -d prof-ip* > prof_ip.txt"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-01-* -o output_prof_1.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-02-* -o output_prof_2.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-03-* -o output_prof_3.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-04-* -o output_prof_4.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-05-* -o output_prof_5.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-06-* -o output_prof_6.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-07-* -o output_prof_7.csv"
+      [ printf "fipppx -A -p all -Icpu,balance,call,hwm -d out/prof-ip* > out/prof_ip.txt"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-01-* -o out/output_prof_1.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-02-* -o out/output_prof_2.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-03-* -o out/output_prof_3.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-04-* -o out/output_prof_4.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-05-* -o out/output_prof_5.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-06-* -o out/output_prof_6.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-07-* -o out/output_prof_7.csv"
       ]
     cmd $ "chmod 755 " ++ "postprocess.sh"
   cmd $ "rsync -avz " ++ (exeDir ++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
