@@ -986,31 +986,6 @@ genCxxFiles formuraProg mmProg = do
     ignore :: X.SomeException -> IO ()
     ignore _ = return ()
 
-ncFilePath :: WithCommandLineOption => FilePath
-ncFilePath = case ?commandLineOption ^. numericalConfigFilename of
-  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".yaml"
-  x  -> x
-
-
-cxxFilePath :: WithCommandLineOption => FilePath
-cxxFilePath = case ?commandLineOption ^. outputFilename of
-  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".c"
-  x  -> x
-
-cxxFileBodyPath :: WithCommandLineOption => FilePath
-cxxFileBodyPath = case ?commandLineOption ^. outputFilename of
-  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ""
-  x  -> x & extension .~ ""
-
-
-hxxFilePath :: WithCommandLineOption => FilePath
-hxxFilePath = cxxFilePath & extension .~ ".h"
-
-cxxFileName :: WithCommandLineOption => FilePath
-cxxFileName = cxxFilePath ^. filename
-
-hxxFileName :: WithCommandLineOption => FilePath
-hxxFileName = hxxFilePath ^. filename
 
 cxxTemplate ::  WithCommandLineOption => T.Text
 cxxTemplate = T.unlines

@@ -5,7 +5,6 @@ double :: π = 3.141592653589793
 double :: dens0 = 1.0
 double :: dp_ddens = 1
 double :: dp_ds    = 2/5
-double :: NX = 64*2, NY=64*2, NZ=64*2
 double :: dt = 0.1/(NX >? NY >? NZ)
 double :: dx = 1/NX, dy = 1/NY, dz = 1/NZ
 double :: c_h = dx/dt

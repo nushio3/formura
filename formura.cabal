@@ -127,6 +127,7 @@ executable incubator
 
 
 executable formura-parser
+  buildable: False
   hs-source-dirs: exe-src
   main-is: formura-parser.hs
   default-language:    Haskell2010
@@ -138,6 +139,7 @@ executable formura-parser
               , trifecta
 
 executable formura-eval
+  buildable: False
   hs-source-dirs: exe-src
   main-is: formura-eval.hs
   default-language:    Haskell2010

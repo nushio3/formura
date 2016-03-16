@@ -15,11 +15,14 @@ module Formura.Parser where
 import Control.Applicative
 import Control.Lens
 import Control.Monad
-import Data.Char (isSpace, isLetter, isAlphaNum, isPrint)
+import Data.Char (isSpace, isLetter, isAlphaNum, isPrint, toUpper)
 import Data.Either (partitionEithers)
+import Data.Foldable (toList)
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as S
+import qualified Data.Yaml as Y
+import System.IO.Unsafe
 import Text.Trifecta hiding (ident)
 import Text.Trifecta.Delta
 import qualified Text.Parser.Expression as X
@@ -27,7 +30,9 @@ import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 
 import Text.Parser.LookAhead
 
+import Formura.CommandLineOption
 import Formura.Language.Combinator
+import Formura.NumericalConfig
 import Formura.Type (elementTypenames)
 import Formura.Vec
 import Formura.Syntax
@@ -466,9 +471,29 @@ specialDeclaration = dd  <|> ad
       xs <- identName `sepBy` symbolic ','
       return $ AxesDeclaration xs
 
-program :: P Program
+program :: WithCommandLineOption => P Program
 program = do
+
   ps <- choice [Left <$> specialDeclaration, Right <$> statementCompound]
         `sepEndBy` statementDelimiter
   let (decls, stmts) = partitionEithers ps
-  return $ Program decls (BindingF $ concat stmts)
+
+  -- read numerical config and introduce global extent variables NX, NY, NZ ...
+  -- TODO: numerical config file is also read at MPICxx.Translate, this is against DRY.
+  -- create a single point of NC reading.
+  let mnc = unsafePerformIO $ Y.decodeFile ncFilePath
+  nc <- case mnc of
+     Nothing -> raiseErr $ failed $ "cannot parse numerical config .yaml file: " ++ show ncFilePath
+     Just x -> return (x :: NumericalConfig)
+  let globalExtents = toList $ (nc ^. ncIntraNodeShape) * (nc ^. ncMPIGridShape)
+      ivars = head [x | AxesDeclaration x <- decls]
+
+      extentVarNames :: [IdentName]
+      extentVarNames = map (("N" ++) . map toUpper) ivars
+
+      mkExtentStmt :: IdentName -> Int -> StatementF RExpr
+      mkExtentStmt x n = SubstF (Ident x) (Imm $ fromIntegral n)
+
+      globalExtentStmts = zipWith mkExtentStmt extentVarNames globalExtents
+
+  return $ Program decls (BindingF $ globalExtentStmts ++ concat stmts)
