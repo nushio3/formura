@@ -53,6 +53,18 @@ superCopy src dest = do
     cmd $ unwords ["scp -r ", fn, dest]
     return ()
 
+superDoesFileExist :: FilePath -> IO Bool
+superDoesFileExist fn = do
+  let (host,b) = break (==':') fn
+  case b of
+    "" -> doesFileExist fn
+    (_:path) -> do
+      xc <- cmd $ "ssh " ++ host ++ " test -e " ++ path
+      case xc of
+        ExitSuccess -> return True
+        _ -> return False
+
+
 writeYaml :: Y.ToJSON a => FilePath -> a -> IO ()
 writeYaml fn obj = BS.writeFile fn $ Y.encodePretty (Y.setConfCompare compare Y.defConfig) obj
 
@@ -144,9 +156,6 @@ data Action = Codegen
 
 deriveJSON defaultOptions ''Action
 
-data WaitFile = WaitLocalFile FilePath
-              | WaitRemoteFile FilePath
-              deriving (Eq, Ord, Show, Read)
 
 data QBConfig =
   QBConfig
