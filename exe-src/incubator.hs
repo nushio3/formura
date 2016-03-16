@@ -504,6 +504,8 @@ mainServer = do
   Just qbc0 <- readYaml qbConfigFilePath
   let ?qbc = qbc0 :: QBConfig
   let noteDir = ?qbc ^. qbLabNotePath
+  withCurrentDirectory noteDir $
+    cmd "git pull"
   findIdvs <- readCmd $ "find " ++ noteDir ++ " -name '*.idv'"
   let idvFns = lines findIdvs
 

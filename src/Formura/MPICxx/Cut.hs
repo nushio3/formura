@@ -87,6 +87,8 @@ data SendOrRecv = Send | Recv | SendRecv
 data MPIPlan = MPIPlan
   { _planArrayAlloc :: M.Map ArrayResourceKey Box
   , _planRidgeAlloc :: M.Map RidgeID Box
+  , _planFacetAssignment :: M.Map RidgeID FacetID
+  , _planFacetAlloc :: M.Map FacetID [RidgeID]
   , _planRegionAlloc :: M.Map (IRank, OMNodeID) Box
   , _planDistributedProgram :: [DistributedInst]
   , _planSystemOffset :: Vec Int
@@ -370,6 +372,15 @@ cut = do
       ridgeRequest :: M.Map (IRank, OMNodeID) [RidgeID]
       ridgeRequest = M.map (map fst) ridgeAndBoxRequest
 
+      ridgeFirstNeededAt :: M.Map RidgeID IRank
+      ridgeFirstNeededAt = M.unionsWith (\a _ -> a)
+        [ (rid,ir)
+        | ir <- iRanks0
+        , nid <- M.keys stepGraph
+        , rid <- maybe [] id $ M.lookup ridgeAndBoxRequest (ir, nid)
+        ]
+
+
       go :: (IRank, OMNodeID) -> M.Map Resource Box -> [Ridge]
       go (ir, nid) rbmap =
         [ mkRidge ir crsc
@@ -446,6 +457,19 @@ cut = do
         ResourceStatic sn () -> M.singleton (ResourceStatic sn ()) box0
         ResourceOMNode nid (_,iDest) -> M.singleton (ResourceOMNode nid iDest) box0
 
+      facetAssignment :: M.Map RidgeID FacetID
+      facetAssignment = M.fromList
+        [ (r, (r ^. ridgeDeltaMPI, irSrc, irDest))
+        | r <- allRidges
+        , True <- doesRidgeNeedMPI r
+        , let Just irDest = M.lookup r ridgeFirstNeededAt
+        , let irSrc = case r of
+                ResourceStatic _ _     -> head $ iRanks0
+                ResourceOMNode _ (x,_) -> x]
+
+      allFacets :: M.Map FacetID [RidgeID]
+      allFacets = M.unionsWith (++) [M.singleton f [r] | (r,f) <- M.toList facetAssignment]
+
   dProg0 <- toList <$> use psDistributedProgramQ
 
   -- insert Free
@@ -514,6 +538,8 @@ cut = do
   return MPIPlan
     { _planArrayAlloc = allAllocs
     , _planRidgeAlloc = allRidges
+    , _planFacetAlloc = allFacets
+    , _planFacetAssignment = facetAssignment
     , _planRegionAlloc = M.fromList
       [ ((ir,nid), boxAssignment mpiRankOrigin ir nid)
       | ir <- iRanks0
