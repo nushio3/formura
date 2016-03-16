@@ -9,8 +9,9 @@ import           Control.Lens
 import           Control.Monad.State
 import           Data.Aeson.TH
 import qualified Data.ByteString as BS
+import           Data.Foldable
 import qualified Data.HashMap.Strict as HM
-import           Data.List (isPrefixOf, sort)
+import           Data.List (isPrefixOf, sort, intercalate)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.Time
@@ -26,7 +27,7 @@ import           System.IO
 import           System.IO.Temp
 import           System.IO.Unsafe
 import           System.Process
-
+import           Text.Printf
 import           Formura.NumericalConfig
 
 ----------------------------------------------------------------
@@ -59,7 +60,7 @@ superDoesFileExist fn = do
   case b of
     "" -> doesFileExist fn
     (_:path) -> do
-      xc <- cmd $ "ssh " ++ host ++ " test -e " ++ path
+      xc <- cmd $ "ssh " ++ host ++ " test -e " ++ "'" ++ path ++ "'"
       case xc of
         ExitSuccess -> return True
         _ -> return False
@@ -257,6 +258,9 @@ instance HasIndividual IndExp where
   individual f (IndExp i x) = (\i -> IndExp i x) <$> f i
 instance HasExperiment IndExp where
   experiment f (IndExp i x) = (\x -> IndExp i x) <$> f x
+instance HasNumericalConfig IndExp where
+  numericalConfig = individual . idvNumericalConfig
+
 
 
 data IncubatorState =
@@ -371,18 +375,107 @@ compile it = do
   let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
-  --remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
+  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.o 2> make.e &"
 
   return $ it
     & xpAction .~ Wait Compile
     [ ([host ++ ":" ++ remotedir ++ "/a.out"], Benchmark)
     , ([host ++ ":" ++ remotedir ++ "/make.done"], Failed Compile)]
 
-benchmark :: IndExp -> IO IndExp
-benchmark idv = return idv
+benchmark :: WithQBConfig => IndExp -> IO IndExp
+benchmark it = do
+  let labNote = ?qbc ^. qbLabNotePath
+      exeDir = it ^. xpLocalWorkDir
+      mpiSize :: Int
+      mpiSize = product $ it ^. ncMPIGridShape
 
-visualize :: IndExp -> IO IndExp
-visualize = return
+      mpiNodeShape :: String
+      mpiNodeShape = intercalate "x" $ map show $ reverse $ toList $ it ^. ncMPIGridShape
+  let
+      localLN  = ?qbc ^. qbLabNotePath
+      remoteLN = ?qbc ^. qbRemoteLabNotePath
+      host = ?qbc ^. qbHostName
+  let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
+
+  withCurrentDirectory exeDir $ do
+    writeFile "submit.sh" $ unlines
+      [ "#!/bin/sh -x"
+      , printf "#PJM --rsc-list \"node=%s\""mpiNodeShape
+      , printf "#PJM --mpi \"shape=%s\""mpiNodeShape
+      , ""
+      , "#time limit"
+      , "#PJM --name \"autobenchmark\""
+      , "#PJM --rsc-list \"elapse=12:00:00\""
+      , "#PJM --rsc-list \"rscgrp=small\""
+      , "#PJM --mpi \"use-rankdir\""
+      , "#PJM --stg-transfiles all"
+      , ""
+      , "# stage in  a.out."
+      , "#PJM --stgin \"./src/a.out %r:./a.out\""
+      , "#PJM --stgout \"%r:./out/* ./out-%r/\""
+      , "#PJM --stgout \"%r:./prof-ip/* ./prof-ip-%r/\""
+      , "#PJM --stgout \"%r:./prof-01/* ./prof-01-%r/\""
+      , "#PJM --stgout \"%r:./prof-02/* ./prof-02-%r/\""
+      , "#PJM --stgout \"%r:./prof-03/* ./prof-03-%r/\""
+      , "#PJM --stgout \"%r:./prof-04/* ./prof-04-%r/\""
+      , "#PJM --stgout \"%r:./prof-05/* ./prof-05-%r/\""
+      , "#PJM --stgout \"%r:./prof-06/* ./prof-06-%r/\""
+      , "#PJM --stgout \"%r:./prof-07/* ./prof-07-%r/\""
+      , ""
+      , "#statistics output"
+      , "#PJM -s"
+      , ""
+      , "# config environmental variables"
+      , ". /work/system/Env_base"
+      , "mpiexec /work/system/bin/msh \"mkdir ./out\""
+      , ""
+      , printf "fipp -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-01 -Hpa=1 mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-02 -Hpa=2 mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-03 -Hpa=3 mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-04 -Hpa=4 mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-05 -Hpa=5 mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-06 -Hpa=6 mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
+      ]
+    cmd $ "chmod 755 " ++ "submit.sh"
+  cmd $ "rsync -avz " ++ (exeDir ++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
+  remoteCmd $ "cd " ++ remotedir ++ ";ksub submit.sh"
+
+  let resultFiles = [kpath ++ pat | pat <- ["autobenchmark.i*", "autobenchmark.s*"]]
+      kpath = ?qbc^.qbHostName++":"++remotedir++"/"
+
+  return $ it
+    & xpAction .~ Wait Benchmark
+    [(resultFiles,Visualize)]
+  -- TODO: you can map kjobid and job_id via kstat.
+
+
+visualize :: WithQBConfig => IndExp -> IO IndExp
+visualize it = do
+  let
+      exeDir = it ^. xpLocalWorkDir
+      localLN  = ?qbc ^. qbLabNotePath
+      remoteLN = ?qbc ^. qbRemoteLabNotePath
+      host = ?qbc ^. qbHostName
+  let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
+  withCurrentDirectory exeDir $ do
+    writeFile "postprocess.sh" $ unlines
+      [ printf "fipppx -A -p all -Icpu,balance,call,hwm -d prof-ip* > prof_ip.txt"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-01-* -o output_prof_1.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-02-* -o output_prof_2.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-03-* -o output_prof_3.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-04-* -o output_prof_4.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-05-* -o output_prof_5.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-06-* -o output_prof_6.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d prof-07-* -o output_prof_7.csv"
+      ]
+    cmd $ "chmod 755 " ++ "postprocess.sh"
+  cmd $ "rsync -avz " ++ (exeDir ++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
+  remoteCmd $ "cd " ++ remotedir ++ ";./postprocess.sh"
+  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/") ++ " " ++ (exeDir ++"/")
+  return $ it
+    & xpAction .~ Done
 
 waits :: WaitList -> IndExp -> IO IndExp
 waits [] it = return it
@@ -390,6 +483,7 @@ waits ((fs,a):ws) it = do
   es <- mapM superDoesFileExist fs
   if and es then return $ it & xpAction .~ a
     else waits ws it
+  -- TODO: double check when selecting for failure. Since a file might appear in slight moment
 
 
 main :: IO ()
@@ -425,6 +519,8 @@ proceed it = do
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
     Compile -> compile it
+    Benchmark -> benchmark it
+    Visualize -> visualize it
     Wait _ waitlist -> waits waitlist it
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
