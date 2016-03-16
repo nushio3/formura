@@ -295,6 +295,14 @@ tellResourceDecl name rsc box0 = do
 --           when (decl /= "") $ tellCLn $ decl <> ";"
 
 
+tellFacetDecl :: FacetID -> [RidgeID] -> TranM ()
+tellFacetDecl f rs = do
+  let name = T.pack $ toCName f
+  tellH $ "struct " <> name <> "{};"
+  tellH $ "extern struct " <> name <> " " <> name <> "Send;"
+  tellC $ "struct " <> name <> " " <> name <> "Send;"
+  return ()
+
 
 toCName :: Show a => a -> IdentName
 toCName a = postfix $ fix $ go False $ prefix $ show a
@@ -316,9 +324,11 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
                       T.replace "IRank" "r".
                       T.replace "ridgeDelta_" "".
                       T.replace "MPIRank" "".
-                      T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge"
+                      T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge" .
+                      T.replace "facetIRSrc_IRank" "src" .
+                      T.replace "facetIRDest_IRank" "dest" .
+                      T.replace "FacetID_facetDeltaMPI_" "Facet"
                       )
-
 
 -- | Give name to Resources
 nameArrayResource :: (ResourceT () IRank) -> TranM T.Text
@@ -380,6 +390,10 @@ tellArrayDecls = do
       ResourceOMNode _ _ -> use planSharedResourceExtent
       _ -> return box0
     tellResourceDecl name rsc box1
+  falloc <- use planFacetAlloc
+  forM_ (M.toList falloc) $ \(fr@(f, rs)) -> do
+    tellFacetDecl f rs
+
   ralloc <- use planRidgeAlloc
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
     name <- nameRidgeRequest rk
@@ -760,7 +774,7 @@ genDistributedProgram insts0 = do
               ["void "<> funName <> "(struct Formura_Navigator *navi){"]
               ++ map braces body ++
               ["}"]
-            return $ funName <> "(navi);"
+            return $ funName <> "(navi);\n"
           False -> do
             return $ T.unlines $ map braces body
 
