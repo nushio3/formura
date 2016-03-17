@@ -487,7 +487,6 @@ waits ((fs,a):ws) it = do
   es <- mapM superDoesFileExist fs
   if and es then return $ it & xpAction .~ a
     else waits ws it
-  -- TODO: double check when selecting for failure. Since a file might appear in slight moment
 
 
 main :: IO ()
@@ -527,7 +526,11 @@ proceed it = do
     Compile -> compile it
     Benchmark -> benchmark it
     Visualize -> visualize it
-    Wait _ waitlist -> waits waitlist it
+    Wait _ waitlist -> do
+      ret <- waits waitlist it
+      case ret ^. xpAction of
+        Failed _ -> waits waitlist it -- Double check before choosing to fail.
+        _ -> return ret
     Done -> return it
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
