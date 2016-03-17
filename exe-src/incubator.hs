@@ -358,7 +358,8 @@ codegen it = do
       , "\t$(CC) $(OBJS) -o a.out"
       , unlines $ map c2oCmd csrcFiles]
     writeFile "make.sh" $ unlines
-      [ "make -j8"
+      [ "rm *.o ./a.out"
+      , "make -j8"
       , "make -j4"
       , "make -j2"
       , "make"
