@@ -23,6 +23,7 @@ source-repository head
 
 library
   exposed-modules:
+                  Formura.Utilities
                   Formura.Language.Combinator
                   Formura.Language.TExpr
                   Formura.Annotation
@@ -71,8 +72,10 @@ library
               , sbv
               , syb
               , text
+              , temporary
               , transformers
               , trifecta
+              , unordered-containers
               , vector
               , yaml
 
