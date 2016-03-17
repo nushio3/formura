@@ -733,18 +733,18 @@ genMPISendRecvCode f = do
       dmpi = f ^. facetDeltaMPI
       mpiIsendIrecv :: T.Text
       mpiIsendIrecv = T.unwords $
-          [ "MPI_Isend( (void*) &" <> facetNameSend, ","
-          , "sizeof(struct " <> facetTypeName <>  ") ,"
-          , "MPI_BYTE,"
-          , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
-          , let Just t = M.lookup f mpiTagDict in showC t, ","
-          , "navi->mpi_comm,"
-          , "&" <> reqName <> " );\n"]
-          ++
           [ "MPI_Irecv( (void*) &" <> facetNameRecv, ","
           , "sizeof(struct " <> facetTypeName <>  ") ,"
           , "MPI_BYTE,"
           , "navi->" <> nameDeltaMPIRank dmpi <> ","
+          , let Just t = M.lookup f mpiTagDict in showC t, ","
+          , "navi->mpi_comm,"
+          , "&" <> reqName <> " );\n"]
+          ++
+          [ "MPI_Isend( (void*) &" <> facetNameSend, ","
+          , "sizeof(struct " <> facetTypeName <>  ") ,"
+          , "MPI_BYTE,"
+          , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup f mpiTagDict in showC t, ","
           , "navi->mpi_comm,"
           , "&" <> reqName <> " );\n"]
