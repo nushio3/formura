@@ -433,7 +433,7 @@ benchmark it = do
       , ". /work/system/Env_base"
       , "mpiexec /work/system/bin/msh \"mkdir ./out\""
       , ""
-      , printf "fipp -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
+      , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-01 -Hpa=1 mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-02 -Hpa=2 mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-03 -Hpa=3 mpirun -n %d ./a.out" mpiSize
