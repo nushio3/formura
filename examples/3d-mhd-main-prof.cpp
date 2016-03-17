@@ -142,7 +142,7 @@ int main (int argc, char **argv)
   }
   printf("wct = %lf sec\n",t_end - t_begin);
 
-
+  MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
 
 
