@@ -4,5 +4,5 @@ packages:
 extra-deps:
 - directory-1.2.5.1 # required for `withCurrentDirectory`
 local-bin-path: ./bin
-resolver: lts-5.5
+resolver: lts-5.8
 # skip-ghc-check: True
