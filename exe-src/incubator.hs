@@ -379,7 +379,7 @@ compile it = do
   let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
---  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.stdout 2> make.stderr &"
+  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.stdout 2> make.stderr &"
 
   return $ it
     & xpAction .~ Wait Compile
