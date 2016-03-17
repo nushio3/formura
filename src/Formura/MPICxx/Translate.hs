@@ -307,9 +307,12 @@ tellFacetDecl f rs = do
   let name = T.pack $ toCName f
   tellH $ "struct " <> name <> "{"
 
+  ralloc <- use planRidgeAlloc
+
   forM_ rs $ \rk -> do
     name <- nameRidgeResource' True rk SendRecv
-    tellResourceDecl' True name rsc box0
+    let Just box0 = M.lookup rk ralloc
+    tellResourceDecl' True name (rk ^. ridgeDelta) box0
 
   tellH "};"
 
