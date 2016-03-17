@@ -820,12 +820,12 @@ genDistributedProgram insts0 = do
         case isGenerateFunction of
           True -> do
             funName <- genFreeName "Formura_internal"
-            tellH $ "void "<> funName <> "(struct Formura_Navigator *navi);\n"
+            tellH $ "void "<> funName <> "();\n"
             tellF (T.unpack funName <> ".c") $ T.unlines $
-              ["void "<> funName <> "(struct Formura_Navigator *navi){"]
+              ["void "<> funName <> "(){"]
               ++ map braces body ++
               ["}"]
-            return $ funName <> "(navi);\n"
+            return $ funName <> "();\n"
           False -> do
             return $ T.unlines $ map braces body
 

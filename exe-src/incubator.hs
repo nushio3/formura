@@ -510,7 +510,7 @@ mainServer = do
   withCurrentDirectory noteDir $
     cmd "git pull"
   findIdvs <- readCmd $ "find " ++ noteDir ++ " -name '*.idv'"
-  let idvFns = lines findIdvs
+  let idvFns = sort $ lines findIdvs
 
   idxps <- catMaybes <$> mapM readIndExp idvFns
 
@@ -520,7 +520,7 @@ mainServer = do
 
 proceed :: WithQBConfig => IndExp -> IO ()
 proceed it = do
-  print it
+  putStrLn $ "## "++ it ^. xpExperimentFilePath
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
@@ -528,12 +528,15 @@ proceed it = do
     Benchmark -> benchmark it
     Visualize -> visualize it
     Wait _ waitlist -> waits waitlist it
+    Done -> return it
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
       return it
   t_end <- getCurrentTime
-  writeIndExp $ newIt
-    & xpTimeStamps %~ insertTimeStamp (t_begin, t_end, it ^. xpAction)
+  let newIt2 = newIt & xpTimeStamps %~ insertTimeStamp (t_begin, t_end, it ^. xpAction)
+
+  writeIndExp $ newIt2
+  print (newIt2 ^. xpAction)
 
   where
     insertTimeStamp ts [] = [ts]
