@@ -30,6 +30,7 @@ import qualified Text.PrettyPrint.ANSI.Leijen as Ppr
 
 import Text.Parser.LookAhead
 
+import Formura.Utilities (readYamlDef)
 import Formura.CommandLineOption
 import Formura.Language.Combinator
 import Formura.NumericalConfig
@@ -481,7 +482,7 @@ program = do
   -- read numerical config and introduce global extent variables NX, NY, NZ ...
   -- TODO: numerical config file is also read at MPICxx.Translate, this is against DRY.
   -- create a single point of NC reading.
-  let mnc = unsafePerformIO $ Y.decodeFile ncFilePath
+  let mnc = unsafePerformIO $ readYamlDef defaultNumericalConfig ncFilePath
   nc <- case mnc of
      Nothing -> raiseErr $ failed $ "cannot parse numerical config .yaml file: " ++ show ncFilePath
      Just x -> return (x :: NumericalConfig)

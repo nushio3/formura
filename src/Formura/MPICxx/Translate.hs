@@ -23,7 +23,7 @@ import           System.FilePath.Lens
 import           System.Process
 import           Text.Trifecta (failed, raiseErr)
 
-
+import           Formura.Utilities (readYamlDef)
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
@@ -179,7 +179,7 @@ setNumericalConfig = do
   dim <- view dimension
   ivars <- view axesNames
 
-  mnc <- liftIO $ Y.decodeFile ncFilePath
+  mnc <- liftIO $ readYamlDef defaultNumericalConfig ncFilePath
   nc <- case mnc of
      Nothing -> raiseErr $ failed $ "cannot parse numerical config .yaml file: " ++ show ncFilePath
      Just x -> return x
