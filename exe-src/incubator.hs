@@ -336,6 +336,9 @@ codegen it = do
     superCopy (it ^. idvFmrSourcecodeURL) "3d-mhd.fmr"
     superCopy (it ^. idvCppSourcecodeURL) "3d-mhd-main.cpp"
     writeYaml "3d-mhd.yaml" $ it ^. idvNumericalConfig
+    forM_ ["3d-mhd.fmr", "3d-mhd.yaml", "3d-mhd-main.cpp"] $ \fn -> do
+      cmd $ "git add " ++ fn
+
     cmd $ codegenFn ++ " 3d-mhd.fmr"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
