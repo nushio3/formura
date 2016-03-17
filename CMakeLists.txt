@@ -49,5 +49,6 @@ add_executable(bin/pearson.out ${PearsonCSources} examples/pearson-main.cpp)
 FILE(GLOB MHD2DSources examples/2d-mhd*.c)
 add_executable(bin/2d-mhd.out ${MHD2DSources} examples/2d-mhd-main.cpp)
 # add_executable(bin/av-mhd.out examples/av-mhd.c examples/av-mhd-main.cpp)
-# add_executable(bin/3d-mhd.out examples/3d-mhd.c examples/3d-mhd-main.cpp)
+FILE(GLOB MHD3DSources examples/3d-mhd*.c)
+add_executable(bin/3d-mhd.out ${MHD3DSources} examples/3d-mhd-main.cpp)
 #

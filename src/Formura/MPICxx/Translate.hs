@@ -397,15 +397,17 @@ nameRidgeResource' isInClass r sr0  = do
       planRidgeNames %= M.insert (r,sr1) ret
       return $ prefix <> ret
 
-nameRidgeRequest :: RidgeID -> TranM T.Text
-nameRidgeRequest r  = do
+
+nameFacetRequest :: FacetID -> TranM T.Text
+nameFacetRequest f  = do
   dict <- use planMPIRequestNames
-  case M.lookup r dict of
+  case M.lookup f dict of
     Just ret -> return ret
     Nothing -> do
-      ret <- genFreeName $ "request_" ++ toCName r
-      planMPIRequestNames %= M.insert r ret
+      ret <- genFreeName $ "req_" ++ toCName f
+      planMPIRequestNames %= M.insert f ret
       return ret
+
 
 nameDeltaMPIRank :: MPIRank -> T.Text
 nameDeltaMPIRank r = "mpi_rank_" <> T.pack (toCName r)
@@ -431,11 +433,12 @@ tellArrayDecls = do
   falloc <- use planFacetAlloc
   forM_ (M.toList falloc) $ \(fr@(f, rs)) -> do
     tellFacetDecl f rs
+    name <- nameFacetRequest f
+    tellMPIRequestDecl name
+
 
   ralloc <- use planRidgeAlloc
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
-    name <- nameRidgeRequest rk
-    tellMPIRequestDecl name
     when (not $ doesRidgeNeedMPI rk) $ do
       name <- nameRidgeResource rk SendRecv
       tellResourceDecl name rsc box0
@@ -669,7 +672,6 @@ genStagingCode isStaging rid = do
   ridgeDict <- use planRidgeAlloc
   arrDict   <- use planArrayAlloc
   intraShape <- use ncIntraNodeShape
-  mpiTagDict <- use planRidgeMPITag
 
   let Just box0 = M.lookup rid ridgeDict
       src :: ArrayResourceKey
@@ -682,7 +684,6 @@ genStagingCode isStaging rid = do
   arrName <- nameArrayResource src
   rdgNameSend <- nameRidgeResource rid Send
   rdgNameRecv <- nameRidgeResource rid Recv
-  reqName <- nameRidgeRequest rid
   ivars <- use loopIndexNames
   let offset :: Vec Int
       offset = box0^.lowerVertex
@@ -715,37 +716,49 @@ genStagingCode isStaging rid = do
         | otherwise = arrTerm <> "=" <> rdgTerm
 
 
-  let dmpi = rid ^. ridgeDeltaMPI
-      mpiIsendIrecv :: T.Text
-      mpiIsendIrecv = case  doesRidgeNeedMPI rid && isStaging of
-        False -> ""
-        True  -> T.unwords $
-          [ "MPI_Isend( (void*) &" <> rdgNameSend <> T.unwords (replicate dim "[0]") , ","
-          , showC $ volume box0 , ","
-          , "MPI_DOUBLE," -- TODO: Check Ridge type!!
-          , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
-          , let Just t = M.lookup rid mpiTagDict in showC t, ","
-          , "navi->mpi_comm," -- TODO: use MPI_COMM given by Formura_Init
-          , "&" <> reqName <> " );\n"]
-          ++
-          [ "MPI_Irecv( (void*) &" <> rdgNameRecv <> T.unwords (replicate dim "[0]") , ","
-          , showC $ volume box0 , ","
-          , "MPI_DOUBLE," -- TODO: Check Ridge type!!
-          , "navi->" <> nameDeltaMPIRank dmpi <> ","
-          , let Just t = M.lookup rid mpiTagDict in showC t, ","
-          , "navi->mpi_comm," -- TODO: use MPI_COMM given by Formura_Init
-          , "&" <> reqName <> " );\n"]
-
-      mpiWait :: T.Text
-      mpiWait =  case  doesRidgeNeedMPI rid && not isStaging of
-        False -> ""
-        True -> T.unwords $
-          ["MPI_Wait(&" <> reqName <>  ",MPI_STATUS_IGNORE);\n"]
 
   return $
-    mpiWait <>
-    T.unlines openLoops <> body <> ";" <> T.unlines closeLoops <>
-    mpiIsendIrecv
+    T.unlines openLoops <> body <> ";" <> T.unlines closeLoops
+
+genMPISendRecvCode :: FacetID -> TranM T.Text
+genMPISendRecvCode f = do
+  reqName <- nameFacetRequest f
+  facetNameSend <- nameFacet f Send
+  facetNameRecv <- nameFacet f Recv
+  facetTypeName <- nameFacet f SendRecv
+  mpiTagDict <- use planFacetMPITag
+
+
+  let
+      dmpi = f ^. facetDeltaMPI
+      mpiIsendIrecv :: T.Text
+      mpiIsendIrecv = T.unwords $
+          [ "MPI_Isend( (void*) &" <> facetNameSend, ","
+          , "sizeof(struct " <> facetTypeName <>  ") ,"
+          , "MPI_BYTE,"
+          , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
+          , let Just t = M.lookup f mpiTagDict in showC t, ","
+          , "navi->mpi_comm,"
+          , "&" <> reqName <> " );\n"]
+          ++
+          [ "MPI_Irecv( (void*) &" <> facetNameRecv, ","
+          , "sizeof(struct " <> facetTypeName <>  ") ,"
+          , "MPI_BYTE,"
+          , "navi->" <> nameDeltaMPIRank dmpi <> ","
+          , let Just t = M.lookup f mpiTagDict in showC t, ","
+          , "navi->mpi_comm,"
+          , "&" <> reqName <> " );\n"]
+  return mpiIsendIrecv
+
+genMPIWaitCode :: FacetID -> TranM T.Text
+genMPIWaitCode f = do
+  reqName <- nameFacetRequest f
+  let
+      dmpi = f ^. facetDeltaMPI
+      mpiWait :: T.Text
+      mpiWait = T.unwords $
+          ["MPI_Wait(&" <> reqName <>  ",MPI_STATUS_IGNORE);\n"]
+  return mpiWait
 
 
 -- | generate a distributed program
@@ -793,8 +806,8 @@ genDistributedProgram insts0 = do
       go (Unstage rid) = genStagingCode False rid
       go (Stage rid) = genStagingCode True rid
       go (FreeResource _) = return ""
-      go (CommunicationSendRecv f) = return $ "// sndrcv " <> showC f <> "\n"
-      go (CommunicationWait f)     = return $ "// wait "   <> showC f <> "\n"
+      go (CommunicationSendRecv f) = genMPISendRecvCode f
+      go (CommunicationWait f)     = genMPIWaitCode f
 
       genCall :: [(DistributedInst, T.Text)] -> TranM T.Text
       genCall instPairs = do
