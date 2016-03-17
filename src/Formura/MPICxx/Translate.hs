@@ -262,9 +262,11 @@ tellMPIRequestDecl name = do
       alreadyDeclaredResourceNames %= S.insert name
       tellH "extern "
       tellBothLn $ "MPI_Request "<>name<>";\n"
-
 tellResourceDecl :: T.Text -> ResourceT a b -> Box -> TranM ()
-tellResourceDecl name rsc box0 = do
+tellResourceDecl = tellResourceDecl' False
+
+tellResourceDecl' :: Bool -> T.Text -> ResourceT a b -> Box -> TranM ()
+tellResourceDecl' isInClass name rsc box0 = do
   adrn <- use alreadyDeclaredResourceNames
   case S.member name adrn || name == "" of
     True -> return ()
@@ -281,9 +283,14 @@ tellResourceDecl name rsc box0 = do
         ElemType x -> return $ T.pack  x <> " " <> name <> szpt
         _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
       when (decl /= "") $ do
-        tellH "extern "
-        tellBoth decl
-        tellBothLn ";"
+
+        when isInClass $ do
+          tellH decl
+          tellHLn ";"
+        when (not isInClass) $ do
+          tellH "extern "
+          tellBoth decl
+          tellBothLn ";"
 
 
 --       case rsc of
@@ -298,9 +305,18 @@ tellResourceDecl name rsc box0 = do
 tellFacetDecl :: FacetID -> [RidgeID] -> TranM ()
 tellFacetDecl f rs = do
   let name = T.pack $ toCName f
-  tellH $ "struct " <> name <> "{};"
-  tellH $ "extern struct " <> name <> " " <> name <> "Send;"
-  tellC $ "struct " <> name <> " " <> name <> "Send;"
+  tellH $ "struct " <> name <> "{"
+
+  forM_ rs $ \rk -> do
+    name <- nameRidgeResource' True rk SendRecv
+    tellResourceDecl' True name rsc box0
+
+  tellH "};"
+
+  tellH $ "extern struct " <> name <> " " <> name <> "_Send;"
+  tellH $ "extern struct " <> name <> " " <> name <> "_Recv;"
+  tellC $ "struct " <> name <> " " <> name <> "_Send;"
+  tellC $ "struct " <> name <> " " <> name <> "_Recv;"
   return ()
 
 
@@ -353,19 +369,30 @@ nameArrayResource rsc = case rsc of
     planResourceNames %= M.insert rsc ret
     return ret
 
-
 nameRidgeResource :: RidgeID -> SendOrRecv -> TranM T.Text
-nameRidgeResource r sr0 = do
+nameRidgeResource = nameRidgeResource' False
+
+nameRidgeResource' :: Bool -> RidgeID -> SendOrRecv -> TranM T.Text
+nameRidgeResource' isInClass r sr0  = do
   dict <- use planRidgeNames
-  let (sr1, suffix) = case doesRidgeNeedMPI r of
-        True  -> (sr0, "_" ++ show sr0)
-        False -> (SendRecv, "")
+  fdict <- use planFacetAssignment
+  prefix <- if not (doesRidgeNeedMPI r) || isInClass
+            then return ""
+            else do
+    let Just f = M.lookup r fdict
+    fname <- nameFacet f sr0
+    return $ fname <> "."
+
+  let (sr1, suffix) = (SendRecv, "")
+--   let (sr1, suffix) = case doesRidgeNeedMPI r of
+--         True  -> (sr0, "_" ++ show sr0)
+--         False -> (SendRecv, "")
   case M.lookup (r,sr1) dict of
-    Just ret -> return ret
+    Just ret -> return $ prefix <> ret
     Nothing -> do
       ret <- genFreeName $ toCName r ++ suffix
       planRidgeNames %= M.insert (r,sr1) ret
-      return ret
+      return $ prefix <> ret
 
 nameRidgeRequest :: RidgeID -> TranM T.Text
 nameRidgeRequest r  = do
@@ -379,6 +406,14 @@ nameRidgeRequest r  = do
 
 nameDeltaMPIRank :: MPIRank -> T.Text
 nameDeltaMPIRank r = "mpi_rank_" <> T.pack (toCName r)
+
+nameFacet :: FacetID -> SendOrRecv -> TranM T.Text
+nameFacet f sr = do
+  let name = T.pack $ toCName f
+  case sr of
+    SendRecv -> return $ name
+    _        -> return $ name <> "_" <> showC sr
+
 
 -- | Generate Declaration for State Arrays
 tellArrayDecls :: TranM ()
@@ -398,8 +433,8 @@ tellArrayDecls = do
   forM_ (M.toList ralloc) $ \(rk@(RidgeID _ rsc), box0) -> do
     name <- nameRidgeRequest rk
     tellMPIRequestDecl name
-    forM_ [Send,Recv] $ \sr -> do
-      name <- nameRidgeResource rk sr
+    when (not $ doesRidgeNeedMPI rk) $ do
+      name <- nameRidgeResource rk SendRecv
       tellResourceDecl name rsc box0
 
 
