@@ -210,7 +210,12 @@ getCodegen gitKey = do
       withSystemTempDirectory "qb-codegen" $ \dir -> do
         withCurrentDirectory dir $ do
           putStrLn dir
-          cmd $ "git clone /home/nushio/hub/formura ."
+          x <- cmd $ "git clone git@github.com:nushio3/formura ."
+          case x of
+            ExitFailure _ -> do
+              cmd $ "git clone /home/nushio/hub/formura ."
+              return ()
+            _ -> return ()
           cmd $ "git checkout " ++ gitKey
           cmd $ "stack install --local-bin-path ./bin"
           cmd $ "cp ./bin/formura " ++ fn
