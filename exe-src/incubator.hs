@@ -332,7 +332,7 @@ codegen it = do
   cmd $ "mkdir -p " ++ codeDir
   codegenFn <- getCodegen $ it ^. idvFormuraVersion
   withCurrentDirectory codeDir $ do
-    cmd $ "rm *.c *.cpp *.h"
+    cmd $ "rm *.c *.cpp *.h *.out"
     superCopy (it ^. idvFmrSourcecodeURL) "3d-mhd.fmr"
     superCopy (it ^. idvCppSourcecodeURL) "3d-mhd-main.cpp"
     writeYaml "3d-mhd.yaml" $ it ^. idvNumericalConfig
