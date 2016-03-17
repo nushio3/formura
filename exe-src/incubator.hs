@@ -444,6 +444,8 @@ benchmark it = do
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
   cmd $ "rsync -avz " ++ (exeDir ++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
+  remoteCmd $ "cd " ++ remotedir ++ ";mkdir -p old"
+  remoteCmd $ "cd " ++ remotedir ++ ";mv autobenchmark.* out/ old/"
   remoteCmd $ "cd " ++ remotedir ++ ";ksub submit.sh"
 
   let resultFiles = [kpath ++ pat | pat <- ["autobenchmark.i*", "autobenchmark.s*"]]
