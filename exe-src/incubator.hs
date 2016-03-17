@@ -464,8 +464,8 @@ visualize it = do
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   withCurrentDirectory exeDir $ do
     writeFile "postprocess.sh" $ unlines
-      [ printf "fipppx -A -p all -Icpu,balance,call,hwm,src -d out/prof-ip* > out/prof-ip.txt"
-      , printf "fipppx -A -p all -Icpu,call,hwm -tcsv -d out/prof-ip* > out/prof-ip.csv"
+      [ printf "fipppx -A -p all -Icpu,balance,call,hwm,src -d out/prof-ip* > out/output_prof_ip.txt"
+      , printf "fipppx -A -p all -Icpu,call,hwm -tcsv -d out/prof-ip* > out/output_prof_ip.csv"
       , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-01-* -o out/output_prof_1.csv"
       , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-02-* -o out/output_prof_2.csv"
       , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-03-* -o out/output_prof_3.csv"
