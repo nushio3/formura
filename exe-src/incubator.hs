@@ -63,7 +63,9 @@ superDoesFileExist fn = do
       xc <- cmd $ "ssh " ++ host ++ " test -e " ++ "'" ++ path ++ "'"
       case xc of
         ExitSuccess -> return True
-        _ -> return False
+        ExitFailure n | n==1 -> return False
+        ExitFailure n | n==2 -> return True
+        ExitFailure n  -> error $ "unexpected return value of test -e : " ++ show n
 
 
 writeYaml :: Y.ToJSON a => FilePath -> a -> IO ()
