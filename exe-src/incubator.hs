@@ -88,7 +88,7 @@ readYamlDef def fn = do
           v2 = unionValue v (Y.toJSON def)
       case (Y.decodeEither' $ Y.encode v2) of
         Left msg -> do
-          hPutStrLn stderr $ "When merginf " ++ fn ++ "\n" ++ Y.prettyPrintParseException msg
+          hPutStrLn stderr $ "When merging " ++ fn ++ "\n" ++ Y.prettyPrintParseException msg
           return Nothing
         Right x -> return $ Just x
 
