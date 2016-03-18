@@ -20,6 +20,7 @@ import qualified Data.Yaml.Pretty as Y
 import qualified Data.Text as T
 import qualified Data.Text.Lens as T (packed)
 import           System.Directory
+import           System.Environment
 import           System.Exit
 import           System.FilePath ((</>))
 import           System.FilePath.Lens
@@ -401,10 +402,13 @@ mainInit = do
 
 mainServer :: IO ()
 mainServer = do
+  argv <- getArgs
   putStrLn "Qppy!"
   writeYaml "izanagi.idv" defaultIndividual
   Just qbc0 <- readYaml qbConfigFilePath
-  let ?qbc = qbc0 :: QBConfig
+  let ?qbc = case argv of
+        [dirn0] -> qbc0{_qbLabNotePath = dirn0}
+        _ -> qbc0 :: QBConfig
   let noteDir = ?qbc ^. qbLabNotePath
   withCurrentDirectory noteDir $
     cmd "git pull"

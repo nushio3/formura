@@ -473,7 +473,7 @@ nPlusK i d | d == 0 = i
 
 -- | generate bindings, and the final expression that contains the result of evaluation.
 
-genMMInstruction :: IRank -> MMInstruction -> TranM (T.Text, T.Text)
+genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (T.Text, T.Text)
 genMMInstruction ir0 mminst = do
   indNames <- use loopIndexNames
   indOffset <- use loopIndexOffset -- indNames + indOffset = real addr
