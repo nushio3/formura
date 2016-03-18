@@ -841,11 +841,11 @@ genDistributedProgram insts0 = do
             tellH $ "void "<> funName <> "();\n"
             tellF (T.unpack funName <> ".c") $ T.unlines $
               ["void "<> funName <> "(){"]
-              ++ map braces body ++
+              ++ body ++
               ["}"]
             return $ funName <> "();\n"
           False -> do
-            return $ T.unlines $ map braces body
+            return $ T.unlines $ body
 
 -- | Let the plans collaborate
 
