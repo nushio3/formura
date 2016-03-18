@@ -250,17 +250,29 @@ codegen it = do
 
     writeFile "Makefile" $ unlines
       [ "all: a.out"
-      , "CC=mpiFCCpx " ++ unwords (it ^. idvCompilerFlags)
+      , "CC=mpiFCC " ++ unwords (it ^. idvCompilerFlags)
       , "OBJS=" ++ unwords objFiles
       , "a.out: $(OBJS)"
       , "\t$(CC) $(OBJS) -o a.out"
       , unlines $ map c2oCmd csrcFiles]
     writeFile "make.sh" $ unlines
-      [ "rm *.o ./a.out make.done"
+      [ "#!/bin/sh -x"
+      , "#PJM --rsc-list \"node=1\""
+      , ""
+      , "#time limit"
+      , "#PJM --name \"autocompile\""
+      , "#PJM --rsc-list \"elapse=12:00:00\""
+      , "#PJM --rsc-list \"rscgrp=small\""
+      , "#PJM --mpi \"use-rankdir\""
+      , "#PJM --stg-transfiles all"
+      , ""
+      , "#PJM --stgin \"./src/* %r:./src/\""
+      , "#PJM --stgout \"%r:./src/* ./src/\""
+      , ""
+      , "# config environmental variables"
+      , ". /work/system/Env_base"
+      , "cd src"
       , "make -j8"
-      , "make -j4"
-      , "make -j2"
-      , "make"
       , "touch make.done"]
     cmd "chmod 755 make.sh"
   return $ it
@@ -269,15 +281,18 @@ codegen it = do
 
 compile :: WithQBConfig => IndExp -> IO IndExp
 compile it = do
-  let localWD = it ^. xpLocalWorkDir
+  let
+      exeDir = it ^. xpLocalWorkDir
       localLN  = ?qbc ^. qbLabNotePath
       remoteLN = ?qbc ^. qbRemoteLabNotePath
       host = ?qbc ^. qbHostName
   let srcdir = it ^. xpLocalCodeDir
   let remotedir = srcdir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
+  let remoteExeDir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
-  remoteCmd $ "cd " ++ remotedir ++ ";nohup ./make.sh < /dev/null > make.stdout 2> make.stderr &"
+  remoteCmd $ "cd " ++ remotedir ++  "; rm *.o ./a.out make.done"
+  remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub make.sh"
 
   return $ it
     & xpAction .~ Wait Compile
