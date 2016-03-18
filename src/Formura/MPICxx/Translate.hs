@@ -784,7 +784,7 @@ genDistributedProgram insts0 = do
       sticks :: DistributedInst -> DistributedInst -> Bool
       sticks | "stick-all-comp" `elem` ?ncOpts = sticksB
              | "stick-single-comp" `elem` ?ncOpts = sticksA
-             | otherwise                       = sticksA
+             | otherwise                       = sticksB
 
       sticksA :: DistributedInst -> DistributedInst -> Bool
       sticksA (Unstage _) (Unstage _ ) = True
@@ -1062,8 +1062,8 @@ genCxxFiles formuraProg mmProg = do
       cluster accum [] = reverse accum
       cluster [] (x:xs) = cluster [x] xs
       cluster (ac:acs) (x:xs)
-        | T.length ac > 64000 = cluster ("":ac:acs)  (x:xs)
-        | otherwise           = cluster (ac <> x : acs) xs
+        | ac /= "" && T.length (ac<>x) > 64000 = cluster ("":ac:acs)  (x:xs)
+        | otherwise                            = cluster (ac <> x : acs) xs
 
       writeAuxFile i con = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".c"
