@@ -340,7 +340,7 @@ benchmark it = do
       , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
-  cmd $ "rsync -avz " ++ (exeDir ++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
+  superCopy (exeDir ++"/submit.sh") (?qbc^.qbHostName++":"++remotedir++"/submit.sh")
   remoteCmd $ "cd " ++ remotedir ++ ";mkdir -p old"
   remoteCmd $ "cd " ++ remotedir ++ ";mv autobenchmark.* out/ old/"
   remoteCmd $ "cd " ++ remotedir ++ ";ksub submit.sh"
@@ -375,7 +375,7 @@ visualize it = do
       , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-07-* -o out/output_prof_7.csv"
       ]
     cmd $ "chmod 755 " ++ "postprocess.sh"
-  cmd $ "rsync -avz " ++ (exeDir ++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
+  superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
   remoteCmd $ "cd " ++ remotedir ++ ";./postprocess.sh"
   cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/") ++ " " ++ (exeDir ++"/out/")
   return $ it
