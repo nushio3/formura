@@ -26,6 +26,7 @@ import qualified Test.QuickCheck as Q
 
 import Formura.Language.Combinator
 import Formura.Vec
+import Formura.NumericalConfig
 
 -- * Syntactical Elements
 
@@ -293,7 +294,8 @@ data SpecialDeclaration = DimensionDeclaration Int
 
 data Program = Program
                { _programSpecialDeclarations :: [SpecialDeclaration]
-               , _programBinding :: BindingF RExpr}
+               , _programBinding :: BindingF RExpr
+               , _programNumericalConfig :: NumericalConfig}
              deriving (Eq, Ord, Show, Data)
 makeLenses ''Program
 

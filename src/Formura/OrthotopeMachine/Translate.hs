@@ -515,7 +515,7 @@ lookupToplevelIdents fprog name0 =  case lup stmts of
   [x] -> return x
   _  -> raiseErr $ failed $ "Multiple declaration of identifier `" ++ name0 ++ "` found."
   where
-    (Program decls (BindingF stmts)) = fprog
+    (Program decls (BindingF stmts) _) = fprog
 
     lup :: [StatementF RExpr] -> [RExpr]
     lup [] = []

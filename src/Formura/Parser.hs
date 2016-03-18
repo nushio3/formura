@@ -9,7 +9,7 @@ Stability   : experimental
 This module contains combinator for writing Formura parser, and also the parsers for Formura syntax.
 -}
 
-{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts, GeneralizedNewtypeDeriving, ImplicitParams, TypeFamilies, TypeOperators #-}
 module Formura.Parser where
 
 import Control.Applicative
@@ -479,13 +479,12 @@ program = do
         `sepEndBy` statementDelimiter
   let (decls, stmts) = partitionEithers ps
 
-  -- read numerical config and introduce global extent variables NX, NY, NZ ...
-  -- TODO: numerical config file is also read at MPICxx.Translate, this is against DRY.
-  -- create a single point of NC reading.
   let mnc = unsafePerformIO $ readYamlDef defaultNumericalConfig ncFilePath
-  nc <- case mnc of
+  nc0 <- case mnc of
      Nothing -> raiseErr $ failed $ "cannot parse numerical config .yaml file: " ++ show ncFilePath
      Just x -> return (x :: NumericalConfig)
+
+  let nc = nc0 & ncOptionStrings %~ ((?commandLineOption ^. auxNumericalConfigOptions) ++)
   let globalExtents = toList $ (nc ^. ncIntraNodeShape) * (nc ^. ncMPIGridShape)
       ivars = head [x | AxesDeclaration x <- decls]
 
@@ -497,4 +496,4 @@ program = do
 
       globalExtentStmts = zipWith mkExtentStmt extentVarNames globalExtents
 
-  return $ Program decls (BindingF $ globalExtentStmts ++ concat stmts)
+  return $ Program decls (BindingF $ globalExtentStmts ++ concat stmts) nc

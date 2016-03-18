@@ -178,13 +178,9 @@ setNumericalConfig :: WithCommandLineOption => TranM ()
 setNumericalConfig = do
   dim <- view dimension
   ivars <- view axesNames
+  prog <- use theProgram
 
-  mnc <- liftIO $ readYamlDef defaultNumericalConfig ncFilePath
-  nc <- case mnc of
-     Nothing -> raiseErr $ failed $ "cannot parse numerical config .yaml file: " ++ show ncFilePath
-     Just x -> return x
-
-  tsNumericalConfig .= nc
+  tsNumericalConfig .= prog ^. programNumericalConfig
 
 
   when (length (nc ^. ncMPIGridShape) /= dim) $
@@ -815,13 +811,21 @@ genDistributedProgram insts0 = do
         j <- go i
         return (i,j)
 
+      抑算 = "knockout-computation"   `elem` ?ncOpts
+      抑信 = "knockout-communication" `elem` ?ncOpts
+
+      knockout :: Bool -> TranM T.Text -> TranM T.Text
+      knockout flag m = do
+        t <- m
+        return $ if flag then "" else t
+
       go :: DistributedInst -> TranM T.Text
-      go (Computation cmp destRsc) = genComputation cmp destRsc
-      go (Unstage rid) = genStagingCode False rid
-      go (Stage rid) = genStagingCode True rid
-      go (FreeResource _) = return ""
-      go (CommunicationSendRecv f) = genMPISendRecvCode f
-      go (CommunicationWait f)     = genMPIWaitCode f
+      go (Computation cmp destRsc) = knockout 抑算 $ genComputation cmp destRsc
+      go (Unstage rid)             = knockout 抑算 $ genStagingCode False rid
+      go (Stage rid)               = knockout 抑算 $ genStagingCode True rid
+      go (FreeResource _)          = knockout 抑算 $ return ""
+      go (CommunicationSendRecv f) = knockout 抑信 $ genMPISendRecvCode f
+      go (CommunicationWait f)     = knockout 抑信 $ genMPIWaitCode f
 
       genCall :: [(DistributedInst, T.Text)] -> TranM T.Text
       genCall instPairs = do

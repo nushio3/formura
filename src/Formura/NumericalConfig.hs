@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveDataTypeable, TemplateHaskell #-}
 
 module Formura.NumericalConfig where
 
@@ -6,6 +6,7 @@ import           Cases (snakify)
 import           Control.Lens
 import           Data.Aeson.TH
 import           Data.Char
+import           Data.Data
 import qualified Data.Map as M
 import           Data.Text.Lens (packed)
 
@@ -21,7 +22,7 @@ data NumericalConfig = NumericalConfig
   , _ncWallInverted :: Maybe Bool
   , _ncOptionStrings :: [String]
   }
- deriving (Eq, Ord, Read, Show)
+ deriving (Eq, Ord, Read, Show, Typeable, Data)
 makeClassy ''NumericalConfig
 
 
