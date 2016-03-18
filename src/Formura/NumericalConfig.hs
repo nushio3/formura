@@ -19,7 +19,7 @@ data NumericalConfig = NumericalConfig
   , _ncMonitorInterval :: Int
   , _ncInitialWalls :: M.Map String [Int]
   , _ncWallInverted :: Maybe Bool
-  , _ncStringOptions :: [String]
+  , _ncOptionStrings :: [String]
   }
  deriving (Eq, Ord, Read, Show)
 makeClassy ''NumericalConfig
@@ -40,7 +40,7 @@ defaultNumericalConfig =
   , _ncMonitorInterval = 1
   , _ncInitialWalls = M.empty
   , _ncWallInverted = Nothing
-  , _ncStringOptions = []
+  , _ncOptionStrings = []
      }
 
 
@@ -53,5 +53,5 @@ sampleNumericalConfig =
   , _ncMonitorInterval = 28
   , _ncInitialWalls = M.fromList [("x",[66]), ("y", [34]), ("z", [12,22]) ]
   , _ncWallInverted = Nothing
-  , _ncStringOptions = []
+  , _ncOptionStrings = []
      }

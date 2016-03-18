@@ -762,7 +762,7 @@ genMPIWaitCode f = do
 
 
 -- | generate a distributed program
-genDistributedProgram :: [DistributedInst] -> TranM T.Text
+genDistributedProgram :: (?ncOpts :: [String]) => [DistributedInst] -> TranM T.Text
 genDistributedProgram insts0 = do
   stepGraph <- use omStepGraph
   theGraph .= stepGraph
@@ -782,11 +782,25 @@ genDistributedProgram insts0 = do
       isNop _ = False
 
       sticks :: DistributedInst -> DistributedInst -> Bool
-      sticks (Unstage _) (Unstage _ ) = True
-      sticks (Unstage _) (Computation _ _ ) = True
-      sticks (Computation _ _ ) (Stage _) = True
-      sticks (Stage _) (Stage _) = True
-      sticks _ _ = False
+      sticks | "stick-all-comp" `elem` ?ncOpts = sticksB
+             | "stick-single-comp" `elem` ?ncOpts = sticksA
+             | otherwise                       = sticksA
+
+      sticksA :: DistributedInst -> DistributedInst -> Bool
+      sticksA (Unstage _) (Unstage _ ) = True
+      sticksA (Unstage _) (Computation _ _ ) = True
+      sticksA (Computation _ _ ) (Stage _) = True
+      sticksA (Stage _) (Stage _) = True
+      sticksA _ _ = False
+
+      sticksB :: DistributedInst -> DistributedInst -> Bool
+      sticksB a b =
+        let isComp (CommunicationWait _) = False
+            isComp (CommunicationSendRecv _) = False
+            isComp _ = True
+        in isComp a && isComp b
+
+
 
       grp :: [DistributedInst] -> [DistributedInst] -> [[DistributedInst]]
       grp accum [] = [reverse accum]
@@ -860,6 +874,8 @@ tellProgram = do
   setNamingState
 
   nc <- use tsNumericalConfig
+  let ?ncOpts = nc ^. ncOptionStrings
+
   mpiGrid0 <- use ncMPIGridShape
   mmprog <- use theMMProgram
   ivars <- fmap T.pack <$> view axesNames
