@@ -597,9 +597,14 @@ genMMInstruction ir0 mminst = do
   return $ (T.unwords txts, tailName)
 
 
+ompEveryLoopPragma :: (?ncOpts :: [String]) => T.Text
+ompEveryLoopPragma
+  | "collapse 2" `elem` ?ncOpts = "#pragma omp parallel for collapse(2)"
+  | otherwise                 = ""
+
 -- | generate a formura function body.
 
-genComputation :: (IRank, OMNodeID) -> ArrayResourceKey -> TranM T.Text
+genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM T.Text
 genComputation (ir0, nid0) destRsc0 = do
   ivars <- use loopIndexNames
   regionDict <- use planRegionAlloc
@@ -643,6 +648,7 @@ genComputation (ir0, nid0) destRsc0 = do
             | otherwise       = ivars
 
       return $ T.unlines $
+        [ompEveryLoopPragma] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
 
@@ -662,7 +668,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
 -- | generate a staging/unstaging code
 
-genStagingCode :: Bool -> RidgeID -> TranM T.Text
+genStagingCode :: (?ncOpts :: [String]) => Bool -> RidgeID -> TranM T.Text
 genStagingCode isStaging rid = do
   dim <- view dimension
   ridgeDict <- use planRidgeAlloc
@@ -713,7 +719,7 @@ genStagingCode isStaging rid = do
 
 
 
-  return $
+  return $ ompEveryLoopPragma <>
     T.unlines openLoops <> body <> ";" <> T.unlines closeLoops
 
 genMPISendRecvCode :: FacetID -> TranM T.Text
