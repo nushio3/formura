@@ -719,7 +719,7 @@ genStagingCode isStaging rid = do
 
 
 
-  return $ ompEveryLoopPragma <>
+  return $ ompEveryLoopPragma <> "\n" <>
     T.unlines openLoops <> body <> ";" <> T.unlines closeLoops
 
 genMPISendRecvCode :: FacetID -> TranM T.Text
