@@ -100,10 +100,11 @@ defaultIndividual = Individual
   { _idvFormuraVersion = "2f8eb9c50669914e17ba24105380d0f4f631ea59"
   , _idvFmrSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd.fmr"
   , _idvCppSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd-main-prof.cpp"
-  , _idvNumericalConfig = unsafePerformIO $ fromJust <$> readYaml "/home/nushio/hub/formura/examples/3d-mhd.yaml"
+  , _idvNumericalConfig = defNC
   , _idvCompilerFlags = ["-O3", "-Kfast,parallel", "-Kocl", "-Klib", "-Koptmsg=2", "-Karray_private", "-Kinstance=8", "-Kdynamic_iteration", "-Kloop_fission", "-Kloop_part_parallel", "-Kloop_part_simd", "-Keval", "-Kreduction", "-Ksimd=2"]
   }
-
+  where
+    defNC = unsafePerformIO $ fromJust <$> readYamlDef defaultNumericalConfig "/home/nushio/hub/formura/examples/3d-mhd.yaml"
 
 data Experiment =
   Experiment
