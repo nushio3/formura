@@ -599,7 +599,7 @@ genMMInstruction ir0 mminst = do
 
 ompEveryLoopPragma :: (?ncOpts :: [String]) => T.Text
 ompEveryLoopPragma
-  | "collapse 2" `elem` ?ncOpts = "#pragma omp parallel for collapse(2)"
+  | "omp-collapse" `elem` ?ncOpts = "#pragma omp for collapse(2)"
   | otherwise                 = ""
 
 -- | generate a formura function body.
@@ -847,8 +847,10 @@ genDistributedProgram insts0 = do
             tellH $ "void "<> funName <> "();\n"
             tellF (T.unpack funName <> ".c") $ T.unlines $
               ["void "<> funName <> "(){"]
-              ++ body ++
-              ["}"]
+              ++ (if "omp" `elem` ?ncOpts then ["#pragma omp parallel\n{"] else [])
+              ++ body
+              ++ (if "omp" `elem` ?ncOpts then ["}"] else [])
+              ++ ["}"]
             return $ funName <> "();\n"
           False -> do
             return $ T.unlines $ body
