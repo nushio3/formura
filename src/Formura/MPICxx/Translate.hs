@@ -180,13 +180,13 @@ setNumericalConfig = do
   ivars <- view axesNames
   prog <- use theProgram
 
-  tsNumericalConfig .= prog ^. programNumericalConfig
-
+  let nc = prog ^. programNumericalConfig
+  tsNumericalConfig .= nc
 
   when (length (nc ^. ncMPIGridShape) /= dim) $
-    raiseErr $ failed $ "mpi_grid_shape need exactly " ++ show dim ++ " elements."
+    raiseErr $ failed $ "mpi_grid_shape needs exactly " ++ show dim ++ " elements."
   when (length (nc ^. ncIntraNodeShape) /= dim) $
-    raiseErr $ failed $ "intra_node_shape need exactly " ++ show dim ++ " elements."
+    raiseErr $ failed $ "intra_node_shape needs exactly " ++ show dim ++ " elements."
   return ()
 
 -- | prepare unique name for everyone
