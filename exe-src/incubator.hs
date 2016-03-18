@@ -11,7 +11,7 @@ import           Data.Aeson.TH
 import qualified Data.ByteString as BS
 import           Data.Foldable
 import qualified Data.HashMap.Strict as HM
-import           Data.List (isPrefixOf, sort, intercalate)
+import           Data.List (isPrefixOf, sort, intercalate, isInfixOf)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.Time
@@ -292,7 +292,7 @@ compile it = do
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
   remoteCmd $ "cd " ++ remotedir ++  "; rm *.o ./a.out make.done"
-  remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub make.sh"
+  remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub src/make.sh"
 
   return $ it
     & xpAction .~ Wait Compile
@@ -421,14 +421,15 @@ mainServer = do
   putStrLn "Qppy!"
   writeYaml "izanagi.idv" defaultIndividual
   Just qbc0 <- readYaml qbConfigFilePath
-  let ?qbc = case argv of
-        [dirn0] -> qbc0{_qbLabNotePath = dirn0}
-        _ -> qbc0 :: QBConfig
-  let noteDir = ?qbc ^. qbLabNotePath
+  let ?qbc = qbc0 :: QBConfig
+  let
+     noteDir = ?qbc ^. qbLabNotePath
   withCurrentDirectory noteDir $
     cmd "git pull"
   findIdvs <- readCmd $ "find " ++ noteDir ++ " -name '*.idv'"
-  let idvFns = sort $ lines findIdvs
+  let idvFns = case argv of
+        [pat] -> filter (isInfixOf pat) $ sort $ lines findIdvs
+        _ ->  sort $ lines findIdvs
 
   idxps <- catMaybes <$> mapM readIndExp idvFns
 
