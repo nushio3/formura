@@ -360,8 +360,7 @@ benchmark it = do
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
   superCopy (exeDir ++"/submit.sh") (?qbc^.qbHostName++":"++remotedir++"/submit.sh")
-  remoteCmd $ "cd " ++ remotedir ++ ";mkdir -p old"
-  remoteCmd $ "cd " ++ remotedir ++ ";mv autobenchmark.* out/ old/"
+  remoteCmd $ "cd " ++ remotedir ++ ";rm -fr autobenchmark.* out/ "
   remoteCmd $ "cd " ++ remotedir ++ ";ksub submit.sh"
 
   let resultFiles = [kpath ++ pat | pat <- ["autobenchmark.i*", "autobenchmark.s*"]]
@@ -397,6 +396,7 @@ visualize it = do
   superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
   remoteCmd $ "cd " ++ remotedir ++ ";./postprocess.sh"
   cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/") ++ " " ++ (exeDir ++"/out/")
+  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/src/*.optmsg") ++ " " ++ (exeDir ++"/src/")
   return $ it
     & xpAction .~ Done
 
