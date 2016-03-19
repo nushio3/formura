@@ -458,6 +458,7 @@ proceed it = do
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
       return it
+--      return (it & xpAction .~ Codegen)
   t_end <- getCurrentTime
   let newIt2 = newIt & xpTimeStamps %~ insertTimeStamp (t_begin, t_end, it ^. xpAction)
 
