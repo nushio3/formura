@@ -273,6 +273,9 @@ codegen it = do
       , ". /work/system/Env_base"
       , "cd src"
       , "make -j8"
+      , "make -j4"
+      , "make -j2"
+      , "make"
       , "touch make.done"]
     cmd "chmod 755 make.sh"
   return $ it
