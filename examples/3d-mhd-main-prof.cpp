@@ -52,6 +52,25 @@ void init() {
   }
 }
 
+void write_monitor() {
+  printf("t = %d\n", navi.time_step);
+  char fn[256];
+  sprintf(fn, "out/dump-%06d-%d.txt", navi.time_step, mpi_my_rank);
+  FILE *fp = fopen(fn,"wb");
+  int global_position[3];
+  global_position[0] = navi.offset_x + navi.lower_x;
+  global_position[1] = navi.offset_y + navi.lower_y;
+  global_position[2] = navi.offset_z + navi.lower_z;
+  fwrite(global_position, sizeof(int), 3, fp);
+
+  int z_size = navi.upper_z - navi.lower_z;
+  for(int x = navi.lower_x; x < navi.upper_x; ++x) {
+    for(int y = navi.lower_y; y < navi.upper_y; ++y) {
+      fwrite(dens[x][y]+navi.lower_z, sizeof(double),z_size, fp);
+    }
+  }
+  fclose(fp);
+}
 
 int main (int argc, char **argv)
 {
@@ -81,50 +100,7 @@ int main (int argc, char **argv)
       printf("%d step @ %lf sec\n", navi.time_step, t-t_begin);
     }
     if(navi.time_step % T_MONITOR == 0) {
-      printf("t = %d\n", navi.time_step);
-      char fn[256];
-      sprintf(fn, "out/dens-%06d-%d.txt", navi.time_step, mpi_my_rank);
-      FILE *fp = fopen(fn,"w");
-      for(int x = navi.lower_x; x < navi.upper_x; ++x) {
-        for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            int gx = navi.offset_x + x;
-            int gy = navi.offset_y + y;
-            int gz = navi.offset_z + z;
-            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, dens[x][y][z], s[x][y][z], Psi[x][y][z]);
-          }
-        }
-      }
-      fclose(fp);
-
-      sprintf(fn, "out/v-%06d-%d.txt", navi.time_step, mpi_my_rank);
-      fp = fopen(fn,"w");
-      for(int x = navi.lower_x; x < navi.upper_x; ++x) {
-        for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            int gx = navi.offset_x + x;
-            int gy = navi.offset_y + y;
-            int gz = navi.offset_z + z;
-            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, vx[x][y][z], vy[x][y][z], vz[x][y][z]);
-          }
-        }
-      }
-      fclose(fp);
-
-      sprintf(fn, "out/B-%06d-%d.txt", navi.time_step, mpi_my_rank);
-      fp = fopen(fn,"w");
-      for(int x = navi.lower_x; x < navi.upper_x; ++x) {
-        for(int y = navi.lower_y; y < navi.upper_y; ++y) {
-          for(int z = navi.lower_z; z < navi.upper_z; ++z) {
-            int gx = navi.offset_x + x;
-            int gy = navi.offset_y + y;
-            int gz = navi.offset_z + z;
-            fprintf(fp, "%d %d %d %f %f %f\n", gx, gy, gz, Bx[x][y][z], By[x][y][z], Bz[x][y][z]);
-          }
-        }
-      }
-      fclose(fp);
-
+      write_monitor(navi);
     }
 
     if (navi.time_step >= T_MAX) break;
