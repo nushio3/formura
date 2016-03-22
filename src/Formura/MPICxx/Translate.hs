@@ -10,7 +10,7 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
-import           Data.List (zip4,zip5, zip6)
+import           Data.List (zip4,zip5, zip6, isPrefixOf)
 import qualified Data.Map as M
 import           Data.Maybe
 import qualified Data.Set as S
@@ -558,7 +558,9 @@ genMMInstruction ir0 mminst = do
       Imm r -> thisEq $ showC (realToFrac r :: Double)
       Uniop op a -> do
         a_code <- query a
-        thisEq $ parens $ T.pack op <> a_code
+        if "external-call/" `isPrefixOf` op
+          then thisEq $ parens $ (T.replace "external-call/" "" $ T.pack op) <> parens a_code
+          else thisEq $ parens $ T.pack op <> a_code
       Binop op a b -> do
         a_code <- query a
         b_code <- query b
