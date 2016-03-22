@@ -577,6 +577,11 @@ genMMInstruction ir0 mminst = do
           "<%" -> thisEq $ chain "fmin" ["0.0", chain "fmax" xs_code] <> "+" <>
                            chain "fmax" ["0.0", chain "fmin" xs_code]
           _ -> raiseErr $ failed $ "unsupported N-ary operator: " ++ show op
+      LoadIndex ax -> do
+        let ofs_i = "navi.offset_" <> i
+            i = toList indNames !! ax
+
+        thisEq $ parens $ nPlusK (ofs_i <> "+" <> i) (toList indOffset !! ax)
 
       LoadCursor vi nid -> do
         node <- lookupNode nid

@@ -344,6 +344,15 @@ namesOfLhs (Grid _ x) = namesOfLhs x
 namesOfLhs (Vector _ x) = namesOfLhs x
 namesOfLhs (Tuple xs) = Tuple $ map namesOfLhs xs
 
+indexNamesOfLhs :: LExpr -> Vec (Maybe IdentName)
+indexNamesOfLhs (Grid npks _) = fmap indexNameOfNPK npks
+  where
+    indexNameOfNPK :: NPlusK -> Maybe IdentName
+    indexNameOfNPK (NPlusK "" _) = Nothing
+    indexNameOfNPK (NPlusK x _)  = Just x
+indexNamesOfLhs  _            = PureVec Nothing
+
+
 tupleContents :: (TupleF ∈ fs) => Lang fs -> [Lang fs]
 tupleContents (Tuple xs) = concat $ map tupleContents xs
 tupleContents x          = [x]
@@ -419,7 +428,16 @@ withBindings b1 genX = do
     graduallyBind :: [(LExpr, GenM ValueExpr)] -> GenM [(IdentName, ValueExpr)]
     graduallyBind [] = return []
     graduallyBind ((l0,genV): restOfBinds) = do
-      v0 <- genV
+      let lis :: Vec (Maybe IdentName)
+          lis = indexNamesOfLhs l0
+          idBs :: [(IdentName, Int)]
+          idBs = [(x, ax) | (Just x , ax) <- zip (toList lis) [0..]]
+
+      indexBindings <- forM idBs $ \ (x, ax) -> do
+        v <- insert (LoadIndex ax) (ElemType "Rational")
+        return (x, v)
+
+      v0 <- local (binding %~ M.union (M.fromList indexBindings)) $ genV
       lvs <- matchValueExprToLhs l0 v0
       nvs <- forM lvs $ \ (name0, v1) -> do
         v <- case M.lookup (name0) typeDict of
