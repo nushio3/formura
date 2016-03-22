@@ -7,7 +7,7 @@
 #include <fj_tool/fapp.h>
 #include <fjcoll.h>
 
-#include "3d-mhd.h"
+#include "3d-localsun.h"
 
 int T_MAX;
 int T_MONITOR;

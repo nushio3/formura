@@ -582,8 +582,8 @@ genMMInstruction ir0 mminst = do
       LoadIndex ax -> do
         let ofs_i = "navi.offset_" <> i
             i = toList axvars !! ax
-
-        thisEq $ parens $ nPlusK (ofs_i <> "+" <> i) (toList indOffset !! ax)
+            ix= toList indNames !! ax
+        thisEq $ parens $ nPlusK (ofs_i <> "+" <> ix) (toList indOffset !! ax)
 
       LoadCursor vi nid -> do
         node <- lookupNode nid
