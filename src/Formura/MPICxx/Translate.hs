@@ -475,6 +475,8 @@ nPlusK i d | d == 0 = i
 
 genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (T.Text, T.Text)
 genMMInstruction ir0 mminst = do
+  axvars <- fmap T.pack <$> view axesNames
+
   indNames <- use loopIndexNames
   indOffset <- use loopIndexOffset -- indNames + indOffset = real addr
   arrayDict <- use planArrayAlloc
@@ -579,7 +581,7 @@ genMMInstruction ir0 mminst = do
           _ -> raiseErr $ failed $ "unsupported N-ary operator: " ++ show op
       LoadIndex ax -> do
         let ofs_i = "navi.offset_" <> i
-            i = toList indNames !! ax
+            i = toList axvars !! ax
 
         thisEq $ parens $ nPlusK (ofs_i <> "+" <> i) (toList indOffset !! ax)
 
@@ -961,6 +963,9 @@ tellProgram = do
   forM_ deltaMPIs $ \r -> do
     tellHLn $ "int " <> nameDeltaMPIRank r <> ";"
   tellHLn $ "};"
+
+  tellH "extern struct Formura_Navigator navi;"
+  tellC "struct Formura_Navigator navi;"
 
   tellBoth "\n\n"
 
