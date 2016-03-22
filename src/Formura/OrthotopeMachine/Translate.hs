@@ -262,7 +262,10 @@ instance Generatable GridF where
         xs <- sequence [gen $ GridF npks (return v :: GenM ValueExpr) | v <- vs]
         return $ Tuple xs
 
-      _ -> raiseErr $ failed $ "unexpected pattern in gen of grid: " ++ show vex
+      _ -> do
+        b0 <- view binding
+        liftIO $ mapM print $ M.toList b0
+        raiseErr $ failed $ "unexpected pattern in gen of grid: " ++ show vex
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
 instance Generatable ApplyF where
@@ -431,7 +434,7 @@ withBindings b1 genX = do
                 , TMExtern `elem` tmde]
 
       extFunBinds :: Binding
-      extFunBinds = M.fromList [ ( f, FunValue (Ident "q") (Binop "external-call" (Ident f) (Ident "q")))
+      extFunBinds = M.fromList [ ( f, FunValue (Ident "q") (Uniop ("external-call/" ++ f) (Ident "q")))
                      | f <- extFuns]
   let
     -- make bindings enter scope one by one, not simultaneously
