@@ -27,7 +27,7 @@ script:
   - stack exec formura -- examples/pearson.fmr
   - ./cmake-for-x86.sh
   - make bin/pearson.out
-  - travis_wait 30 stack exec formura -- examples/3d-mhd.fmr
-  - mpicxx -c examples/3d-mhd.c
+  - travis_wait 30 stack exec formura -- examples/3d-localsun.fmr
+  - travis_wait 30 mpicxx -I fj_dummy -c examples/3d-localsun.*c*
   - stack test
   - echo "done test"
