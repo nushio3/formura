@@ -430,8 +430,8 @@ withBindings b1 genX = do
                 , Just tmde <- [M.lookup f typeModDict]
                 , TMExtern `elem` tmde]
 
-      extFunSubsts :: [(LExpr, GenM ValueExpr)]
-      extFunSubsts = [ (Ident f, return $ Lambda (Ident "q") (Binop "☎" (Ident f) (Ident "q")))
+      extFunBinds :: Binding
+      extFunBinds = M.fromList [ ( f, FunValue (Ident "q") (Binop "external-call" (Ident f) (Ident "q")))
                      | f <- extFuns]
   let
     -- make bindings enter scope one by one, not simultaneously
@@ -473,11 +473,10 @@ withBindings b1 genX = do
 
       nvs2 <- local (binding %~ M.union (M.fromList nvs)) $ graduallyBind restOfBinds
       return $ nvs ++ nvs2
-  substs1 <- graduallyBind $ extFunSubsts ++ substs0
 
-
-  --  M.union prefers left-hand-side when duplicate keys are encountered
-  local (binding %~ M.union (M.fromList substs1)) genX
+  local (binding %~ M.union extFunBinds) $ do
+    substs1 <- graduallyBind substs0
+    local (binding %~ M.union (M.fromList substs1)) genX
 
 
 
