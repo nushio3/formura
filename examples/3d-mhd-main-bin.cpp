@@ -55,7 +55,7 @@ void init() {
 void write_monitor() {
   printf("t = %d\n", navi.time_step);
   char fn[256];
-  sprintf(fn, "out/dump-%06d-%d.txt", navi.time_step, mpi_my_rank);
+  sprintf(fn, "out/monitor-%06d-%d.txt", navi.time_step, mpi_my_rank);
   FILE *fp = fopen(fn,"wb");
   int global_position[6];
   global_position[0] = navi.offset_x + navi.lower_x;
