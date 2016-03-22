@@ -33,6 +33,8 @@ del=((1,0,0),(0,1,0),(0,0,1))
 Σ = fun (e) e(0)+e(1)+e(2)
 
 
+extern function :: gx000
+
 begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s, Psi)
       double [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0,Psi=0
 end function
@@ -93,7 +95,7 @@ begin function ddt_sys(dens1, v, B, s, Psi)\
   ddt_v[x,y,z] = vec fun(i)  -(Σ fun(j) v j * ∂ i (v i))  \
          - ∂ i (dp_ddens * dens + dp_ds * s + 1/(8*π) * Σ fun(j) B j * B j)/dens \
          + 1/(4*π) * (Σ fun(j) ∂ j (B j * B i)  )/dens \
-         - dens1 * x**2.56
+         - dens1 * gx000(x)
 
   ddt_B = vec fun(i) Σ fun(j) ∂ j (-0*(del i j) * Psi + v i * B j - v j * B i)
 

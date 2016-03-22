@@ -262,7 +262,7 @@ instance Generatable GridF where
         xs <- sequence [gen $ GridF npks (return v :: GenM ValueExpr) | v <- vs]
         return $ Tuple xs
 
-      _ -> raiseErr $ failed $ "unexpected pattern in gen of grid" ++ show vex
+      _ -> raiseErr $ failed $ "unexpected pattern in gen of grid: " ++ show vex
   gen _ = raiseErr $ failed "unexpected happened in gen of grid"
 
 instance Generatable ApplyF where
@@ -423,6 +423,16 @@ withBindings b1 genX = do
                     map (\(ident, tm) -> M.singleton ident [tm]) $
                     (typeModifiers b1) >>= evalTypeModDecl
 
+  -- select all external function declarations
+  let extFuns :: [IdentName]
+      extFuns = [ f
+                | (Ident f, FunType) <- typeDecls0
+                , Just tmde <- [M.lookup f typeModDict]
+                , TMExtern `elem` tmde]
+
+      extFunSubsts :: [(LExpr, GenM ValueExpr)]
+      extFunSubsts = [ (Ident f, return $ Lambda (Ident "q") (Binop "☎" (Ident f) (Ident "q")))
+                     | f <- extFuns]
   let
     -- make bindings enter scope one by one, not simultaneously
     graduallyBind :: [(LExpr, GenM ValueExpr)] -> GenM [(IdentName, ValueExpr)]
@@ -463,7 +473,7 @@ withBindings b1 genX = do
 
       nvs2 <- local (binding %~ M.union (M.fromList nvs)) $ graduallyBind restOfBinds
       return $ nvs ++ nvs2
-  substs1 <- graduallyBind substs0
+  substs1 <- graduallyBind $ extFunSubsts ++ substs0
 
 
   --  M.union prefers left-hand-side when duplicate keys are encountered
