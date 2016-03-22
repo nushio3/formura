@@ -576,7 +576,7 @@ genMMInstruction ir0 mminst = do
           "<?" -> thisEq $ chain "fmin" xs_code
           "<%" -> thisEq $ chain "fmin" ["0.0", chain "fmax" xs_code] <> "+" <>
                            chain "fmax" ["0.0", chain "fmin" xs_code]
-          _ -> raiseErr $ failed $ "unexpected N-ary operator: " ++ show op
+          _ -> raiseErr $ failed $ "unsupported N-ary operator: " ++ show op
 
       LoadCursor vi nid -> do
         node <- lookupNode nid
