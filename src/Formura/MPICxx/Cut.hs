@@ -25,11 +25,9 @@ import           Data.List (sort)
 import           Data.Data
 import           Data.Foldable
 import qualified Data.Map as M
-import           Data.Monoid
 import qualified Data.Sequence as Q
 import qualified Data.Set as S
 import           Data.Maybe
-import qualified Data.Text as T
 import           Text.Trifecta (failed, raiseErr)
 
 
@@ -41,7 +39,7 @@ import           Formura.GlobalEnvironment
 import           Formura.OrthotopeMachine.Graph
 import           Formura.NumericalConfig
 import           Formura.Compiler
-
+import           Formura.MPICxx.Language
 
 
 newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num, Data)
@@ -96,11 +94,11 @@ data MPIPlan = MPIPlan
   , _planSystemOffset :: Vec Int
   , _planResourceSharing :: M.Map ArrayResourceKey ResourceSharingID
   , _planSharedResourceExtent :: Box
-  , _planResourceNames :: M.Map ArrayResourceKey T.Text
-  , _planSharedResourceNames :: M.Map ResourceSharingID T.Text
-  , _planRidgeNames :: M.Map (RidgeID, SendOrRecv) T.Text
+  , _planResourceNames :: M.Map ArrayResourceKey CLang
+  , _planSharedResourceNames :: M.Map ResourceSharingID CLang
+  , _planRidgeNames :: M.Map (RidgeID, SendOrRecv) CLang
   , _planFacetMPITag :: M.Map FacetID Int
-  , _planMPIRequestNames :: M.Map FacetID T.Text
+  , _planMPIRequestNames :: M.Map FacetID CLang
   }
 makeClassy ''MPIPlan
 

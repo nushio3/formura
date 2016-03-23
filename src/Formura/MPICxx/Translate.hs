@@ -14,7 +14,6 @@ import           Data.List (zip4,zip5, zip6, isPrefixOf)
 import qualified Data.Map as M
 import           Data.Maybe
 import qualified Data.Set as S
-import           Data.String
 import qualified Data.Text as T
 import qualified Data.Text.Lens as T
 import qualified Data.Text.IO as T
@@ -37,28 +36,9 @@ import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
+import           Formura.MPICxx.Language
 import           Formura.MPICxx.Cut hiding (cut)
 
-
-data CWord = RawC T.Text | TypedC T.Text T.Text
-                deriving (Eq, Ord, Show, Read)
-newtype CLang = CLang [CWord]
-                deriving (Eq, Ord, Show, Read, Monoid)
-
-instance IsString CLang where
-  fromString str = CLang [RawC $ T.pack str]
-
-showC :: Show a => a -> CLang
-showC = fromString . show
-
-parens :: CLang -> CLang
-parens x = "(" <> x <> ")"
-
-brackets :: CLang -> CLang
-brackets x = "[" <> x <> "]"
-
-braces :: CLang -> CLang
-braces x = "{" <> x <> "}"
 
 newtype VariableName = VariableName CLang
 
