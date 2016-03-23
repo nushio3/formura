@@ -1,15 +1,28 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include <time.h>
+
+#include <fj_tool/fapp.h>
+#include <fjcoll.h>
+
 #include "pearson-3d.h"
 
 int T_MAX;
+int T_MONITOR;
 int mpi_my_rank;
 
 float frand() {
   return rand() / float(RAND_MAX);
 }
+
+double wctime() {
+  struct timeval tv;
+  gettimeofday(&tv,NULL);
+  return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
+}
+
 
 void init() {
   for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
