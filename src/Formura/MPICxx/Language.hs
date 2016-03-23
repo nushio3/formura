@@ -3,6 +3,7 @@
 module Formura.MPICxx.Language where
 
 import           Control.Lens
+import           Data.Function (on)
 import           Data.List (intersperse)
 import           Data.Monoid
 import           Data.String
@@ -17,9 +18,24 @@ data Word = Raw {_cValue :: T.Text}
                 deriving (Eq, Ord, Show, Read)
 
 newtype Src = Src [Word]
-                deriving (Eq, Ord, Show, Read)
+                deriving (Eq, Show, Read)
 
-makeLenses ''Word
+instance Ord Src where
+  compare = let key :: Src -> ([T.Text], [T.Text], T.Text)
+                key (Src xs) = (xs >>= vals , xs >>= typs, toText (Src xs))
+
+                vals :: Word -> [T.Text]
+                vals (Raw x) = [x]
+                vals (Typed _ x) = []
+                vals (PotentialSubroutine (Src xs)) = xs >>= vals
+
+                typs :: Word -> [T.Text]
+                typs (Raw _) = []
+                typs (Typed t _) = [t]
+                typs (PotentialSubroutine (Src xs)) = xs >>= typs
+
+            in compare `on` key
+
 
 instance Monoid Src where
   mempty = Src []
@@ -50,6 +66,10 @@ instance ToText Word where
 instance ToText Src where
   toText (Src xs) = mconcat $ map toText xs
 
+makeLenses ''Word
+
+
+
 length :: Src -> Int
 length = T.length . toText
 
@@ -76,3 +96,7 @@ unlines = mconcat . map (<> "\n")
 
 intercalate :: Src -> [Src] -> Src
 intercalate x ys = mconcat $ intersperse x ys
+
+-- | Wrap a C source as a potential subroutine
+potentialSubroutine :: Src -> Src
+potentialSubroutine s = Src [PotentialSubroutine s]

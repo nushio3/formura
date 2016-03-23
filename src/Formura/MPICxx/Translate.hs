@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, LambdaCase, MultiParamTypeClasses, OverloadedStrings, PackageImports, ScopedTypeVariables, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, LambdaCase, MultiParamTypeClasses, OverloadedStrings, PackageImports, ScopedTypeVariables, TemplateHaskell #-}
 
 module Formura.MPICxx.Translate where
 
@@ -10,7 +10,7 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
-import           Data.List (zip4,zip5, zip6, isPrefixOf)
+import           Data.List ({-zip4,-} isPrefixOf)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.String
@@ -19,7 +19,6 @@ import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.Lens as T
 import qualified Data.Text.IO as T
-import qualified Data.Yaml as Y
 import           System.Directory
 import           System.FilePath.Lens
 import           System.Process
@@ -103,10 +102,11 @@ instance HasMPIPlan TranState where
       settr s a = s & tsMPIPlanMap %~ M.insert (s^.tsMPIPlanSelection) a
     in lens gettr settr
 
-data CProgram = CProgram { _headerFileContent :: C.Src, _sourceFileContent :: C.Src,
-                         _auxFilesContent :: M.Map FilePath C.Src}
-                deriving (Eq, Ord, Show)
-makeLenses ''CProgram
+data CProgramF a = CProgram { _headerFileContent :: a, _sourceFileContent :: a,
+                              _auxFilesContent :: M.Map FilePath a}
+                deriving (Eq, Ord, Show, Functor, Foldable, Traversable)
+type CProgram = CProgramF C.Src
+makeLenses ''CProgramF
 
 tellH :: (MonadWriter CProgram m) => C.Src -> m ()
 tellH txt = tell $ CProgram txt "" M.empty
@@ -648,7 +648,7 @@ genComputation (ir0, nid0) destRsc0 = do
             | useSystemOffset = (\i d -> i <> "+" <> C.show d) <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
 
-      return $ C.unlines $
+      return $ C.potentialSubroutine $ C.unlines $
         [ompEveryLoopPragma] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
@@ -1045,6 +1045,27 @@ tellProgram = do
     ]
 
 
+joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
+joinSubroutines cprog0 = do
+  when (?commandLineOption ^. verbose || True) $ do
+    putStrLn $ "## found " ++ show (length subs0) ++ " subroutines."
+    forM_ (zip [1..] subs0) $ \(i, s) -> do
+      putStrLn $ "#" ++ show i ++ ": " ++ toString s
+  return cprog0
+    where
+      subs0 :: [C.Src]
+
+      subs0 = foldMap getSub cprog0
+
+      getSub :: C.Src -> [C.Src]
+      getSub (C.Src xs) = xs >>= toSub
+
+      toSub :: C.Word -> [C.Src]
+      toSub (C.PotentialSubroutine s) = [s]
+      toSub _ = []
+
+
+
 genCxxFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
 genCxxFiles formuraProg mmProg = do
   let
@@ -1062,13 +1083,14 @@ genCxxFiles formuraProg mmProg = do
       }
 
 
-  (_, tranState1 , CProgram hxxContent cxxContent auxFilesContent)
+  (_, tranState1 , cprog0)
     <- runCompilerRight tellProgram
        (mmProg ^. omGlobalEnvironment)
        tranState0
 
-  createDirectoryIfMissing True (cxxFilePath ^. directory)
+  (CProgram hxxContent cxxContent auxFilesContent) <- joinSubroutines cprog0
 
+  createDirectoryIfMissing True (cxxFilePath ^. directory)
 
   T.writeFile hxxFilePath $ C.toText hxxContent
   T.writeFile cxxFilePath $ C.toText cxxContent
