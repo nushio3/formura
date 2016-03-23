@@ -404,7 +404,7 @@ visualize it = do
       , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-05 -o out/output_prof_5.csv"
       , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-06 -o out/output_prof_6.csv"
       , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-07 -o out/output_prof_7.csv"
-      , printf "fapppx -A -Impi -p all -l0 -ttext -d out/prof-mpi -o out/output_prof_mpi.txt"
+      , printf "fapppx -A -Impi -p all -ttext -d out/prof-mpi -o out/output_prof_mpi.txt"
       , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-C -o out/output_prof_C.txt"
       , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-I -o out/output_prof_I.txt"
       , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-M -o out/output_prof_M.txt"
