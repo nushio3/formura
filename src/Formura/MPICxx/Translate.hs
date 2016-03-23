@@ -13,6 +13,8 @@ import           Data.Foldable (toList)
 import           Data.List (zip4,zip5, zip6, isPrefixOf)
 import qualified Data.Map as M
 import           Data.Maybe
+import           Data.String
+import           Data.String.ToString
 import qualified Data.Set as S
 import qualified Data.Text as T
 import qualified Data.Text.Lens as T
