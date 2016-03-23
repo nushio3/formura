@@ -11,13 +11,15 @@ import qualified Data.Text as T
 import           Prelude hiding (show, Word, length)
 import qualified Prelude
 
-data Word = Raw {_cValue :: T.Text} | Typed { _cType :: T.Text, _cValue :: T.Text}
+data Word = Raw {_cValue :: T.Text}
+          | Typed { _cType :: T.Text, _cValue :: T.Text}
+          | PotentialSubroutine { _cSrc :: Src}
                 deriving (Eq, Ord, Show, Read)
-
-makeLenses ''Word
 
 newtype Src = Src [Word]
                 deriving (Eq, Ord, Show, Read)
+
+makeLenses ''Word
 
 instance Monoid Src where
   mempty = Src []
@@ -33,13 +35,20 @@ instance IsString Src where
   fromString str = Src [Raw $ T.pack str]
 
 instance ToString Word where
-  toString x = toString $ x ^.cValue
+  toString x = toString $ toText x
 
 instance ToString Src where
   toString (Src xs) = concat $ map toString xs
 
-toText :: Src -> T.Text
-toText (Src xs) = mconcat $ map (^.cValue) xs
+class ToText a where
+  toText :: a -> T.Text
+
+instance ToText Word where
+  toText (Raw x) = x
+  toText (Typed _ x) = x
+  toText (PotentialSubroutine x) = toText x
+instance ToText Src where
+  toText (Src xs) = mconcat $ map toText xs
 
 length :: Src -> Int
 length = T.length . toText
