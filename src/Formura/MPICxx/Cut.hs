@@ -39,7 +39,7 @@ import           Formura.GlobalEnvironment
 import           Formura.OrthotopeMachine.Graph
 import           Formura.NumericalConfig
 import           Formura.Compiler
-import           Formura.MPICxx.Language
+import qualified Formura.MPICxx.Language as C
 
 
 newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num, Data)
@@ -94,11 +94,11 @@ data MPIPlan = MPIPlan
   , _planSystemOffset :: Vec Int
   , _planResourceSharing :: M.Map ArrayResourceKey ResourceSharingID
   , _planSharedResourceExtent :: Box
-  , _planResourceNames :: M.Map ArrayResourceKey CLang
-  , _planSharedResourceNames :: M.Map ResourceSharingID CLang
-  , _planRidgeNames :: M.Map (RidgeID, SendOrRecv) CLang
+  , _planResourceNames :: M.Map ArrayResourceKey C.Src
+  , _planSharedResourceNames :: M.Map ResourceSharingID C.Src
+  , _planRidgeNames :: M.Map (RidgeID, SendOrRecv) C.Src
   , _planFacetMPITag :: M.Map FacetID Int
-  , _planMPIRequestNames :: M.Map FacetID CLang
+  , _planMPIRequestNames :: M.Map FacetID C.Src
   }
 makeClassy ''MPIPlan
 

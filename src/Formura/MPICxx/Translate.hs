@@ -38,24 +38,24 @@ import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
-import           Formura.MPICxx.Language
+import qualified Formura.MPICxx.Language as C
 import           Formura.MPICxx.Cut hiding (cut)
 
 
-newtype VariableName = VariableName CLang
+newtype VariableName = VariableName C.Src
 
 
 -- | The struct for generating unique names, and holds already given names.
 data NamingState = NamingState
-  { _alreadyGivenNames :: S.Set CLang
-  , _alreadyGivenLocalNames :: S.Set CLang
-  , _alreadyDeclaredResourceNames :: S.Set CLang
+  { _alreadyGivenNames :: S.Set C.Src
+  , _alreadyGivenLocalNames :: S.Set C.Src
+  , _alreadyDeclaredResourceNames :: S.Set C.Src
   , _freeNameCounter :: Integer
   , _freeLocalNameCounter :: Integer
-  , _nodeIDtoLocalName :: M.Map MMNodeID CLang
-  , _loopIndexNames :: Vec CLang
+  , _nodeIDtoLocalName :: M.Map MMNodeID C.Src
+  , _loopIndexNames :: Vec C.Src
   , _loopIndexOffset :: Vec Int
-  , _loopExtentNames :: Vec CLang
+  , _loopExtentNames :: Vec C.Src
   }
 makeClassy ''NamingState
 
@@ -83,7 +83,7 @@ data TranState = TranState
   , _tsMPIPlanSelection :: MPIPlanSelector
   , _tsMPIPlanMap :: M.Map MPIPlanSelector MPIPlan
   , _tsCommonStaticBox :: Box
-  , _tsCxxTemplateWithMacro :: CLang
+  , _tsCxxTemplateWithMacro :: C.Src
   }
 makeClassy ''TranState
 
@@ -103,27 +103,27 @@ instance HasMPIPlan TranState where
       settr s a = s & tsMPIPlanMap %~ M.insert (s^.tsMPIPlanSelection) a
     in lens gettr settr
 
-data CProgram = CProgram { _headerFileContent :: CLang, _sourceFileContent :: CLang,
-                         _auxFilesContent :: M.Map FilePath CLang}
+data CProgram = CProgram { _headerFileContent :: C.Src, _sourceFileContent :: C.Src,
+                         _auxFilesContent :: M.Map FilePath C.Src}
                 deriving (Eq, Ord, Show)
 makeLenses ''CProgram
 
-tellH :: (MonadWriter CProgram m) => CLang -> m ()
+tellH :: (MonadWriter CProgram m) => C.Src -> m ()
 tellH txt = tell $ CProgram txt "" M.empty
-tellC :: (MonadWriter CProgram m) => CLang -> m ()
+tellC :: (MonadWriter CProgram m) => C.Src -> m ()
 tellC txt = tell $ CProgram "" txt M.empty
-tellBoth :: (MonadWriter CProgram m) => CLang -> m ()
+tellBoth :: (MonadWriter CProgram m) => C.Src -> m ()
 tellBoth txt = tell $ CProgram txt txt  M.empty
-tellF :: (MonadWriter CProgram m) => FilePath -> CLang -> m ()
+tellF :: (MonadWriter CProgram m) => FilePath -> C.Src -> m ()
 tellF fn txt = tell $ CProgram "" ""  (M.singleton fn txt)
 
-tellHLn :: (MonadWriter CProgram m) => CLang -> m ()
+tellHLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellHLn txt = tellH $ txt <> "\n"
-tellCLn :: (MonadWriter CProgram m) => CLang -> m ()
+tellCLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellCLn txt = tellC $ txt <> "\n"
-tellBothLn :: (MonadWriter CProgram m) => CLang -> m ()
+tellBothLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellBothLn txt = tellBoth $ txt <> "\n"
-tellFLn :: (MonadWriter CProgram m) => FilePath -> CLang -> m ()
+tellFLn :: (MonadWriter CProgram m) => FilePath -> C.Src -> m ()
 tellFLn fn txt = tellF fn $ txt <> "\n"
 
 
@@ -138,16 +138,16 @@ type TranM = CompilerMonad GlobalEnvironment CProgram TranState
 
 -- | generate new free global name based on given identifier,
 --   and prevent further generation of that name
-genFreeName :: IdentName -> TranM CLang
+genFreeName :: IdentName -> TranM C.Src
 genFreeName = genFreeName' True
 
 -- | generate new free local name based on given identifier,
 --   and prevent further generation of that name within current scope
-genFreeLocalName :: IdentName -> TranM CLang
+genFreeLocalName :: IdentName -> TranM C.Src
 genFreeLocalName = genFreeName' False
 
 -- | base function for giving names
-genFreeName' :: Bool -> IdentName -> TranM CLang
+genFreeName' :: Bool -> IdentName -> TranM C.Src
 genFreeName' isGlobal ident = do
   aggNames <- use alreadyGivenNames
   aglNames <- use alreadyGivenLocalNames
@@ -157,7 +157,7 @@ genFreeName' isGlobal ident = do
       nCounter = if isGlobal then freeNameCounter else freeLocalNameCounter
       go = do
         ctr <- use nCounter
-        let tmpName = initName <> "_" <> showC ctr
+        let tmpName = initName <> "_" <> C.show ctr
         if S.member tmpName agNames
           then (nCounter += 1) >> go
           else return tmpName
@@ -212,7 +212,7 @@ setNamingState = do
 
 
 -- | Generate C type declaration for given language.
-genTypeDecl :: IdentName -> TypeExpr -> TranM CLang
+genTypeDecl :: IdentName -> TypeExpr -> TranM C.Src
 genTypeDecl name typ = case typ of
   ElemType "void" -> return ""
   ElemType "Rational" -> return $ "double " <> fromString name
@@ -222,7 +222,7 @@ genTypeDecl name typ = case typ of
     if body == "" then return ""
       else do
         sz <- use ncIntraNodeShape
-        let szpt = foldMap (brackets . showC) sz
+        let szpt = foldMap (C.brackets . C.show) sz
         return $ body <> szpt
   _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
 
@@ -241,7 +241,7 @@ elemTypeOfResource (ResourceOMNode nid _) = do
     ElemType x -> return $ ElemType x
     GridType _ etyp -> return $ subFix etyp
 
-tellMPIRequestDecl :: CLang -> TranM ()
+tellMPIRequestDecl :: C.Src -> TranM ()
 tellMPIRequestDecl name = do
   adrn <- use alreadyDeclaredResourceNames
   case S.member name adrn of
@@ -250,10 +250,10 @@ tellMPIRequestDecl name = do
       alreadyDeclaredResourceNames %= S.insert name
       tellH "extern "
       tellBothLn $ "MPI_Request "<>name<>";\n"
-tellResourceDecl :: CLang -> ResourceT a b -> Box -> TranM ()
+tellResourceDecl :: C.Src -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl = tellResourceDecl' False
 
-tellResourceDecl' :: Bool -> CLang -> ResourceT a b -> Box -> TranM ()
+tellResourceDecl' :: Bool -> C.Src -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl' isInClass name rsc box0 = do
   adrn <- use alreadyDeclaredResourceNames
   case S.member name adrn || name == "" of
@@ -262,7 +262,7 @@ tellResourceDecl' isInClass name rsc box0 = do
       alreadyDeclaredResourceNames %= S.insert name
 
       typ <- elemTypeOfResource rsc
-      let szpt = foldMap (brackets . showC) sz
+      let szpt = foldMap (C.brackets . C.show) sz
           sz = box0 ^.upperVertex - box0 ^. lowerVertex
 
       decl <- case typ of
@@ -338,7 +338,7 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
                       )
 
 -- | Give name to Resources
-nameArrayResource :: (ResourceT () IRank) -> TranM CLang
+nameArrayResource :: (ResourceT () IRank) -> TranM C.Src
 nameArrayResource rsc = case rsc of
   ResourceStatic sn _ -> do
     let ret = fromString sn
@@ -360,10 +360,10 @@ nameArrayResource rsc = case rsc of
     planResourceNames %= M.insert rsc ret
     return ret
 
-nameRidgeResource :: RidgeID -> SendOrRecv -> TranM CLang
+nameRidgeResource :: RidgeID -> SendOrRecv -> TranM C.Src
 nameRidgeResource = nameRidgeResource' False
 
-nameRidgeResource' :: Bool -> RidgeID -> SendOrRecv -> TranM CLang
+nameRidgeResource' :: Bool -> RidgeID -> SendOrRecv -> TranM C.Src
 nameRidgeResource' isInClass r sr0  = do
   dict <- use planRidgeNames
   fdict <- use planFacetAssignment
@@ -386,7 +386,7 @@ nameRidgeResource' isInClass r sr0  = do
       return $ prefix <> ret
 
 
-nameFacetRequest :: FacetID -> TranM CLang
+nameFacetRequest :: FacetID -> TranM C.Src
 nameFacetRequest f  = do
   dict <- use planMPIRequestNames
   case M.lookup f dict of
@@ -397,15 +397,15 @@ nameFacetRequest f  = do
       return ret
 
 
-nameDeltaMPIRank :: MPIRank -> CLang
+nameDeltaMPIRank :: MPIRank -> C.Src
 nameDeltaMPIRank r = "mpi_rank_" <> fromString (toCName r)
 
-nameFacet :: FacetID -> SendOrRecv -> TranM CLang
+nameFacet :: FacetID -> SendOrRecv -> TranM C.Src
 nameFacet f sr = do
   let name = fromString $ toCName f
   case sr of
     SendRecv -> return $ name
-    _        -> return $ name <> "_" <> showC sr
+    _        -> return $ name <> "_" <> C.show sr
 
 
 -- | Generate Declaration for State Arrays
@@ -441,7 +441,7 @@ tellIntermediateVariables = do
     forM_ (M.toList gr) $ \(_, node) -> do
       let typ = subFix $ node ^. nodeType
           Just (VariableName vname) = A.viewMaybe node
-      decl <- genTypeDecl (T.unpack vname) typ
+      decl <- genTypeDecl (toString vname) typ
       when (decl /= "") $ tellCLn $ "static " <> decl <> ";"
 
 -- | lookup node by its index
@@ -457,15 +457,15 @@ lookupNode i = do
      return n
 
 
-nPlusK :: CLang -> Int -> CLang
+nPlusK :: C.Src -> Int -> C.Src
 nPlusK i d | d == 0 = i
-           | d <  0 = i <> showC d
-           | otherwise = i <> "+" <> showC d
+           | d <  0 = i <> C.show d
+           | otherwise = i <> "+" <> C.show d
 
 
 -- | generate bindings, and the final expression that contains the result of evaluation.
 
-genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (CLang, CLang)
+genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (C.Src, C.Src)
 genMMInstruction ir0 mminst = do
   axvars <- fmap fromString <$> view axesNames
 
@@ -478,11 +478,11 @@ genMMInstruction ir0 mminst = do
   let
     -- how to access physical coordinate indNames + indOffset
     -- in array allocated with margin box0
-    accAtMargin :: Box -> Vec Int -> CLang
+    accAtMargin :: Box -> Vec Int -> C.Src
     accAtMargin box0 vi = accAt (indOffset + vi - (box0 ^. lowerVertex))
 
-    accAt :: Vec Int -> CLang
-    accAt v = foldMap brackets $ nPlusK  <$> indNames <*> v
+    accAt :: Vec Int -> C.Src
+    accAt v = foldMap C.brackets $ nPlusK  <$> indNames <*> v
 
 
   alreadyGivenLocalNames .= S.empty
@@ -522,7 +522,7 @@ genMMInstruction ir0 mminst = do
 
   txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
     microTypDecl <- genTypeDecl "" (subFix microTyp)
-    let thisEq :: CLang -> TranM CLang
+    let thisEq :: C.Src -> TranM C.Src
         thisEq code =
           case doesBind nid0 of
             True ->  do
@@ -533,7 +533,7 @@ genMMInstruction ir0 mminst = do
               nodeIDtoLocalName %= M.insert nid0 code
               return ""
 
-        query :: MMNodeID -> TranM CLang
+        query :: MMNodeID -> TranM C.Src
         query nid1 = do
           nmap <- use nodeIDtoLocalName
           case M.lookup nid1 nmap of
@@ -555,26 +555,26 @@ genMMInstruction ir0 mminst = do
         case node ^. nodeType of
           ElemType _ -> thisEq $ rscName
           _ -> thisEq $ rscName <> accAtMargin abox vi
-      Imm r -> thisEq $ showC (realToFrac r :: Double)
+      Imm r -> thisEq $ C.show (realToFrac r :: Double)
       Uniop op a -> do
         a_code <- query a
         if "external-call/" `isPrefixOf` op
-          then thisEq $ parens $ fromString (T.packed %~ T.replace "external-call/" "" $ op) <> parens a_code
-          else thisEq $ parens $ fromString op <> a_code
+          then thisEq $ C.parens $ fromString (T.packed %~ T.replace "external-call/" "" $ op) <> C.parens a_code
+          else thisEq $ C.parens $ fromString op <> a_code
       Binop op a b -> do
         a_code <- query a
         b_code <- query b
         case op of
-          "**" -> thisEq $ ("pow"<>) $ parens $ a_code <> "," <> b_code
-          _ -> thisEq $ parens $ a_code <> fromString op <> b_code
+          "**" -> thisEq $ ("pow"<>) $ C.parens $ a_code <> "," <> b_code
+          _ -> thisEq $ C.parens $ a_code <> fromString op <> b_code
       Triop "ite" a b c -> do
         a_code <- query a
         b_code <- query b
         c_code <- query c
-        thisEq $ parens $ a_code <> "?" <> b_code <> ":" <> c_code
+        thisEq $ C.parens $ a_code <> "?" <> b_code <> ":" <> c_code
       Naryop op xs -> do
         xs_code <- mapM query xs
-        let chain fname cs = foldr1 (\a b -> fname <> parens (a <> "," <> b) ) cs
+        let chain fname cs = foldr1 (\a b -> fname <> C.parens (a <> "," <> b) ) cs
         case op of
           ">?" -> thisEq $ chain "fmax" xs_code
           "<?" -> thisEq $ chain "fmin" xs_code
@@ -585,7 +585,7 @@ genMMInstruction ir0 mminst = do
         let ofs_i = "navi.offset_" <> i
             i = toList axvars !! ax
             ix= toList indNames !! ax
-        thisEq $ parens $ nPlusK (ofs_i <> "+" <> ix) (toList indOffset !! ax)
+        thisEq $ C.parens $ nPlusK (ofs_i <> "+" <> ix) (toList indOffset !! ax)
 
       Store _ x -> do
         x_code <- query x
@@ -595,17 +595,17 @@ genMMInstruction ir0 mminst = do
   nmap <- use nodeIDtoLocalName
   let (tailID, _) = M.findMax mminst
       Just tailName = M.lookup tailID nmap
-  return $ (T.unwords txts, tailName)
+  return $ (C.unwords txts, tailName)
 
 
-ompEveryLoopPragma :: (?ncOpts :: [String]) => CLang
+ompEveryLoopPragma :: (?ncOpts :: [String]) => C.Src
 ompEveryLoopPragma
   | "omp-collapse" `elem` ?ncOpts = "#pragma omp for collapse(2)"
   | otherwise                 = ""
 
 -- | generate a formura function body.
 
-genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM CLang
+genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM C.Src
 genComputation (ir0, nid0) destRsc0 = do
   ivars <- use loopIndexNames
   regionDict <- use planRegionAlloc
@@ -634,8 +634,8 @@ genComputation (ir0, nid0) destRsc0 = do
   let
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
-            [ T.unwords
-              ["for (int ", i, "=", showC l ,";", i,  "<", showC h, ";++", i, "){"]
+            [ C.unwords
+              ["for (int ", i, "=", C.show l ,";", i,  "<", C.show h, ";++", i, "){"]
             | (i,(l,h)) <- (toList ivars) `zip`
               zip (toList loopFroms) (toList loopTos)]
           closeLoops =
@@ -643,12 +643,12 @@ genComputation (ir0, nid0) destRsc0 = do
 
       (letBs,rhs) <- genMMInstruction ir0 mmInst
 
-      let bodyExpr = lhsName2 <> foldMap brackets ivarExpr <> "=" <> rhs <> ";"
+      let bodyExpr = lhsName2 <> foldMap C.brackets ivarExpr <> "=" <> rhs <> ";"
           ivarExpr
-            | useSystemOffset = (\i d -> i <> "+" <> showC d) <$> ivars <*> negate systemOffset0
+            | useSystemOffset = (\i d -> i <> "+" <> C.show d) <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
 
-      return $ T.unlines $
+      return $ C.unlines $
         [ompEveryLoopPragma] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
@@ -669,7 +669,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
 -- | generate a staging/unstaging code
 
-genStagingCode :: (?ncOpts :: [String]) => Bool -> RidgeID -> TranM CLang
+genStagingCode :: (?ncOpts :: [String]) => Bool -> RidgeID -> TranM C.Src
 genStagingCode isStaging rid = do
   dim <- view dimension
   ridgeDict <- use planRidgeAlloc
@@ -702,8 +702,8 @@ genStagingCode isStaging rid = do
         - (if isStaging then  mpivec * intraShape else 0)
 
   let openLoops =
-        [ T.unwords
-          ["for (int ", i, "=", showC l ,";", i,  "<", showC h, ";++", i, "){"]
+        [ C.unwords
+          ["for (int ", i, "=", C.show l ,";", i,  "<", C.show h, ";++", i, "){"]
         | (i,(l,h)) <- (toList ivars) `zip`
           zip (toList loopFroms) (toList loopTos)]
       closeLoops =
@@ -711,8 +711,8 @@ genStagingCode isStaging rid = do
 
 
       rdgName = if isStaging then rdgNameSend else rdgNameRecv
-      rdgTerm = rdgName <> foldMap brackets ivars
-      arrTerm = arrName  <> foldMap brackets (liftVec2 (\i n -> i <> "+" <> showC n) ivars otherOffset)
+      rdgTerm = rdgName <> foldMap C.brackets ivars
+      arrTerm = arrName  <> foldMap C.brackets (liftVec2 (\i n -> i <> "+" <> C.show n) ivars otherOffset)
 
       body
         | isStaging = rdgTerm <> "=" <> arrTerm
@@ -721,9 +721,9 @@ genStagingCode isStaging rid = do
 
 
   return $ ompEveryLoopPragma <> "\n" <>
-    T.unlines openLoops <> body <> ";" <> T.unlines closeLoops
+    C.unlines openLoops <> body <> ";" <> C.unlines closeLoops
 
-genMPISendRecvCode :: FacetID -> TranM CLang
+genMPISendRecvCode :: FacetID -> TranM C.Src
 genMPISendRecvCode f = do
   reqName <- nameFacetRequest f
   facetNameSend <- nameFacet f Send
@@ -734,13 +734,13 @@ genMPISendRecvCode f = do
 
   let
       dmpi = f ^. facetDeltaMPI
-      mpiIsendIrecv :: CLang
-      mpiIsendIrecv = T.unwords $
+      mpiIsendIrecv :: C.Src
+      mpiIsendIrecv = C.unwords $
           [ "MPI_Irecv( (void*) &" <> facetNameRecv, ","
           , "sizeof(struct " <> facetTypeName <>  ") ,"
           , "MPI_BYTE,"
           , "navi->" <> nameDeltaMPIRank dmpi <> ","
-          , let Just t = M.lookup f mpiTagDict in showC t, ","
+          , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi->mpi_comm,"
           , "&" <> reqName <> " );\n"]
           ++
@@ -748,24 +748,24 @@ genMPISendRecvCode f = do
           , "sizeof(struct " <> facetTypeName <>  ") ,"
           , "MPI_BYTE,"
           , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
-          , let Just t = M.lookup f mpiTagDict in showC t, ","
+          , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi->mpi_comm,"
           , "&" <> reqName <> " );\n"]
   return mpiIsendIrecv
 
-genMPIWaitCode :: FacetID -> TranM CLang
+genMPIWaitCode :: FacetID -> TranM C.Src
 genMPIWaitCode f = do
   reqName <- nameFacetRequest f
   let
       dmpi = f ^. facetDeltaMPI
-      mpiWait :: CLang
-      mpiWait = T.unwords $
+      mpiWait :: C.Src
+      mpiWait = C.unwords $
           ["MPI_Wait(&" <> reqName <>  ",MPI_STATUS_IGNORE);\n"]
   return mpiWait
 
 
 -- | generate a distributed program
-genDistributedProgram :: (?ncOpts :: [String]) => [DistributedInst] -> TranM CLang
+genDistributedProgram :: (?ncOpts :: [String]) => [DistributedInst] -> TranM C.Src
 genDistributedProgram insts0 = do
   stepGraph <- use omStepGraph
   theGraph .= stepGraph
@@ -813,7 +813,7 @@ genDistributedProgram insts0 = do
         | otherwise  = reverse accum : grp [] (x:xs)
 
 
-      go2 :: DistributedInst -> TranM (DistributedInst, CLang)
+      go2 :: DistributedInst -> TranM (DistributedInst, C.Src)
       go2 i = do
         j <- go i
         return (i,j)
@@ -821,12 +821,12 @@ genDistributedProgram insts0 = do
       抑算 = "knockout-computation"   `elem` ?ncOpts
       抑信 = "knockout-communication" `elem` ?ncOpts
 
-      knockout :: Bool -> TranM CLang -> TranM CLang
+      knockout :: Bool -> TranM C.Src -> TranM C.Src
       knockout flag m = do
         t <- m
         return $ if flag then "" else t
 
-      go :: DistributedInst -> TranM CLang
+      go :: DistributedInst -> TranM C.Src
       go (Computation cmp destRsc) = knockout 抑算 $ genComputation cmp destRsc
       go (Unstage rid)             = knockout 抑算 $ genStagingCode False rid
       go (Stage rid)               = knockout 抑算 $ genStagingCode True rid
@@ -834,7 +834,7 @@ genDistributedProgram insts0 = do
       go (CommunicationSendRecv f) = knockout 抑信 $ genMPISendRecvCode f
       go (CommunicationWait f)     = knockout 抑信 $ genMPIWaitCode f
 
-      genCall :: [(DistributedInst, CLang)] -> TranM CLang
+      genCall :: [(DistributedInst, C.Src)] -> TranM C.Src
       genCall instPairs = do
         let body = map snd instPairs
             isGenerateFunction = case map fst instPairs of
@@ -846,7 +846,7 @@ genDistributedProgram insts0 = do
           True -> do
             funName <- genFreeName "Formura_internal"
             tellH $ "void "<> funName <> "();\n"
-            tellF (T.unpack funName <> ".c") $ T.unlines $
+            tellF (toString $  funName <> ".c") $ C.unlines $
               ["void "<> funName <> "(){"]
               ++ (if "omp" `elem` ?ncOpts then ["#pragma omp parallel\n{"] else [])
               ++ body
@@ -854,7 +854,7 @@ genDistributedProgram insts0 = do
               ++ ["}"]
             return $ funName <> "();\n"
           False -> do
-            return $ T.unlines $ body
+            return $ C.unlines $ body
 
 -- | Let the plans collaborate
 
@@ -894,7 +894,7 @@ tellProgram = do
   ivars <- fmap fromString <$> view axesNames
   intraExtents <- use ncIntraNodeShape
 
-  let cxxTemplateWithMacro :: CLang
+  let cxxTemplateWithMacro :: C.Src
       cxxTemplateWithMacro = cxxTemplate
   tsCxxTemplateWithMacro .= cxxTemplateWithMacro
 
@@ -908,7 +908,7 @@ tellProgram = do
 
   collaboratePlans
 
-  tellH $ T.unlines
+  tellH $ C.unlines
     [ ""
     , "#pragma once"
     , "#ifdef __cplusplus"
@@ -919,14 +919,14 @@ tellProgram = do
 
 
 
-  tellH $ T.unlines ["#include <mpi.h>"]
+  tellH $ C.unlines ["#include <mpi.h>"]
   tellC $ cxxTemplateWithMacro
 
   tellBoth "\n\n"
-  tellH $ T.unlines
-        [ "#define " <> nx <> "  " <> showC (i*g)
+  tellH $ C.unlines
+        [ "#define " <> nx <> "  " <> C.show (i*g)
         | (x,i,g) <- zip3 (toList ivars) (toList intraExtents) (toList mpiGrid0)
-        , let nx = "N" <> T.map toUpper x
+        , let nx = "N" <> (fromString $ map toUpper $ toString) x
         ]
 
   tsMPIPlanSelection .= False
@@ -963,17 +963,17 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  tellCLn $ "void Formura_decode_mpi_rank (int r" <> T.unwords[", int *i" <> x | x<-toList ivars] <>  "){"
+  tellCLn $ "void Formura_decode_mpi_rank (int r" <> C.unwords[", int *i" <> x | x<-toList ivars] <>  "){"
   tellCLn "int s=r;"
   forM_ (zip (reverse $ toList ivars) (reverse $ toList mpiGrid0)) $ \(x, g) -> do
-    tellCLn $ "*i" <> x <> "=s%" <> showC g <> ";"
-    tellCLn $ "s=s/" <> showC g <> ";"
+    tellCLn $ "*i" <> x <> "=s%" <> C.show g <> ";"
+    tellCLn $ "s=s/" <> C.show g <> ";"
   tellCLn "}"
 
   tellCLn $ "int Formura_encode_mpi_rank (" <> T.intercalate "," [" int i" <> x | x<-toList ivars] <>  "){"
   tellCLn "int s = 0;"
   forM_ (zip (toList ivars) (toList mpiGrid0)) $ \(x, ig) -> do
-    let g=showC ig
+    let g=C.show ig
     tellCLn $ "s *= " <>g<>";"
     tellCLn $ "s += (i"<>x<>"%"<>g<>"+"<>g<>")%"<>g<>";"
   tellCLn "return s;}"
@@ -990,16 +990,16 @@ tellProgram = do
   tellCLn $ "int " <> T.intercalate "," (toList mpiivars) <> ";"
   tellCLn $ "navi->mpi_comm = comm;"
   tellCLn $ "{int r; MPI_Comm_rank(comm,&r);navi->mpi_my_rank = r;}"
-  tellCLn $ "Formura_decode_mpi_rank( navi->mpi_my_rank" <> T.unwords [ ", &" <> x| x<- toList mpiivars]  <> ");"
+  tellCLn $ "Formura_decode_mpi_rank( navi->mpi_my_rank" <> C.unwords [ ", &" <> x| x<- toList mpiivars]  <> ");"
   forM_ deltaMPIs $ \r@(MPIRank rv) -> do
     let terms = zipWith nPlusK (toList mpiivars) (toList rv)
     tellC $ "navi->" <> nameDeltaMPIRank r <> "="
     tellCLn $ "Formura_encode_mpi_rank( " <> T.intercalate "," terms  <> ");"
   tellCLn "navi->time_step=0;"
   forM_ (zip3 (toList ivars) (toList intraExtents) (toList lower_offset)) $ \(x, e, o) -> do
-    tellCLn $ "navi->offset_" <> x <> "=" <> "i"<> x <> "*"<>showC e <> "-" <> showC o <> ";"
-    tellCLn $ "navi->lower_" <> x <> "=" <> showC o<>";"
-    tellCLn $ "navi->upper_" <> x <> "=" <> showC o <> "+"<>showC e <> ";"
+    tellCLn $ "navi->offset_" <> x <> "=" <> "i"<> x <> "*"<>C.show e <> "-" <> C.show o <> ";"
+    tellCLn $ "navi->lower_" <> x <> "=" <> C.show o<>";"
+    tellCLn $ "navi->upper_" <> x <> "=" <> C.show o <> "+"<>C.show e <> ";"
   tellCLn "return 0;}"
 
 
@@ -1020,24 +1020,24 @@ tellProgram = do
   when ((monitorInterval0`mod`2)/=0) $ raiseErr $ failed "Monitor interval must be multiple of 2"
 
   let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
-                     timeStepVarName <> "<" <> showC (monitorInterval0`div`2)  <> ";" <>
+                     timeStepVarName <> "<" <> C.show (monitorInterval0`div`2)  <> ";" <>
                      "++" <> timeStepVarName <>  "){"
       closeTimeLoop = "}"
 
   tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
   tellH ";"
 
-  tellC $ T.unlines
+  tellC $ C.unlines
     [ "{"
     , openTimeLoop
-    , T.unlines [cprogcon!!0,"/* HALFWAYS */" , cprogcon!!1]
+    , C.unlines [cprogcon!!0,"/* HALFWAYS */" , cprogcon!!1]
     , closeTimeLoop
-    , "navi->time_step += "  <> showC monitorInterval0  <> ";"
+    , "navi->time_step += "  <> C.show monitorInterval0  <> ";"
     , "return 0;}"
     ]
 
 
-  tellH $ T.unlines
+  tellH $ C.unlines
     [ ""
     , "#ifdef __cplusplus"
     , "}"
@@ -1074,7 +1074,7 @@ genCxxFiles formuraProg mmProg = do
   T.writeFile cxxFilePath cxxContent
 
   let funcs = cluster [] $ M.elems auxFilesContent
-      cluster :: [CLang] -> [CLang] -> [CLang]
+      cluster :: [C.Src] -> [C.Src] -> [C.Src]
       cluster accum [] = reverse accum
       cluster [] (x:xs) = cluster [x] xs
       cluster (ac:acs) (x:xs)
@@ -1100,8 +1100,8 @@ genCxxFiles formuraProg mmProg = do
     ignore _ = return ()
 
 
-cxxTemplate ::  WithCommandLineOption => CLang
-cxxTemplate = T.unlines
+cxxTemplate ::  WithCommandLineOption => C.Src
+cxxTemplate = C.unlines
   [ ""
   , "#include <mpi.h>"
   , "#include <math.h>"

@@ -3,48 +3,58 @@
 module Formura.MPICxx.Language where
 
 import           Control.Lens
+import           Data.List (intersperse)
 import           Data.Monoid
 import           Data.String
 import           Data.String.ToString
 import qualified Data.Text as T
+import           Prelude hiding (show, Word)
+import qualified Prelude
 
-data CWord = RawC {_cValue :: T.Text} | TypedC { _cType :: T.Text, _cValue :: T.Text}
+data Word = Raw {_cValue :: T.Text} | Typed { _cType :: T.Text, _cValue :: T.Text}
                 deriving (Eq, Ord, Show, Read)
 
-makeLenses ''CWord
+makeLenses ''Word
 
-newtype CLang = CLang [CWord]
+newtype Src = Src [Word]
                 deriving (Eq, Ord, Show, Read)
 
-instance Monoid CLang where
-  mempty = CLang []
-  mappend (CLang xs) (CLang ys) = let
-    go [] = []
-    go [x] = [x]
-    go (RawC x: RawC y: z) = go ((RawC $ x<>y) : z)
+instance Monoid Src where
+  mempty = Src []
+  mappend (Src xs) (Src ys) = let -- it
+    go [] = [] -- let it
+    go [x] = [x] -- I am one element list
+    go (Raw x: Raw y: z) = go ((Raw $ x<>y) : z)
     go (x:y) = x: go y
-    in CLang $ go $ xs ++ ys
+    _ = error "never bothered me anyway"
+    in Src $ go $ xs ++ ys
 
-instance IsString CLang where
-  fromString str = CLang [RawC $ T.pack str]
+instance IsString Src where
+  fromString str = Src [Raw $ T.pack str]
 
-instance ToString CWord where
+instance ToString Word where
   toString x = toString $ x ^.cValue
 
-instance ToString CLang where
-  toString (CLang xs) = concat $ map toString xs
+instance ToString Src where
+  toString (Src xs) = concat $ map toString xs
 
-rawC :: T.Text -> CLang
-rawC t = CLang [RawC t]
+raw :: T.Text -> Src
+raw t = Src [Raw t]
 
-showC :: Show a => a -> CLang
-showC = fromString . show
+show :: Show a => a -> Src
+show = fromString . Prelude.show
 
-parens :: CLang -> CLang
+parens :: Src -> Src
 parens x = "(" <> x <> ")"
 
-brackets :: CLang -> CLang
+brackets :: Src -> Src
 brackets x = "[" <> x <> "]"
 
-braces :: CLang -> CLang
+braces :: Src -> Src
 braces x = "{" <> x <> "}"
+
+unwords :: [Src] -> Src
+unwords = mconcat . intersperse " "
+
+unlines :: [Src] -> Src
+unlines = mconcat . map (<> "\n")
