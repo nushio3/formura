@@ -334,14 +334,20 @@ benchmark it = do
       , "# stage in  a.out."
       , "#PJM --stgin \"./src/a.out %r:./a.out\""
       , "#PJM --stgout \"%r:./out/* ./out/out-%r/\""
-      , "#PJM --stgout \"%r:./prof-ip/* ./out/prof-ip-%r/\""
-      , "#PJM --stgout \"%r:./prof-01/* ./out/prof-01-%r/\""
-      , "#PJM --stgout \"%r:./prof-02/* ./out/prof-02-%r/\""
-      , "#PJM --stgout \"%r:./prof-03/* ./out/prof-03-%r/\""
-      , "#PJM --stgout \"%r:./prof-04/* ./out/prof-04-%r/\""
-      , "#PJM --stgout \"%r:./prof-05/* ./out/prof-05-%r/\""
-      , "#PJM --stgout \"%r:./prof-06/* ./out/prof-06-%r/\""
-      , "#PJM --stgout \"%r:./prof-07/* ./out/prof-07-%r/\""
+      , "#PJM --stgout \"%r:./prof-ip/* ./out/prof-ip/\""
+      , "#PJM --stgout \"%r:./prof-01/* ./out/prof-01/\""
+      , "#PJM --stgout \"%r:./prof-02/* ./out/prof-02/\""
+      , "#PJM --stgout \"%r:./prof-03/* ./out/prof-03/\""
+      , "#PJM --stgout \"%r:./prof-04/* ./out/prof-04/\""
+      , "#PJM --stgout \"%r:./prof-05/* ./out/prof-05/\""
+      , "#PJM --stgout \"%r:./prof-06/* ./out/prof-06/\""
+      , "#PJM --stgout \"%r:./prof-07/* ./out/prof-07/\""
+      , "#PJM --stgout \"%r:./prof-C/* ./out/prof-C/\""
+      , "#PJM --stgout \"%r:./prof-I/* ./out/prof-I/\""
+      , "#PJM --stgout \"%r:./prof-M/* ./out/prof-M/\""
+      , "#PJM --stgout \"%r:./prof-P/* ./out/prof-P/\""
+      , "#PJM --stgout \"%r:./prof-S/* ./out/prof-S/\""
+      , "#PJM --stgout \"%r:./prof-mpi/* ./out/prof-mpi/\""
       , ""
       , "#statistics output"
       , "#PJM -s"
@@ -358,6 +364,12 @@ benchmark it = do
       , printf "fapp -C -d prof-05 -Hpa=5 mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-06 -Hpa=6 mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-mpi -Impi mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-P -Hevent=Performance  mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-S -Hevent=Statistics   mpirun -n %d ./a.out" mpiSize
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
   superCopy (exeDir ++"/submit.sh") (?qbc^.qbHostName++":"++remotedir++"/submit.sh")
@@ -383,15 +395,21 @@ visualize it = do
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   withCurrentDirectory exeDir $ do
     writeFile "postprocess.sh" $ unlines
-      [ printf "fipppx -A -p all -Icpu,balance,call,hwm,src -d out/prof-ip* > out/output_prof_ip.txt"
-      , printf "fipppx -A -p all -Icpu,call,hwm -tcsv -d out/prof-ip* > out/output_prof_ip.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-01-* -o out/output_prof_1.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-02-* -o out/output_prof_2.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-03-* -o out/output_prof_3.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-04-* -o out/output_prof_4.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-05-* -o out/output_prof_5.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-06-* -o out/output_prof_6.csv"
-      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-07-* -o out/output_prof_7.csv"
+      [ printf "fipppx -A -p all -Icpu,balance,call,hwm,src -d out/prof-ip > out/output_prof_ip.txt"
+      , printf "fipppx -A -p all -Icpu,call,hwm -tcsv -d out/prof-ip > out/output_prof_ip.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-01 -o out/output_prof_1.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-02 -o out/output_prof_2.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-03 -o out/output_prof_3.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-04 -o out/output_prof_4.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-05 -o out/output_prof_5.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-06 -o out/output_prof_6.csv"
+      , printf "fapppx -A -p all -l0 -tcsv -Hpa -d out/prof-07 -o out/output_prof_7.csv"
+      , printf "fapppx -A -Impi -p all -l0 -ttext -d out/prof-mpi -o out/output_prof_mpi.txt"
+      , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-C -o out/output_prof_C.txt"
+      , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-I -o out/output_prof_I.txt"
+      , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-M -o out/output_prof_M.txt"
+      , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-P -o out/output_prof_P.txt"
+      , printf "fapppx -A -Ihwm,nompi -p all -d out/prof-S -o out/output_prof_S.txt"
       ]
     cmd $ "chmod 755 " ++ "postprocess.sh"
   superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
