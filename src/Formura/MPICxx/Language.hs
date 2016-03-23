@@ -79,6 +79,9 @@ raw t = Src [Raw t]
 show :: Show a => a -> Src
 show = fromString . Prelude.show
 
+parameter :: Show a => T.Text -> a -> Src
+parameter t x = Src [Typed t (fromString $ Prelude.show x)]
+
 parens :: Src -> Src
 parens x = "(" <> x <> ")"
 
@@ -100,3 +103,14 @@ intercalate x ys = mconcat $ intersperse x ys
 -- | Wrap a C source as a potential subroutine
 potentialSubroutine :: Src -> Src
 potentialSubroutine s = Src [PotentialSubroutine s]
+
+-- | Does the two code can be made into single subroutine?
+isCopipe :: Src -> Src -> Bool
+isCopipe (Src xs) (Src ys) = go xs ys
+  where
+    go [] [] = True
+    go (x:xs) (y:ys) = go1 x y && go xs ys
+    go _ _ = False
+
+    go1 (Typed tx _) (Typed ty _) = tx == ty
+    go1 x y = x == y -- TODO: consider recursive call.

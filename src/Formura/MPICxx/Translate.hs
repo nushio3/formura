@@ -10,7 +10,7 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
-import           Data.List ({-zip4,-} isPrefixOf)
+import           Data.List ({-zip4,-} isPrefixOf, sort, groupBy)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.String
@@ -635,7 +635,7 @@ genComputation (ir0, nid0) destRsc0 = do
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
             [ C.unwords
-              ["for (int ", i, "=", C.show l ,";", i,  "<", C.show h, ";++", i, "){"]
+              ["for (int ", i, "=", C.parameter "int" l ,";", i,  "<", C.parameter "int" h, ";++", i, "){"]
             | (i,(l,h)) <- (toList ivars) `zip`
               zip (toList loopFroms) (toList loopTos)]
           closeLoops =
@@ -1048,13 +1048,16 @@ tellProgram = do
 joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
   when (?commandLineOption ^. verbose || True) $ do
-    putStrLn $ "## found " ++ show (length subs0) ++ " subroutines."
+    putStrLn $ "## Subroutine Analysis"
     forM_ (zip [1..] subs0) $ \(i, s) -> do
       putStrLn $ "#" ++ show i ++ ": " ++ toString s
+    putStrLn $ "Found " ++ show (length subs0) ++ " subroutines."
+    putStrLn $ "Found " ++ show (length subs1) ++ " subroutine groups."
   return cprog0
     where
-      subs0 :: [C.Src]
+      subs1 = groupBy C.isCopipe $ sort subs0
 
+      subs0 :: [C.Src]
       subs0 = foldMap getSub cprog0
 
       getSub :: C.Src -> [C.Src]
