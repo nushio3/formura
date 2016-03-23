@@ -149,7 +149,7 @@ genFreeName' :: Bool -> IdentName -> TranM CLang
 genFreeName' isGlobal ident = do
   aggNames <- use alreadyGivenNames
   aglNames <- use alreadyGivenLocalNames
-  let initName = T.pack ident
+  let initName = fromString ident
       agNames = aggNames <> aglNames
       nCounter :: Lens' TranState Integer
       nCounter = if isGlobal then freeNameCounter else freeLocalNameCounter
@@ -183,7 +183,7 @@ setNumericalConfig = do
 setNamingState :: TranM ()
 setNamingState = do
   stateVars <- use omStateSignature
-  alreadyGivenNames .= (S.fromList $ map T.pack $ M.keys stateVars)
+  alreadyGivenNames .= (S.fromList $ map fromString $ M.keys stateVars)
 
   ans <- view axesNames
   lins <- traverse (genFreeName . ("i"++)) ans
@@ -213,8 +213,8 @@ setNamingState = do
 genTypeDecl :: IdentName -> TypeExpr -> TranM CLang
 genTypeDecl name typ = case typ of
   ElemType "void" -> return ""
-  ElemType "Rational" -> return $ "double " <> T.pack name
-  ElemType x -> return $ T.pack  x <> " " <> T.pack name
+  ElemType "Rational" -> return $ "double " <> fromString name
+  ElemType x -> return $ fromString  x <> " " <> fromString name
   GridType _ x -> do
     body <- genTypeDecl name x
     if body == "" then return ""
@@ -266,7 +266,7 @@ tellResourceDecl' isInClass name rsc box0 = do
       decl <- case typ of
         ElemType "void" -> return ""
         ElemType "Rational" -> return $ "double " <> name <> szpt
-        ElemType x -> return $ T.pack  x <> " " <> name <> szpt
+        ElemType x -> return $ fromString  x <> " " <> name <> szpt
         _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
       when (decl /= "") $ do
 
@@ -290,7 +290,7 @@ tellResourceDecl' isInClass name rsc box0 = do
 
 tellFacetDecl :: FacetID -> [RidgeID] -> TranM ()
 tellFacetDecl f rs = do
-  let name = T.pack $ toCName f
+  let name = fromString $ toCName f
   tellH $ "struct " <> name <> "{"
 
   ralloc <- use planRidgeAlloc
@@ -339,7 +339,7 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
 nameArrayResource :: (ResourceT () IRank) -> TranM CLang
 nameArrayResource rsc = case rsc of
   ResourceStatic sn _ -> do
-    let ret = T.pack sn
+    let ret = fromString sn
     planResourceNames %= M.insert rsc ret
     return ret
   _ -> do
@@ -396,11 +396,11 @@ nameFacetRequest f  = do
 
 
 nameDeltaMPIRank :: MPIRank -> CLang
-nameDeltaMPIRank r = "mpi_rank_" <> T.pack (toCName r)
+nameDeltaMPIRank r = "mpi_rank_" <> fromString (toCName r)
 
 nameFacet :: FacetID -> SendOrRecv -> TranM CLang
 nameFacet f sr = do
-  let name = T.pack $ toCName f
+  let name = fromString $ toCName f
   case sr of
     SendRecv -> return $ name
     _        -> return $ name <> "_" <> showC sr
@@ -465,7 +465,7 @@ nPlusK i d | d == 0 = i
 
 genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (CLang, CLang)
 genMMInstruction ir0 mminst = do
-  axvars <- fmap T.pack <$> view axesNames
+  axvars <- fmap fromString <$> view axesNames
 
   indNames <- use loopIndexNames
   indOffset <- use loopIndexOffset -- indNames + indOffset = real addr
@@ -557,14 +557,14 @@ genMMInstruction ir0 mminst = do
       Uniop op a -> do
         a_code <- query a
         if "external-call/" `isPrefixOf` op
-          then thisEq $ parens $ (T.replace "external-call/" "" $ T.pack op) <> parens a_code
-          else thisEq $ parens $ T.pack op <> a_code
+          then thisEq $ parens $ fromString (T.packed %~ T.replace "external-call/" "" $ op) <> parens a_code
+          else thisEq $ parens $ fromString op <> a_code
       Binop op a b -> do
         a_code <- query a
         b_code <- query b
         case op of
           "**" -> thisEq $ ("pow"<>) $ parens $ a_code <> "," <> b_code
-          _ -> thisEq $ parens $ a_code <> T.pack op <> b_code
+          _ -> thisEq $ parens $ a_code <> fromString op <> b_code
       Triop "ite" a b c -> do
         a_code <- query a
         b_code <- query b
@@ -662,7 +662,7 @@ genComputation (ir0, nid0) destRsc0 = do
       lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
       genGrid False lhsName
     _ -> do
-      return $ T.pack $  "// dunno how gen " ++ show mmInst
+      return $ fromString $  "// dunno how gen " ++ show mmInst
 
 
 -- | generate a staging/unstaging code
@@ -889,7 +889,7 @@ tellProgram = do
 
   mpiGrid0 <- use ncMPIGridShape
   mmprog <- use theMMProgram
-  ivars <- fmap T.pack <$> view axesNames
+  ivars <- fmap fromString <$> view axesNames
   intraExtents <- use ncIntraNodeShape
 
   let cxxTemplateWithMacro :: CLang
