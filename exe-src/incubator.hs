@@ -238,7 +238,7 @@ codegen it = do
     forM_ [fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
 
-    cmd $ codegenFn ++ " 3d-mhd.fmr"
+    cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
           [fn | fn <- foundFiles, fn ^. extension == ".cpp"] ++
