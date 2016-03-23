@@ -231,10 +231,11 @@ codegen it = do
   codegenFn <- getCodegen $ it ^. idvFormuraVersion
   withCurrentDirectory codeDir $ do
     cmd $ "rm *.c *.cpp *.h *.out"
-    superCopy (it ^. idvFmrSourcecodeURL) "3d-mhd.fmr"
-    superCopy (it ^. idvCppSourcecodeURL) "3d-mhd-main.cpp"
-    writeYaml "3d-mhd.yaml" $ it ^. idvNumericalConfig
-    forM_ ["3d-mhd.fmr", "3d-mhd.yaml", "3d-mhd-main.cpp"] $ \fn -> do
+    let fnBase = it ^. idvFmrSourcecodeURL . basename
+    superCopy (it ^. idvFmrSourcecodeURL) (fnBase ++ ".fmr")
+    superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.cpp")
+    writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
+    forM_ [fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
 
     cmd $ codegenFn ++ " 3d-mhd.fmr"
