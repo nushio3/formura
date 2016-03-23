@@ -8,7 +8,7 @@ import           Data.Monoid
 import           Data.String
 import           Data.String.ToString
 import qualified Data.Text as T
-import           Prelude hiding (show, Word)
+import           Prelude hiding (show, Word, length)
 import qualified Prelude
 
 data Word = Raw {_cValue :: T.Text} | Typed { _cType :: T.Text, _cValue :: T.Text}
@@ -38,6 +38,12 @@ instance ToString Word where
 instance ToString Src where
   toString (Src xs) = concat $ map toString xs
 
+toText :: Src -> T.Text
+toText (Src xs) = mconcat $ map (^.cValue) xs
+
+length :: Src -> Int
+length = T.length . toText
+
 raw :: T.Text -> Src
 raw t = Src [Raw t]
 
@@ -58,3 +64,6 @@ unwords = mconcat . intersperse " "
 
 unlines :: [Src] -> Src
 unlines = mconcat . map (<> "\n")
+
+intercalate :: Src -> [Src] -> Src
+intercalate x ys = mconcat $ intersperse x ys

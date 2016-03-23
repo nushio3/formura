@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, LambdaCase, MultiParamTypeClasses, OverloadedStrings, PackageImports, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, LambdaCase, MultiParamTypeClasses, OverloadedStrings, PackageImports, ScopedTypeVariables, TemplateHaskell #-}
 
 module Formura.MPICxx.Translate where
 
@@ -818,8 +818,8 @@ genDistributedProgram insts0 = do
         j <- go i
         return (i,j)
 
-      抑算 = "knockout-computation"   `elem` ?ncOpts
-      抑信 = "knockout-communication" `elem` ?ncOpts
+      剔算 = "knockout-computation"   `elem` ?ncOpts
+      剔通 = "knockout-communication" `elem` ?ncOpts
 
       knockout :: Bool -> TranM C.Src -> TranM C.Src
       knockout flag m = do
@@ -827,12 +827,12 @@ genDistributedProgram insts0 = do
         return $ if flag then "" else t
 
       go :: DistributedInst -> TranM C.Src
-      go (Computation cmp destRsc) = knockout 抑算 $ genComputation cmp destRsc
-      go (Unstage rid)             = knockout 抑算 $ genStagingCode False rid
-      go (Stage rid)               = knockout 抑算 $ genStagingCode True rid
-      go (FreeResource _)          = knockout 抑算 $ return ""
-      go (CommunicationSendRecv f) = knockout 抑信 $ genMPISendRecvCode f
-      go (CommunicationWait f)     = knockout 抑信 $ genMPIWaitCode f
+      go (Computation cmp destRsc) = knockout 剔算 $ genComputation cmp destRsc
+      go (Unstage rid)             = knockout 剔算 $ genStagingCode False rid
+      go (Stage rid)               = knockout 剔算 $ genStagingCode True rid
+      go (FreeResource _)          = knockout 剔算 $ return ""
+      go (CommunicationSendRecv f) = knockout 剔通 $ genMPISendRecvCode f
+      go (CommunicationWait f)     = knockout 剔通 $ genMPIWaitCode f
 
       genCall :: [(DistributedInst, C.Src)] -> TranM C.Src
       genCall instPairs = do
@@ -891,7 +891,7 @@ tellProgram = do
 
   mpiGrid0 <- use ncMPIGridShape
   mmprog <- use theMMProgram
-  ivars <- fmap fromString <$> view axesNames
+  (ivars :: Vec C.Src) <- fmap fromString <$> view axesNames
   intraExtents <- use ncIntraNodeShape
 
   let cxxTemplateWithMacro :: C.Src
@@ -926,7 +926,7 @@ tellProgram = do
   tellH $ C.unlines
         [ "#define " <> nx <> "  " <> C.show (i*g)
         | (x,i,g) <- zip3 (toList ivars) (toList intraExtents) (toList mpiGrid0)
-        , let nx = "N" <> (fromString $ map toUpper $ toString) x
+        , let nx = "N" <> (fromString $ map toUpper $ toString x)
         ]
 
   tsMPIPlanSelection .= False
@@ -970,7 +970,7 @@ tellProgram = do
     tellCLn $ "s=s/" <> C.show g <> ";"
   tellCLn "}"
 
-  tellCLn $ "int Formura_encode_mpi_rank (" <> T.intercalate "," [" int i" <> x | x<-toList ivars] <>  "){"
+  tellCLn $ "int Formura_encode_mpi_rank (" <> C.intercalate "," [" int i" <> x | x<-toList ivars] <>  "){"
   tellCLn "int s = 0;"
   forM_ (zip (toList ivars) (toList mpiGrid0)) $ \(x, ig) -> do
     let g=C.show ig
@@ -987,14 +987,14 @@ tellProgram = do
   let mpiivars = fmap ("i"<>) ivars
       lower_offset = negate $ csb0 ^.lowerVertex
   tellCLn "{"
-  tellCLn $ "int " <> T.intercalate "," (toList mpiivars) <> ";"
+  tellCLn $ "int " <> C.intercalate "," (toList mpiivars) <> ";"
   tellCLn $ "navi->mpi_comm = comm;"
   tellCLn $ "{int r; MPI_Comm_rank(comm,&r);navi->mpi_my_rank = r;}"
   tellCLn $ "Formura_decode_mpi_rank( navi->mpi_my_rank" <> C.unwords [ ", &" <> x| x<- toList mpiivars]  <> ");"
   forM_ deltaMPIs $ \r@(MPIRank rv) -> do
     let terms = zipWith nPlusK (toList mpiivars) (toList rv)
     tellC $ "navi->" <> nameDeltaMPIRank r <> "="
-    tellCLn $ "Formura_encode_mpi_rank( " <> T.intercalate "," terms  <> ");"
+    tellCLn $ "Formura_encode_mpi_rank( " <> C.intercalate "," terms  <> ");"
   tellCLn "navi->time_step=0;"
   forM_ (zip3 (toList ivars) (toList intraExtents) (toList lower_offset)) $ \(x, e, o) -> do
     tellCLn $ "navi->offset_" <> x <> "=" <> "i"<> x <> "*"<>C.show e <> "-" <> C.show o <> ";"
@@ -1070,20 +1070,20 @@ genCxxFiles formuraProg mmProg = do
   createDirectoryIfMissing True (cxxFilePath ^. directory)
 
 
-  T.writeFile hxxFilePath hxxContent
-  T.writeFile cxxFilePath cxxContent
+  T.writeFile hxxFilePath $ C.toText hxxContent
+  T.writeFile cxxFilePath $ C.toText cxxContent
 
   let funcs = cluster [] $ M.elems auxFilesContent
       cluster :: [C.Src] -> [C.Src] -> [C.Src]
       cluster accum [] = reverse accum
       cluster [] (x:xs) = cluster [x] xs
       cluster (ac:acs) (x:xs)
-        | ac /= "" && T.length (ac<>x) > 64000 = cluster ("":ac:acs)  (x:xs)
+        | ac /= "" && C.length (ac<>x) > 64000 = cluster ("":ac:acs)  (x:xs)
         | otherwise                            = cluster (ac <> x : acs) xs
 
       writeAuxFile i con = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".c"
-        T.writeFile fn $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
+        T.writeFile fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
         return fn
 
   auxFilePaths <- zipWithM writeAuxFile [0..] funcs
@@ -1106,6 +1106,6 @@ cxxTemplate = C.unlines
   , "#include <mpi.h>"
   , "#include <math.h>"
   , "#include <stdbool.h>"
-  , "#include \"" <> T.pack hxxFileName <> "\""
+  , "#include \"" <> fromString hxxFileName <> "\""
   , ""
   ]
