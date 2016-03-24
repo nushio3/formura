@@ -88,7 +88,7 @@ int main (int argc, char **argv) {
 
   init();
 
-  double t_begin, t_end;
+  double t_begin = wctime(), t_end;
 
   for(;;){
     double t = wctime();
