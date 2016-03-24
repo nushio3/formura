@@ -1049,6 +1049,23 @@ tellProgram = do
     , "#endif"
     ]
 
+useSubroutineCalls :: WithCommandLineOption => M.Map C.Src String -> CProgram -> IO CProgram
+useSubroutineCalls subroutineMap cprog0 =
+  traverse (useSubroutineInSrc subroutineMap) cprog0
+
+useSubroutineInSrc :: WithCommandLineOption => M.Map C.Src String -> C.Src -> IO C.Src
+useSubroutineInSrc subroutineMap (C.Src xs) = C.Src <$> mapM go xs
+  where
+    go :: C.Word -> IO C.Word
+    go x@(C.Raw _) = return x
+    go x@(C.Hole _) = return x
+    go (C.PotentialSubroutine pssrc) = do
+      let tmpl = C.template pssrc
+          Just funName = M.lookup tmpl subroutineMap
+          argList :: [T.Text]
+          argList = [(argN ^. C.holeExpr) | argN <-toList pssrc]
+
+      return $ C.Raw $ fromString funName <> "(" <> T.intercalate "," argList <> ");\n"
 
 joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
@@ -1070,7 +1087,9 @@ joinSubroutines cprog0 = do
       print ("Count of typed holes #",i, sum $ map cnt xs)
       -- forM_ (take 2 ss) $ T.putStrLn . C.pretty
 
-  return $ cprog0
+  cprog1 <- useSubroutineCalls subroutineNameMap cprog0
+
+  return $ cprog1
     & headerFileContent %~ (C.replace "/*INSERT SUBROUTINES HERE*/" hxxSubroutineDecls)
     & auxFilesContent %~ (M.union auxSubroutineDefs)
     where
