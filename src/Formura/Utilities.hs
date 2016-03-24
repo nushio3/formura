@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, LambdaCase, MultiWayIf, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, LambdaCase, MultiWayIf, TemplateHaskell, TupleSections #-}
 
 module Formura.Utilities where
 
@@ -6,6 +6,7 @@ import           Control.Concurrent
 import qualified Control.Exception as C
 import           Control.Monad
 import qualified Data.ByteString as BS
+import           Data.Foldable
 import qualified Data.HashMap.Strict as HM
 import           Data.List (isPrefixOf, sort, intercalate)
 import qualified Data.Yaml as Y
@@ -19,8 +20,42 @@ import           System.IO.Temp
 import           System.Process
 
 ----------------------------------------------------------------
--- External Functions Utilities
+-- https://wiki.haskell.org/Foldable_and_Traversable
 ----------------------------------------------------------------
+
+data Supply s v = Supply { unSupply :: [s] -> ([s],v) }
+
+instance Functor (Supply s) where
+  fmap f av = Supply (\l -> let (l',v) = unSupply av l in (l',f v))
+
+instance Applicative (Supply s) where
+  pure v    = Supply (\l -> (l,v))
+  af <*> av = Supply (\l -> let (l',f)  = unSupply af l
+                                (l'',v) = unSupply av l'
+                            in (l'',f v))
+
+runSupply :: (Supply s v) -> [s] -> v
+runSupply av l = snd $ unSupply av l
+
+supply :: Supply s s
+supply = Supply (\(x:xs) -> (xs,x))
+
+zipTF :: (Traversable t, Foldable f) => t a -> f b -> t (a,b)
+zipTF t f = runSupply (traverse (\a -> (,) a <$> supply) t) (toList f)
+
+zipFT :: (Traversable t, Foldable f) => f a -> t b -> t (a,b)
+zipFT = zipWithFT (,)
+
+zipWithTF :: (Traversable t,Foldable f) => (a -> b -> c) -> t a -> f b -> t c
+zipWithTF g t f = runSupply  (traverse (\a -> g a <$> supply) t) (toList f)
+
+zipWithFT :: (Traversable t,Foldable f) => (a -> b -> c) -> f a -> t b -> t c
+zipWithFT g = flip $ zipWithTF (flip g)
+
+----------------------------------------------------------------
+-- System Call Utilities
+----------------------------------------------------------------
+
 
 cmd :: String -> IO ExitCode
 cmd str = do

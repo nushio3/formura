@@ -1,7 +1,7 @@
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, OverloadedStrings, TypeSynonymInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, OverloadedStrings, TemplateHaskell, TypeSynonymInstances #-}
 
 module Formura.MPICxx.Language where
-
+import           Control.Lens
 import           Data.List (intersperse)
 import           Data.Monoid
 import           Data.String
@@ -15,15 +15,17 @@ data WordF a = Raw T.Text
              | PotentialSubroutine (SrcF a)
              deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable)
 
-data TypedText = Typed T.Text T.Text
+data TypedHole = Typed { _holeType :: T.Text, _holeExpr :: T.Text}
              deriving (Eq, Ord, Show, Read)
 
-type Word = WordF (TypedText)
+type Word = WordF (TypedHole)
 
 newtype SrcF a = Src [WordF a]
                deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable)
 
-type Src = SrcF TypedText
+type Src = SrcF TypedHole
+
+makeLenses ''TypedHole
 
 -- instance Ord Src where
 --   compare = let key :: Src -> ([T.Text], [T.Text], T.Text)
@@ -103,6 +105,14 @@ unlines = mconcat . map (<> "\n")
 
 intercalate :: Src -> [Src] -> Src
 intercalate x ys = mconcat $ intersperse x ys
+
+replace :: Src -> Src -> Src -> Src
+replace src dest (Src xs) = Src $ map go xs
+  where
+    repT = T.replace (toText src) (toText dest)
+    go (Raw x) = Raw (repT x)
+    go x@(Hole _) = x
+    go (PotentialSubroutine s) = PotentialSubroutine $ replace src dest s
 
 -- | Wrap a C source as a potential subroutine
 potentialSubroutine :: Src -> Src

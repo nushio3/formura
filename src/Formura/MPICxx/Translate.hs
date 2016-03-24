@@ -1070,7 +1070,9 @@ joinSubroutines cprog0 = do
       print ("Count of typed holes #",i, sum $ map cnt xs)
       -- forM_ (take 2 ss) $ T.putStrLn . C.pretty
 
-  return cprog0
+  return $ cprog0
+    & headerFileContent %~ (C.replace "/*INSERT SUBROUTINES HERE*/" hxxSubroutineDecls)
+    & auxFilesContent %~ (M.union auxSubroutineDefs)
     where
       subs0 :: [C.Src]
       subs0 = foldMap getSub cprog0
@@ -1082,6 +1084,7 @@ joinSubroutines cprog0 = do
       toSub (C.PotentialSubroutine s) = [s]
       toSub _ = []
 
+      -- (subroutine template, the list of codes that uses the subroutine)
       submap1 = M.unionsWith (++)
         [ M.singleton (C.template s) [s] | s <- subs0]
 
@@ -1096,11 +1099,27 @@ joinSubroutines cprog0 = do
       subroutineNameMap = M.fromList
         [(tmpl, "Formura_subroutine_" ++ show i) | (i,tmpl) <- zip [0..] subTemplates]
 
+
+      argvNames :: [C.Src]
+      argvNames = ["argx" <> C.show i | i <- [0..]]
+
       genSubroutine :: String -> C.Src -> (C.Src, C.Src)
       genSubroutine fname tmpl = let
-        header = "void " <> fromString fname <> "(" <> ")"
-        in (header, header)
+        header = "void " <> fromString fname <> "(" <> C.intercalate "," argvList <> ")"
+        argvList = [C.raw (h ^. C.holeType) <> " " <>  argN | (h, argN) <- zip (toList tmpl) argvNames]
+        in (header <> ";", "")
 
+      subroutineCodes :: [(String, C.Src, C.Src)]
+      subroutineCodes =
+        [ (fnBody ++ ".c", hxx, cxx)
+        | (tmpl, fnBody) <- M.toList subroutineNameMap
+        , let (hxx,cxx) = genSubroutine fnBody tmpl]
+
+      hxxSubroutineDecls :: C.Src
+      hxxSubroutineDecls = C.unlines [ hc ^. _2 | hc <- subroutineCodes]
+
+      auxSubroutineDefs :: M.Map FilePath C.Src
+      auxSubroutineDefs = M.fromList [ (hc ^. _1, hc ^. _3) | hc <- subroutineCodes]
 
 genCxxFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
 genCxxFiles formuraProg mmProg = do
