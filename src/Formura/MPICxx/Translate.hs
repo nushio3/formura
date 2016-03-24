@@ -1051,7 +1051,7 @@ tellProgram = do
 
 joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
-  when (?commandLineOption ^. verbose || True) $ do
+  when (?commandLineOption ^. verbose) $ do
     putStrLn $ "## Subroutine Analysis"
     when (elem "show-subroutines" $ ?commandLineOption ^. auxFlags) $ do
        forM_ (zip [1..] subs1) $ \(i, ss) -> do
@@ -1062,6 +1062,13 @@ joinSubroutines cprog0 = do
            print $ sum $ map fromEnum $ show $ C.template s
     putStrLn $ "Found " ++ show (length subs0) ++ " subroutines."
     putStrLn $ "Found " ++ show (length subs1) ++ " subroutine groups."
+    forM_ (zip [1..] subs1) $ \(i, ss) -> do
+      let C.Src xs = head ss
+          cnt (C.Typed _ _) = 1
+          cnt _ = 0
+      print ("CNTCNT###",i, sum $ map cnt xs)
+      forM_ (take 2 ss) $ T.putStrLn . C.pretty
+
   return cprog0
     where
       subs1 :: [[C.Src]]
