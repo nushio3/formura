@@ -458,7 +458,7 @@ lookupNode i = do
 
 
 nPlusK :: C.Src -> Int -> C.Src
-nPlusK i d = i <> "+" <> C.parens (C.parameter "int" (C.show d))
+nPlusK i d = i <> "+" <> C.parens (C.parameter "int" d)
 --- nPlusK i d | d == 0 = i
 ---            | d <  0 = i <> C.show d
 ---            | otherwise = i <> "+" <> C.show d
@@ -1053,12 +1053,12 @@ joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
   when (?commandLineOption ^. verbose || True) $ do
     putStrLn $ "## Subroutine Analysis"
-    forM_ (zip [1..] subs1) $ \(i, ss) -> do
-      forM_ (zip [1..] ss) $ \(j, s) -> do
-        putStrLn $ "# Subroutine group" ++ show i ++ ": member " ++ show j
-        T.putStrLn $ C.pretty s
-        putStrLn $ show $ C.template s
-        print $ sum $ map fromEnum $ show $ C.template s
+--     forM_ (zip [1..] subs1) $ \(i, ss) -> do
+--       forM_ (zip [1..] ss) $ \(j, s) -> do
+--         putStrLn $ "# Subroutine group" ++ show i ++ ": member " ++ show j
+--         T.putStrLn $ C.pretty s
+--         putStrLn $ show $ C.template s
+--         print $ sum $ map fromEnum $ show $ C.template s
     putStrLn $ "Found " ++ show (length subs0) ++ " subroutines."
     putStrLn $ "Found " ++ show (length subs1) ++ " subroutine groups."
   return cprog0
