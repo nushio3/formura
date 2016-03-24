@@ -16,6 +16,7 @@ data CommandLineOption =
     , _verbose :: Bool
     , _generateMakefile :: Bool
     , _auxNumericalConfigOptions :: [String]
+    , _auxFlags :: [String]
     , _sleepAfterGen :: Int
     }
   deriving (Eq, Show)
@@ -37,6 +38,8 @@ cloParser = CommandLineOption
             switch (long "makefile" <> long "mk" <> help "also generate a Makefile for compilation.")
             <*>
             many (strOption $ long "ncopt" <> help "additional arguments to numerical configuration.")
+            <*>
+            many (strOption $ long "flag" <> short 'f' <> help "additional arguments to formura.")
             <*>
             fmap read (strOption (long "sleep" <> metavar "SECOND" <> value "0" <>
                     help "sleep n seconds after successful generation of the destination program."))
