@@ -1188,4 +1188,4 @@ cxxTemplate = C.unlines
   ]
 
 resourceOMNodeTypename :: T.Text
-resourceOMNodeTypename = "restricted rsc_surface *"
+resourceOMNodeTypename = "__restrict rsc_surface *"
