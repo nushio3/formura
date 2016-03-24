@@ -1,9 +1,7 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, OverloadedStrings, TemplateHaskell #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, OverloadedStrings #-}
 
 module Formura.MPICxx.Language where
 
-import           Control.Lens
-import           Data.Function (on)
 import           Data.List (intersperse)
 import           Data.Monoid
 import           Data.String
@@ -12,9 +10,9 @@ import qualified Data.Text as T
 import           Prelude hiding (show, Word, length)
 import qualified Prelude
 
-data Word = Raw {_cValue :: T.Text}
-          | Typed { _cType :: T.Text, _cValue :: T.Text}
-          | PotentialSubroutine { _cSrc :: Src}
+data Word = Raw T.Text
+          | Typed T.Text  T.Text
+          | PotentialSubroutine Src
                 deriving (Eq, Ord, Show, Read)
 
 newtype Src = Src [Word]
@@ -66,7 +64,6 @@ instance ToText Word where
 instance ToText Src where
   toText (Src xs) = mconcat $ map toText xs
 
-makeLenses ''Word
 
 
 

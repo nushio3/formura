@@ -1016,6 +1016,7 @@ tellProgram = do
     dProg <- use planDistributedProgram
     genDistributedProgram dProg
 
+  tellH $ "/*INSERT SUBROUTINES HERE*/\n"
 
   monitorInterval0 <- use ncMonitorInterval
   timeStepVarName <- genFreeName "timestep"
@@ -1066,16 +1067,11 @@ joinSubroutines cprog0 = do
       let C.Src xs = head ss
           cnt (C.Typed _ _) = 1
           cnt _ = 0
-      print ("CNTCNT###",i, sum $ map cnt xs)
-      forM_ (take 2 ss) $ T.putStrLn . C.pretty
+      print ("Count of typed holes #",i, sum $ map cnt xs)
+      -- forM_ (take 2 ss) $ T.putStrLn . C.pretty
 
   return cprog0
     where
-      subs1 :: [[C.Src]]
-      subs1 = M.elems $
-        M.unionsWith (++)
-        [ M.singleton (C.template s) [s] | s <- subs0]
-
       subs0 :: [C.Src]
       subs0 = foldMap getSub cprog0
 
@@ -1086,6 +1082,24 @@ joinSubroutines cprog0 = do
       toSub (C.PotentialSubroutine s) = [s]
       toSub _ = []
 
+      submap1 = M.unionsWith (++)
+        [ M.singleton (C.template s) [s] | s <- subs0]
+
+      subs1 :: [[C.Src]]
+      subs1 = M.elems $ submap1
+
+      subTemplates :: [C.Src]
+      subTemplates = M.keys submap1
+
+      -- map a Potential Subroutine template to its subroutine name
+      subroutineNameMap :: M.Map C.Src String
+      subroutineNameMap = M.fromList
+        [(tmpl, "Formura_subroutine_" ++ show i) | (i,tmpl) <- zip [0..] subTemplates]
+
+      genSubroutine :: String -> C.Src -> (C.Src, C.Src)
+      genSubroutine fname tmpl = let
+        header = "void " <> fromString fname <> "(" <> ")"
+        in (header, header)
 
 
 genCxxFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
