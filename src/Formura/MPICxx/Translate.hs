@@ -550,8 +550,10 @@ genMMInstruction ir0 mminst = do
       LoadCursor vi nid -> do
         node <- lookupNode nid
         let Just abox = M.lookup key arrayDict
-            Just rscName = M.lookup key resourceDict
+            Just rscName0 = M.lookup key resourceDict
             key = ResourceOMNode nid ir0
+            rscName :: C.Src
+            rscName = C.parameter resourceOMNodeTypename (C.toText rscName0)
         case node ^. nodeType of
           ElemType _ -> thisEq $ rscName
           _ -> thisEq $ rscName <> accAtMargin abox vi
@@ -662,7 +664,8 @@ genComputation (ir0, nid0) destRsc0 = do
         _ -> return "// void"
     GridType _ typ -> do
       lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
-      genGrid False lhsName
+      genGrid False (C.parameter resourceOMNodeTypename (C.toText lhsName))
+
     _ -> do
       return $ fromString $  "// dunno how gen " ++ show mmInst
 
@@ -1049,8 +1052,8 @@ joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
   when (?commandLineOption ^. verbose || True) $ do
     putStrLn $ "## Subroutine Analysis"
-    forM_ (zip [1..] subs0) $ \(i, s) -> do
-      putStrLn $ "#" ++ show i ++ ": " ++ toString s
+--     forM_ (zip [1..] subs0) $ \(i, s) -> do
+--       putStrLn $ "#" ++ show i ++ ": " ++ toString s
     putStrLn $ "Found " ++ show (length subs0) ++ " subroutines."
     putStrLn $ "Found " ++ show (length subs1) ++ " subroutine groups."
   return cprog0
@@ -1134,3 +1137,6 @@ cxxTemplate = C.unlines
   , "#include \"" <> fromString hxxFileName <> "\""
   , ""
   ]
+
+resourceOMNodeTypename :: T.Text
+resourceOMNodeTypename = "restricted rsc_surface *"
