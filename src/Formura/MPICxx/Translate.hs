@@ -458,9 +458,10 @@ lookupNode i = do
 
 
 nPlusK :: C.Src -> Int -> C.Src
-nPlusK i d | d == 0 = i
-           | d <  0 = i <> C.show d
-           | otherwise = i <> "+" <> C.show d
+nPlusK i d = i <> "+" <> C.parens (C.parameter "int" (C.show d))
+--- nPlusK i d | d == 0 = i
+---            | d <  0 = i <> C.show d
+---            | otherwise = i <> "+" <> C.show d
 
 
 -- | generate bindings, and the final expression that contains the result of evaluation.
@@ -647,7 +648,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
       let bodyExpr = lhsName2 <> foldMap C.brackets ivarExpr <> "=" <> rhs <> ";"
           ivarExpr
-            | useSystemOffset = (\i d -> i <> "+" <> C.show d) <$> ivars <*> negate systemOffset0
+            | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
 
       return $ C.potentialSubroutine $ C.unlines $
@@ -715,7 +716,7 @@ genStagingCode isStaging rid = do
 
       rdgName = if isStaging then rdgNameSend else rdgNameRecv
       rdgTerm = rdgName <> foldMap C.brackets ivars
-      arrTerm = arrName  <> foldMap C.brackets (liftVec2 (\i n -> i <> "+" <> C.show n) ivars otherOffset)
+      arrTerm = arrName  <> foldMap C.brackets (liftVec2 nPlusK ivars otherOffset)
 
       body
         | isStaging = rdgTerm <> "=" <> arrTerm
@@ -1052,13 +1053,20 @@ joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
   when (?commandLineOption ^. verbose || True) $ do
     putStrLn $ "## Subroutine Analysis"
---     forM_ (zip [1..] subs0) $ \(i, s) -> do
---       putStrLn $ "#" ++ show i ++ ": " ++ toString s
+    forM_ (zip [1..] subs1) $ \(i, ss) -> do
+      forM_ (zip [1..] ss) $ \(j, s) -> do
+        putStrLn $ "# Subroutine group" ++ show i ++ ": member " ++ show j
+        T.putStrLn $ C.pretty s
+        putStrLn $ show $ C.template s
+        print $ sum $ map fromEnum $ show $ C.template s
     putStrLn $ "Found " ++ show (length subs0) ++ " subroutines."
     putStrLn $ "Found " ++ show (length subs1) ++ " subroutine groups."
   return cprog0
     where
-      subs1 = groupBy C.isCopipe $ sort subs0
+      subs1 :: [[C.Src]]
+      subs1 = M.elems $
+        M.unionsWith (++)
+        [ M.singleton (C.template s) [s] | s <- subs0]
 
       subs0 :: [C.Src]
       subs0 = foldMap getSub cprog0

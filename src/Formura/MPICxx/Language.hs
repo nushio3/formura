@@ -18,24 +18,24 @@ data Word = Raw {_cValue :: T.Text}
                 deriving (Eq, Ord, Show, Read)
 
 newtype Src = Src [Word]
-                deriving (Eq, Show, Read)
+                deriving (Eq, Ord, Show, Read)
 
-instance Ord Src where
-  compare = let key :: Src -> ([T.Text], [T.Text], T.Text)
-                key (Src xs) = (xs >>= vals , xs >>= typs, toText (Src xs))
-
-                vals :: Word -> [T.Text]
-                vals (Raw x) = [x]
-                vals (Typed _ x) = []
-                vals (PotentialSubroutine (Src xs)) = xs >>= vals
-
-                typs :: Word -> [T.Text]
-                typs (Raw _) = []
-                typs (Typed t _) = [t]
-                typs (PotentialSubroutine (Src xs)) = xs >>= typs
-
-            in compare `on` key
-
+-- instance Ord Src where
+--   compare = let key :: Src -> ([T.Text], [T.Text], T.Text)
+--                 key (Src xs) = (xs >>= vals , xs >>= typs, toText (Src xs))
+--
+--                 vals :: Word -> [T.Text]
+--                 vals (Raw x) = [x]
+--                 vals (Typed _ x) = []
+--                 vals (PotentialSubroutine (Src xs)) = xs >>= vals
+--
+--                 typs :: Word -> [T.Text]
+--                 typs (Raw _) = []
+--                 typs (Typed t _) = [t]
+--                 typs (PotentialSubroutine (Src xs)) = xs >>= typs
+--
+--             in compare `on` key
+--
 
 instance Monoid Src where
   mempty = Src []
@@ -104,13 +104,23 @@ intercalate x ys = mconcat $ intersperse x ys
 potentialSubroutine :: Src -> Src
 potentialSubroutine s = Src [PotentialSubroutine s]
 
+template :: Src -> Src
+template (Src xs) = Src $ map go xs
+  where
+    go x@(Raw _) = x
+    go (Typed t _) = Typed t ""
+    go (PotentialSubroutine s) = PotentialSubroutine $ template s
+
+
 -- | Does the two code can be made into single subroutine?
 isCopipe :: Src -> Src -> Bool
-isCopipe (Src xs) (Src ys) = go xs ys
-  where
-    go [] [] = True
-    go (x:xs) (y:ys) = go1 x y && go xs ys
-    go _ _ = False
+isCopipe x y = template x == template y
 
-    go1 (Typed tx _) (Typed ty _) = tx == ty
-    go1 x y = x == y -- TODO: consider recursive call.
+
+pretty :: Src -> T.Text
+pretty (Src xs) = T.concat $ map go xs
+  where
+    go :: Word -> T.Text
+    go (Raw x) = x
+    go (Typed _ x) = "<<" <> x <> ">>"
+    go (PotentialSubroutine s) = pretty s
