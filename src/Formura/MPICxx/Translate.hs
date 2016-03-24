@@ -1065,7 +1065,7 @@ joinSubroutines cprog0 = do
     putStrLn $ "Found " ++ show (length subs1) ++ " subroutine groups."
     forM_ (zip [1..] subs1) $ \(i, ss) -> do
       let C.Src xs = head ss
-          cnt (C.Typed _ _) = 1
+          cnt (C.Hole _) = 1
           cnt _ = 0
       print ("Count of typed holes #",i, sum $ map cnt xs)
       -- forM_ (take 2 ss) $ T.putStrLn . C.pretty

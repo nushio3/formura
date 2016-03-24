@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, OverloadedStrings #-}
+{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, OverloadedStrings, TypeSynonymInstances #-}
 
 module Formura.MPICxx.Language where
 
@@ -10,13 +10,20 @@ import qualified Data.Text as T
 import           Prelude hiding (show, Word, length)
 import qualified Prelude
 
-data Word = Raw T.Text
-          | Typed T.Text  T.Text
-          | PotentialSubroutine Src
-                deriving (Eq, Ord, Show, Read)
+data WordF a = Raw T.Text
+             | Hole a
+             | PotentialSubroutine (SrcF a)
+             deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable)
 
-newtype Src = Src [Word]
-                deriving (Eq, Ord, Show, Read)
+data TypedText = Typed T.Text T.Text
+             deriving (Eq, Ord, Show, Read)
+
+type Word = WordF (TypedText)
+
+newtype SrcF a = Src [WordF a]
+               deriving (Eq, Ord, Show, Read, Functor, Foldable, Traversable)
+
+type Src = SrcF TypedText
 
 -- instance Ord Src where
 --   compare = let key :: Src -> ([T.Text], [T.Text], T.Text)
@@ -24,12 +31,12 @@ newtype Src = Src [Word]
 --
 --                 vals :: Word -> [T.Text]
 --                 vals (Raw x) = [x]
---                 vals (Typed _ x) = []
+--                 vals (Hole _ x) = []
 --                 vals (PotentialSubroutine (Src xs)) = xs >>= vals
 --
 --                 typs :: Word -> [T.Text]
 --                 typs (Raw _) = []
---                 typs (Typed t _) = [t]
+--                 typs (Hole t _) = [t]
 --                 typs (PotentialSubroutine (Src xs)) = xs >>= typs
 --
 --             in compare `on` key
@@ -59,7 +66,7 @@ class ToText a where
 
 instance ToText Word where
   toText (Raw x) = x
-  toText (Typed _ x) = x
+  toText (Hole (Typed _ x)) = x
   toText (PotentialSubroutine x) = toText x
 instance ToText Src where
   toText (Src xs) = mconcat $ map toText xs
@@ -77,7 +84,7 @@ show :: Show a => a -> Src
 show = fromString . Prelude.show
 
 parameter :: Show a => T.Text -> a -> Src
-parameter t x = Src [Typed t (fromString $ Prelude.show x)]
+parameter t x = Src [Hole (Typed t (fromString $ Prelude.show x))]
 
 parens :: Src -> Src
 parens x = "(" <> x <> ")"
@@ -105,7 +112,7 @@ template :: Src -> Src
 template (Src xs) = Src $ map go xs
   where
     go x@(Raw _) = x
-    go (Typed t _) = Typed t ""
+    go (Hole (Typed t _)) = Hole (Typed t "")
     go (PotentialSubroutine s) = PotentialSubroutine $ template s
 
 
@@ -119,5 +126,5 @@ pretty (Src xs) = T.concat $ map go xs
   where
     go :: Word -> T.Text
     go (Raw x) = x
-    go (Typed _ x) = "<<" <> x <> ">>"
+    go (Hole (Typed _ x)) = "<<" <> x <> ">>"
     go (PotentialSubroutine s) = pretty s
