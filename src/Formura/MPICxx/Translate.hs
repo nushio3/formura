@@ -24,7 +24,7 @@ import           System.FilePath.Lens
 import           System.Process
 import           Text.Trifecta (failed, raiseErr)
 
-import           Formura.Utilities (readYamlDef)
+import           Formura.Utilities (readYamlDef, zipWithFT)
 import qualified Formura.Annotation as A
 import           Formura.Annotation.Boundary
 import           Formura.Annotation.Representation
@@ -1126,7 +1126,9 @@ joinSubroutines cprog0 = do
       genSubroutine fname tmpl = let
         header = "void " <> fromString fname <> "(" <> C.intercalate "," argvList <> ")"
         argvList = [C.raw (h ^. C.holeType) <> " " <>  argN | (h, argN) <- zip (toList tmpl) argvNames]
-        in (header <> ";", "")
+        sbody :: C.Src
+        sbody = zipWithFT (\arg hole -> hole & C.holeExpr .~ C.toText arg) argvNames tmpl
+        in (header <> ";", header <> C.braces sbody)
 
       subroutineCodes :: [(String, C.Src, C.Src)]
       subroutineCodes =
