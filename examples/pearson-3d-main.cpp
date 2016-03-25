@@ -39,7 +39,7 @@ void init() {
 }
 
 void write_monitor() {
-  printf("t = %d\n", navi.time_step);
+  printf("#%d: t = %d\n", mpi_my_rank, navi.time_step);
   char fn[256];
   sprintf(fn, "out/monitor-%06d-%d.txt", navi.time_step, mpi_my_rank);
   FILE *fp = fopen(fn,"wb");
