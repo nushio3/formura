@@ -412,12 +412,18 @@ nameFacet f sr = do
 tellArrayDecls :: TranM ()
 tellArrayDecls = do
   aalloc <- use planArrayAlloc
+  commonBox <- use planSharedResourceExtent
+  let szpt = foldMap (C.brackets . C.show) (drop 1 $ toList sz)
+      sz = commonBox ^.upperVertex - commonBox ^. lowerVertex
+
+  tellHLn $ "typedef double " <> rscSfcTypename <> szpt <> ";"
   forM_ (M.toList aalloc) $ \(rsc, box0) -> do
     name <- nameArrayResource rsc
-    box1 <- case rsc of
-      ResourceOMNode _ _ -> use planSharedResourceExtent
-      _ -> return box0
+    let box1 = case rsc of
+          ResourceOMNode _ _ -> commonBox
+          _ -> box0
     tellResourceDecl name rsc box1
+
   falloc <- use planFacetAlloc
   forM_ (M.toList falloc) $ \(fr@(f, rs)) -> do
     tellFacetDecl f rs
@@ -554,7 +560,7 @@ genMMInstruction ir0 mminst = do
             Just rscName0 = M.lookup key resourceDict
             key = ResourceOMNode nid ir0
             rscName :: C.Src
-            rscName = C.typedHole resourceOMNodeTypename (C.toText rscName0)
+            rscName = C.typedHole rscPtrTypename (C.toText rscName0)
         case node ^. nodeType of
           ElemType _ -> thisEq $ rscName
           _ -> thisEq $ rscName <> accAtMargin abox vi
@@ -665,7 +671,7 @@ genComputation (ir0, nid0) destRsc0 = do
         _ -> return "// void"
     GridType _ typ -> do
       lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
-      genGrid False (C.typedHole resourceOMNodeTypename (C.toText lhsName))
+      genGrid False (C.typedHole rscPtrTypename (C.toText lhsName))
 
     _ -> do
       return $ fromString $  "// dunno how gen " ++ show mmInst
@@ -1208,5 +1214,8 @@ cxxTemplate = C.unlines
   , ""
   ]
 
-resourceOMNodeTypename :: T.Text
-resourceOMNodeTypename = "__restrict rsc_surface *"
+rscPtrTypename :: T.Text
+rscPtrTypename = "__restrict " <> rscSfcTypename <> " *"
+
+rscSfcTypename :: T.Text
+rscSfcTypename = "rsc_surface"
