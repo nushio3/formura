@@ -1,3 +1,4 @@
+#include <math.h>
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,7 @@
 int T_MAX;
 int T_MONITOR;
 int mpi_my_rank;
+const double PI=3.14159265358979323846;
 
 float frand() {
   return rand() / float(RAND_MAX);
@@ -33,8 +35,8 @@ void init() {
         double z = (navi.offset_z + iz)/(double)NZ;
         //U[ix][iy][iz] = 1;//0.5+0.01*frand();
         //V[ix][iy][iz] = 0.01*frand();//0.25+0.01*frand();
-        U[ix][iy][iz] = 1.0*x;
-        V[ix][iy][iz] = 1.0*z;
+        U[ix][iy][iz] = sin(2 * PI * x)*sin(6 * PI * x);
+        V[ix][iy][iz] = sin(4 * PI * z)*sin(8 * PI * x);
       }
     }
   }
