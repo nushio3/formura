@@ -1,8 +1,8 @@
 initial_walls:
-  x: [50]
+  x: [40]
   y: [50]
-  z: [50]
-intra_node_shape: [100, 100, 100]
+  z: [60]
+intra_node_shape: [80, 100, 120]
 monitor_interval: 2
 mpi_grid_shape: [2,2,2]
 temporal_blocking_interval: 1
