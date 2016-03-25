@@ -1,9 +1,8 @@
-echo $1
-rm  examples/pearson-3d*.c examples/Makefile
+rm  examples/$1*.c examples/Makefile
 stack install
-stack exec formura -- examples/pearson-3d.fmr
+stack exec formura -- examples/$1.fmr
 ./cmake-for-x86.sh
-make bin/pearson-3d.out
+make bin/$1.out
 # WARNING: you need to symbolic link the .bin folder
 # mkdir -p out-2d-mhd
 # rm out-2d-mhd/*
