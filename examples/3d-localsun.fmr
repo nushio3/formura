@@ -34,7 +34,8 @@ del=((1,0,0),(0,1,0),(0,0,1))
 
 tashizan = fun (x) x+x
 
-extern function :: gx000
+# extern function :: gx000
+gx000 = fun(x) x
 
 begin function init() returns (dens, vx, vy, vz, Bx, By, Bz ,s, Psi)
       double [] :: dens = 0, vx = 0, vy = 0, vz = 0, Bx = 0, By = 0, Bz = 0,s = 0,Psi=0
