@@ -34,6 +34,7 @@ for fn in sys.argv[1:]:
 
         secy_u = np.fromfile(fp, dtype=np.float64,count=sx*sz).reshape(sx,sz,1)
         secy_v = np.fromfile(fp, dtype=np.float64,count=sx*sz).reshape(sx,sz,1)
+        print secy_u
         key = (t,x,y,z)
         img_r = secy_u
         img_g = secy_v
