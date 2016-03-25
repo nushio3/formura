@@ -1,3 +1,4 @@
+echo $1
 rm  examples/pearson-3d*.c examples/Makefile
 stack install
 stack exec formura -- examples/pearson-3d.fmr
