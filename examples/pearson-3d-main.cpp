@@ -110,6 +110,8 @@ int main (int argc, char **argv) {
     }
 
     Formura_Forward(&navi); // navi.time_step increases
+    MPI_Barrier(MPI_COMM_WORLD); // TODO: test the effect of synchronization
+
 
     if (navi.time_step >= T_MAX) {
       t_end = wctime();

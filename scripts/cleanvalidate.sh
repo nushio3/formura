@@ -1,4 +1,4 @@
-rm  examples/$1*.c examples/Makefile
+rm  examples/$1*.c examples/Makefile bin/$1.out
 stack install
 stack exec formura -- examples/$1.fmr
 ./cmake-for-x86.sh

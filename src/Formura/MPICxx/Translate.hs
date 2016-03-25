@@ -82,6 +82,7 @@ data TranState = TranState
   , _tsMPIPlanSelection :: MPIPlanSelector
   , _tsMPIPlanMap :: M.Map MPIPlanSelector MPIPlan
   , _tsCommonStaticBox :: Box
+  , _tsCommonOMNodeBox :: Box
   , _tsCxxTemplateWithMacro :: C.Src
   }
 makeClassy ''TranState
@@ -884,7 +885,7 @@ collaboratePlans = do
       rewritePlan :: MPIPlan -> MPIPlan
       rewritePlan p = p
         & planArrayAlloc %~ M.mapWithKey go
-        & planSharedResourceExtent .~ commonRscBox
+        -- & planSharedResourceExtent .~ commonRscBox -- TODO: Flipping the comment of this line changes the behavior.
 
       go (ResourceStatic snName ()) _ = commonStaticBox
       go _ b = b
