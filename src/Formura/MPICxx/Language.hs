@@ -88,6 +88,10 @@ show = fromString . Prelude.show
 parameter :: Show a => T.Text -> a -> Src
 parameter t x = Src [Hole (Typed t (fromString $ Prelude.show x))]
 
+typedHole :: T.Text -> T.Text -> Src
+typedHole t x = Src [Hole (Typed t x)]
+
+
 parens :: Src -> Src
 parens x = "(" <> x <> ")"
 

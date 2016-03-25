@@ -61,4 +61,6 @@ FILE(GLOB MHD3DSources examples/3d-mhd*.c)
 add_executable(bin/3d-mhd.out ${MHD3DSources} examples/3d-mhd-main.cpp)
 FILE(GLOB PEARSON3DSources examples/pearson-3d*.c)
 add_executable(bin/pearson-3d.out ${PEARSON3DSources} examples/pearson-3d-main.cpp)
+FILE(GLOB PEARSON3DSources examples/3d-localsun*.c)
+add_executable(bin/3d-localsun.out ${PEARSON3DSources} examples/3d-localsun-main.cpp)
 #

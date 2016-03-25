@@ -554,7 +554,7 @@ genMMInstruction ir0 mminst = do
             Just rscName0 = M.lookup key resourceDict
             key = ResourceOMNode nid ir0
             rscName :: C.Src
-            rscName = C.parameter resourceOMNodeTypename (C.toText rscName0)
+            rscName = C.typedHole resourceOMNodeTypename (C.toText rscName0)
         case node ^. nodeType of
           ElemType _ -> thisEq $ rscName
           _ -> thisEq $ rscName <> accAtMargin abox vi
@@ -665,7 +665,7 @@ genComputation (ir0, nid0) destRsc0 = do
         _ -> return "// void"
     GridType _ typ -> do
       lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
-      genGrid False (C.parameter resourceOMNodeTypename (C.toText lhsName))
+      genGrid False (C.typedHole resourceOMNodeTypename (C.toText lhsName))
 
     _ -> do
       return $ fromString $  "// dunno how gen " ++ show mmInst
