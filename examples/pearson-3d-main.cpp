@@ -31,8 +31,8 @@ void init() {
         double x = (navi.offset_x + ix)/(double)NX;
         double y = (navi.offset_y + iy)/(double)NY;
         double z = (navi.offset_z + iz)/(double)NZ;
-        U[ix][iy][iz] = 0.01+0.98*frand();
-        V[ix][iy][iz] = 0.01+0.98*frand();
+        U[ix][iy][iz] = 0.5+0.01*frand();
+        V[ix][iy][iz] = 0.25+0.01*frand();
       }
     }
   }

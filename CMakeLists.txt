@@ -52,8 +52,8 @@ add_custom_command(
 
 # add_executable(bin/diffusion.out examples/diffusion.c examples/diffusion-main.cpp)
 
-FILE(GLOB PearsonCSources examples/pearson*.c)
-add_executable(bin/pearson.out ${PearsonCSources} examples/pearson-main.cpp)
+FILE(GLOB PearsonCSources examples/pearson-2d*.c)
+add_executable(bin/pearson-2d.out ${PearsonCSources} examples/pearson-2d-main.cpp)
 FILE(GLOB MHD2DSources examples/2d-mhd*.c)
 add_executable(bin/2d-mhd.out ${MHD2DSources} examples/2d-mhd-main.cpp)
 # add_executable(bin/av-mhd.out examples/av-mhd.c examples/av-mhd-main.cpp)
