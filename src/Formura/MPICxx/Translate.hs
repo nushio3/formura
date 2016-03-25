@@ -882,10 +882,16 @@ collaboratePlans = do
       newPlans = M.map rewritePlan plans0
 
       rewritePlan :: MPIPlan -> MPIPlan
-      rewritePlan = planArrayAlloc %~ M.mapWithKey go
+      rewritePlan p = p
+        & planArrayAlloc %~ M.mapWithKey go
+        & planSharedResourceExtent .~ commonRscBox
 
       go (ResourceStatic snName ()) _ = commonStaticBox
       go _ b = b
+
+      commonRscBox = foldr1 (|||)
+        [ p ^. planSharedResourceExtent
+        | p <- M.elems plans0]
   tsCommonStaticBox .= commonStaticBox
   tsMPIPlanMap .= newPlans
 
