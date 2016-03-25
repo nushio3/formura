@@ -416,7 +416,7 @@ tellArrayDecls = do
   let szpt = foldMap (C.brackets . C.show) (drop 1 $ toList sz)
       sz = commonBox ^.upperVertex - commonBox ^. lowerVertex
 
-  tellHLn $ "typedef double " <> rscSfcTypename <> szpt <> ";"
+  tellHLn $ "typedef double " <> C.raw rscSfcTypename <> szpt <> ";"
   forM_ (M.toList aalloc) $ \(rsc, box0) -> do
     name <- nameArrayResource rsc
     let box1 = case rsc of
@@ -1215,7 +1215,7 @@ cxxTemplate = C.unlines
   ]
 
 rscPtrTypename :: T.Text
-rscPtrTypename = "__restrict " <> rscSfcTypename <> " *"
+rscPtrTypename = rscSfcTypename <> " * __restrict "
 
 rscSfcTypename :: T.Text
 rscSfcTypename = "rsc_surface"
