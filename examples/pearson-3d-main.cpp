@@ -35,8 +35,8 @@ void init() {
         double z = (navi.offset_z + iz)/(double)NZ;
         //U[ix][iy][iz] = 1;//0.5+0.01*frand();
         //V[ix][iy][iz] = 0.01*frand();//0.25+0.01*frand();
-        U[ix][iy][iz] = sin(2 * PI * x)*sin(6 * PI * x);
-        V[ix][iy][iz] = sin(4 * PI * z)*sin(8 * PI * x);
+        U[ix][iy][iz] = sin(2 * PI * x)*sin(2 * PI * z)/2+0.5;
+        V[ix][iy][iz] = sin(2 * PI * x)*sin(2 * PI * z)/2+0.5;
       }
     }
   }

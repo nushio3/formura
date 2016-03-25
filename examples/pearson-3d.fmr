@@ -26,7 +26,7 @@ begin function step(U,V) returns (U_next, V_next)
   # V_next = V + dt * dV_dt
 
   manifest :: U2 = 1*U[i-1,j] + 0*U[i+1,j]
-  manifest :: V2 = 1*V[i,j-1] + 0*V[i,j+1]
+  manifest :: V2 = 1*V[i,j,k-1] + 0*V[i,j,k+1]
 
   U_next = 1.0 * U2 +   0 * V2
   V_next = 0 *   U2 + 1.0 * V2
