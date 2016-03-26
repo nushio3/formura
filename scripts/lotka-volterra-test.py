@@ -5,7 +5,7 @@ import pylab
 dt = 0.01
 
 U = 1.0
-V = 1.0
+V = 0.5
 
 us = []
 vs = []
@@ -19,8 +19,14 @@ while t < 1000.0:
     # dV_dt = mu*(1-U*U)*V - U
 
 
-    dU_dt = - 2.0 * U * V + 1.0 * V
+    # Lotka-Volterra equation
+    dU_dt = - 2.0 * U * V + 1.0 * U * (1 - U)
     dV_dt =   1.0 * U * V - 0.5 * V
+
+    # Pearson's equation
+    dU_dt = - U * V*V + 0.015 * (1 - U)
+    dV_dt =   U * V*V - 0.065 * V
+
 
     U += dt * dU_dt
     V += dt * dV_dt
