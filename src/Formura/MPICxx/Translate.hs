@@ -1177,7 +1177,9 @@ genCxxFiles formuraProg mmProg = do
        (mmProg ^. omGlobalEnvironment)
        tranState0
 
-  (CProgram hxxContent cxxContent auxFilesContent) <- joinSubroutines cprog0
+  (CProgram hxxContent cxxContent auxFilesContent) <-
+    if (elem "no-subroutine" $ tranState1 ^. ncOptionStrings) then return cprog0
+    else joinSubroutines cprog0
 
   createDirectoryIfMissing True (cxxFilePath ^. directory)
 
