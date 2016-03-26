@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import pylab
 
-mu = 0.1
 
 dt = 0.01
 
@@ -14,8 +13,15 @@ vs = []
 t = 0.0
 
 while t < 1000.0:
-    dU_dt = V
-    dV_dt = mu*(1-U*U)*V - U
+    # van der Pol oscillator
+    # mu = 0.1
+    # dU_dt = V
+    # dV_dt = mu*(1-U*U)*V - U
+
+
+    dU_dt = - 2.0 * U * V + 1.0 * V
+    dV_dt =   1.0 * U * V - 0.5 * V
+
     U += dt * dU_dt
     V += dt * dV_dt
     us.append(U)
