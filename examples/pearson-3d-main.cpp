@@ -39,7 +39,7 @@ void init() {
         //V[ix][iy][iz] = sin(2 * PI * x)*sin(2 * PI * z)/2+0.5;
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
-        if (x*x+y*y+z*z < 0.01) {
+        if (x*x+z*z < 0.01) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
