@@ -44,6 +44,7 @@ library
                   Formura.OrthotopeMachine.Graph
                   Formura.OrthotopeMachine.Translate
                   Formura.OrthotopeMachine.Manifestation
+                  Formura.OrthotopeMachine.TemporalBlocking
                   Formura.MPICxx.Language
                   Formura.MPICxx.Cut
                   Formura.MPICxx.Translate
