@@ -30,12 +30,13 @@ void init() {
   for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
     for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
       for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
-        double x = (navi.offset_x + ix)/(double)NX;
-        double y = (navi.offset_y + iy)/(double)NY;
-        double z = (navi.offset_z + iz)/(double)NZ;
+        double k = (2*PI) / fmin(NX,fmin(NY,NZ));
+        double x = k * (navi.offset_x + ix);
+        double y = k * (navi.offset_y + iy);
+        double z = k * (navi.offset_z + iz);
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
-        if (x*x+y*y+z*z < 0.01) {
+        if (sin(x) * sin(y) * sin(z) > 0.9) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
