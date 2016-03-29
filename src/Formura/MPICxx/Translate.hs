@@ -35,6 +35,7 @@ import           Formura.GlobalEnvironment
 import           Formura.Language.Combinator (subFix)
 import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
+import           Formura.OrthotopeMachine.TemporalBlocking
 import           Formura.Syntax
 import           Formura.Vec
 import qualified Formura.MPICxx.Language as C
@@ -1032,14 +1033,17 @@ tellProgram = do
   tellH $ "/*INSERT SUBROUTINES HERE*/\n"
 
   monitorInterval0 <- use ncMonitorInterval
+  temporalBlockingInterval0 <- use ncTemporalBlockingInterval
   timeStepVarName <- genFreeName "timestep"
 
 
-  when ((monitorInterval0`mod`2)/=0) $ raiseErr $ failed "Monitor interval must be multiple of 2"
+  when ((monitorInterval0`mod`(2*temporalBlockingInterval0))/=0) $
+    raiseErr $ failed "Monitor interval must be multiple of (2 * temporal blocking interval)"
 
   let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
-                     timeStepVarName <> "<" <> C.show (monitorInterval0`div`2)  <> ";" <>
-                     "++" <> timeStepVarName <>  "){"
+                     timeStepVarName <> "<"
+                     <> C.show (monitorInterval0`div`(2*temporalBlockingInterval0))
+                     <> ";" <> "++" <> timeStepVarName <>  "){"
       closeTimeLoop = "}"
 
   tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
@@ -1156,14 +1160,20 @@ joinSubroutines cprog0 = do
       auxSubroutineDefs = M.fromList [ (hc ^. _1, hc ^. _3) | hc <- subroutineCodes]
 
 genCxxFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
-genCxxFiles formuraProg mmProg = do
+genCxxFiles formuraProg mmProg0 = do
   let
+    nc = formuraProg ^. programNumericalConfig
+
+    tbFoldingNumber = nc ^. ncTemporalBlockingInterval
+
+    mmProgTB = temporalBlocking tbFoldingNumber mmProg0
+
     tranState0 = TranState
       { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "C++ code generation"}
       , _tsNamingState = defaultNamingState
       , _theProgram = formuraProg
-      , _theMMProgram = mmProg
-      , _tsNumericalConfig = defaultNumericalConfig
+      , _theMMProgram = mmProgTB
+      , _tsNumericalConfig = nc
       , _theGraph = M.empty
       , _tsMPIPlanSelection = False
       , _tsMPIPlanMap = M.empty
@@ -1174,7 +1184,7 @@ genCxxFiles formuraProg mmProg = do
 
   (_, tranState1 , cprog0)
     <- runCompilerRight tellProgram
-       (mmProg ^. omGlobalEnvironment)
+       (mmProgTB ^. omGlobalEnvironment)
        tranState0
 
   (CProgram hxxContent cxxContent auxFilesContent) <-
