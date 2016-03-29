@@ -83,12 +83,12 @@ int main (int argc, char **argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_my_rank);
 
   if (argc <= 1) {
-    T_MAX=1000;
+    T_MAX=1024;
   }else{
     sscanf(argv[1], "%d",  &T_MAX);
   }
   if (argc <= 2) {
-    T_MONITOR=1000;
+    T_MONITOR=1024;
   }else{
     sscanf(argv[2], "%d",  &T_MONITOR);
   }

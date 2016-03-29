@@ -6,4 +6,4 @@ intra_node_shape: [80, 80, 80]
 monitor_interval: 40
 mpi_grid_shape: [2,2,2]
 temporal_blocking_interval: 1
-option_strings: ["no-subroutine"]
+option_strings: []
