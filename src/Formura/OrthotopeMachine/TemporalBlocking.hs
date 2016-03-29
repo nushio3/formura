@@ -3,6 +3,7 @@ module Formura.OrthotopeMachine.TemporalBlocking where
 
 import           Control.Lens
 import qualified Data.Map as M
+import           System.IO.Unsafe
 
 import Formura.CommandLineOption
 import Formura.Syntax
@@ -44,7 +45,9 @@ data MachineProgram instType typeType = MachineProgram
 -- These invariants are created by genGlobalFunction from Formura.OrthotopeMachine.Translate
 
 temporalBlocking :: WithCommandLineOption => Int -> MMProgram -> MMProgram
-temporalBlocking tbFoldingNumber mmprog0 = mmprog0 & omStepGraph .~ stepGraphN
+temporalBlocking tbFoldingNumber mmprog0 = unsafePerformIO $ do
+  print storeInstID
+  return $ mmprog0 & omStepGraph .~ stepGraphN
   where
     stepGraphN = M.unions
       [ mkNthGraph i
@@ -91,16 +94,17 @@ temporalBlocking tbFoldingNumber mmprog0 = mmprog0 & omStepGraph .~ stepGraphN
     behead = microInstsOfMMGraph %~ beheadMicroInst
 
     beheadMicroInst :: MicroInstruction -> MicroInstruction
-    beheadMicroInst (LoadCursorStatic v ident) =
-      let Just i = M.lookup ident storeInstID in LoadCursor v (i - omNodeIDStride)
-    cjHeadMicroInst x = x
+    beheadMicroInst (LoadCursorStatic v ident) = unsafePerformIO $ do
+      putStrLn $ "requested ident: " ++ show ident
+      return $ let Just i = M.lookup ident storeInstID in LoadCursor v (i - omNodeIDStride)
+    beheadMicroInst x = x
 
     betail :: MMGraph -> MMGraph
     betail = traverse . nodeInst %~ betailMMInst
 
     betailMMInst :: MMInstruction -> MMInstruction
-    betailMMInst = M.filter (isStore . (^.nodeInst))
+    betailMMInst = M.map (nodeInst %~ storeToReturn)
 
-    isStore :: MicroInstruction -> Bool
-    isStore (Store _ _) = True
-    isStore _           = False
+    storeToReturn :: MicroInstruction -> MicroInstruction
+    storeToReturn (Store _ x) = Uniop "+" x
+    storeToReturn x           = x
