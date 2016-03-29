@@ -275,6 +275,13 @@ mfoldout k x = foldout (join . mlift k) x
 subFix :: (fs ⊆ gs) => Lang fs -> Lang gs
 subFix = fold (review (fix . subrep))
 
+-- | Demote a @Lang gs@ to @Lang fs@, when @gs@ has more constructors than @fs@. Demotion may fail.
+
+-- superFix :: (fs ⊆ gs) => Lang gs -> Maybe (Lang fs)
+-- superFix = mfold (^? (fix . review subrep ))
+
+
+
 -- | Restrict a function from @Lang gs@ to that from @Lang fs@, where @fs@ has less constructors than @gs@.
 
 subOp :: (fs ⊆ gs) => (Lang gs -> c) -> Lang fs -> c

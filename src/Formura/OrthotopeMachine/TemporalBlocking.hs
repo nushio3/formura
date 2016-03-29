@@ -1,10 +1,12 @@
-{-# LANGUAGE ImplicitParams #-}
+{-# LANGUAGE ImplicitParams, TypeFamilies #-}
 module Formura.OrthotopeMachine.TemporalBlocking where
 
 import           Control.Lens
 import qualified Data.Map as M
+import           Data.Maybe
 import           System.IO.Unsafe
 
+import Formura.Language.Combinator
 import Formura.CommandLineOption
 import Formura.Syntax
 import Formura.OrthotopeMachine.Graph
@@ -100,11 +102,36 @@ temporalBlocking tbFoldingNumber mmprog0 = unsafePerformIO $ do
     beheadMicroInst x = x
 
     betail :: MMGraph -> MMGraph
-    betail = traverse . nodeInst %~ betailMMInst
+    betail = M.map betailMMNode
+
+    lookupStoreDest :: MMInstruction -> Maybe IdentName
+    lookupStoreDest mminst = listToMaybe
+      [ ident
+      | Store ident _ <- map (^. nodeInst) $ M.elems mminst]
+
+    betailMMNode :: MMNode -> MMNode
+    betailMMNode nd0 = case lookupStoreDest $ nd0 ^. nodeInst of
+      Just ident ->
+        let
+          typ0 :: TypeExpr
+          typ0 = fromJust $ M.lookup ident $ mmprog0 ^. omStateSignature
+          typ1 :: OMNodeType
+          typ1 = go typ0
+          go (GridType v x) = GridType v $ go x
+          go (ElemType e)   = ElemType e
+          go _              = TopType
+        in
+        nd0
+        & nodeInst %~ betailMMInst
+        & nodeType .~ typ1
+      Nothing -> nd0
 
     betailMMInst :: MMInstruction -> MMInstruction
-    betailMMInst = M.map (nodeInst %~ storeToReturn)
+    betailMMInst = M.map storeToReturn
 
-    storeToReturn :: MicroInstruction -> MicroInstruction
-    storeToReturn (Store _ x) = Uniop "+" x
-    storeToReturn x           = x
+    storeToReturn :: MicroNode -> MicroNode
+    storeToReturn nd0 = case nd0 ^. nodeInst of
+      (Store ident x) ->
+        nd0
+        & nodeInst .~ Uniop "+" x
+      _ -> nd0

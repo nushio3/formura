@@ -125,6 +125,7 @@ instance (Show v, Show t) => Show (Node v t) where
 
 type OMNode = Node OMInstruction OMNodeType
 type MMNode = Node MMInstruction OMNodeType
+type MicroNode = Node MicroInstruction MicroNodeType
 
 makeLenses ''Node
 instance A.Annotated (Node v t) where
