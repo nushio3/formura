@@ -119,6 +119,7 @@ mapElemType f (GridType v t) = GridType v $ mapElemType f t
 mapElemType _ TopType = TopType
 
 data Node instType typeType = Node {_nodeInst :: instType, _nodeType :: typeType, _nodeAnnot :: A.Annotation}
+
 instance (Show v, Show t) => Show (Node v t) where
   show (Node v t _) = show v ++ " :: " ++ show t
 
@@ -128,6 +129,9 @@ type MMNode = Node MMInstruction OMNodeType
 makeLenses ''Node
 instance A.Annotated (Node v t) where
   annotation = nodeAnnot
+-- instance (Data instType) => Data (Node instType typeType) where
+--   gfoldl (*) z x = x{_nodeInst = gfoldl (*) z (_nodeInst x)}
+
 
 type Graph instType typeType = M.Map OMNodeID (Node instType typeType)
 type OMGraph = Graph OMInstruction OMNodeType
