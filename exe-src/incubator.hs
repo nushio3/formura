@@ -459,7 +459,7 @@ mainServer = do
   let crowded = length (lines kstat) > 50
   when crowded $ do
     putStrLn "CROWDED!!"
-    threadDelay $ 10^6
+    threadDelay $ 60 * 10^6
 
   mapM_ (proceed crowded) idxps
 
