@@ -455,24 +455,28 @@ mainServer = do
 
   idxps <- catMaybes <$> mapM readIndExp idvFns
 
-  kstat <- readCmd "ssh K kstat"
-  let crowded = length (lines kstat) > 50
-  when crowded $ do
-    putStrLn "CROWDED!!"
-    threadDelay $ 60 * 10^6
-
-  mapM_ (proceed crowded) idxps
+  mapM_ proceed  idxps
 
   return ()
 
-proceed :: WithQBConfig => Bool -> IndExp -> IO ()
-proceed crowded it = do
+proceed :: WithQBConfig => IndExp -> IO ()
+proceed it = do
+  let whenSlack perform it = do
+        kstat <- readCmd "ssh K kstat"
+        let crowded = length (lines kstat) > 50
+        case crowded of
+          True -> do
+            putStrLn "CROWDED!!"
+            threadDelay $ 60 * 10^6
+            return it
+          False -> perform it
+
   putStrLn $ "## "++ it ^. xpExperimentFilePath
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile -> (if crowded then return else compile) it
-    Benchmark -> (if crowded then return else benchmark) it
+    Compile ->  whenSlack compile it
+    Benchmark -> whenSlack benchmark it
     Visualize -> visualize it
     Wait _ waitlist -> do
       ret <- waits waitlist it
