@@ -469,7 +469,7 @@ proceed it = do
         case crowded of
           True -> do
             putStrLn "CROWDED!!"
-            threadDelay $ 60 * 10^6
+            threadDelay $ 1 * 10^6
             return it
           False -> perform it
 
