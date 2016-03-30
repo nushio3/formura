@@ -12,7 +12,7 @@ double :: ch2_cp2 = c_h / 0.18
 
 ddx = fun(a) (a[i-2] + 8*a[i+1] - 8*a[i-1] - a[i+2])/(12*dx)
 ddy = fun(a) (a[,i-2] + 8*a[,i+1] - 8*a[,i-1] - a[,i+2])/(12*dy)
-ddz = fun(a) (a[,,i-2] + 8*a[,,i+1] - 8*a[,,i-1] - a[,,i+2])/(12*dy)
+ddz = fun(a) (a[,,i-2] + 8*a[,,i+1] - 8*a[,,i-1] - a[,,i+2])/(12*dz)
 
 ∂ = (ddx,ddy,ddz)
 
