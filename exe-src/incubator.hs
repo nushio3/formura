@@ -328,7 +328,7 @@ benchmark it = do
       , ""
       , "#time limit"
       , "#PJM --name \"autobenchmark\""
-      , "#PJM --rsc-list \"elapse=12:00:00\""
+      , "#PJM --rsc-list \"elapse=1:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
