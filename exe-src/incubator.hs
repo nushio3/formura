@@ -328,6 +328,7 @@ benchmark it = do
       , ""
       , "#time limit"
       , "#PJM --name \"autobenchmark\""
+        -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
       , "#PJM --rsc-list \"elapse=1:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
@@ -358,6 +359,11 @@ benchmark it = do
       , ". /work/system/Env_base"
       , "mpiexec /work/system/bin/msh \"mkdir ./out\""
       , ""
+      , printf "fapp -C -d prof-S -Hevent=Statistics   mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
+      , printf "fapp -C -d prof-P -Hevent=Performance  mpirun -n %d ./a.out" mpiSize
       , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-01 -Hpa=1 mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-02 -Hpa=2 mpirun -n %d ./a.out" mpiSize
@@ -367,11 +373,6 @@ benchmark it = do
       , printf "fapp -C -d prof-06 -Hpa=6 mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
       , printf "fapp -C -d prof-mpi -Impi mpirun -n %d ./a.out" mpiSize
-      , printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
-      , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
-      , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
-      , printf "fapp -C -d prof-P -Hevent=Performance  mpirun -n %d ./a.out" mpiSize
-      , printf "fapp -C -d prof-S -Hevent=Statistics   mpirun -n %d ./a.out" mpiSize
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
   superCopy (exeDir ++"/submit.sh") (?qbc^.qbHostName++":"++remotedir++"/submit.sh")
