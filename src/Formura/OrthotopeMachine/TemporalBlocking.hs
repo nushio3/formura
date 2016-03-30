@@ -47,9 +47,7 @@ data MachineProgram instType typeType = MachineProgram
 -- These invariants are created by genGlobalFunction from Formura.OrthotopeMachine.Translate
 
 temporalBlocking :: WithCommandLineOption => Int -> MMProgram -> MMProgram
-temporalBlocking tbFoldingNumber mmprog0 = unsafePerformIO $ do
-  print storeInstID
-  return $ mmprog0 & omStepGraph .~ stepGraphN
+temporalBlocking tbFoldingNumber mmprog0 = mmprog0 & omStepGraph .~ stepGraphN
   where
     stepGraphN = M.unions
       [ mkNthGraph i
@@ -96,9 +94,8 @@ temporalBlocking tbFoldingNumber mmprog0 = unsafePerformIO $ do
     behead = microInstsOfMMGraph %~ beheadMicroInst
 
     beheadMicroInst :: MicroInstruction -> MicroInstruction
-    beheadMicroInst (LoadCursorStatic v ident) = unsafePerformIO $ do
-      putStrLn $ "requested ident: " ++ show ident
-      return $ let Just i = M.lookup ident storeInstID in LoadCursor v (i - omNodeIDStride)
+    beheadMicroInst (LoadCursorStatic v ident) =
+      let Just i = M.lookup ident storeInstID in LoadCursor v (i - omNodeIDStride)
     beheadMicroInst x = x
 
     betail :: MMGraph -> MMGraph
