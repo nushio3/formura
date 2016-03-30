@@ -84,6 +84,7 @@ data Individual =
   { _idvFormuraVersion :: String
   , _idvFmrSourcecodeURL :: String
   , _idvCppSourcecodeURL :: String
+  , _idvBaseFilename :: String
   , _idvNumericalConfig :: NumericalConfig
   , _idvCompilerFlags :: [String]
   } deriving (Eq, Ord, Read, Show)
@@ -231,7 +232,7 @@ codegen it = do
   codegenFn <- getCodegen $ it ^. idvFormuraVersion
   withCurrentDirectory codeDir $ do
     cmd $ "rm *.c *.cpp *.h *.out"
-    let fnBase = it ^. idvFmrSourcecodeURL . basename
+    let fnBase = it ^. idvBaseFilename . basename
     superCopy (it ^. idvFmrSourcecodeURL) (fnBase ++ ".fmr")
     superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.cpp")
     writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
