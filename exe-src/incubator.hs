@@ -453,8 +453,8 @@ mainServer = do
     cmd "git pull"
   findIdvs <- readCmd $ "find " ++ noteDir ++ " -name '*.idv'"
   let idvFns = case argv of
-        [pat] -> filter (isInfixOf pat) $ sort $ lines findIdvs
-        _ ->  sort $ lines findIdvs
+        [] ->  sort $ lines findIdvs
+        pats -> concat [sort $ filter (isInfixOf pat) $ lines findIdvs | pat <- pats]
 
   idxps <- catMaybes <$> mapM readIndExp idvFns
 
@@ -464,10 +464,11 @@ mainServer = do
 
 proceed :: WithQBConfig => IndExp -> IO ()
 proceed it = do
+  argv <- getArgs
   let whenSlack lmt perform it = do
         kstat <- readCmd "ssh K kstat"
         let crowded = length (lines kstat) > lmt
-        case crowded of
+        case crowded &&  (not $ "--unnice" `elem` argv) of
           True -> do
             putStrLn "CROWDED!!"
             threadDelay $ 1 * 10^6
