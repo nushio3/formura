@@ -27,6 +27,9 @@ double wctime() {
 
 
 void init() {
+  double wx = frand() * 2 * PI;
+  double wy = frand() * 2 * PI;
+  double wz = frand() * 2 * PI;
   for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
     for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
       for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
@@ -36,7 +39,7 @@ void init() {
         double z = k * (navi.offset_z + iz);
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
-        if (sin(x) * sin(y) * sin(z) > 0.9) {
+        if (sin(x+wx) * sin(y+wy) * sin(z+wz) > 0.9) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
