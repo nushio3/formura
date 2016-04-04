@@ -100,13 +100,18 @@ int main (int argc, char **argv) {
 
   double t_begin = wctime(), t_end;
 
+  int last_monitor_t = -T_MONITOR;
   for(;;){
     double t = wctime();
-    if(navi.time_step % T_MONITOR == 0 || navi.time_step <= 3 * T_MONITOR ) {
+    bool monitor_flag = navi.time_step >= last_monitor_t + T_MONITOR;
+    if(monitor_flag || navi.time_step <= 3 * T_MONITOR ) {
       printf("%d step @ %lf sec\n", navi.time_step, t-t_begin);
     }
-    if(navi.time_step % T_MONITOR == 0) {
+    if(monitor_flag) {
       write_monitor();
+    }
+    if(monitor_flag) {
+      last_monitor_t += T_MONITOR;
     }
 
     if (navi.time_step >= T_MAX) break;

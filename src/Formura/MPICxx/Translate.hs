@@ -609,15 +609,16 @@ genMMInstruction ir0 mminst = do
   return $ (C.unwords txts, tailName)
 
 
-ompEveryLoopPragma :: (?ncOpts :: [String]) => C.Src
-ompEveryLoopPragma
-  | "omp-collapse" `elem` ?ncOpts = "#pragma omp for collapse(2)"
+ompEveryLoopPragma :: (?ncOpts :: [String]) => Int -> C.Src
+ompEveryLoopPragma n
+  | "omp-collapse" `elem` ?ncOpts = "#pragma omp for collapse(" <> C.show n <> ")"
   | otherwise                 = ""
 
 -- | generate a formura function body.
 
 genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM C.Src
 genComputation (ir0, nid0) destRsc0 = do
+  dim <- view dimension
   ivars <- use loopIndexNames
   regionDict <- use planRegionAlloc
   arrayDict <- use planArrayAlloc
@@ -660,7 +661,7 @@ genComputation (ir0, nid0) destRsc0 = do
             | otherwise       = ivars
 
       return $ C.potentialSubroutine $ C.unlines $
-        [ompEveryLoopPragma] ++
+        [ompEveryLoopPragma $ dim-1] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
 
@@ -732,7 +733,7 @@ genStagingCode isStaging rid = do
 
 
 
-  return $ ompEveryLoopPragma <> "\n" <>
+  return $ ompEveryLoopPragma dim <> "\n" <>
     C.unlines openLoops <> body <> ";" <> C.unlines closeLoops
 
 genMPISendRecvCode :: FacetID -> TranM C.Src

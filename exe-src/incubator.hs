@@ -14,6 +14,7 @@ import qualified Data.HashMap.Strict as HM
 import           Data.List (isPrefixOf, sort, intercalate, isInfixOf)
 import qualified Data.Map as M
 import           Data.Maybe
+import qualified Data.Set as S
 import           Data.Time
 import qualified Data.Yaml as Y
 import qualified Data.Yaml.Pretty as Y
@@ -428,6 +429,27 @@ waits ((fs,a):ws) it = do
   es <- mapM superDoesFileExist fs
   if and es then return $ it & xpAction .~ a
     else waits ws it
+
+----------------------------------------------------------------
+-- Evolutionary Computations
+----------------------------------------------------------------
+
+perturb :: Individual -> [Individual]
+perturb x = S.toList $ S.fromList [f x | f <- perturbers]
+
+perturbers :: [Individual -> Individual]
+perturbers = [idvNumericalConfig %~ f | f <- ncPerturbers]
+
+ncPerturbers :: [NumericalConfig -> NumericalConfig]
+ncPerturbers = [ ncIntraNodeShape . ix a %~ f | a <- [0..2], f <- intPerturbers]
+  ++ [ncTemporalBlockingInterval %~ f | f <- intPerturbers]
+intPerturbers :: [Int -> Int]
+intPerturbers =
+  [(+1), (+ negate 1),(*2),(flip div 2),(+8), (+ negate 8)]
+
+----------------------------------------------------------------
+-- Main Program
+----------------------------------------------------------------
 
 
 main :: IO ()
