@@ -1039,11 +1039,12 @@ tellProgram = do
 
 
   when ((monitorInterval0`mod`(2*temporalBlockingInterval0))/=0) $
-    raiseErr $ failed "Monitor interval must be multiple of (2 * temporal blocking interval)"
+    liftIO $ print "Monitor interval must be multiple of (2 * temporal blocking interval)"
+  let monitorInterval2 = head $ filter (\x -> x`mod`(2*temporalBlockingInterval0)==0)[monitorInterval0 ..]
 
   let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
                      timeStepVarName <> "<"
-                     <> C.show (monitorInterval0`div`(2*temporalBlockingInterval0))
+                     <> C.show (monitorInterval2`div`(2*temporalBlockingInterval0))
                      <> ";" <> "++" <> timeStepVarName <>  "){"
       closeTimeLoop = "}"
 
@@ -1055,7 +1056,7 @@ tellProgram = do
     , openTimeLoop
     , C.unlines [cprogcon!!0,"/* HALFWAYS */" , cprogcon!!1]
     , closeTimeLoop
-    , "navi->time_step += "  <> C.show monitorInterval0  <> ";"
+    , "navi->time_step += "  <> C.show monitorInterval2  <> ";"
     , "return 0;}"
     ]
 
