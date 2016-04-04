@@ -1039,7 +1039,7 @@ tellProgram = do
 
 
   when ((monitorInterval0`mod`(2*temporalBlockingInterval0))/=0) $
-    liftIO $ print "Monitor interval must be multiple of (2 * temporal blocking interval)"
+    liftIO $ putStrLn "Warning : Monitor interval must be multiple of (2 * temporal blocking interval)"
   let monitorInterval2 = head $ filter (\x -> x`mod`(2*temporalBlockingInterval0)==0)[monitorInterval0 ..]
 
   let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
