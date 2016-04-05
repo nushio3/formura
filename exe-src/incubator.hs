@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, ImplicitParams, LambdaCase, MultiWayIf, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, ImplicitParams, LambdaCase, MultiWayIf, OverloadedStrings, TemplateHaskell #-}
 
 module Main where
 
@@ -379,10 +379,10 @@ benchmark it = do
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
   superCopy (exeDir ++"/submit.sh") (?qbc^.qbHostName++":"++remotedir++"/submit.sh")
-  remoteCmd $ "cd " ++ remotedir ++ ";rm -fr autobenchmark.* out/ "
+  remoteCmd $ "cd " ++ remotedir ++ ";rm -fr B*.i* B*.o* out/ "
   remoteCmd $ "cd " ++ remotedir ++ ";ksub submit.sh"
 
-  let resultFiles = [kpath ++ pat | pat <- ["autobenchmark.i*", "autobenchmark.s*"]]
+  let resultFiles = [kpath ++ pat | pat <- ["B*.i*", "B*.s*"]]
       kpath = ?qbc^.qbHostName++":"++remotedir++"/"
 
   return $ it
@@ -428,7 +428,8 @@ waits :: WaitList -> IndExp -> IO IndExp
 waits [] it = return it
 waits ((fs,a):ws) it = do
   es <- mapM superDoesFileExist fs
-  if and es then return $ it & xpAction .~ a
+  es2 <- mapM superDoesFileExist (flip map fs (T.packed %~ T.replace "autobenchmark" "B*")) -- TODO: 移行措置
+  if and es || and es2 then return $ it & xpAction .~ a
     else waits ws it
 
 ----------------------------------------------------------------
