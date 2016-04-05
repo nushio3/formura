@@ -80,18 +80,18 @@ void write_monitor() {
 
 
 int main (int argc, char **argv) {
-  srand(time(NULL));
   MPI_Init(&argc, &argv);
   Formura_Init(&navi, MPI_COMM_WORLD);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_my_rank);
+  srand(time(NULL)+mpi_my_rank*65537);
 
   if (argc <= 1) {
-    T_MAX=1024;
+    T_MAX=8192;
   }else{
     sscanf(argv[1], "%d",  &T_MAX);
   }
   if (argc <= 2) {
-    T_MONITOR=1024;
+    T_MONITOR=8192;
   }else{
     sscanf(argv[2], "%d",  &T_MONITOR);
   }
