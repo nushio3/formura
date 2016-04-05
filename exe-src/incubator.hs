@@ -552,6 +552,7 @@ proceed it = do
     Failed act -> case it ^. xpFailureCounter > 3 of
       True -> return it
       _ ->  return $ it & xpAction .~ Codegen
+        & xpFailureCounter %~ (+1)
 
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
