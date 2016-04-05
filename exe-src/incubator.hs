@@ -435,6 +435,19 @@ waits ((fs,a):ws) it = do
 -- Evolutionary Computations
 ----------------------------------------------------------------
 
+stringAdd :: String -> [String] -> [String]
+stringAdd x ys = S.toList $ S.fromList $ x:ys
+
+stringDel :: String -> [String] -> [String]
+stringDel x ys = filter (/=x) ys
+
+stringPerturbers :: String -> [[String] -> [String]]
+stringPerturbers x = [stringAdd x, stringDel x]
+
+strOptPerturbers :: [String] -> [[String] -> [String]]
+strOptPerturbers kwds = [f | k <- kwds, f <- stringPerturbers k]
+
+
 perturb :: Individual -> [Individual]
 perturb x = S.toList $ S.fromList [f x | f <- perturbers]
 
@@ -460,7 +473,7 @@ normalize nc
 ncPerturbers :: [NumericalConfig -> NumericalConfig]
 ncPerturbers = [ ncIntraNodeShape . ix a %~ f | a <- [0..2], f <- intPerturbers]
   ++ [ncTemporalBlockingInterval %~ f | f <- intPerturbers]
-
+  ++ [ncOptionStrings %~ id]
 
 intPerturbers :: [Int -> Int]
 intPerturbers =
