@@ -33,13 +33,13 @@ void init() {
   for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
     for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
       for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
-        double k = (2*PI) / fmin(NX,fmin(NY,NZ));
+        double k = (2*PI) / 128;
         double x = k * (navi.offset_x + ix);
         double y = k * (navi.offset_y + iy);
         double z = k * (navi.offset_z + iz);
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
-        if (sin(x+wx) * sin(y+wy) * sin(z+wz) > 0.9) {
+        if (abs(cos(x+0.1*y+wx) * cos(y+0.1*z+wy) * cos(z+0.1*x+wz)) > 0.1) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
@@ -80,18 +80,18 @@ void write_monitor() {
 
 
 int main (int argc, char **argv) {
-  srand(time(NULL));
   MPI_Init(&argc, &argv);
   Formura_Init(&navi, MPI_COMM_WORLD);
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_my_rank);
+  srand(time(NULL)+mpi_my_rank*65537);
 
   if (argc <= 1) {
-    T_MAX=1024;
+    T_MAX=8192;
   }else{
     sscanf(argv[1], "%d",  &T_MAX);
   }
   if (argc <= 2) {
-    T_MONITOR=1024;
+    T_MONITOR=8192;
   }else{
     sscanf(argv[2], "%d",  &T_MONITOR);
   }
