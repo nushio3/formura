@@ -390,7 +390,6 @@ benchmark it = do
     [(resultFiles,Visualize)]
   -- TODO: you can map kjobid and job_id via kstat.
 
-
 visualize :: WithQBConfig => IndExp -> IO IndExp
 visualize it = do
   let
@@ -528,11 +527,11 @@ proceed it = do
       ret <- waits waitlist it
       case ret ^. xpAction of
         Failed _ -> waits waitlist it -- Double check before choosing to fail.
-        _ -> return $ it & xpAction .~ Codegen
+        _ -> return ret
     Done -> return it
     Failed act -> case it ^. xpFailureCounter > 3 of
       True -> return it
-      _ -> case act of
+      _ ->  return $ it & xpAction .~ Codegen
 
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
