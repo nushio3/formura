@@ -39,7 +39,7 @@ void init() {
         double z = k * (navi.offset_z + iz);
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
-        if (sin(x+wx) * sin(y+wy) * sin(z+wz) > 0.9) {
+        if (sin(x+wx) * sin(y+wy) * sin(z+wz) > 0.1) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }

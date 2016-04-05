@@ -17,12 +17,15 @@ secs_x = {}
 
 sx=sy=sz=0
 
+dtype_int32 = '>i4'
+dtype_float64= '>f8'
+
 for fn in sys.argv[1:]:
     print fn
     m = re.search('monitor-([\d]+)-([\d]+)',fn)
     t = int(m.group(1))
     with open(fn,'rb') as fp:
-        gps = np.fromfile(fp, dtype=np.int32,count=6)
+        gps = np.fromfile(fp, dtype=dtype_int32,count=6)
         print gps
         x,y,z,sx,sy,sz = gps
 
@@ -32,8 +35,8 @@ for fn in sys.argv[1:]:
         z_ax.add(z)
 
 
-        secy_u = np.fromfile(fp, dtype=np.float64,count=sx*sz).reshape(sx,sz,1)
-        secy_v = np.fromfile(fp, dtype=np.float64,count=sx*sz).reshape(sx,sz,1)
+        secy_u = np.fromfile(fp, dtype=dtype_float64,count=sx*sz).reshape(sx,sz,1)
+        secy_v = np.fromfile(fp, dtype=dtype_float64,count=sx*sz).reshape(sx,sz,1)
         print secy_u
         key = (t,x,y,z)
         img_r = secy_u
@@ -42,8 +45,8 @@ for fn in sys.argv[1:]:
         val = np.concatenate((img_r,img_g,img_b),axis=2)
         secs_y[key] = val
 
-        secx_u = np.fromfile(fp, dtype=np.float64,count=sy*sz).reshape(sy,sz,1)
-        secx_v = np.fromfile(fp, dtype=np.float64,count=sy*sz).reshape(sy,sz,1)
+        secx_u = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
+        secx_v = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
         key = (t,x,y,z)
         img_r = secx_u
         img_g = secx_v
@@ -66,7 +69,7 @@ for t in t_ax:
             continue
         canvas[x1:x1+sx,z1:z1+sz,:] = val
 
-    pylab.rcParams['figure.figsize'] = (canvas_size_x/50.0,canvas_size_z/50.0)
+    pylab.rcParams['figure.figsize'] = (canvas_size_z/50.0,canvas_size_x/50.0)
     pylab.clf()
     pylab.imshow(canvas)
     pylab.savefig('images/{:06}.png'.format(t))
