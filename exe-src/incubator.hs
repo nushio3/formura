@@ -520,7 +520,7 @@ mainServer = do
       return ()
     False -> do
       mapM_ proceed  idxps
-
+  putStrLn $ "remaining tasks: " ++ show remainingTaskCount
   return ()
 
 proceed :: WithQBConfig => IndExp -> IO ()
