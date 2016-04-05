@@ -440,9 +440,27 @@ perturb x = S.toList $ S.fromList [f x | f <- perturbers]
 perturbers :: [Individual -> Individual]
 perturbers = [idvNumericalConfig %~ f | f <- ncPerturbers]
 
+ncIxs :: [(String,Int)]
+ncIxs = zip ["x","y","z"] [0..]
+
+normalize :: NumericalConfig -> [NumericalConfig]
+normalize nc
+  | not (sane nc) = []
+  | otherwise     = [nc]
+  where
+    sane nc = and
+      [ nc ^. ncTemporalBlockingInterval > 0
+      , all (>0) $ nc ^. ncIntraNodeShape
+      , all (>0) $ nc ^. ncMPIGridShape
+      , nc ^. ncMonitorInterval > 0
+      , and [ (head $ nc ^. ncInitialWalls . ix a) >  nc ^. ncTemporalBlockingInterval*2  | (a,i) <- ncIxs ]
+      , and [ ws == sort ws | (a,_) <- ncIxs, let ws = nc ^. ncInitialWalls . ix a]
+      ]
 ncPerturbers :: [NumericalConfig -> NumericalConfig]
 ncPerturbers = [ ncIntraNodeShape . ix a %~ f | a <- [0..2], f <- intPerturbers]
   ++ [ncTemporalBlockingInterval %~ f | f <- intPerturbers]
+
+
 intPerturbers :: [Int -> Int]
 intPerturbers =
   [(+1), (+ negate 1),(*2),(flip div 2),(+8), (+ negate 8)]
