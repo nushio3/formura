@@ -266,7 +266,7 @@ codegen it = do
       , "#PJM --rsc-list \"node=1\""
       , ""
       , "#time limit"
-      , "#PJM --name \"autocompile\""
+      , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
       , "#PJM --rsc-list \"elapse=12:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
@@ -330,7 +330,7 @@ benchmark it = do
       , printf "#PJM --mpi \"shape=%s\""mpiNodeShape
       , ""
       , "#time limit"
-      , "#PJM --name \"autobenchmark\""
+      , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
       , "#PJM --rsc-list \"elapse=1:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
