@@ -122,6 +122,7 @@ data Experiment =
   , _xpRemoteOutputPath :: String
   , _xpImagePath :: String
   , _xpTimeStamps :: [(UTCTime,UTCTime,Action)]
+  , _xpFailureCounter :: Int
   } deriving (Eq, Ord, Read, Show)
 
 makeClassy ''Experiment
@@ -144,6 +145,7 @@ defaultExperiment = Experiment
   , _xpRemoteOutputPath = ""
   , _xpImagePath = ""
   , _xpTimeStamps = []
+  , _xpFailureCounter = 0
   }
 
 
@@ -526,8 +528,12 @@ proceed it = do
       ret <- waits waitlist it
       case ret ^. xpAction of
         Failed _ -> waits waitlist it -- Double check before choosing to fail.
-        _ -> return ret
+        _ -> return $ it & xpAction .~ Codegen
     Done -> return it
+    Failed act -> case it ^. xpFailureCounter > 3 of
+      True -> return it
+      _ -> case act of
+
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
       return it
