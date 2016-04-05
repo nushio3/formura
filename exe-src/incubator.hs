@@ -419,7 +419,6 @@ visualize it = do
   superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
   remoteCmd $ "cd " ++ remotedir ++ ";./postprocess.sh"
   cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/") ++ " " ++ (exeDir ++"/out/")
-  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/output_prof_*") ++ " " ++ (exeDir ++"/")
   cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/src/*.optmsg") ++ " " ++ (exeDir ++"/src/")
   return $ it
     & xpAction .~ Done
