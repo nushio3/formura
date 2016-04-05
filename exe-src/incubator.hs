@@ -122,6 +122,7 @@ data Experiment =
   , _xpRemoteOutputPath :: String
   , _xpImagePath :: String
   , _xpTimeStamps :: [(UTCTime,UTCTime,Action)]
+  , _xpFailureCounter :: Int
   } deriving (Eq, Ord, Read, Show)
 
 makeClassy ''Experiment
@@ -144,6 +145,7 @@ defaultExperiment = Experiment
   , _xpRemoteOutputPath = ""
   , _xpImagePath = ""
   , _xpTimeStamps = []
+  , _xpFailureCounter = 0
   }
 
 
@@ -264,7 +266,7 @@ codegen it = do
       , "#PJM --rsc-list \"node=1\""
       , ""
       , "#time limit"
-      , "#PJM --name \"autocompile\""
+      , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
       , "#PJM --rsc-list \"elapse=12:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
@@ -328,7 +330,7 @@ benchmark it = do
       , printf "#PJM --mpi \"shape=%s\""mpiNodeShape
       , ""
       , "#time limit"
-      , "#PJM --name \"autobenchmark\""
+      , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
       , "#PJM --rsc-list \"elapse=1:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
@@ -387,7 +389,6 @@ benchmark it = do
     & xpAction .~ Wait Benchmark
     [(resultFiles,Visualize)]
   -- TODO: you can map kjobid and job_id via kstat.
-
 
 visualize :: WithQBConfig => IndExp -> IO IndExp
 visualize it = do
@@ -528,6 +529,10 @@ proceed it = do
         Failed _ -> waits waitlist it -- Double check before choosing to fail.
         _ -> return ret
     Done -> return it
+    Failed act -> case it ^. xpFailureCounter > 3 of
+      True -> return it
+      _ ->  return $ it & xpAction .~ Codegen
+
     x -> do
       hPutStrLn stderr $ "Unimplemented Action: " ++ show x
       return it
