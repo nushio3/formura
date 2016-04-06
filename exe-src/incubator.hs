@@ -473,7 +473,7 @@ normalize nc
 ncPerturbers :: [NumericalConfig -> NumericalConfig]
 ncPerturbers = [ ncIntraNodeShape . ix a %~ f | a <- [0..2], f <- intPerturbers]
   ++ [ncTemporalBlockingInterval %~ f | f <- intPerturbers]
-  ++ [ncOptionStrings %~ id]
+  ++ [ncOptionStrings %~ f | f <- strOptPerturbers ]
 
 intPerturbers :: [Int -> Int]
 intPerturbers =
