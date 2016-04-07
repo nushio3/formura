@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <map>
 #include <math.h>
 #include <mpi.h>
 #include <stdio.h>
@@ -25,11 +27,8 @@ double wctime() {
   return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
 }
 
-
+/*
 void init() {
-  double wx = frand() * 2 * PI;
-  double wy = frand() * 2 * PI;
-  double wz = frand() * 2 * PI;
   for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
     for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
       for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
@@ -40,6 +39,30 @@ void init() {
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
         if (abs(cos(x+0.1*y+wx) * cos(y+0.1*z+wy) * cos(z+0.1*x+wz)) > 0.1) {
+        if (frand() < 0.5) {
+          U[ix][iy][iz] = 0.5;
+          V[ix][iy][iz] = 0.25;
+        }
+      }
+    }
+  }
+  }*/
+
+typedef pair<int,<int,int> > Key;
+void init() {
+  map<Key ,double> seeds;
+  for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
+    for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
+      for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
+        Key k (ix%16, pair<int,int>(iy%16, iz%16));
+        U[ix][iy][iz] = 1.0;
+        V[ix][iy][iz] = 0.0;
+        double s = seeds[k];
+        if (s==0) {
+          s = frand();
+          seeds[k]=s;
+        }
+        if (s < 0.25) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
