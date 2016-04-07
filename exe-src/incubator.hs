@@ -322,7 +322,8 @@ benchmark it = do
       remoteLN = ?qbc ^. qbRemoteLabNotePath
       host = ?qbc ^. qbHostName
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
-
+      rscgrp :: String
+      rscgrp = if product (it ^. ncMPIGridShape) > 384 then "large" else "small"
   withCurrentDirectory exeDir $ do
     writeFile "submit.sh" $ unlines
       [ "#!/bin/sh -x"
@@ -333,7 +334,7 @@ benchmark it = do
       , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
       , "#PJM --rsc-list \"elapse=1:00:00\""
-      , "#PJM --rsc-list \"rscgrp=small\""
+      , printf "#PJM --rsc-list \"rscgrp=%s\"" rscgrp
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
       , ""
