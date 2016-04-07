@@ -420,7 +420,7 @@ visualize it = do
     cmd $ "chmod 755 " ++ "postprocess.sh"
   superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
   remoteCmd $ "cd " ++ remotedir ++ ";./postprocess.sh"
-  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/") ++ " " ++ (exeDir ++"/out/")
+  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/output_prof*.*") ++ " " ++ (exeDir ++"/out/")
   cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/src/*.optmsg") ++ " " ++ (exeDir ++"/src/")
   return $ it
     & xpAction .~ Done
