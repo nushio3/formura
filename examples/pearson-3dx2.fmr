@@ -25,8 +25,8 @@ begin function step(U,V) returns (U2, V2)
   U1 = U + dt * dU_dt
   V1 = V + dt * dV_dt
 
-  dU1_dt = -rE * U1 * V1*V1 + rU1 * (1-U1) + Du/(dx*dx) * Σ fun(i) (∂ i . ∂ i) U1
-  dV1_dt =  rE * U1 * V1*V1 - rV1 * V1     + Dv/(dx*dx) * Σ fun(i) (∂ i . ∂ i) V1
+  dU1_dt = -rE * U1 * V1*V1 + rU * (1-U1) + Du/(dx*dx) * Σ fun(i) (∂ i . ∂ i) U1
+  dV1_dt =  rE * U1 * V1*V1 - rV * V1     + Dv/(dx*dx) * Σ fun(i) (∂ i . ∂ i) V1
 
   U2 = U1 + dt * dU1_dt
   V2 = V1 + dt * dV1_dt
