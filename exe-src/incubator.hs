@@ -240,9 +240,9 @@ codegen it = do
     superCopy (it ^. idvFmrSourcecodeURL) (fnBase ++ ".fmr")
     superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.cpp")
     writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
-    forM_ [fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
+    forM_ [fnBase ++ ".idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
-
+    cmd $ "git commit -m 'incubation in progress'"
     cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
@@ -322,7 +322,8 @@ benchmark it = do
       remoteLN = ?qbc ^. qbRemoteLabNotePath
       host = ?qbc ^. qbHostName
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
-
+      rscgrp :: String
+      rscgrp = if product (it ^. ncMPIGridShape) > 384 then "large" else "small"
   withCurrentDirectory exeDir $ do
     writeFile "submit.sh" $ unlines
       [ "#!/bin/sh -x"
@@ -333,7 +334,7 @@ benchmark it = do
       , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
       , "#PJM --rsc-list \"elapse=1:00:00\""
-      , "#PJM --rsc-list \"rscgrp=small\""
+      , printf "#PJM --rsc-list \"rscgrp=%s\"" rscgrp
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
       , ""
@@ -419,7 +420,7 @@ visualize it = do
     cmd $ "chmod 755 " ++ "postprocess.sh"
   superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
   remoteCmd $ "cd " ++ remotedir ++ ";./postprocess.sh"
-  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/") ++ " " ++ (exeDir ++"/out/")
+  cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/out/output_prof*.*") ++ " " ++ (exeDir ++"/out/")
   cmd $ "rsync -avz " ++ (?qbc^.qbHostName++":"++remotedir++"/src/*.optmsg") ++ " " ++ (exeDir ++"/src/")
   return $ it
     & xpAction .~ Done
@@ -474,7 +475,7 @@ normalize nc
 ncPerturbers :: [NumericalConfig -> NumericalConfig]
 ncPerturbers = [ ncIntraNodeShape . ix a %~ f | a <- [0..2], f <- intPerturbers]
   ++ [ncTemporalBlockingInterval %~ f | f <- intPerturbers]
-  ++ [ncOptionStrings %~ f | f <- strOptPerturbers ]
+--  ++ [ncOptionStrings %~ f | f <- strOptPerturbers ]
 
 intPerturbers :: [Int -> Int]
 intPerturbers =
@@ -514,7 +515,7 @@ mainServer = do
   idxps <- catMaybes <$> mapM readIndExp idvFns
 
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
-  case remainingTaskCount < 15 of
+  case remainingTaskCount < 15 && ("--perturb" `elem` argv) of
     True -> do
       cmd "cd /home/nushio/hub/3d-mhd/individuals/survey; ./perturb.py"
       return ()
