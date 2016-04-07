@@ -240,9 +240,9 @@ codegen it = do
     superCopy (it ^. idvFmrSourcecodeURL) (fnBase ++ ".fmr")
     superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.cpp")
     writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
-    forM_ [fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
+    forM_ [fnBase ++ ".idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
-
+    cmd $ "git commit -m 'incubation in progress'"
     cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
@@ -474,7 +474,7 @@ normalize nc
 ncPerturbers :: [NumericalConfig -> NumericalConfig]
 ncPerturbers = [ ncIntraNodeShape . ix a %~ f | a <- [0..2], f <- intPerturbers]
   ++ [ncTemporalBlockingInterval %~ f | f <- intPerturbers]
-  ++ [ncOptionStrings %~ f | f <- strOptPerturbers ]
+--  ++ [ncOptionStrings %~ f | f <- strOptPerturbers ]
 
 intPerturbers :: [Int -> Int]
 intPerturbers =
@@ -514,7 +514,7 @@ mainServer = do
   idxps <- catMaybes <$> mapM readIndExp idvFns
 
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
-  case remainingTaskCount < 15 && ("--perturb" `elem` argv) ofof
+  case remainingTaskCount < 15 && ("--perturb" `elem` argv) of
     True -> do
       cmd "cd /home/nushio/hub/3d-mhd/individuals/survey; ./perturb.py"
       return ()
