@@ -303,10 +303,19 @@ compile it = do
   remoteCmd $ "cd " ++ remotedir ++  "; rm *.o ./a.out make.done"
   remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub src/make.sh"
 
+  let resultFiles = [kpath ++ pat | pat <- ["C*.o*", "C*.e*"]]
+      kpath = ?qbc^.qbHostName++":"++remotedir++"/"
+
   return $ it
     & xpAction .~ Wait Compile
     [ ([host ++ ":" ++ remotedir ++ "/a.out"], Benchmark)
-    , ([host ++ ":" ++ remotedir ++ "/make.done"], Failed Compile)]
+    , (resultFiles, Failed Compile)]
+--    , ([host ++ ":" ++ remotedir ++ "/make.done"], Failed Compile)]
+
+extensionNSet :: [Int]
+extensionNSet = unsafePerformIO $ do
+  argv <- getArgs
+  return $ if "--extend" `elem` argv then [1..8] else []
 
 benchmark :: WithQBConfig => IndExp -> IO IndExp
 benchmark it = do
@@ -355,6 +364,8 @@ benchmark it = do
       , "#PJM --stgout \"%r:./prof-P/* ./out/prof-P/\""
       , "#PJM --stgout \"%r:./prof-S/* ./out/prof-S/\""
       , "#PJM --stgout \"%r:./prof-mpi/* ./out/prof-mpi/\""
+      , unlines [printf "#PJM --stgout \"%r:./prof-X%d/* ./out/prof-X%d/\"" n n
+                |n <- extensionNSet]
       , ""
       , "#statistics output"
       , "#PJM -s"
@@ -364,7 +375,8 @@ benchmark it = do
       , "mpiexec /work/system/bin/msh \"mkdir ./out\""
       , ""
       , printf "fapp -C -d prof-S -Hevent=Statistics   mpirun -n %d ./a.out" mpiSize
-      , printf "fapp -C -d prof-X -Hevent=Statistics   mpirun -n %d ./a.out 8192 8192 ex" mpiSize
+      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpirun -n %d ./a.out %d %d" n mpiSize x x
+                | n <- extensionNSet, let x = 8192 * 2^n::Integer]
       -- , printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
       -- , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
       -- , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
@@ -418,7 +430,8 @@ visualize it = do
       -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-M -o out/output_prof_M.txt"
       -- ,  printf "fapppx -A -Ihwm,nompi  -d out/prof-P -o out/output_prof_P.txt"
         printf "fapppx -A -Ihwm,nompi  -d out/prof-S -o out/output_prof_S.txt"
-      , printf "fapppx -A -Ihwm,nompi  -d out/prof-X -o out/output_prof_X.txt"
+      , unlines [ printf "fapppx -A -Ihwm,nompi  -d out/prof-X%d -o out/output_prof_X%d.txt" n n
+                | n <- extensionNSet]
       ]
     cmd $ "chmod 755 " ++ "postprocess.sh"
   superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
