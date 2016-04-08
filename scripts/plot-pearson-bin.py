@@ -17,10 +17,19 @@ secs_x = {}
 
 sx=sy=sz=0
 
-dtype_int32 = '>i4'
-dtype_float64= '>f8'
 
-for fn in sys.argv[1:]:
+if sys.argv[1] == 'big':
+    dtype_int32 = '>i4'
+    dtype_float64= '>f8'
+elif sys.argv[1] == 'little':
+    dtype_int32 = '<i4'
+    dtype_float64= '<f8'
+else:
+    print "USAGE: plot-pearson-bin.py ENDIAN [FILES...]"
+    exit(0)
+
+
+for fn in sys.argv[2:]:
     print fn
     m = re.search('monitor-([\d]+)-([\d]+)',fn)
     t = int(m.group(1))

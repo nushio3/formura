@@ -2,7 +2,7 @@ rm  examples/$1*.c examples/Makefile bin/$1.out
 stack install
 stack exec formura -- examples/$1.fmr
 ./cmake-for-x86.sh
-make bin/$1.out
+make -j8 bin/$1.out
 # WARNING: you need to symbolic link the .bin folder
 # mkdir -p out-2d-mhd
 # rm out-2d-mhd/*
