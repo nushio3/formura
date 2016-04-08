@@ -62,7 +62,7 @@ void init() {
           s = frand();
           seeds[k]=s;
         }
-        if (s < 0.1) {
+        if (s < 0.1 ) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
