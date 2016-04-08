@@ -74,8 +74,6 @@ void init() {
   }
 
 void write_monitor() {
-  printf("#%d: t = %d\n", mpi_my_rank, navi.time_step);
-
   int global_position[6];
   global_position[0] = navi.offset_x + navi.lower_x;
   global_position[1] = navi.offset_y + navi.lower_y;
@@ -152,10 +150,15 @@ int main (int argc, char **argv) {
     double t = wctime();
     bool monitor_flag = navi.time_step >= last_monitor_t + T_MONITOR;
     if(monitor_flag || navi.time_step <= 3 * T_MONITOR ) {
-      printf("%d step @ %lf sec\n", navi.time_step, t-t_begin);
+      if(mpi_my_rank==0){
+        printf("marked %d step @ %lf sec\n", navi.time_step, t-t_begin);
+      }
     }
     if(monitor_flag) {
       write_monitor();
+      if(mpi_my_rank==0){
+        printf("monitor %d step @ %lf sec\n", navi.time_step, t-t_begin);
+      }
     }
     if(monitor_flag) {
       last_monitor_t += T_MONITOR;
@@ -166,7 +169,8 @@ int main (int argc, char **argv) {
         T_MAX*=2;
         T_MONITOR*=2;
         sprintf(benchmark_name,"extend-%d",T_MAX);
-        start_collection(benchmark_name);
+        //start_collection(benchmark_name);
+        fapp_start(benchmark_name, 0,0);
       }else{
         break;
       }
@@ -174,7 +178,8 @@ int main (int argc, char **argv) {
     }
     if (navi.time_step == 0) {
       t_begin = wctime();
-      start_collection(benchmark_name);
+      //start_collection(benchmark_name);
+      fapp_start(benchmark_name, 0,0);
     }
 
     Formura_Forward(&navi); // navi.time_step increases
@@ -183,10 +188,11 @@ int main (int argc, char **argv) {
 
     if (navi.time_step >= T_MAX) {
       t_end = wctime();
-      stop_collection(benchmark_name);
+      //stop_collection(benchmark_name);
+      fapp_stop(benchmark_name, 0,0);
     }
   }
-  printf("wct = %lf sec\n",t_end - t_begin);
+  printf("total wct = %lf sec\n",t_end - t_begin);
 
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();

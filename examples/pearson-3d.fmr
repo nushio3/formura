@@ -19,10 +19,9 @@ begin function step(U,V) returns (U_next, V_next)
 
   double [] ::  dU_dt, dV_dt
 
-  manifest :: dU_dt = -Fe * U * V*V + Fu * (1-U) + Du/(dx*dx) * Σ fun(i) (∂ i . ∂ i) U
-  manifest :: dV_dt =  Fe * U * V*V - Fv * V     + Dv/(dx*dx) * Σ fun(i) (∂ i . ∂ i) V
+  dU_dt = -Fe * U * V*V + Fu * (1-U) + Du/(dx*dx) * Σ fun(i) (∂ i . ∂ i) U
+  dV_dt =  Fe * U * V*V - Fv * V     + Dv/(dx*dx) * Σ fun(i) (∂ i . ∂ i) V
 
-  manifest :: U_next = U + dt * dU_dt
-  manifest :: V_next = V + dt * dV_dt
-
+  U_next = U + dt * dU_dt
+  V_next = V + dt * dV_dt
 end function
