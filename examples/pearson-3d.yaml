@@ -1,6 +1,6 @@
 initial_walls:
   x: [72]
-  y: [72]
+  y: [40]
   z: [520]
 intra_node_shape: [128, 64, 1024]
 monitor_interval: 64
