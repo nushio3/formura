@@ -85,7 +85,7 @@ void write_monitor() {
   int y_size = navi.upper_y - navi.lower_y;
   int z_size = navi.upper_z - navi.lower_z;
 
-  if (navi.offset_x + navi.lower_x < navi.upper_x) {
+  if (navi.offset_x + navi.lower_x == 0) {
     char fn[256];
     sprintf(fn, "out/monitorX-%06d-%d.txt", navi.time_step, mpi_my_rank);
 
@@ -100,7 +100,7 @@ void write_monitor() {
   }
 
 
-  if (navi.offset_y + navi.lower_y < navi.upper_y) {
+  if (navi.offset_y + navi.lower_y == 0) {
     char fn[256];
     sprintf(fn, "out/monitorY-%06d-%d.txt", navi.time_step, mpi_my_rank);
 
