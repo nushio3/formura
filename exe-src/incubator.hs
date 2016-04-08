@@ -418,7 +418,7 @@ visualize it = do
       -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-M -o out/output_prof_M.txt"
       -- ,  printf "fapppx -A -Ihwm,nompi  -d out/prof-P -o out/output_prof_P.txt"
         printf "fapppx -A -Ihwm,nompi  -d out/prof-S -o out/output_prof_S.txt"
-        printf "fapppx -A -Ihwm,nompi  -d out/prof-X -o out/output_prof_X.txt"
+      , printf "fapppx -A -Ihwm,nompi  -d out/prof-X -o out/output_prof_X.txt"
       ]
     cmd $ "chmod 755 " ++ "postprocess.sh"
   superCopy (exeDir ++"/postprocess.sh") (?qbc^.qbHostName++":"++remotedir++"/postprocess.sh")
