@@ -146,6 +146,8 @@ int main (int argc, char **argv) {
   double t_begin = wctime(), t_end;
 
   int last_monitor_t = -T_MONITOR;
+  char[256] benchmark_name;
+  sprintf(benchmark_name,"main");
   for(;;){
     double t = wctime();
     bool monitor_flag = navi.time_step >= last_monitor_t + T_MONITOR;
@@ -163,6 +165,8 @@ int main (int argc, char **argv) {
       if (EXTEND_MISSION){
         T_MAX*=2;
         T_MONITOR*=2;
+        sprintf(benchmark_name,"extend-%d",T_MAX);
+        start_collection(benchmark_name);
       }else{
         break;
       }
@@ -170,7 +174,7 @@ int main (int argc, char **argv) {
     }
     if (navi.time_step == 0) {
       t_begin = wctime();
-      start_collection("main");
+      start_collection(benchmark_name);
     }
 
     Formura_Forward(&navi); // navi.time_step increases
@@ -179,7 +183,7 @@ int main (int argc, char **argv) {
 
     if (navi.time_step >= T_MAX) {
       t_end = wctime();
-      stop_collection("main");
+      stop_collection(benchmark_name);
     }
   }
   printf("wct = %lf sec\n",t_end - t_begin);
