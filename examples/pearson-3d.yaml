@@ -1,9 +1,9 @@
 initial_walls:
-  x: [40]
-  y: [40]
-  z: [40]
-intra_node_shape: [80, 80, 80]
+  x: [32]
+  y: [32]
+  z: [264]
+intra_node_shape: [48, 48, 512]
 monitor_interval: 64
 mpi_grid_shape: [2,2,2]
-temporal_blocking_interval: 4
+temporal_blocking_interval: 8
 option_strings: []

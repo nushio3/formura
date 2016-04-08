@@ -10,6 +10,8 @@
 #include <fj_tool/fapp.h>
 #include <fjcoll.h>
 
+using namespace std;
+
 #include "pearson-3d.h"
 
 int T_MAX;
@@ -48,13 +50,13 @@ void init() {
   }
   }*/
 
-typedef pair<int,<int,int> > Key;
+typedef pair<int,pair<int,int> > Key;
 void init() {
   map<Key ,double> seeds;
   for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
     for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
       for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
-        Key k (ix%16, pair<int,int>(iy%16, iz%16));
+        Key k (ix/16, pair<int,int>(iy/16, iz/16));
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
         double s = seeds[k];
