@@ -146,7 +146,7 @@ int main (int argc, char **argv) {
   double t_begin = wctime(), t_end;
 
   int last_monitor_t = -T_MONITOR;
-  char[256] benchmark_name;
+  char benchmark_name[256];
   sprintf(benchmark_name,"main");
   for(;;){
     double t = wctime();
