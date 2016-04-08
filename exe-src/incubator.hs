@@ -364,7 +364,7 @@ benchmark it = do
       , "#PJM --stgout \"%r:./prof-P/* ./out/prof-P/\""
       , "#PJM --stgout \"%r:./prof-S/* ./out/prof-S/\""
       , "#PJM --stgout \"%r:./prof-mpi/* ./out/prof-mpi/\""
-      , unlines [printf "#PJM --stgout \"%r:./prof-X%d/* ./out/prof-X%d/\"" n n
+      , unlines [printf "#PJM --stgout \"%%r:./prof-X%d/* ./out/prof-X%d/\"" n n
                 |n <- extensionNSet]
       , ""
       , "#statistics output"
