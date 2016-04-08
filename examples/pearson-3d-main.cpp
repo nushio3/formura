@@ -28,26 +28,26 @@ double wctime() {
   gettimeofday(&tv,NULL);
   return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
 }
-
+/*
 void init() {
   for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
     for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
       for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
-        double x = navi.offset_x + ix;
-        double y = navi.offset_y + iy;
-        double z = navi.offset_z + iz;
+        double x = double(navi.offset_x + ix)/NX;
+        double y = double(navi.offset_y + iy)/NY;
+        double z = double(navi.offset_z + iz)/NZ;
         U[ix][iy][iz] = 1.0;
         V[ix][iy][iz] = 0.0;
-        if (z > 0.4 && z < 0.6) {
+        if (z > 0.49 && z < 0.51 && x > 0.4 && x < 0.6) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
       }
     }
   }
-  }
+}*/
 
-/*
+
 typedef pair<int,pair<int,int> > Key;
 void init() {
   map<Key ,double> seeds;
@@ -62,14 +62,14 @@ void init() {
           s = frand();
           seeds[k]=s;
         }
-        if (s < 0.25) {
+        if (s < 0.1) {
           U[ix][iy][iz] = 0.5;
           V[ix][iy][iz] = 0.25;
         }
       }
     }
   }
-  }*/
+  }
 
 void write_monitor() {
   printf("#%d: t = %d\n", mpi_my_rank, navi.time_step);
