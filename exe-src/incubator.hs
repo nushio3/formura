@@ -267,7 +267,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=1:00:00\""
+      , "#PJM --rsc-list \"elapse=3:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -304,7 +304,7 @@ compile it = do
   remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub src/make.sh"
 
   let resultFiles = [kpath ++ pat | pat <- ["C*.o*", "C*.e*"]]
-      kpath = ?qbc^.qbHostName++":"++remotedir++"/"
+      kpath = ?qbc^.qbHostName++":"++remoteExeDir++"/"
 
   return $ it
     & xpAction .~ Wait Compile
@@ -315,7 +315,7 @@ compile it = do
 extensionNSet :: [Int]
 extensionNSet = unsafePerformIO $ do
   argv <- getArgs
-  return $ if "--extend" `elem` argv then [1..8] else []
+  return $ if "--extend" `elem` argv then [1..8] else [3]
 
 benchmark :: WithQBConfig => IndExp -> IO IndExp
 benchmark it = do
@@ -374,7 +374,7 @@ benchmark it = do
       , ". /work/system/Env_base"
       , "mpiexec /work/system/bin/msh \"mkdir ./out\""
       , ""
-      , printf "fapp -C -d prof-S -Hevent=Statistics   mpirun -n %d ./a.out" mpiSize
+      --        , printf "fapp -C -d prof-S -Hevent=Statistics   mpirun -n %d ./a.out" mpiSize
       , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpirun -n %d ./a.out %d %d" n mpiSize x x
                 | n <- extensionNSet, let x = 8192 * 2^n::Integer]
       -- , printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
@@ -414,8 +414,8 @@ visualize it = do
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   withCurrentDirectory exeDir $ do
     writeFile "postprocess.sh" $ unlines
-      [
-      --   printf "fipppx -A  -Icpu,balance,call,hwm,src -d out/prof-ip > out/output_prof_ip.txt"
+      [ ""
+      -- , printf "fipppx -A  -Icpu,balance,call,hwm,src -d out/prof-ip > out/output_prof_ip.txt"
       -- , printf "fipppx -A  -Icpu,call,hwm -tcsv -d out/prof-ip > out/output_prof_ip.csv"
       -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-01 -o out/output_prof_1.csv"
       -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-02 -o out/output_prof_2.csv"
@@ -428,8 +428,8 @@ visualize it = do
       -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-C -o out/output_prof_C.txt"
       -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-I -o out/output_prof_I.txt"
       -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-M -o out/output_prof_M.txt"
-      -- ,  printf "fapppx -A -Ihwm,nompi  -d out/prof-P -o out/output_prof_P.txt"
-        printf "fapppx -A -Ihwm,nompi  -d out/prof-S -o out/output_prof_S.txt"
+      -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-P -o out/output_prof_P.txt"
+      -- ,        printf "fapppx -A -Ihwm,nompi  -d out/prof-S -o out/output_prof_S.txt"
       , unlines [ printf "fapppx -A -Ihwm,nompi  -d out/prof-X%d -o out/output_prof_X%d.txt" n n
                 | n <- extensionNSet]
       ]
@@ -445,8 +445,8 @@ waits :: WaitList -> IndExp -> IO IndExp
 waits [] it = return it
 waits ((fs,a):ws) it = do
   es <- mapM superDoesFileExist fs
-  es2 <- mapM superDoesFileExist (flip map fs (T.packed %~ T.replace "autobenchmark" "B*")) -- TODO: 移行措置
-  if and es || and es2 then return $ it & xpAction .~ a
+  es3 <- mapM superDoesFileExist (flip map fs (T.packed %~ T.replace "/src/C" "/C")) -- TODO: 移行措置
+  if and es || and es3 then return $ it & xpAction .~ a
     else waits ws it
 
 ----------------------------------------------------------------
@@ -533,7 +533,7 @@ mainServer = do
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
   case remainingTaskCount < 15 && ("--perturb" `elem` argv) of
     True -> do
-      cmd "cd /home/nushio/hub/3d-mhd/individuals/survey444; ./perturb.py"
+      cmd "cd /home/nushio/hub/3d-mhd/individuals/survey4^4; ./perturb.py"
       return ()
     False -> do
       mapM_ proceed  idxps
@@ -566,7 +566,7 @@ proceed it = do
         Failed _ -> waits waitlist it -- Double check before choosing to fail.
         _ -> return ret
     Done -> return it
-    Failed act -> case it ^. xpFailureCounter > 3 of
+    Failed act -> case it ^. xpFailureCounter > 2 of
       True -> return it
       _ ->  return $ it & xpAction .~ Codegen
         & xpFailureCounter %~ (+1)
