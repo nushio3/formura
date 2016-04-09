@@ -267,7 +267,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=1:00:00\""
+      , "#PJM --rsc-list \"elapse=3:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -315,7 +315,7 @@ compile it = do
 extensionNSet :: [Int]
 extensionNSet = unsafePerformIO $ do
   argv <- getArgs
-  return $ if "--extend" `elem` argv then [1..8] else [4]
+  return $ if "--extend" `elem` argv then [1..8] else [3]
 
 benchmark :: WithQBConfig => IndExp -> IO IndExp
 benchmark it = do
@@ -566,7 +566,7 @@ proceed it = do
         Failed _ -> waits waitlist it -- Double check before choosing to fail.
         _ -> return ret
     Done -> return it
-    Failed act -> case it ^. xpFailureCounter > 0 of
+    Failed act -> case it ^. xpFailureCounter > 2 of
       True -> return it
       _ ->  return $ it & xpAction .~ Codegen
         & xpFailureCounter %~ (+1)
