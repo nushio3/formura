@@ -5,7 +5,7 @@
 #include <time.h>
 #include <stdio.h>
 
-#define N 100
+#define N 512
 
 typedef double array[N][N][N];
 
@@ -28,7 +28,7 @@ void init() {
       for (int z=0;z<N;++z) {
         U[x][y][z] = 1.0;
         V[x][y][z] = 0.0;
-        If (x*x+y*y+z*z<0.01*N*N) {
+        if (x*x+y*y+z*z<0.01*N*N) {
           U[x][y][z] = 0.5;
           V[x][y][z] = 0.25;
         }
@@ -52,20 +52,19 @@ int main (int argc, char **argv) {
   double dU_dt, dV_dt;
 
   init();
-
-  for (int x=1;x<N-1;++x) {
-    for (int y=1;y<N-1;++y) {
-      for (int z=1;z<N-1;++z) {
-        double U0=U[x][y][z];
-        double V0=V[x][y][z];
-        dU_dt = -rE * U0 * V0*V0 + rU * (1-U0) + Du/(dx*dx) * laplacian(U,x,y,z);
-        dV_dt =  rE * U0 * V0*V0 - rV * V0     + Dv/(dx*dx) * laplacian(V,x,y,z);
-        U_next[x][y][z] = U0 + dt * dU_dt;
-        V_next[x][y][z] = V0 + dt * dV_dt;
+  for(int t=0; t<8192*16;++t){
+    for (int x=1;x<N-1;++x) {
+      for (int y=1;y<N-1;++y) {
+        for (int z=1;z<N-1;++z) {
+          double U0=U[x][y][z];
+          double V0=V[x][y][z];
+          dU_dt = -rE * U0 * V0*V0 + rU * (1-U0) + Du/(dx*dx) * laplacian(U,x,y,z);
+          dV_dt =  rE * U0 * V0*V0 - rV * V0     + Dv/(dx*dx) * laplacian(V,x,y,z);
+          U_next[x][y][z] = U0 + dt * dU_dt;
+          V_next[x][y][z] = V0 + dt * dV_dt;
+        }
       }
     }
   }
-
-
-
+  printf("%lf\n",U[0][0][0]);
 }

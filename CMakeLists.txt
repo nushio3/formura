@@ -50,6 +50,7 @@ add_custom_command(
 
 
 
+add_executable(bin/pearson-3d-native.out attic/pearson-3d-native/main.c)
 # add_executable(bin/diffusion.out examples/diffusion.c examples/diffusion-main.cpp)
 
 FILE(GLOB PearsonCSources examples/pearson-2d*.c)
