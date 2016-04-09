@@ -304,7 +304,7 @@ compile it = do
   remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub src/make.sh"
 
   let resultFiles = [kpath ++ pat | pat <- ["C*.o*", "C*.e*"]]
-      kpath = ?qbc^.qbHostName++":"++remotedir++"/"
+      kpath = ?qbc^.qbHostName++":"++remoteExedir++"/"
 
   return $ it
     & xpAction .~ Wait Compile
@@ -446,7 +446,8 @@ waits [] it = return it
 waits ((fs,a):ws) it = do
   es <- mapM superDoesFileExist fs
   es2 <- mapM superDoesFileExist (flip map fs (T.packed %~ T.replace "autobenchmark" "B*")) -- TODO: 移行措置
-  if and es || and es2 then return $ it & xpAction .~ a
+  es3 <- mapM superDoesFileExist (flip map fs (T.packed %~ T.replace "/src/C" "/C")) -- TODO: 移行措置
+  if and es || and es2 || and es3 then return $ it & xpAction .~ a
     else waits ws it
 
 ----------------------------------------------------------------
