@@ -3,7 +3,10 @@ import re
 import sys
 import subprocess
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import pylab
+
 
 subprocess.call('mkdir -p images',shell=True)
 
