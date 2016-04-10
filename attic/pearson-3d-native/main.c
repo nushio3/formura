@@ -5,10 +5,13 @@
 #include <time.h>
 #include <stdio.h>
 
-#define N 128
+#define NX 64
+#define NY 64
+#define NZ 512
 
-typedef double array[N][N][N];
-typedef double surface[N][N];
+
+typedef double array[NX][NY][NZ];
+typedef double surface[NY][NZ];
 
 array  U_mem, V_mem;
 array  U_mem2, V_mem2;
@@ -25,9 +28,9 @@ double wctime() {
 
 
 void init() {
-  for (int x=0;x<N;++x) {
-    for (int y=0;y<N;++y) {
-      for (int z=0;z<N;++z) {
+  for (int x=0;x<NX;++x) {
+    for (int y=0;y<NY;++y) {
+      for (int z=0;z<NZ;++z) {
         U_mem[x][y][z] = 1.0;
         V_mem[x][y][z] = 0.0;
         U_mem2[x][y][z] = 1.0;
@@ -35,9 +38,9 @@ void init() {
       }
     }
   }
-  for (int x=N/2;x<N/2+16;++x) {
-    for (int y=N/2;y<N/2+16;++y) {
-      for (int z=N/2;z<N/2+16;++z) {
+  for (int x=NX/2;x<NX/2+16;++x) {
+    for (int y=NY/2;y<NY/2+16;++y) {
+      for (int z=NZ/2;z<NZ/2+16;++z) {
         U_mem[x][y][z] = 0.5;
         V_mem[x][y][z] = 0.25;
       }
@@ -47,12 +50,12 @@ void init() {
 
 
 
-double laplacian(surface *A, int x, int y, int z) {
-  return A[x+1][y][z] + A[x-1][y][z]
-    +    A[x][y+1][z] + A[x][y-1][z]
-    +    A[x][y][z+1] + A[x][y][z-1]
-    - 6.0 * A[x][y][z];
-}
+#define laplacian(A,x,y,z)			\
+  (A[x+1][y][z] + A[x-1][y][z]			\
+  +    A[x][y+1][z] + A[x][y-1][z]		\
+  +    A[x][y][z+1] + A[x][y][z-1]		\
+  - 6.0 * A[x][y][z])
+
 
 void swap(surface **a, surface **b) {
   surface *tmp=*b;*b=*a;*a=tmp;
@@ -69,9 +72,9 @@ int main (int argc, char **argv) {
 
   init();
   for(int t=0; t<256;++t){
-    for (int x=1;x<N-1;++x) {
-      for (int y=1;y<N-1;++y) {
-        for (int z=1;z<N-1;++z) {
+    for (int x=1;x<NX-1;++x) {
+      for (int y=1;y<NY-1;++y) {
+        for (int z=1;z<NZ-1;++z) {
           double U0=U[x][y][z];
           double V0=V[x][y][z];
           dU_dt = -rE * U0 * V0*V0 + rU * (1-U0) + Du/(dx*dx) * laplacian(U,x,y,z);
@@ -84,6 +87,6 @@ int main (int argc, char **argv) {
     swap(&U,&U_next);
     swap(&V,&V_next);
   }
-  for(int i=0;i<N;++i)
-    printf("%lf\n",V[i][N/2][N/2]);
+  for(int i=0;i<NX;++i)
+    printf("%lf\n",V[i][NY/2][NZ/2]);
 }
