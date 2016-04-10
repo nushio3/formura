@@ -4,6 +4,8 @@
 #include <sys/time.h>
 #include <time.h>
 #include <stdio.h>
+#include <fj_tool/fapp.h>
+#include <fjcoll.h>
 
 #define NX 64
 #define NY 64
@@ -71,6 +73,9 @@ int main (int argc, char **argv) {
   V=V_mem; V_next = V_mem2;
 
   init();
+  start_collection("main");
+  fapp_start("main", 0,0);
+
   for(int t=0; t<256;++t){
     for (int x=1;x<NX-1;++x) {
       for (int y=1;y<NY-1;++y) {
@@ -87,6 +92,9 @@ int main (int argc, char **argv) {
     swap(&U,&U_next);
     swap(&V,&V_next);
   }
+  fapp_stop("main", 0,0);
+  stop_collection("main");
+
   for(int i=0;i<NX;++i)
     printf("%lf\n",V[i][NY/2][NZ/2]);
 }
