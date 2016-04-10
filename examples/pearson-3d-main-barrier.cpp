@@ -159,12 +159,12 @@ int main (int argc, char **argv) {
       if(mpi_my_rank==0){
         printf("monitor %d step @ %lf sec\n", navi.time_step, t-t_begin);
       }
+      MPI_Barrier(MPI_COMM_WORLD); // TODO: test the effect of synchronization
     }
     if(monitor_flag) {
       last_monitor_t += T_MONITOR;
     }
 
-    MPI_Barrier(MPI_COMM_WORLD); // TODO: test the effect of synchronization
 
     if (navi.time_step >= T_MAX) {
       if (EXTEND_MISSION){
