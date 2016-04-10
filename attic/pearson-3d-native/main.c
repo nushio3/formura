@@ -76,7 +76,7 @@ int main (int argc, char **argv) {
   start_collection("main");
   fapp_start("main", 0,0);
 
-  for(int t=0; t<256;++t){
+  for(int t=0; t<256*16;++t){
     for (int x=1;x<NX-1;++x) {
       for (int y=1;y<NY-1;++y) {
         for (int z=1;z<NZ-1;++z) {
