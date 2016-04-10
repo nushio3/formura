@@ -301,7 +301,7 @@ compile it = do
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
   remoteCmd $ "cd " ++ remotedir ++  "; rm *.o ./a.out make.done"
-  remoteCmd $ "cd " ++ remoteExedir ++  "; rm C*.o* C*.e*"
+  remoteCmd $ "cd " ++ remoteExeDir ++  "; rm C*.o* C*.e*"
   remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub src/make.sh"
 
   let resultFiles = [kpath ++ pat | pat <- ["C*.o*", "C*.e*"]]
