@@ -10,7 +10,8 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
-import           Data.List ({-zip4,-} isPrefixOf, sort, groupBy)
+import           Data.Function (on)
+import           Data.List ({-zip4,-} isPrefixOf, sort, groupBy, sortBy)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.String
@@ -528,8 +529,13 @@ genMMInstruction ir0 mminst = do
       doesBind' _ (Store _ x) = False
       doesBind' n _ = n >= 1 -- TODO : Implement CSE and then reduce n
 
+  let orderedMMInst :: [(MMNodeID, MicroNode)]
+      orderedMMInst = sortBy (compare `on` (loc . snd)) $ M.toList mminst
 
-  txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
+      loc :: MicroNode -> MMLocation
+      loc = fromJust . A.viewMaybe
+
+  txts <- forM orderedMMInst $ \(nid0, Node inst microTyp _) -> do
     microTypDecl <- genTypeDecl "" (subFix microTyp)
     let thisEq :: C.Src -> TranM C.Src
         thisEq code =

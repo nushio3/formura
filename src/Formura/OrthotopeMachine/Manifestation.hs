@@ -92,7 +92,7 @@ insertMM c i inst = do
   j <- mapNodeID c i -- lookup for already inserted nodes
   omNode <- lookupNode i
   typ2 <- toMicroType $ omNode ^. nodeType
-  let nd = Node inst typ2 (omNode ^. nodeAnnot)
+  let nd = Node inst typ2 (omNode ^. nodeAnnot & A.set (MMLocation i c))
   theMMInstruction %= M.insert j nd
   return j
 
@@ -140,7 +140,8 @@ rhsDelayedCodeAt cursor omNodeID = do
 
 genMMInstruction :: OMNodeID -> TranM ()
 genMMInstruction omNodeID = do
-  rhsDelayedCodeAt (Vec [1,0,0]) omNodeID
+  -- NBU Dummy!
+  rhsDelayedCodeAt (Vec [0,-1,0]) omNodeID
   rhsDelayedCodeAt 0 omNodeID
   return ()
 
