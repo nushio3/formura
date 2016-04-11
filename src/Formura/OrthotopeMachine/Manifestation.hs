@@ -182,7 +182,11 @@ manifestG omg = do
 
         return $ Just (nO, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
 
-  return $ boundaryAnalysis $ M.fromList nodeList
+  nc <- view envNumericalConfig
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
+      boundaryFixer = Vec [nbux-1, nbuy-1, 0]
+  return $ boundaryAnalysis boudaryFixer $ M.fromList nodeList
 
 manifestation :: WithCommandLineOption => OMProgram -> TranM MMProgram
 manifestation omprog = do
@@ -195,13 +199,16 @@ manifestation omprog = do
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
 
-boundaryAnalysis :: MMGraph -> MMGraph
-boundaryAnalysis gr =
+boundaryAnalysis :: Vec Int -> MMGraph -> MMGraph
+boundaryAnalysis fixer gr =
   flip M.mapWithKey gr $
   \ k nd -> case M.lookup k bgr of
-  Just b ->  nd & A.annotation %~ A.set (b <> Boundary (0,0))
+  Just b ->  nd & A.annotation %~ A.set (fix $ b <> Boundary (0,0))
   Nothing -> nd
   where
+    fix :: Boundary -> Boundary
+    fix (Boundary (lo,hi)) = Boundary (lo, hi-fixer)
+
     bgr :: M.Map OMNodeID Boundary
     bgr = M.mapWithKey knb gr
 
