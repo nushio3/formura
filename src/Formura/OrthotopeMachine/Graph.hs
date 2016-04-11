@@ -120,6 +120,11 @@ mapElemType _ TopType = TopType
 
 data Node instType typeType = Node {_nodeInst :: instType, _nodeType :: typeType, _nodeAnnot :: A.Annotation}
 
+instance (Eq i, Eq t) => Eq (Node i t) where
+  (Node a b _) == (Node c d _)   = (a,b) == (c,d)
+instance (Ord i, Ord t) => Ord (Node i t) where
+  compare (Node a b _) (Node c d _)   = compare (a,b) (c,d)
+
 instance (Show v, Show t) => Show (Node v t) where
   show (Node v t _) = show v ++ " :: " ++ show t
 

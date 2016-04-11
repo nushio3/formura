@@ -45,6 +45,9 @@ makeClassy ''TranState
 instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
 
+revmapMMInstruction :: Getter TranState (M.Map (Node MicroInstruction MicroNodeType) MMNodeID)
+revmapMMInstruction = theMMInstruction . (to $ M.fromList . map (\(k,v) -> (v,k)) . M.toList)
+
 defaultTranState :: TranState
 defaultTranState = TranState
   { _tranSyntacticState = defaultCompilerSyntacticState{ _compilerStage = "manifestation"}
@@ -86,10 +89,11 @@ toMicroType x = raiseErr $ failed $ "Top type encountered while manifestation"
 -- | insert a single subgraph instruction into current MMInstruction
 insertMM :: Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
 insertMM c i inst = do
-  j <- mapNodeID c i
+  j <- mapNodeID c i -- lookup for already inserted nodes
   omNode <- lookupNode i
   typ2 <- toMicroType $ omNode ^. nodeType
-  theMMInstruction %= M.insert j (Node inst typ2 (omNode ^. nodeAnnot))
+  let nd = Node inst typ2 (omNode ^. nodeAnnot)
+  theMMInstruction %= M.insert j nd
   return j
 
 -- | generate code that returns the RHS of current (cursor,nid)
@@ -135,7 +139,10 @@ rhsDelayedCodeAt cursor omNodeID = do
 
 
 genMMInstruction :: OMNodeID -> TranM ()
-genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID >> return ()
+genMMInstruction omNodeID = do
+  rhsDelayedCodeAt (Vec [1,0,0]) omNodeID
+  rhsDelayedCodeAt 0 omNodeID
+  return ()
 
 
 manifestG :: WithCommandLineOption => OMGraph -> TranM MMGraph
