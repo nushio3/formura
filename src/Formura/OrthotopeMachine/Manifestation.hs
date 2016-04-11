@@ -29,6 +29,7 @@ import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.CommandLineOption
 import           Formura.GlobalEnvironment
+import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
@@ -140,9 +141,12 @@ rhsDelayedCodeAt cursor omNodeID = do
 
 genMMInstruction :: OMNodeID -> TranM ()
 genMMInstruction omNodeID = do
-  -- NBU Dummy!
-  rhsDelayedCodeAt (Vec [0,-1,0]) omNodeID
-  rhsDelayedCodeAt 0 omNodeID
+  nc <- view envNumericalConfig
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "x" nc
+  sequence_ [rhsDelayedCodeAt (Vec [x,y,0]) omNodeID
+            | x <- [0..nbux-1]
+            , y <- [0..nbuy-1]]
   return ()
 
 

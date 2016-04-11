@@ -11,7 +11,7 @@ import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
 import           Data.Function (on)
-import           Data.List ({-zip4,-} isPrefixOf, sort, groupBy, sortBy)
+import           Data.List (zip4, isPrefixOf, sort, groupBy, sortBy)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.String
@@ -648,6 +648,7 @@ genComputation (ir0, nid0) destRsc0 = do
   regionDict <- use planRegionAlloc
   arrayDict <- use planArrayAlloc
   stepGraph <- use omStepGraph
+  nc <- view envNumericalConfig
 
   let
       regionBox :: Box
@@ -667,14 +668,15 @@ genComputation (ir0, nid0) destRsc0 = do
   loopIndexOffset .= marginBox^. lowerVertex
 
   systemOffset0 <- use planSystemOffset
-
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "x" nc
+      gridStride = [nbux, nbuy, 1]
   let
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
             [ C.unwords
-              ["for (int ", i, "=", C.parameter "int" l ,";", i,  "<", C.parameter "int" h, ";++", i, "){"]
-            | (i,(l,h)) <- (toList ivars) `zip`
-              zip (toList loopFroms) (toList loopTos)]
+              ["for (int ", i, "=", C.parameter "int" l ,";", i,  "<", C.parameter "int" h, ";", i, "+=", C.show s ,"){"]
+            | (i,s,l,h) <- zip4 (toList ivars) gridStride (toList loopFroms) (toList loopTos)]
           closeLoops =
             ["}" | _ <- toList ivars]
 
@@ -901,9 +903,15 @@ genDistributedProgram insts0 = do
 collaboratePlans :: TranM ()
 collaboratePlans = do
   plans0 <- use tsMPIPlanMap
+  nc <- view envNumericalConfig
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "x" nc
+      nbuMargin = Vec [nbux-1, nbuy-1, 0]
 
   let commonStaticBox :: Box
-      commonStaticBox = foldr1 (|||)
+      commonStaticBox =
+        upperVertex %~ (+nbuMargin) $
+        foldr1 (|||)
         [ b
         | p <- M.elems plans0
         , (ResourceStatic snName (), b)  <- M.toList $ p ^. planArrayAlloc
