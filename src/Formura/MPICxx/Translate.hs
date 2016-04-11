@@ -910,7 +910,7 @@ collaboratePlans = do
 
   let commonStaticBox :: Box
       commonStaticBox =
-        upperVertex %~ (+nbuMargin) $
+      upperVertex %~ (+nbuMargin) $
         foldr1 (|||)
         [ b
         | p <- M.elems plans0
