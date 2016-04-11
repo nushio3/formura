@@ -143,7 +143,7 @@ genMMInstruction :: OMNodeID -> TranM ()
 genMMInstruction omNodeID = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
-      nbuy = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
   sequence_ [rhsDelayedCodeAt (Vec [x,y,0]) omNodeID
             | x <- [0..nbux-1]
             , y <- [0..nbuy-1]]

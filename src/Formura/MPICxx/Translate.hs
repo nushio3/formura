@@ -669,7 +669,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
   systemOffset0 <- use planSystemOffset
   let nbux = nbuSize "x" nc
-      nbuy = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
       gridStride = [nbux, nbuy, 1]
   let
     genGrid useSystemOffset lhsName2 = do
@@ -905,7 +905,7 @@ collaboratePlans = do
   plans0 <- use tsMPIPlanMap
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
-      nbuy = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
       nbuMargin = Vec [nbux-1+2, nbuy-1+2, 2]
 
   let commonStaticBox :: Box

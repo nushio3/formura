@@ -1,9 +1,9 @@
 initial_walls:
-  x: [80]
+  x: [40]
   y: [40]
-  z: [80]
-intra_node_shape: [128, 64, 128]
+  z: [264]
+intra_node_shape: [64, 64, 512]
 monitor_interval: 64
-mpi_grid_shape: [2,2,2]
+mpi_grid_shape: [8,1,1]
 temporal_blocking_interval: 8
-option_strings: ['stick-single-comp', 'omp', 'omp-collapse', 'no-subroutine', 'nbux2', 'nbuy2']
+option_strings: ['stick-single-comp', 'omp', 'omp-collapse', 'no-subroutine', 'nbux2']
