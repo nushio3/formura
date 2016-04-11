@@ -141,7 +141,7 @@ rhsDelayedCodeAt cursor omNodeID = do
 genMMInstruction :: OMNodeID -> TranM ()
 genMMInstruction omNodeID = do
   -- NBU Dummy!
-  -- rhsDelayedCodeAt (Vec [0,-1,0]) omNodeID
+  rhsDelayedCodeAt (Vec [0,-1,0]) omNodeID
   rhsDelayedCodeAt 0 omNodeID
   return ()
 

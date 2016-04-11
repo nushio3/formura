@@ -239,7 +239,7 @@ cut = do
 
   -- assign the same wall for all the Static nodes
   let wallMap2 = flip M.mapWithKey wallMap $ \nid0 wall0 ->
-        case mmInstTail $ (fromJust $ M.lookup nid0 stepGraph) ^. nodeInst of
+        case head $ mmInstTails $ (fromJust $ M.lookup nid0 stepGraph) ^. nodeInst of
           Store _ _ -> staticWallConsensus
           _ -> wall0
 
@@ -247,7 +247,7 @@ cut = do
       staticWalls =
         [ fromJust $ M.lookup nid0 wallMap
         | (nid0, mmNode) <- M.toList stepGraph
-        , Store _ _ <- [mmInstTail $ mmNode ^. nodeInst]
+        , Store _ _ <- mmInstTails $ mmNode ^. nodeInst
         ]
 
       staticWallConsensus :: Walls
@@ -447,7 +447,7 @@ cut = do
       forM_ inRidges $ \rdg0 -> insertOnce $ Unstage rdg0
 
       let tailRsc :: ArrayResourceKey
-          tailRsc = case mmInstTail mmInst of
+          tailRsc = case head $ mmInstTails mmInst of
             Store snName _ -> ResourceStatic snName ()
             _              -> ResourceOMNode nid ir
 

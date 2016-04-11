@@ -88,8 +88,18 @@ data MMLocation = MMLocation { _mmlOMNodeID :: OMNodeID,  _mmlCursor :: (Vec Int
                   deriving(Eq, Ord, Show)
 
 
-mmInstTail :: MMInstruction -> MMInstF MMNodeID
-mmInstTail = _nodeInst . snd . M.findMax
+mmInstTails :: MMInstruction -> [MMInstF MMNodeID]
+mmInstTails mminst = rets
+  where
+    rets = [_nodeInst nd
+      | nd <- M.elems mminst,
+        let Just (MMLocation omnid2 _) = A.viewMaybe nd,
+        omnid2==omnid ]
+
+    Just (MMLocation omnid _) = A.viewMaybe maxNode
+
+    maxNode :: MicroNode
+    maxNode = snd $ M.findMax mminst
 
 
 type OMNodeType  = Fix OMNodeTypeF

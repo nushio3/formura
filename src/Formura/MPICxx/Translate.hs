@@ -475,7 +475,7 @@ nPlusK i d = i <> "+" <> C.parens (C.parameter "int" d)
 
 -- | generate bindings, and the final expression that contains the result of evaluation.
 
-genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (C.Src, C.Src)
+genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (C.Src, [(C.Src,Vec Int)])
 genMMInstruction ir0 mminst = do
   axvars <- fmap fromString <$> view axesNames
 
@@ -612,7 +612,26 @@ genMMInstruction ir0 mminst = do
   nmap <- use nodeIDtoLocalName
   let (tailID, _) = M.findMax mminst
       Just tailName = M.lookup tailID nmap
-  return $ (C.unwords txts, tailName)
+      retPairs = [ (tailName,c)
+                 | (i,c) <- mmFindTailIDs mminst
+                 , tailName <- maybeToList $ M.lookup i nmap]
+
+  return $ (C.unwords txts, retPairs)
+
+
+mmFindTailIDs :: MMInstruction -> [(MMNodeID, Vec Int)]
+mmFindTailIDs mminst = rets
+  where
+    rets =
+      [ (i, c)
+      | (i,nd) <- M.toList mminst,
+        let Just (MMLocation omnid2 c) = A.viewMaybe nd,
+        omnid2==omnid ]
+
+    Just (MMLocation omnid _) = A.viewMaybe maxNode
+
+    maxNode :: MicroNode
+    maxNode = snd $ M.findMax mminst
 
 
 ompEveryLoopPragma :: (?ncOpts :: [String]) => Int -> C.Src
@@ -659,9 +678,11 @@ genComputation (ir0, nid0) destRsc0 = do
           closeLoops =
             ["}" | _ <- toList ivars]
 
-      (letBs,rhs) <- genMMInstruction ir0 mmInst
+      (letBs,rhss) <- genMMInstruction ir0 mmInst
 
-      let bodyExpr = lhsName2 <> foldMap C.brackets ivarExpr <> "=" <> rhs <> ";"
+      let bodyExpr = C.unlines
+            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs <> ";"
+            | (rhs, c) <- rhss ]
           ivarExpr
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
@@ -673,7 +694,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
   case typ of
     ElemType "void" ->
-      case mmInstTail mmInst of
+      case head $ mmInstTails mmInst of
         Store n _ -> do
           lhsName <- nameArrayResource (ResourceStatic n ())
           genGrid True lhsName
