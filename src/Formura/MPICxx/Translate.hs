@@ -521,6 +521,12 @@ genMMInstruction ir0 mminst = do
       genRefCnt (LoadCursor _ _) = []
       genRefCnt (LoadCursorStatic _ _) = []
 
+      doesSpine :: MMNodeID -> Bool
+      doesSpine nid =  case A.viewMaybe  $ fromJust $ M.lookup nid mminst  of
+        Just (NBUSpine False) -> False
+        _ -> True
+
+
       doesBind :: MMNodeID -> Bool
       doesBind nid = doesBind' (refCount nid) (fromJust (M.lookup nid mminst) ^. nodeInst)
 
@@ -543,7 +549,8 @@ genMMInstruction ir0 mminst = do
             True ->  do
               thisName <- genFreeLocalName "a"
               nodeIDtoLocalName %= M.insert nid0 thisName
-              return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";\n"
+              return $ microTypDecl <> " " <> thisName <> "=" <> code
+                <> "/*"<> C.show (doesSpine nid0) <> "*/" <> ";\n"
             False -> do
               nodeIDtoLocalName %= M.insert nid0 code
               return ""

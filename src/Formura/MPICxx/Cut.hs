@@ -30,7 +30,8 @@ import qualified Data.Set as S
 import           Data.Maybe
 import           Text.Trifecta (failed, raiseErr)
 
-
+import qualified Formura.Annotation as A
+import           Formura.Annotation.Boundary
 import           Formura.CommandLineOption
 import           Formura.Syntax(IdentName)
 import           Formura.Vec
@@ -40,6 +41,7 @@ import           Formura.OrthotopeMachine.Graph
 import           Formura.NumericalConfig
 import           Formura.Compiler
 import qualified Formura.MPICxx.Language as C
+import System.IO.Unsafe
 
 
 newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num, Data)
@@ -133,10 +135,10 @@ instance HasCompilerSyntacticState PlanState where
 type PlanM = CompilerMonad PlanRead () PlanState
 
 makePlan :: WithCommandLineOption => NumericalConfig -> MMProgram -> IO MPIPlan
-makePlan nc prog = do
+makePlan nc prog0 = do
   let pr = PlanRead
            { _prNumericalConfig = nc
-           , _prMMProgram = prog
+           , _prMMProgram = prunedProg
            }
       ps = PlanState
            { _psSyntacticState = defaultCompilerSyntacticState {_compilerStage = "MPI Planning"}
@@ -146,10 +148,19 @@ makePlan nc prog = do
            , _psFreeResourceSharingID = [0..]
            }
 
-
+      prunedProg = prog0
+           & omStepGraph %~ pruneMMGraph
 
   (ret, _, _) <- runCompilerRight cut pr ps
   return ret
+
+pruneMMGraph :: MMGraph -> MMGraph
+pruneMMGraph = M.map (nodeInst %~ pruneMMInst)
+
+pruneMMInst :: MMInstruction -> MMInstruction
+pruneMMInst = M.filter (\nd -> case A.viewMaybe nd of
+                           Just (NBUSpine True) -> True
+                           _ -> False)
 
 getVecAccessor :: PlanM (Vec a -> IdentName -> a)
 getVecAccessor = do
@@ -227,16 +238,19 @@ cut = do
       go i mmNode = let
           mmInst :: MMInstruction
           mmInst = mmNode ^. nodeInst
-          microInsts :: [MMInstF MMNodeID]
-          microInsts = map (^. nodeInst) $ M.elems mmInst
-        in foldr1 (&&&) (map listBounds microInsts)
+          --microInsts :: [MMInstF MMNodeID]
+          --microInsts = map (^. nodeInst) $ M.elems mmInst
+          in foldr1 (&&&) (map listBounds $ M.elems mmInst)
 
-      listBounds :: MMInstF MMNodeID -> Walls
-      listBounds (LoadCursorStatic v _) = move (negate v) walls0
-      listBounds (LoadCursor v nid) =
-        let Just w_of_n = M.lookup nid wallMap
-        in move (negate v) w_of_n
-      listBounds _ = fmap (fmap (const (mempty :: Partition))) walls0
+      infinityWall = fmap (fmap (const (mempty :: Partition))) walls0
+
+      listBounds :: MicroNode -> Walls
+      listBounds microNd =
+        case microNd ^. nodeInst of
+             LoadCursorStatic v _ -> move (negate v) walls0
+             LoadCursor v nid -> let Just w_of_n = M.lookup nid wallMap
+                                 in move (negate v) w_of_n
+             _ -> infinityWall
 
   -- assign the same wall for all the Static nodes
   let wallMap2 = flip M.mapWithKey wallMap $ \nid0 wall0 ->

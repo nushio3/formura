@@ -8,7 +8,7 @@ Stability   : experimental
 A module for manifestation of the Orthotope Machine: that is, an operation that removes all the delayed nodes, and replace all shift instructions with cursored-load at manifest variables.
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, ImplicitParams, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
+{-# LANGUAGE ConstraintKinds,DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, ImplicitParams, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Manifestation where
 
@@ -87,18 +87,22 @@ toMicroType (GridType _ x) = toMicroType x
 toMicroType (ElemType x) = return $ ElemType x
 toMicroType x = raiseErr $ failed $ "Top type encountered while manifestation"
 
+type WithNBUSpine = ?nbuSpine :: Bool
+
 -- | insert a single subgraph instruction into current MMInstruction
-insertMM :: Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
+insertMM :: WithNBUSpine => Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
 insertMM c i inst = do
   j <- mapNodeID c i -- lookup for already inserted nodes
   omNode <- lookupNode i
   typ2 <- toMicroType $ omNode ^. nodeType
-  let nd = Node inst typ2 (omNode ^. nodeAnnot & A.set (MMLocation i c))
+  let nd = Node inst typ2 (omNode ^. nodeAnnot
+                           & A.set (MMLocation i c)
+                           & A.set (NBUSpine ?nbuSpine))
   theMMInstruction %= M.insert j nd
   return j
 
 -- | generate code that returns the RHS of current (cursor,nid)
-rhsCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
+rhsCodeAt :: WithNBUSpine => Vec Int -> OMNodeID -> TranM MMNodeID
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
   isM <- use isManifestNode
@@ -108,7 +112,7 @@ rhsCodeAt cursor nid = do
      False -> rhsDelayedCodeAt cursor nid
 
 -- | generate code that calculates the RHS of current (cursor,nid)
-rhsDelayedCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
+rhsDelayedCodeAt :: WithNBUSpine => Vec Int -> OMNodeID -> TranM MMNodeID
 rhsDelayedCodeAt cursor omNodeID = do
   let ins = insertMM cursor omNodeID
   (Node inst0 _ _) <- lookupNode omNodeID
@@ -144,9 +148,10 @@ genMMInstruction omNodeID = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
-  sequence_ [rhsDelayedCodeAt (Vec [x,y,0]) omNodeID
-            | x <- [0..nbux-1]
-            , y <- [0..nbuy-1]]
+  sequence_ $ reverse
+    [ let ?nbuSpine = x==0&&y==0 in rhsDelayedCodeAt (Vec [x,y,0]) omNodeID
+    | x <- [0..nbux-1]
+    , y <- [0..nbuy-1]]
   return ()
 
 
