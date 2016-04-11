@@ -761,8 +761,9 @@ genStagingCode isStaging rid = do
         | otherwise = arrTerm <> "=" <> rdgTerm
 
 
-
-  return $ ompEveryLoopPragma dim <> "\n" <>
+  pragma = if "collapse-ridge" `elem` ?ncOpts then ompEveryLoopPragma dim
+           else ompEveryLoopPragma (dim -1)
+  return $ pragma <> "\n" <>
     C.unlines openLoops <> body <> ";" <> C.unlines closeLoops
 
 genMPISendRecvCode :: FacetID -> TranM C.Src
