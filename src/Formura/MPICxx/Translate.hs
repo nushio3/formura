@@ -906,11 +906,11 @@ collaboratePlans = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "x" nc
-      nbuMargin = Vec [nbux-1, nbuy-1, 0]
+      nbuMargin = Vec [nbux-1+2, nbuy-1+2, 2]
 
   let commonStaticBox :: Box
       commonStaticBox =
-      upperVertex %~ (+nbuMargin) $
+        upperVertex %~ (+nbuMargin) $
         foldr1 (|||)
         [ b
         | p <- M.elems plans0
@@ -927,7 +927,9 @@ collaboratePlans = do
       go (ResourceStatic snName ()) _ = commonStaticBox
       go _ b = b
 
-      commonRscBox = foldr1 (|||)
+      commonRscBox =
+        upperVertex %~ (+nbuMargin) $
+        foldr1 (|||)
         [ p ^. planSharedResourceExtent
         | p <- M.elems plans0]
   tsCommonStaticBox .= commonStaticBox
