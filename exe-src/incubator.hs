@@ -558,8 +558,8 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 35 compile it
-    Benchmark -> whenSlack 50 benchmark it
+    Compile ->  whenSlack 30 compile it
+    Benchmark -> whenSlack 45 benchmark it
     Visualize -> visualize it
     Wait _ waitlist -> do
       ret <- waits waitlist it
