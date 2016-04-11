@@ -219,6 +219,16 @@ cut = do
 
   stepGraph <- view omStepGraph
 
+  nc <- view envNumericalConfig
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
+      fixVec = Vec [Levitate $ nbux-1, Levitate $ nbuy-1, 0]
+      boundaryFixer :: Partition -> Partition
+      boundaryFixer = upperVertex %~ (+fixVec)
+      wallFixer :: Walls -> Walls
+      wallFixer = fmap (fmap boundaryFixer)
+
+
   let wallMap :: M.Map OMNodeID Walls
       wallMap = M.mapWithKey go stepGraph
 
@@ -231,8 +241,8 @@ cut = do
         in foldr1 (&&&) (map listBounds microInsts)
 
       listBounds :: MMInstF MMNodeID -> Walls
-      listBounds (LoadCursorStatic v _) = move (negate v) walls0
-      listBounds (LoadCursor v nid) =
+      listBounds (LoadCursorStatic v _) = wallFixer $ move (negate v) walls0
+      listBounds (LoadCursor v nid) = wallFixer $
         let Just w_of_n = M.lookup nid wallMap
         in move (negate v) w_of_n
       listBounds _ = fmap (fmap (const (mempty :: Partition))) walls0

@@ -186,7 +186,7 @@ manifestG omg = do
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
       boundaryFixer = Vec [nbux-1, nbuy-1, 0]
-  return $ boundaryAnalysis boudaryFixer $ M.fromList nodeList
+  return $ boundaryAnalysis boundaryFixer $ M.fromList nodeList
 
 manifestation :: WithCommandLineOption => OMProgram -> TranM MMProgram
 manifestation omprog = do
@@ -199,6 +199,8 @@ manifestation omprog = do
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
 
+
+-- WARNING: The Boundary set here is never used!!!
 boundaryAnalysis :: Vec Int -> MMGraph -> MMGraph
 boundaryAnalysis fixer gr =
   flip M.mapWithKey gr $
@@ -207,7 +209,7 @@ boundaryAnalysis fixer gr =
   Nothing -> nd
   where
     fix :: Boundary -> Boundary
-    fix (Boundary (lo,hi)) = Boundary (lo, hi-fixer)
+    fix (Boundary (lo,hi)) = error $ show (lo,hi)--Boundary (lo, hi-fixer)
 
     bgr :: M.Map OMNodeID Boundary
     bgr = M.mapWithKey knb gr

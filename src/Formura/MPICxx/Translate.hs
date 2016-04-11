@@ -761,8 +761,9 @@ genStagingCode isStaging rid = do
         | otherwise = arrTerm <> "=" <> rdgTerm
 
 
-  pragma = if "collapse-ridge" `elem` ?ncOpts then ompEveryLoopPragma dim
-           else ompEveryLoopPragma (dim -1)
+  let pragma =
+        if "collapse-ridge" `elem` ?ncOpts then ompEveryLoopPragma dim
+        else ompEveryLoopPragma (dim -1)
   return $ pragma <> "\n" <>
     C.unlines openLoops <> body <> ";" <> C.unlines closeLoops
 
