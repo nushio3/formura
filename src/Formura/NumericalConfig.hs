@@ -7,6 +7,7 @@ import           Control.Lens
 import           Data.Aeson.TH
 import           Data.Char
 import           Data.Data
+import           Data.List
 import qualified Data.Map as M
 import           Data.Text.Lens (packed)
 
@@ -43,6 +44,13 @@ defaultNumericalConfig =
   , _ncWallInverted = Nothing
   , _ncOptionStrings = []
      }
+
+nbuSize :: String -> NumericalConfig -> Int
+nbuSize a nc = let kwd = "nbu" ++ a
+  in head $ [ read $ drop (length kwd) opt
+  | opt <- nc ^. ncOptionStrings
+  , kwd `isPrefixOf` opt
+  ] ++ [1]
 
 
 sampleNumericalConfig :: NumericalConfig

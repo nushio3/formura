@@ -8,7 +8,7 @@ Stability   : experimental
 A module for manifestation of the Orthotope Machine: that is, an operation that removes all the delayed nodes, and replace all shift instructions with cursored-load at manifest variables.
 -}
 
-{-# LANGUAGE DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, ImplicitParams, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
+{-# LANGUAGE ConstraintKinds,DataKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleInstances, ImplicitParams, PatternSynonyms,TemplateHaskell, TypeSynonymInstances, ViewPatterns #-}
 
 module Formura.OrthotopeMachine.Manifestation where
 
@@ -29,6 +29,7 @@ import           Formura.Annotation.Representation
 import           Formura.Compiler
 import           Formura.CommandLineOption
 import           Formura.GlobalEnvironment
+import           Formura.NumericalConfig
 import           Formura.OrthotopeMachine.Graph
 import           Formura.Syntax
 import           Formura.Vec
@@ -44,6 +45,9 @@ makeClassy ''TranState
 
 instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
+
+revmapMMInstruction :: Getter TranState (M.Map (Node MicroInstruction MicroNodeType) MMNodeID)
+revmapMMInstruction = theMMInstruction . (to $ M.fromList . map (\(k,v) -> (v,k)) . M.toList)
 
 defaultTranState :: TranState
 defaultTranState = TranState
@@ -83,17 +87,22 @@ toMicroType (GridType _ x) = toMicroType x
 toMicroType (ElemType x) = return $ ElemType x
 toMicroType x = raiseErr $ failed $ "Top type encountered while manifestation"
 
+type WithNBUSpine = ?nbuSpine :: Bool
+
 -- | insert a single subgraph instruction into current MMInstruction
-insertMM :: Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
+insertMM :: WithNBUSpine => Vec Int -> OMNodeID -> MMInstF MMNodeID -> TranM MMNodeID
 insertMM c i inst = do
-  j <- mapNodeID c i
+  j <- mapNodeID c i -- lookup for already inserted nodes
   omNode <- lookupNode i
   typ2 <- toMicroType $ omNode ^. nodeType
-  theMMInstruction %= M.insert j (Node inst typ2 (omNode ^. nodeAnnot))
+  let nd = Node inst typ2 (omNode ^. nodeAnnot
+                           & A.set (MMLocation i c)
+                           & A.set (NBUSpine ?nbuSpine))
+  theMMInstruction %= M.insert j nd
   return j
 
 -- | generate code that returns the RHS of current (cursor,nid)
-rhsCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
+rhsCodeAt :: WithNBUSpine => Vec Int -> OMNodeID -> TranM MMNodeID
 rhsCodeAt cursor nid = do
   nd <- lookupNode nid
   isM <- use isManifestNode
@@ -103,7 +112,7 @@ rhsCodeAt cursor nid = do
      False -> rhsDelayedCodeAt cursor nid
 
 -- | generate code that calculates the RHS of current (cursor,nid)
-rhsDelayedCodeAt :: Vec Int -> OMNodeID -> TranM MMNodeID
+rhsDelayedCodeAt :: WithNBUSpine => Vec Int -> OMNodeID -> TranM MMNodeID
 rhsDelayedCodeAt cursor omNodeID = do
   let ins = insertMM cursor omNodeID
   (Node inst0 _ _) <- lookupNode omNodeID
@@ -135,7 +144,15 @@ rhsDelayedCodeAt cursor omNodeID = do
 
 
 genMMInstruction :: OMNodeID -> TranM ()
-genMMInstruction omNodeID = rhsDelayedCodeAt 0 omNodeID >> return ()
+genMMInstruction omNodeID = do
+  nc <- view envNumericalConfig
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
+  sequence_ $ reverse
+    [ let ?nbuSpine = x==0&&y==0 in rhsDelayedCodeAt (Vec [x,y,0]) omNodeID
+    | x <- [0..nbux-1]
+    , y <- [0..nbuy-1]]
+  return ()
 
 
 manifestG :: WithCommandLineOption => OMGraph -> TranM MMGraph
@@ -170,7 +187,11 @@ manifestG omg = do
 
         return $ Just (nO, Node ndInst (omNode ^. nodeType) (omNode ^. nodeAnnot) :: MMNode)
 
-  return $ boundaryAnalysis $ M.fromList nodeList
+  nc <- view envNumericalConfig
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
+      boundaryFixer = Vec [nbux-1, nbuy-1, 0]
+  return $ boundaryAnalysis boundaryFixer $ M.fromList nodeList
 
 manifestation :: WithCommandLineOption => OMProgram -> TranM MMProgram
 manifestation omprog = do
@@ -183,13 +204,18 @@ manifestation omprog = do
     , _omInitGraph         = ig2
     , _omStepGraph         = sg2}
 
-boundaryAnalysis :: MMGraph -> MMGraph
-boundaryAnalysis gr =
+
+-- WARNING: The Boundary set here is never used!!!
+boundaryAnalysis :: Vec Int -> MMGraph -> MMGraph
+boundaryAnalysis fixer gr =
   flip M.mapWithKey gr $
   \ k nd -> case M.lookup k bgr of
-  Just b ->  nd & A.annotation %~ A.set (b <> Boundary (0,0))
+  Just b ->  nd & A.annotation %~ A.set (fix $ b <> Boundary (0,0))
   Nothing -> nd
   where
+    fix :: Boundary -> Boundary
+    fix (Boundary (lo,hi)) = error $ show (lo,hi)--Boundary (lo, hi-fixer)
+
     bgr :: M.Map OMNodeID Boundary
     bgr = M.mapWithKey knb gr
 

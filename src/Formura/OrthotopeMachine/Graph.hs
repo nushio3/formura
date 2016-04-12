@@ -84,8 +84,22 @@ type MMInstF = Sum '[DataflowInstF, LoadCursorF, OperatorF, ImmF]
 type MMInstruction = M.Map MMNodeID (Node MicroInstruction MicroNodeType)
 type MicroInstruction = MMInstF MMNodeID
 
-mmInstTail :: MMInstruction -> MMInstF MMNodeID
-mmInstTail = _nodeInst . snd . M.findMax
+data MMLocation = MMLocation { _mmlOMNodeID :: OMNodeID,  _mmlCursor :: (Vec Int)}
+                  deriving(Eq, Ord, Show)
+
+
+mmInstTails :: MMInstruction -> [MMInstF MMNodeID]
+mmInstTails mminst = rets
+  where
+    rets = [_nodeInst nd
+      | nd <- M.elems mminst,
+        let Just (MMLocation omnid2 _) = A.viewMaybe nd,
+        omnid2==omnid ]
+
+    Just (MMLocation omnid _) = A.viewMaybe maxNode
+
+    maxNode :: MicroNode
+    maxNode = snd $ M.findMax mminst
 
 
 type OMNodeType  = Fix OMNodeTypeF
@@ -119,6 +133,11 @@ mapElemType f (GridType v t) = GridType v $ mapElemType f t
 mapElemType _ TopType = TopType
 
 data Node instType typeType = Node {_nodeInst :: instType, _nodeType :: typeType, _nodeAnnot :: A.Annotation}
+
+instance (Eq i, Eq t) => Eq (Node i t) where
+  (Node a b _) == (Node c d _)   = (a,b) == (c,d)
+instance (Ord i, Ord t) => Ord (Node i t) where
+  compare (Node a b _) (Node c d _)   = compare (a,b) (c,d)
 
 instance (Show v, Show t) => Show (Node v t) where
   show (Node v t _) = show v ++ " :: " ++ show t
@@ -181,3 +200,6 @@ type MMProgram = MachineProgram MMInstruction OMNodeType
 
 instance HasGlobalEnvironment (MachineProgram v t) where
   globalEnvironment = omGlobalEnvironment
+
+
+makeClassy ''MMLocation
