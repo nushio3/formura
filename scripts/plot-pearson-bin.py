@@ -77,6 +77,9 @@ canvas_size_x = max(x_ax)+sx
 canvas_size_y = max(y_ax)+sy
 canvas_size_z = max(z_ax)+sz
 
+pylab.rcParams.update({'font.size': 22})
+
+
 for t in t_ax:
     canvas=np.zeros((canvas_size_x, canvas_size_z, 3))
     for key,val in secs_y.iteritems():
@@ -88,4 +91,5 @@ for t in t_ax:
     pylab.rcParams['figure.figsize'] = (canvas_size_z/50.0,canvas_size_x/50.0)
     pylab.clf()
     pylab.imshow(canvas)
+    pylab.title('t = {}'.format(t))
     pylab.savefig('images/{:06}.png'.format(t))

@@ -1,6 +1,6 @@
 dimension :: 3
 axes :: x, y, z
-double :: Fu = 1/86400, Fv = 6/86400, Fe = 1/900, Du = 0.1*2.3e-9, Dv = 6.1e-11
+double :: Fu = 1/86400, Fv = 6/86400, Fe = 1/900, Du = 0.1*2.3e-9, Dv = 12.2e-11
 double :: dt = 200, dx = 0.001
 
 
