@@ -267,7 +267,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=3:00:00\""
+      , "#PJM --rsc-list \"elapse=1:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -534,7 +534,7 @@ mainServer = do
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
   case remainingTaskCount < 15 && ("--perturb" `elem` argv) of
     True -> do
-      cmd "cd /home/nushio/hub/3d-mhd/individuals/survey4^4; ./perturb.py"
+      cmd "cd /home/nushio/hub/3d-mhd/individuals/understand; ./perturb.py"
       return ()
     False -> do
       mapM_ proceed  idxps
@@ -558,8 +558,8 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 35 compile it
-    Benchmark -> whenSlack 50 benchmark it
+    Compile ->  whenSlack 40 compile it
+    Benchmark -> whenSlack 55 benchmark it
     Visualize -> visualize it
     Wait _ waitlist -> do
       ret <- waits waitlist it
