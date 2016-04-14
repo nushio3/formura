@@ -71,7 +71,7 @@ void init() {
             + gaussian(iz-190,ix-170 ,iy-oy);
 
           U[ix][iy][iz] -= 0.5 *g;
-          V[ix][iy][iz] += 0.5 *g*(1 + 0.01*frand());
+          V[ix][iy][iz] += 0.25 *g*(1 + 0.01*frand());
 
         }
       }
