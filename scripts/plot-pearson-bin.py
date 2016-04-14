@@ -56,13 +56,13 @@ for fn in sys.argv[2:]:
         print secy_u
         key = (t,x,y,z)
 
-        peak = 4 * (secy_v**2)
+        peak = np.maximum(0,(secy_v-0.3)/0.1)
         colony = secy_v*3.0
         aura = 0.3 * secy_v**0.2
         food = secy_u
-        img_r = np.minimum(1.0, peak + food)
+        img_r = np.minimum(1.0, 0.7*peak + food)
         img_g = np.minimum(1.0, peak + colony)
-        img_b = np.minimum(1.0, peak + aura)
+        img_b = np.minimum(1.0, 0.7*peak + aura)
 
         val = np.concatenate((img_r,img_g,img_b),axis=2)
         secs_y[key] = val
