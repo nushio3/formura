@@ -59,10 +59,11 @@ void init() {
           U[ix][iy][iz] = 1.0;
           V[ix][iy][iz] = 0.0;
           int kx=ix/5*5, ky=iy/5*5, kz=iz/5*5;
-          if(ky==125){
-            if(kz==75 && kx==220 ||
-               kz==100 && kx == 80 ||
-               kz==150 && kx==150){
+          if(ky==120 || ky==125 || ky==130){
+            if(kz==50 && kx==230 ||
+               kz==80 && kx ==  80 ||
+               kz==120 && kx == 40 ||
+               kz==190 && kx==170){
               U[ix][iy][iz] = 0.5;
               V[ix][iy][iz] = 0.5;
             }
