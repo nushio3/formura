@@ -72,11 +72,10 @@ void init() {
             U[ix][iy][iz] -= 0.5 * g;
             V[ix][iy][iz] += 0.5*g;
 
-          }
         }
       }
     }
-  }  else    {
+  }else{
     map<Key ,double> seeds;
     for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
       for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {

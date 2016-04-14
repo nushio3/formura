@@ -24,9 +24,14 @@ sx=sy=sz=0
 if sys.argv[1] == 'big':
     dtype_int32 = '>i4'
     dtype_float64= '>f8'
+    img_shrink=500.0
+    pylab.rcParams.update({'font.size': 66})
+
 elif sys.argv[1] == 'little':
     dtype_int32 = '<i4'
     dtype_float64= '<f8'
+    img_shrink=50.0
+    pylab.rcParams.update({'font.size': 22})
 else:
     print "USAGE: plot-pearson-bin.py ENDIAN [FILES...]"
     exit(0)
@@ -83,7 +88,6 @@ canvas_size_x = max(x_ax)+sx
 canvas_size_y = max(y_ax)+sy
 canvas_size_z = max(z_ax)+sz
 
-pylab.rcParams.update({'font.size': 22})
 
 
 for t in t_ax:
@@ -94,7 +98,8 @@ for t in t_ax:
             continue
         canvas[x1:x1+sx,z1:z1+sz,:] = val
 
-    pylab.rcParams['figure.figsize'] = (canvas_size_z/50.0,canvas_size_x/50.0)
+
+    pylab.rcParams['figure.figsize'] = (canvas_size_z/img_shrink,canvas_size_x/img_shrink)
     pylab.clf()
     pylab.imshow(canvas)
     pylab.title('t = {}'.format(t))
