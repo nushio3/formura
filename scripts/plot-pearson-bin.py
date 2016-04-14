@@ -24,8 +24,10 @@ sx=sy=sz=0
 if sys.argv[1] == 'big':
     dtype_int32 = '>i4'
     dtype_float64= '>f8'
-    img_shrink=500.0
-    pylab.rcParams.update({'font.size': 66})
+    #img_shrink=500.0
+    #pylab.rcParams.update({'font.size': 48})
+    img_shrink=100.0
+    pylab.rcParams.update({'font.size': 48})
 
 elif sys.argv[1] == 'little':
     dtype_int32 = '<i4'
