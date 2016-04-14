@@ -10,7 +10,8 @@ import           Control.Monad
 import "mtl"     Control.Monad.RWS
 import           Data.Char (toUpper, isAlphaNum)
 import           Data.Foldable (toList)
-import           Data.List ({-zip4,-} isPrefixOf, sort, groupBy)
+import           Data.Function (on)
+import           Data.List (zip4, isPrefixOf, sort, groupBy, sortBy)
 import qualified Data.Map as M
 import           Data.Maybe
 import           Data.String
@@ -474,7 +475,7 @@ nPlusK i d = i <> "+" <> C.parens (C.parameter "int" d)
 
 -- | generate bindings, and the final expression that contains the result of evaluation.
 
-genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (C.Src, C.Src)
+genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (C.Src, [(C.Src,Vec Int)])
 genMMInstruction ir0 mminst = do
   axvars <- fmap fromString <$> view axesNames
 
@@ -520,6 +521,12 @@ genMMInstruction ir0 mminst = do
       genRefCnt (LoadCursor _ _) = []
       genRefCnt (LoadCursorStatic _ _) = []
 
+      doesSpine :: MMNodeID -> Bool
+      doesSpine nid =  case A.viewMaybe  $ fromJust $ M.lookup nid mminst  of
+        Just (NBUSpine False) -> False
+        _ -> True
+
+
       doesBind :: MMNodeID -> Bool
       doesBind nid = doesBind' (refCount nid) (fromJust (M.lookup nid mminst) ^. nodeInst)
 
@@ -528,8 +535,13 @@ genMMInstruction ir0 mminst = do
       doesBind' _ (Store _ x) = False
       doesBind' n _ = n >= 1 -- TODO : Implement CSE and then reduce n
 
+  let orderedMMInst :: [(MMNodeID, MicroNode)]
+      orderedMMInst = sortBy (compare `on` (loc . snd)) $ M.toList mminst
 
-  txts <- forM (M.toList mminst) $ \(nid0, Node inst microTyp _) -> do
+      loc :: MicroNode -> MMLocation
+      loc = fromJust . A.viewMaybe
+
+  txts <- forM orderedMMInst $ \(nid0, Node inst microTyp _) -> do
     microTypDecl <- genTypeDecl "" (subFix microTyp)
     let thisEq :: C.Src -> TranM C.Src
         thisEq code =
@@ -537,7 +549,8 @@ genMMInstruction ir0 mminst = do
             True ->  do
               thisName <- genFreeLocalName "a"
               nodeIDtoLocalName %= M.insert nid0 thisName
-              return $ microTypDecl <> " " <> thisName <> "=" <> code <> ";\n"
+              return $ microTypDecl <> " " <> thisName <> "=" <> code
+                <> "/*"<> C.show (doesSpine nid0) <> "*/" <> ";\n"
             False -> do
               nodeIDtoLocalName %= M.insert nid0 code
               return ""
@@ -606,7 +619,26 @@ genMMInstruction ir0 mminst = do
   nmap <- use nodeIDtoLocalName
   let (tailID, _) = M.findMax mminst
       Just tailName = M.lookup tailID nmap
-  return $ (C.unwords txts, tailName)
+      retPairs = [ (tailName,c)
+                 | (i,c) <- mmFindTailIDs mminst
+                 , tailName <- maybeToList $ M.lookup i nmap]
+
+  return $ (C.unwords txts, retPairs)
+
+
+mmFindTailIDs :: MMInstruction -> [(MMNodeID, Vec Int)]
+mmFindTailIDs mminst = rets
+  where
+    rets =
+      [ (i, c)
+      | (i,nd) <- M.toList mminst,
+        let Just (MMLocation omnid2 c) = A.viewMaybe nd,
+        omnid2==omnid ]
+
+    Just (MMLocation omnid _) = A.viewMaybe maxNode
+
+    maxNode :: MicroNode
+    maxNode = snd $ M.findMax mminst
 
 
 ompEveryLoopPragma :: (?ncOpts :: [String]) => Int -> C.Src
@@ -623,6 +655,7 @@ genComputation (ir0, nid0) destRsc0 = do
   regionDict <- use planRegionAlloc
   arrayDict <- use planArrayAlloc
   stepGraph <- use omStepGraph
+  nc <- view envNumericalConfig
 
   let
       regionBox :: Box
@@ -642,20 +675,23 @@ genComputation (ir0, nid0) destRsc0 = do
   loopIndexOffset .= marginBox^. lowerVertex
 
   systemOffset0 <- use planSystemOffset
-
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
+      gridStride = [nbux, nbuy, 1]
   let
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
             [ C.unwords
-              ["for (int ", i, "=", C.parameter "int" l ,";", i,  "<", C.parameter "int" h, ";++", i, "){"]
-            | (i,(l,h)) <- (toList ivars) `zip`
-              zip (toList loopFroms) (toList loopTos)]
+              ["for (int ", i, "=", C.parameter "int" l ,";", i,  "<", C.parameter "int" h, ";", i, "+=", C.show s ,"){"]
+            | (i,s,l,h) <- zip4 (toList ivars) gridStride (toList loopFroms) (toList loopTos)]
           closeLoops =
             ["}" | _ <- toList ivars]
 
-      (letBs,rhs) <- genMMInstruction ir0 mmInst
+      (letBs,rhss) <- genMMInstruction ir0 mmInst
 
-      let bodyExpr = lhsName2 <> foldMap C.brackets ivarExpr <> "=" <> rhs <> ";"
+      let bodyExpr = C.unlines
+            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs <> ";"
+            | (rhs, c) <- rhss ]
           ivarExpr
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
@@ -667,7 +703,7 @@ genComputation (ir0, nid0) destRsc0 = do
 
   case typ of
     ElemType "void" ->
-      case mmInstTail mmInst of
+      case head $ mmInstTails mmInst of
         Store n _ -> do
           lhsName <- nameArrayResource (ResourceStatic n ())
           genGrid True lhsName
@@ -732,8 +768,10 @@ genStagingCode isStaging rid = do
         | otherwise = arrTerm <> "=" <> rdgTerm
 
 
-
-  return $ ompEveryLoopPragma dim <> "\n" <>
+  let pragma =
+        if "collapse-ridge" `elem` ?ncOpts then ompEveryLoopPragma dim
+        else ompEveryLoopPragma (dim -1)
+  return $ pragma <> "\n" <>
     C.unlines openLoops <> body <> ";" <> C.unlines closeLoops
 
 genMPISendRecvCode :: FacetID -> TranM C.Src
@@ -874,9 +912,15 @@ genDistributedProgram insts0 = do
 collaboratePlans :: TranM ()
 collaboratePlans = do
   plans0 <- use tsMPIPlanMap
+  nc <- view envNumericalConfig
+  let nbux = nbuSize "x" nc
+      nbuy = nbuSize "y" nc
+      nbuMargin = Vec [nbux-1+2, nbuy-1+2, 2]
 
   let commonStaticBox :: Box
-      commonStaticBox = foldr1 (|||)
+      commonStaticBox =
+        upperVertex %~ (+nbuMargin) $
+        foldr1 (|||)
         [ b
         | p <- M.elems plans0
         , (ResourceStatic snName (), b)  <- M.toList $ p ^. planArrayAlloc
@@ -892,7 +936,9 @@ collaboratePlans = do
       go (ResourceStatic snName ()) _ = commonStaticBox
       go _ b = b
 
-      commonRscBox = foldr1 (|||)
+      commonRscBox =
+        upperVertex %~ (+nbuMargin) $
+        foldr1 (|||)
         [ p ^. planSharedResourceExtent
         | p <- M.elems plans0]
   tsCommonStaticBox .= commonStaticBox

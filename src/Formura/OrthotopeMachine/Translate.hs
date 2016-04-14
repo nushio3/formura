@@ -79,6 +79,7 @@ setupGlobalEnvironment prog = do
     _  -> raiseErr $ failed "multiple axes declaration found."
   dimension .= dim
   axesNames .= Vec axs
+  envNumericalConfig .= prog ^. programNumericalConfig
   where
     spDecls = prog ^. programSpecialDeclarations
 

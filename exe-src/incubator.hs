@@ -267,7 +267,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=3:00:00\""
+      , "#PJM --rsc-list \"elapse=0:30:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -301,6 +301,7 @@ compile it = do
   remoteCmd $ "mkdir -p " ++ remotedir
   cmd $ "rsync -avz " ++ (srcdir++"/") ++ " " ++ (?qbc^.qbHostName++":"++remotedir++"/")
   remoteCmd $ "cd " ++ remotedir ++  "; rm *.o ./a.out make.done"
+  remoteCmd $ "cd " ++ remoteExeDir ++  "; rm C*.o* C*.e*"
   remoteCmd $ "cd " ++ remoteExeDir ++  "; ksub src/make.sh"
 
   let resultFiles = [kpath ++ pat | pat <- ["C*.o*", "C*.e*"]]
@@ -345,7 +346,7 @@ benchmark it = do
       , "#time limit"
       , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
-      , "#PJM --rsc-list \"elapse=1:00:00\""
+      , "#PJM --rsc-list \"elapse=0:30:00\""
       , printf "#PJM --rsc-list \"rscgrp=%s\"" rscgrp
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -536,7 +537,7 @@ mainServer = do
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
   case remainingTaskCount < 15 && ("--perturb" `elem` argv) of
     True -> do
-      cmd "cd /home/nushio/hub/3d-mhd/individuals/survey4^4; ./perturb.py"
+      cmd "cd /home/nushio/hub/3d-mhd/individuals/understand; ./perturb.py"
       return ()
     False -> do
       mapM_ proceed  idxps
@@ -560,7 +561,7 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 35 compile it
+    Compile ->  whenSlack 30 compile it
     Benchmark -> whenSlack 50 benchmark it
     Visualize -> visualize it
     Wait _ waitlist -> do

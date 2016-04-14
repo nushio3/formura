@@ -1,0 +1,25 @@
+Parallelization messages
+  jwd8206o-i  "main.c", line 22: Division is changed to multiplication by reciprocal.
+  jwd6002s-i  "main.c", line 33: SIMD conversion is applied to this loop.
+  jwd8663o-i  "main.c", line 33: This loop is not software pipelined because software pipelining is worthless for this loop.
+  jwd8202o-i  "main.c", line 33: Loop unrolling expanding 8 times is applied to this loop.
+  jwd5002p-i  "main.c", line 35: This loop is parallelized.
+  jwd8330o-i  "main.c", line 35: Loop collapse is applied to the nested loops with loop variables 'x',...,'z'.
+  jwd5001p-i  "main.c", line 43: This loop with loop variable 'x' is parallelized.
+  jwd6001s-i  "main.c", line 45: SIMD conversion is applied to this loop with the loop variable 'z'.
+  jwd8663o-i  "main.c", line 45: This loop is not software pipelined because software pipelining is worthless for this loop.
+  jwd8202o-i  "main.c", line 45: Loop unrolling expanding 8 times is applied to this loop.
+  jwd5101p-i  "main.c", line 79: A statement in this loop prevents loop parallelization.
+  jwd8664o-i  "main.c", line 79: This loop is not software pipelined because the loop contains an instruction not covered by software pipelining, such as function call.
+  jwd5001p-i  "main.c", line 80: This loop with loop variable 'x' is parallelized.
+  jwd6001s-i  "main.c", line 82: SIMD conversion is applied to this loop with the loop variable 'z'.
+  jwd8204o-i  "main.c", line 82: This loop is software pipelined.
+  jwd8205o-i  "main.c", line 82: The software-pipelined loop is chosen at run time when the iteration count is greater than or equal to '33'.
+  jwd8209o-i  "main.c", line 84: Evaluation order of polynomial expression is changed according to commutative law of addition and multiplication.
+  jwd8209o-i  "main.c", line 86: Evaluation order of polynomial expression is changed according to commutative law of addition and multiplication.
+  jwd8209o-i  "main.c", line 87: Evaluation order of polynomial expression is changed according to commutative law of addition and multiplication.
+  jwd8209o-i  "main.c", line 88: Evaluation order of polynomial expression is changed according to commutative law of addition and multiplication.
+  jwd8101o-i  "main.c", line 92: Inline expansion is applied to the user defined function '_Z4swapPPA64_A512_dS2_'.
+  jwd8101o-i  "main.c", line 93: Inline expansion is applied to the user defined function '_Z4swapPPA64_A512_dS2_'.
+  jwd8664o-i  "main.c", line 98: This loop is not software pipelined because the loop contains an instruction not covered by software pipelining, such as function call.
+  jwd8202o-i  "main.c", line 98: Loop unrolling expanding 8 times is applied to this loop.

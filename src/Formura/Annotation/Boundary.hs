@@ -13,3 +13,5 @@ instance Monoid Boundary where
   mempty = Boundary (PureVec $ minBound `div` 2, PureVec $ maxBound `div` 2)
   mappend (Boundary (l1, u1)) (Boundary (l2, u2))
     = Boundary (max <$> l1 <*> l2, min <$> u1 <*> u2)
+
+newtype NBUSpine = NBUSpine Bool

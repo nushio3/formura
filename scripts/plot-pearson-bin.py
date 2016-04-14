@@ -34,7 +34,9 @@ else:
 
 for fn in sys.argv[2:]:
     print fn
-    m = re.search('monitor-([\d]+)-([\d]+)',fn)
+    m = re.search('monitorY-([\d]+)-([\d]+)',fn)
+    if m is None:
+        continue
     t = int(m.group(1))
     with open(fn,'rb') as fp:
         gps = np.fromfile(fp, dtype=dtype_int32,count=6)
@@ -48,23 +50,31 @@ for fn in sys.argv[2:]:
 
 
         secy_u = np.fromfile(fp, dtype=dtype_float64,count=sx*sz).reshape(sx,sz,1)
-        secy_v = np.fromfile(fp, dtype=dtype_float64,count=sx*sz).reshape(sx,sz,1)
+        tmp = np.fromfile(fp, dtype=dtype_float64,count=sx*sz)
+        print tmp.shape
+        secy_v = tmp.reshape(sx,sz,1)
         print secy_u
         key = (t,x,y,z)
-        img_r = secy_u
-        img_g = secy_v
-        img_b = np.zeros((sx,sz,1))
+
+        peak = 4 * (secy_v**2)
+        colony = secy_v*3.0
+        aura = 0.3 * secy_v**0.2
+        food = secy_u
+        img_r = np.minimum(1.0, peak + food)
+        img_g = np.minimum(1.0, peak + colony)
+        img_b = np.minimum(1.0, peak + aura)
+
         val = np.concatenate((img_r,img_g,img_b),axis=2)
         secs_y[key] = val
 
-        secx_u = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
-        secx_v = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
-        key = (t,x,y,z)
-        img_r = secx_u
-        img_g = secx_v
-        img_b = np.zeros((sy,sz,1))
-        val = np.concatenate((img_r,img_g,img_b),axis=2)
-        secs_x[key] = val
+        # secx_u = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
+        # secx_v = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
+        # key = (t,x,y,z)
+        # img_r = secx_u
+        # img_g = secx_v
+        # img_b = np.zeros((sy,sz,1))
+        # val = np.concatenate((img_r,img_g,img_b),axis=2)
+        # secs_x[key] = val
 
 
 print max(x_ax),max(y_ax),max(z_ax)
@@ -72,6 +82,9 @@ print sx,sy,sz
 canvas_size_x = max(x_ax)+sx
 canvas_size_y = max(y_ax)+sy
 canvas_size_z = max(z_ax)+sz
+
+pylab.rcParams.update({'font.size': 22})
+
 
 for t in t_ax:
     canvas=np.zeros((canvas_size_x, canvas_size_z, 3))
@@ -84,4 +97,5 @@ for t in t_ax:
     pylab.rcParams['figure.figsize'] = (canvas_size_z/50.0,canvas_size_x/50.0)
     pylab.clf()
     pylab.imshow(canvas)
+    pylab.title('t = {}'.format(t))
     pylab.savefig('images/{:06}.png'.format(t))
