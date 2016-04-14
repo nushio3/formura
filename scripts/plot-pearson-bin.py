@@ -55,9 +55,15 @@ for fn in sys.argv[2:]:
         secy_v = tmp.reshape(sx,sz,1)
         print secy_u
         key = (t,x,y,z)
-        img_r = secy_u
-        img_g = secy_v
-        img_b = np.zeros((sx,sz,1))
+
+        peak = 4 * (secy_v**2)
+        colony = secy_v*3.0
+        aura = 0.3 * secy_v**0.2
+        food = secy_u
+        img_r = np.minimum(1.0, peak + food)
+        img_g = np.minimum(1.0, peak + colony)
+        img_b = np.minimum(1.0, peak + aura)
+
         val = np.concatenate((img_r,img_g,img_b),axis=2)
         secs_y[key] = val
 
