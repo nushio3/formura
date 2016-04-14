@@ -267,7 +267,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=1:00:00\""
+      , "#PJM --rsc-list \"elapse=0:30:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -343,7 +343,7 @@ benchmark it = do
       , "#time limit"
       , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
-      , "#PJM --rsc-list \"elapse=1:00:00\""
+      , "#PJM --rsc-list \"elapse=0:30:00\""
       , printf "#PJM --rsc-list \"rscgrp=%s\"" rscgrp
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -558,8 +558,8 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 40 compile it
-    Benchmark -> whenSlack 55 benchmark it
+    Compile ->  whenSlack 30 compile it
+    Benchmark -> whenSlack 50 benchmark it
     Visualize -> visualize it
     Wait _ waitlist -> do
       ret <- waits waitlist it
