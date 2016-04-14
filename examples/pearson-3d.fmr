@@ -3,14 +3,13 @@ axes :: x, y, z
 double :: Fu = 1/86400, Fv = 6/86400, Fe = 1/900, Du = 0.1*2.3e-9, Dv = 6.1e-11
 double :: dt = 200, dx = 0.001
 
-
 ddx = fun(a) (a[i+1/2,j,k] - a[i-1/2,j,k])/dx
 ddy = fun(a) (a[i,j+1/2,k] - a[i,j-1/2,k])/dx
 ddz = fun(a) (a[i,j,k+1/2] - a[i,j,k-1/2])/dx
 
 ∂ = (ddx,ddy,ddz)
 
-Σ = fun (e) e(0) + e(1) + e(2)
+Σ = fun (e) e 0 + e 1 + e 2
 
 begin function init() returns (U,V)
   double [] :: U = 0, V = 0
