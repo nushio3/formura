@@ -334,7 +334,7 @@ benchmark it = do
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
       rscgrp ::String
       rscgrp
-        | product (it ^. ncMPIGridShape) > 30000  = "huge"
+        | product (it ^. ncMPIGridShape) > 36864  = "huge"
         | product (it ^. ncMPIGridShape) > 384    = "large"
         | otherwise = "small"
   withCurrentDirectory exeDir $ do
@@ -346,7 +346,7 @@ benchmark it = do
       , "#time limit"
       , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
-      , "#PJM --rsc-list \"elapse=0:30:00\""
+      , "#PJM --rsc-list \"elapse=1:00:00\""
       , printf "#PJM --rsc-list \"rscgrp=%s\"" rscgrp
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"

@@ -52,7 +52,7 @@ double wctime() {
 
 typedef pair<int,pair<int,int> > Key;
 void init() {
-  if (NZ<500){
+  /*  if (NZ<500){
     for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
       for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
         for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
@@ -71,7 +71,9 @@ void init() {
         }
       }
     }
-  }else{
+    }
+    else*/
+  {
     map<Key ,double> seeds;
     for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
       for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
@@ -212,7 +214,7 @@ int main (int argc, char **argv) {
       fapp_stop(benchmark_name, 0,0);
     }
   }
-  printf("total wct = %lf sec\n",t_end - t_begin);
+  //printf("total wct = %lf sec\n",t_end - t_begin);
 
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();
