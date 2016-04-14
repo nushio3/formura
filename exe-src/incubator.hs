@@ -331,8 +331,11 @@ benchmark it = do
       remoteLN = ?qbc ^. qbRemoteLabNotePath
       host = ?qbc ^. qbHostName
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
-      rscgrp :: String
-      rscgrp = if product (it ^. ncMPIGridShape) > 384 then "large" else "small"
+      rscgrp ::String
+      rscgrp
+        | product (it ^. ncMPIGridShape) > 30000  = "huge"
+        | product (it ^. ncMPIGridShape) > 384    = "large"
+        | otherwise = "small"
   withCurrentDirectory exeDir $ do
     writeFile "submit.sh" $ unlines
       [ "#!/bin/sh -x"
