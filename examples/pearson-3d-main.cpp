@@ -51,7 +51,7 @@ double wctime() {
 
 
 double gaussian(double x, double y,double z) {
-  return exp(- (x*x+y*y+z*z) / 25.0);
+  return exp(- (x*x+y*y+z*z) / 100.0);
 }
 
 typedef pair<int,pair<int,int> > Key;
