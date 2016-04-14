@@ -50,6 +50,10 @@ double wctime() {
   }*/
 
 
+double gaussian(double x, double y,double z) {
+  return exp(- (x*x+y*y+z*z) / 25.0);
+}
+
 typedef pair<int,pair<int,int> > Key;
 void init() {
   if (NZ<500){
@@ -58,20 +62,21 @@ void init() {
         for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
           U[ix][iy][iz] = 1.0;
           V[ix][iy][iz] = 0.0;
-          int kx=ix/5*5, ky=iy/5*5, kz=iz/5*5;
-          if(ky==120 || ky==125 || ky==130){
-            if(kz==50 && kx==230 ||
-               kz==80 && kx ==  80 ||
-               kz==120 && kx == 40 ||
-               kz==190 && kx==170){
-              U[ix][iy][iz] = 0.5;
-              V[ix][iy][iz] = 0.5;
-            }
+          int oy = 131;
+          double g
+            = gaussian(iz-50, ix-230 ,iy-oy)
+            + gaussian(iz-80, ix-80  ,iy-oy)
+            + gaussian(iz-120,ix-40  ,iy-oy)
+            + gaussian(iz-190,ix-170 ,iy-oy);
+
+            U[ix][iy][iz] -= 0.5 * g;
+            V[ix][iy][iz] += 0.5*g;
+
           }
         }
       }
     }
-  }else{
+  }  else    {
     map<Key ,double> seeds;
     for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
       for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
@@ -212,7 +217,7 @@ int main (int argc, char **argv) {
       fapp_stop(benchmark_name, 0,0);
     }
   }
-  printf("total wct = %lf sec\n",t_end - t_begin);
+  //printf("total wct = %lf sec\n",t_end - t_begin);
 
   MPI_Barrier(MPI_COMM_WORLD);
   MPI_Finalize();

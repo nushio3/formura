@@ -267,7 +267,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=1:00:00\""
+      , "#PJM --rsc-list \"elapse=0:30:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -332,8 +332,11 @@ benchmark it = do
       remoteLN = ?qbc ^. qbRemoteLabNotePath
       host = ?qbc ^. qbHostName
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
-      rscgrp :: String
-      rscgrp = if product (it ^. ncMPIGridShape) > 384 then "large" else "small"
+      rscgrp ::String
+      rscgrp
+        | product (it ^. ncMPIGridShape) > 36864  = "huge"
+        | product (it ^. ncMPIGridShape) > 384    = "large"
+        | otherwise = "small"
   withCurrentDirectory exeDir $ do
     writeFile "submit.sh" $ unlines
       [ "#!/bin/sh -x"
@@ -558,8 +561,8 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 40 compile it
-    Benchmark -> whenSlack 55 benchmark it
+    Compile ->  whenSlack 30 compile it
+    Benchmark -> whenSlack 50 benchmark it
     Visualize -> visualize it
     Wait _ waitlist -> do
       ret <- waits waitlist it
