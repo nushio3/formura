@@ -3,6 +3,7 @@ import re
 import sys
 import subprocess
 import numpy as np
+from scipy import ndimage
 import matplotlib
 matplotlib.use('Agg')
 import pylab
@@ -63,15 +64,7 @@ for fn in sys.argv[2:]:
         print secy_u
         key = (t,x,y,z)
 
-        peak = np.maximum(0,(secy_v-0.3)/0.1)
-        colony = secy_v*3.0
-        aura = 0.3 * secy_v**0.2
-        food = secy_u
-        img_r = np.minimum(1.0, 0.7*peak + food)
-        img_g = np.minimum(1.0, peak + colony)
-        img_b = np.minimum(1.0, 0.7*peak + aura)
-
-        val = np.concatenate((img_r,img_g,img_b),axis=2)
+        val = np.concatenate((secy_u,secy_v),axis=2)
         secs_y[key] = val
 
         # secx_u = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
@@ -93,16 +86,34 @@ canvas_size_z = max(z_ax)+sz
 
 
 for t in t_ax:
-    canvas=np.zeros((canvas_size_x, canvas_size_z, 3))
+    field=np.zeros((canvas_size_x, canvas_size_z, 2))
     for key,val in secs_y.iteritems():
         t1, x1, y1, z1 = key
         if t1 != t or y1 != 0:
             continue
-        canvas[x1:x1+sx,z1:z1+sz,:] = val
+        field[x1:x1+sx,z1:z1+sz,:] = val
+
+    secy_u = field[:, :, 0:1]
+    secy_v = field[:, :, 1:2]
+
+    peak = np.maximum(0,(secy_v-0.3)/0.1)
+    colony = secy_v*3.0
+    aura = 0.3 * secy_v**0.2
+    food = secy_u
+    img_r = np.minimum(1.0, 0.7*peak + food)
+    img_g = np.minimum(1.0, peak + colony)
+    img_b = np.minimum(1.0, 0.7*peak + aura)
+
+    canvas = np.concatenate((img_r,img_g,img_b),axis=2)
+
+    u_gauss = ndimage.interpolation.zoom(ndimage.interpolation.zoom(secy_u[:,:,0],7.8125e-3,order=3,mode='wrap'),128.0,order=3,mode='wrap')
 
 
     pylab.rcParams['figure.figsize'] = (canvas_size_z/img_shrink,canvas_size_x/img_shrink)
     pylab.clf()
     pylab.imshow(canvas)
+    CS=pylab.contour(u_gauss,[0.25,0.5,0.75],colors='blue')
+    for c in CS.collections:
+        pylab.setp(c,linewidth=4)
     pylab.title('t = {}'.format(t))
     pylab.savefig('images/{:06}.png'.format(t))

@@ -60,13 +60,15 @@ typedef pair<int,pair<int,int> > Key;
 
 void init() {
   if (NZ<500){
-    const int NI=4,NJ=5;
+    const int NI=4,NJ=7;
     double oxs[NI*NJ], pat_x[NI] = {230,80, 40,170};
+    double oys[NI*NJ], pat_y[NI] = {131,131,131,131};
     double ozs[NI*NJ], pat_z[NI] = { 50,80,120,190};
     for (int i=0;i<NI;++i) {
       for (int j=0;j<NJ;++j) {
-        oxs[j*4+i] = pat_x[i] + 6.0 * (2*frand()-1);
-        ozs[j*4+i] = pat_z[i] + 6.0 * (2*frand()-1);
+        oxs[j*4+i] = pat_x[i] + 2.0 * j*(2*frand()-1);
+        oys[j*4+i] = pat_y[i] + 2.0 * j*(2*frand()-1);
+        ozs[j*4+i] = pat_z[i] + 2.0 * j*(2*frand()-1);
       }
     }
 
@@ -75,13 +77,12 @@ void init() {
         for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
           U[ix][iy][iz] = 1.0;
           V[ix][iy][iz] = 0.0;
-          int oy = 131;
           double g=0;
           for (int i=0;i<NI*NJ;++i) {
-            double oz=ozs[i], ox=oxs[i];
+            double oz=ozs[i], oy=oys[i],ox=oxs[i];
             g += gaussian(iz-oz, ix-ox ,iy-oy);
           }
-          if (g>=0.5) g=0.5;
+          if (g>=1.0) g=1.0;
           U[ix][iy][iz] -= 0.5 *g;
           V[ix][iy][iz] += 0.25 *g;
 
