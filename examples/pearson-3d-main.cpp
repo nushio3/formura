@@ -55,6 +55,9 @@ double gaussian(double x, double y,double z) {
   return 1.0/(1.0+exp( (d-3.0)*3.0 ));
 }
 
+
+typedef pair<int,pair<int,int> > Key;
+
 void init() {
   if (NZ<500){
     const int NI=4,NJ=5;
@@ -78,7 +81,7 @@ void init() {
             double oz=ozs[i], ox=oxs[i];
             g += gaussian(iz-oz, ix-ox ,iy-oy);
           }
-
+          if (g>=0.5) g=0.5;
           U[ix][iy][iz] -= 0.5 *g;
           V[ix][iy][iz] += 0.25 *g;
 
