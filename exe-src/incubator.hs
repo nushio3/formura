@@ -240,7 +240,7 @@ codegen it = do
     superCopy (it ^. idvFmrSourcecodeURL) (fnBase ++ ".fmr")
     superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.cpp")
     writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
-    forM_ [fnBase ++ ".idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
+    forM_ ["*.idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
     cmd $ "git commit -m 'incubation in progress'"
     cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr"
