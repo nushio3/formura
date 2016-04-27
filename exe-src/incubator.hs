@@ -563,6 +563,7 @@ proceed it = do
     Compile ->  whenSlack 15 compile it
     Benchmark -> whenSlack 30 benchmark it
     Visualize -> visualize it
+    Wait _ _ | "--unwait" `elem` argv -> return $  it & xpAction .~ Codegen
     Wait _ waitlist -> do
       ret <- waits waitlist it
       case ret ^. xpAction of
