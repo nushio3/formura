@@ -6,6 +6,7 @@ import numpy as np
 from scipy import ndimage
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.patches as patches
 import pylab
 
 
@@ -27,8 +28,8 @@ if sys.argv[1] == 'big':
     dtype_float64= '>f8'
     #img_shrink=500.0
     #pylab.rcParams.update({'font.size': 48})
-    img_shrink=100.0
-    pylab.rcParams.update({'font.size': 48})
+    img_shrink=300.0
+    pylab.rcParams.update({'font.size': 72})
 
 elif sys.argv[1] == 'little':
     dtype_int32 = '<i4'
@@ -106,14 +107,19 @@ for t in t_ax:
 
     canvas = np.concatenate((img_r,img_g,img_b),axis=2)
 
-    u_gauss = ndimage.interpolation.zoom(ndimage.interpolation.zoom(secy_u[:,:,0],7.8125e-3,order=3,mode='wrap'),128.0,order=3,mode='wrap')
-
+    c_field = ndimage.interpolation.zoom(secy_u[:, :, 0],0.25,order=3,mode='wrap')
+    c_field = ndimage.filters.gaussian_filter(c_field,8.0,mode='wrap')
+    c_field = ndimage.interpolation.zoom(c_field,4.0,order=3,mode='wrap')
 
     pylab.rcParams['figure.figsize'] = (canvas_size_z/img_shrink,canvas_size_x/img_shrink)
     pylab.clf()
     pylab.imshow(canvas)
-    CS=pylab.contour(u_gauss,[0.25,0.5,0.75],colors='blue')
-    for c in CS.collections:
-        pylab.setp(c,linewidth=4)
+    if sys.argv[1] == 'big':
+        CS=pylab.contour(c_field,[0.5],colors='blue')
+        #pylab.clabel(CS,fontsize=0)
+        for c in CS.collections:
+            pylab.setp(c,linewidth=4)
+        if t ==262144:
+            pylab.gca().add_patch(patches.Rectangle((10200,1450),2000,2000,fill=False,edgecolor='white',linewidth=8))
     pylab.title('t = {}'.format(t))
     pylab.savefig('images/{:06}.png'.format(t))
