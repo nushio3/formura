@@ -51,32 +51,45 @@ double wctime() {
 
 
 double gaussian(double x, double y,double z) {
-  return exp(- (x*x+y*y+z*z) / 25.0);
+  double d = sqrt(x*x+y*y+z*z);
+  return 1.0/(1.0+exp( (d-3.0)*3.0 ));
 }
 
+
 typedef pair<int,pair<int,int> > Key;
+
 void init() {
   if (NZ<500){
+    const int NI=4,NJ=7;
+    double oxs[NI*NJ], pat_x[NI] = {230,80, 40,170};
+    double oys[NI*NJ], pat_y[NI] = {131,131,131,131};
+    double ozs[NI*NJ], pat_z[NI] = { 50,80,120,190};
+    for (int i=0;i<NI;++i) {
+      for (int j=0;j<NJ;++j) {
+        oxs[j*4+i] = pat_x[i] + 2.0 * j*(2*frand()-1);
+        oys[j*4+i] = pat_y[i] + 2.0 * j*(2*frand()-1);
+        ozs[j*4+i] = pat_z[i] + 2.0 * j*(2*frand()-1);
+      }
+    }
+
     for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
       for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {
         for(int iz = navi.lower_z; iz < navi.upper_z; ++iz) {
           U[ix][iy][iz] = 1.0;
           V[ix][iy][iz] = 0.0;
-          int oy = 131;
-          double g
-            = gaussian(iz-50, ix-230 ,iy-oy)
-            + gaussian(iz-80, ix-80  ,iy-oy)
-            + gaussian(iz-120,ix-40  ,iy-oy)
-            + gaussian(iz-190,ix-170 ,iy-oy);
-
-            U[ix][iy][iz] -= 0.5 * g;
-            V[ix][iy][iz] += 0.5*g;
-
+          double g=0;
+          for (int i=0;i<NI*NJ;++i) {
+            double oz=ozs[i], oy=oys[i],ox=oxs[i];
+            g += gaussian(iz-oz, ix-ox ,iy-oy);
           }
+          if (g>=1.0) g=1.0;
+          U[ix][iy][iz] -= 0.5 *g;
+          V[ix][iy][iz] += 0.25 *g;
+
         }
       }
     }
-  }  else    {
+  }else{
     map<Key ,double> seeds;
     for(int ix = navi.lower_x; ix < navi.upper_x; ++ix) {
       for(int iy = navi.lower_y; iy < navi.upper_y; ++iy) {

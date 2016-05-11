@@ -3,8 +3,10 @@ import re
 import sys
 import subprocess
 import numpy as np
+from scipy import ndimage
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.patches as patches
 import pylab
 
 
@@ -24,9 +26,16 @@ sx=sy=sz=0
 if sys.argv[1] == 'big':
     dtype_int32 = '>i4'
     dtype_float64= '>f8'
+    #img_shrink=500.0
+    #pylab.rcParams.update({'font.size': 48})
+    img_shrink=300.0
+    pylab.rcParams.update({'font.size': 72})
+
 elif sys.argv[1] == 'little':
     dtype_int32 = '<i4'
     dtype_float64= '<f8'
+    img_shrink=50.0
+    pylab.rcParams.update({'font.size': 22})
 else:
     print "USAGE: plot-pearson-bin.py ENDIAN [FILES...]"
     exit(0)
@@ -56,15 +65,7 @@ for fn in sys.argv[2:]:
         print secy_u
         key = (t,x,y,z)
 
-        peak = np.maximum(0,(secy_v-0.3)/0.1)
-        colony = secy_v*3.0
-        aura = 0.3 * secy_v**0.2
-        food = secy_u
-        img_r = np.minimum(1.0, 0.7*peak + food)
-        img_g = np.minimum(1.0, peak + colony)
-        img_b = np.minimum(1.0, 0.7*peak + aura)
-
-        val = np.concatenate((img_r,img_g,img_b),axis=2)
+        val = np.concatenate((secy_u,secy_v),axis=2)
         secs_y[key] = val
 
         # secx_u = np.fromfile(fp, dtype=dtype_float64,count=sy*sz).reshape(sy,sz,1)
@@ -83,19 +84,42 @@ canvas_size_x = max(x_ax)+sx
 canvas_size_y = max(y_ax)+sy
 canvas_size_z = max(z_ax)+sz
 
-pylab.rcParams.update({'font.size': 22})
 
 
 for t in t_ax:
-    canvas=np.zeros((canvas_size_x, canvas_size_z, 3))
+    field=np.zeros((canvas_size_x, canvas_size_z, 2))
     for key,val in secs_y.iteritems():
         t1, x1, y1, z1 = key
         if t1 != t or y1 != 0:
             continue
-        canvas[x1:x1+sx,z1:z1+sz,:] = val
+        field[x1:x1+sx,z1:z1+sz,:] = val
 
-    pylab.rcParams['figure.figsize'] = (canvas_size_z/50.0,canvas_size_x/50.0)
+    secy_u = field[:, :, 0:1]
+    secy_v = field[:, :, 1:2]
+
+    peak = np.maximum(0,(secy_v-0.3)/0.1)
+    colony = secy_v*3.0
+    aura = 0.3 * secy_v**0.2
+    food = secy_u
+    img_r = np.minimum(1.0, 0.7*peak + food)
+    img_g = np.minimum(1.0, peak + colony)
+    img_b = np.minimum(1.0, 0.7*peak + aura)
+
+    canvas = np.concatenate((img_r,img_g,img_b),axis=2)
+
+    c_field = ndimage.interpolation.zoom(secy_u[:, :, 0],0.25,order=3,mode='wrap')
+    c_field = ndimage.filters.gaussian_filter(c_field,8.0,mode='wrap')
+    c_field = ndimage.interpolation.zoom(c_field,4.0,order=3,mode='wrap')
+
+    pylab.rcParams['figure.figsize'] = (canvas_size_z/img_shrink,canvas_size_x/img_shrink)
     pylab.clf()
     pylab.imshow(canvas)
+    if sys.argv[1] == 'big':
+        CS=pylab.contour(c_field,[0.5],colors='blue')
+        #pylab.clabel(CS,fontsize=0)
+        for c in CS.collections:
+            pylab.setp(c,linewidth=4)
+        if t ==262144:
+            pylab.gca().add_patch(patches.Rectangle((10200,1450),2000,2000,fill=False,edgecolor='white',linewidth=8))
     pylab.title('t = {}'.format(t))
     pylab.savefig('images/{:06}.png'.format(t))
