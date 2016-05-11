@@ -207,7 +207,7 @@ int main (int argc, char **argv) {
         T_MAX*=2;
         T_MONITOR*=2;
         sprintf(benchmark_name,"extend-%d",T_MAX);
-        //start_collection(benchmark_name);
+        start_collection(benchmark_name);
         fapp_start(benchmark_name, 0,0);
       }else{
         break;
@@ -216,7 +216,7 @@ int main (int argc, char **argv) {
     }
     if (navi.time_step == 0) {
       t_begin = wctime();
-      //start_collection(benchmark_name);
+      start_collection(benchmark_name);
       fapp_start(benchmark_name, 0,0);
     }
 
@@ -226,7 +226,7 @@ int main (int argc, char **argv) {
 
     if (navi.time_step >= T_MAX) {
       t_end = wctime();
-      //stop_collection(benchmark_name);
+      stop_collection(benchmark_name);
       fapp_stop(benchmark_name, 0,0);
     }
   }

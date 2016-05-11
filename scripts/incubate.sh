@@ -1,5 +1,5 @@
 #!/bin/bash
 while true; do
     ./bin/incubator "$@"
-    sleep 0
+    sleep 60
 done
