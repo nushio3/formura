@@ -240,7 +240,7 @@ codegen it = do
     superCopy (it ^. idvFmrSourcecodeURL) (fnBase ++ ".fmr")
     superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.cpp")
     writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
-    forM_ [fnBase ++ ".idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
+    forM_ ["*.idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
     --cmd $ "git commit -m 'incubation in progress'"
     cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr"
@@ -576,6 +576,7 @@ proceed it = do
     Compile ->  whenSlack 15 compile it
     Benchmark -> whenSlack 30 benchmark it
     Visualize -> visualize it
+    Wait _ _ | "--unwait" `elem` argv -> return $  it & xpAction .~ Codegen
     Wait _ waitlist -> do
       ret <- waits waitlist it
       case ret ^. xpAction of
