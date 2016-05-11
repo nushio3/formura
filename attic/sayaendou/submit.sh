@@ -3,7 +3,7 @@
 #PJM --mpi "shape=4x4x4"
 
 #time limit
-#PJM --name "Bpt-115"
+#PJM --name "Bnative"
 #PJM --rsc-list "elapse=1:00:00"
 #PJM --rsc-list "rscgrp=small"
 #PJM --mpi "use-rankdir"
