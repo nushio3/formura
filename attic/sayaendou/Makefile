@@ -1,5 +1,6 @@
 all: a.out
-CC=mpiFCCpx -Kdynamic_iteration -Keval -Kfast,parallel -Klib -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Kocl -Kopenmp -Koptmsg=2 -Kreduction -Ksimd=2 -O3 -Krestp=all
+CC=mpiFCCpx -Kalias_const -Karray_private -Kdynamic_iteration -Keval -Kfast -Kinstance=8 -Klib -Kloop_fission -Kloop_part_parallel -Koptmsg=2 -Kprefetch_conditional -Kprefetch_strong -Kreduction -Ksimd=2 -Kstriping -Kswp_strong
+
 a.out: main.c Makefile
 	$(CC) main.c -o a.out
 

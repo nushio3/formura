@@ -10,9 +10,9 @@
 // L2 Cache = 6MB
 
 
-#define NX 56
-#define NY 56
-#define NZ 56
+#define NX 26
+#define NY 26
+#define NZ 256
 
 
 typedef double array[NX][NY][NZ];
@@ -79,7 +79,7 @@ int main (int argc, char **argv) {
   start_collection("main");
   fapp_start("main", 0,0);
 
-  for(int t=0; t<256*16;++t){
+  for(int t=0; t<32*1024;++t){
     for (int x=1;x<NX-1;++x) {
       for (int y=1;y<NY-1;++y) {
         for (int z=1;z<NZ-1;++z) {
