@@ -1,6 +1,6 @@
 #!/bin/sh -x
-#PJM --rsc-list "node=4x4x4"
-#PJM --mpi "shape=4x4x4"
+#PJM --rsc-list "node=1"
+#PJM --mpi "shape=1"
 
 #time limit
 #PJM --name "Bnative"
