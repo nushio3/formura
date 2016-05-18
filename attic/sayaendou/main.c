@@ -70,7 +70,7 @@ void proceed(surface * U, surface * V, surface * U_next, surface * V_next) {
   const double rU = 1/86400.0, rV = 6/86400.0, rE = 1/900.0, Du = 2.3e-10, Dv = 6.1e-11;
   const double dt = 200, dx = 0.001;
     for (int x=1;x<NX-1;++x) {
-      for (int y=1;y<NY-1;y+=2) {//NBU
+      for (int y=1;y<NY-1;y+=2) {// NBU
         for (int z=1;z<NZ-1;++z) {
           double U0=U[x][y][z];
           double V0=V[x][y][z];
@@ -165,6 +165,7 @@ int main (int argc, char **argv) {
     proceed_nbuxy(U_mem, V_mem, U_mem2, V_mem2);
     proceed_nbuxy(U_mem2, V_mem2, U_mem, V_mem);
   }
+
   fapp_stop("main", 0,0);
   stop_collection("main");
 
