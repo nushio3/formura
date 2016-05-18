@@ -124,4 +124,4 @@ Nanoblock Unrollを適用する。
 
 - コンパイルオプション`-Krestp=all`を外すと、整数ロード・ストアはほぼ無視できる程度に減る。その代わり、１コア以外はバリア同期待ちに陥る。
 - restrict pointerを使わず、生配列で書いた場合、整数ロード・ストアのフットプリントは１％前後にまで減る（まだ多いか？）
-- omp collapse forをしてみたり、`-Kdynamic_iteration`を切ってみたりしたが、結果は変わらず
+- omp collapse forをしてみたり、`-Kdynamic_iteration`を切ってみたりしたが、結果はほぼほぼ変わらず
