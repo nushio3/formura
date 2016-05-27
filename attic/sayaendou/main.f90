@@ -2,8 +2,14 @@ program main
   implicit none
 
   double precision, dimension(50,50,50) :: u,v
-  double precision, dimension(50,50,50) :: u_m,v_m
+  double precision, dimension(50,50,50) :: u_other,v_other
+  integer t
   call init()
+
+  do t = 1, 1024
+     call proceed(u,v, u_other, v_other)
+     call proceed(u_other,v_other, u, v)
+  end do
 
   print *, u(25,25,25), v(25,25,25)
 
@@ -18,13 +24,23 @@ contains
           end do
        end do
     end do
+    do z = 20, 30
+       do y = 20, 30
+          do x = 20, 30
+             u(x,y,z) = 0.5
+             v(x,y,z) = 0.25
+          end do
+       end do
+    end do
+
   end subroutine init
 
   subroutine proceed(u,v,u_next,v_next)
     double precision, intent(in) ,dimension(50,50,50) :: u,v
     double precision, intent(out),dimension(50,50,50) :: u_next,v_next
 
-    double precision, parameter ::  rU = 1/86400.0, rV = 6/86400.0, rE = 1/900.0, Du = 2.3e-10, Dv = 6.1e-11, dt = 200, dx = 0.001
+    double precision, parameter :: rU = 1.0/86400.0, rV = 6.0/86400.0, rE = 1.0/900.0
+    double precision, parameter :: Du = 2.3e-10, Dv = 6.1e-11, dt = 200, dx = 0.001
     double precision u0, v0, eat, du_dt, dv_dt, lap_u, lap_v
     integer x,y,z
 
@@ -35,9 +51,9 @@ contains
              v0 = v(x,y,z)
              eat = rE * u0 * v0 * v0
              lap_u = u(x+1,y,z)+u(x-1,y,z)+u(x,y+1,z)+u(x,y-1,z)+u(x,y,z+1)+u(x,y,z-1)-6.0*u(x,y,z)
-             lap_v = u(x+1,y,z)+u(x-1,y,z)+u(x,y+1,z)+u(x,y-1,z)+u(x,y,z+1)+u(x,y,z-1)-6.0*u(x,y,z)
+             lap_v = v(x+1,y,z)+v(x-1,y,z)+v(x,y+1,z)+v(x,y-1,z)+v(x,y,z+1)+v(x,y,z-1)-6.0*v(x,y,z)
              du_dt = -eat + rU * (1.0-u0) + Du/dx/dx * lap_u
-             dv_dt =  eat + rV * v0 + Dv/dx/dx * lap_v
+             dv_dt =  eat - rV * v0 + Dv/dx/dx * lap_v
              u_next(x,y,z) = u0 + du_dt * dt
              v_next(x,y,z) = v0 + dv_dt * dt
           end do
