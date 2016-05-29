@@ -6,10 +6,12 @@ program main
   integer t
   call init()
 
-  do t = 1, 1024
+  call fapp_start("main", 0,0);
+  do t = 1, 8*1024
      call proceed(u,v, u_other, v_other)
      call proceed(u_other,v_other, u, v)
   end do
+  call fapp_stop("main", 0,0);
 
   print *, u(25,25,25), v(25,25,25)
 
