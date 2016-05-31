@@ -53,12 +53,12 @@ contains
     double precision u0, v0, eat, du_dt, dv_dt, lap_u, lap_v
     integer x,y,z,x0,y0,z0
 
-    do z0 = 1, NZ-2
+    do z0 = 1, (NZ-2)/2
        do y0 = 1, NY-2
           do x0 = 1, NX-2
              x=x0+1
              y=z0+1
-             z=z0+1
+             z=2*z0
              u0 = u(x,y,z)
              v0 = v(x,y,z)
              eat = rE * u0 * v0 * v0
@@ -66,8 +66,20 @@ contains
              lap_v = v(x+1,y,z)+v(x-1,y,z)+v(x,y+1,z)+v(x,y-1,z)+v(x,y,z+1)+v(x,y,z-1)-6.0*v(x,y,z)
              du_dt = -eat + rU * (1.0-u0) + Du/dx/dx * lap_u
              dv_dt =  eat - rV * v0 + Dv/dx/dx * lap_v
-             u_next(x0,y0,z0) = u0 + du_dt * dt
-             v_next(x0,y0,z0) = v0 + dv_dt * dt
+             u_next(x0,y0,z-1) = u0 + du_dt * dt
+             v_next(x0,y0,z-1) = v0 + dv_dt * dt
+             ! x=x0+1
+             ! y=z0+1
+             z=2*z0+1
+             u0 = u(x,y,z)
+             v0 = v(x,y,z)
+             eat = rE * u0 * v0 * v0
+             lap_u = u(x+1,y,z)+u(x-1,y,z)+u(x,y+1,z)+u(x,y-1,z)+u(x,y,z+1)+u(x,y,z-1)-6.0*u(x,y,z)
+             lap_v = v(x+1,y,z)+v(x-1,y,z)+v(x,y+1,z)+v(x,y-1,z)+v(x,y,z+1)+v(x,y,z-1)-6.0*v(x,y,z)
+             du_dt = -eat + rU * (1.0-u0) + Du/dx/dx * lap_u
+             dv_dt =  eat - rV * v0 + Dv/dx/dx * lap_v
+             u_next(x0,y0,z-1) = u0 + du_dt * dt
+             v_next(x0,y0,z-1) = v0 + dv_dt * dt
           end do
        end do
     end do
