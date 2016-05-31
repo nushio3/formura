@@ -9,8 +9,8 @@
 #PJM --mpi "use-rankdir"
 #PJM --stg-transfiles all
 
-# stage in  f.out.
-#PJM --stgin "./f.out %r:./f.out"
+# stage in  c.out.
+#PJM --stgin "./c.out %r:./c.out"
 #PJM --stgout "%r:./out/* ./out/out-%r/"
 #PJM --stgout "%r:./prof-ip/* ./out/prof-ip/"
 #PJM --stgout "%r:./prof-01/* ./out/prof-01/"
@@ -36,19 +36,19 @@
 . /work/system/Env_base
 mpiexec /work/system/bin/msh "mkdir ./out"
 
-fapp -C -d prof-X3 -Hevent=Statistics  mpirun -n 1 ./f.out 65536 65536
+fapp -C -d prof-X3 -Hevent=Statistics  mpirun -n 1 ./c.out 65536 65536
 
-fapp -C -d prof-C -Hevent=Cache        mpirun -n 1 ./f.out
-fapp -C -d prof-I -Hevent=Instructions mpirun -n 1 ./f.out
-fapp -C -d prof-M -Hevent=MEM_access   mpirun -n 1 ./f.out
-fapp -C -d prof-P -Hevent=Performance  mpirun -n 1 ./f.out
-fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n 1 ./f.out
-fapp -C -d prof-01 -Hpa=1 mpirun -n 1 ./f.out
-fapp -C -d prof-02 -Hpa=2 mpirun -n 1 ./f.out
-fapp -C -d prof-03 -Hpa=3 mpirun -n 1 ./f.out
-fapp -C -d prof-04 -Hpa=4 mpirun -n 1 ./f.out
-fapp -C -d prof-05 -Hpa=5 mpirun -n 1 ./f.out
-fapp -C -d prof-06 -Hpa=6 mpirun -n 1 ./f.out
-fapp -C -d prof-07 -Hpa=7 mpirun -n 1 ./f.out
-fapp -C -d prof-mpi -Impi mpirun -n 1 ./f.out
+fapp -C -d prof-C -Hevent=Cache        mpirun -n 1 ./c.out
+fapp -C -d prof-I -Hevent=Instructions mpirun -n 1 ./c.out
+fapp -C -d prof-M -Hevent=MEM_access   mpirun -n 1 ./c.out
+fapp -C -d prof-P -Hevent=Performance  mpirun -n 1 ./c.out
+fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n 1 ./c.out
+fapp -C -d prof-01 -Hpa=1 mpirun -n 1 ./c.out
+fapp -C -d prof-02 -Hpa=2 mpirun -n 1 ./c.out
+fapp -C -d prof-03 -Hpa=3 mpirun -n 1 ./c.out
+fapp -C -d prof-04 -Hpa=4 mpirun -n 1 ./c.out
+fapp -C -d prof-05 -Hpa=5 mpirun -n 1 ./c.out
+fapp -C -d prof-06 -Hpa=6 mpirun -n 1 ./c.out
+fapp -C -d prof-07 -Hpa=7 mpirun -n 1 ./c.out
+fapp -C -d prof-mpi -Impi mpirun -n 1 ./c.out
 

@@ -167,7 +167,7 @@ int main (int argc, char **argv) {
 
 #pragma omp parallel
   {
-    for(int t=0; t<4*1024;++t){
+    for(int t=0; t<8*1024;++t){
       proceed_nbux();
       proceed_nbux();
     }

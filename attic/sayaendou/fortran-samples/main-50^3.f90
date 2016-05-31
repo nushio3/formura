@@ -25,17 +25,17 @@ program main
 contains
   subroutine init()
     integer x,y,z
-    do z = 1, 50
-       do y = 1, 50
-          do x = 1, 50
+    do z = 1, NZ
+       do y = 1, NY
+          do x = 1, NX
              u(x,y,z) = 1.0
              v(x,y,z) = 0.0
           end do
        end do
     end do
-    do z = 20, 30
-       do y = 20, 30
-          do x = 20, 30
+    do z = NZ*4/10, NZ*6/10
+       do y = NY*4/10, NY*6/10
+          do x = NX*4/10, NX*6/10
              u(x,y,z) = 0.5
              v(x,y,z) = 0.25
           end do
@@ -45,8 +45,8 @@ contains
   end subroutine init
 
   subroutine proceed(u,v,u_next,v_next)
-    double precision, intent(in) ,dimension(50,50,50) :: u,v
-    double precision, intent(out),dimension(50,50,50) :: u_next,v_next
+    double precision, intent(in) ,dimension(NX,NY,NZ) :: u,v
+    double precision, intent(out),dimension(NX,NY,NZ) :: u_next,v_next
 
     double precision, parameter :: rU = 1.0/86400.0, rV = 6.0/86400.0, rE = 1.0/900.0
     double precision, parameter :: Du = 2.3e-10, Dv = 6.1e-11, dt = 200, dx = 0.001
