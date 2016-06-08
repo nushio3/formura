@@ -535,9 +535,9 @@ mainServer = do
   idxps <- catMaybes <$> mapM readIndExp idvFns
 
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
-  case remainingTaskCount < 5 && ("--perturb" `elem` argv) of
+  case remainingTaskCount <= 5 && ("--perturb" `elem` argv) of
     True -> do
-      cmd "cd /home/nushio/hub/3d-mhd/individuals/understand; ./perturb.py"
+      cmd "cd /home/nushio/hub/3d-mhd/individuals/understand-2; ./perturb.py"
       return ()
     False -> do
       mapM_ proceed  idxps
@@ -560,8 +560,8 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 15 compile it
-    Benchmark -> whenSlack 30 benchmark it
+    Compile ->  whenSlack 25 compile it
+    Benchmark -> whenSlack 40 benchmark it
     Visualize -> visualize it
     Wait _ _ | "--unwait" `elem` argv -> return $  it & xpAction .~ Codegen
     Wait _ waitlist -> do
