@@ -242,7 +242,7 @@ codegen it = do
     writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
     forM_ ["*.idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
-    cmd $ "git commit -m 'incubation in progress'"
+    --cmd $ "git commit -m 'incubation in progress'"
     cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
@@ -320,6 +320,9 @@ extensionNSet = unsafePerformIO $ do
 
 benchmark :: WithQBConfig => IndExp -> IO IndExp
 benchmark it = do
+  argv <- getArgs
+  let csvMode = "--csv" `elem` argv -- Generate csv for Fujitsu XLS
+
   let labNote = ?qbc ^. qbLabNotePath
       exeDir = it ^. xpLocalWorkDir
       mpiSize :: Int
@@ -331,6 +334,8 @@ benchmark it = do
       localLN  = ?qbc ^. qbLabNotePath
       remoteLN = ?qbc ^. qbRemoteLabNotePath
       host = ?qbc ^. qbHostName
+
+
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
       rscgrp ::String
       rscgrp
@@ -378,22 +383,25 @@ benchmark it = do
       , ". /work/system/Env_base"
       , "mpiexec /work/system/bin/msh \"mkdir ./out\""
       , ""
-      --        , printf "fapp -C -d prof-S -Hevent=Statistics   mpirun -n %d ./a.out" mpiSize
       , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpirun -n %d ./a.out %d %d" n mpiSize x x
                 | n <- extensionNSet, let x = 8192 * 2^n::Integer]
-      -- , printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-P -Hevent=Performance  mpirun -n %d ./a.out" mpiSize
-      -- , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-01 -Hpa=1 mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-02 -Hpa=2 mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-03 -Hpa=3 mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-04 -Hpa=4 mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-05 -Hpa=5 mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-06 -Hpa=6 mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
-      -- , printf "fapp -C -d prof-mpi -Impi mpirun -n %d ./a.out" mpiSize
+      ,
+        if not csvMode then "" else
+          unlines
+          [ printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-P -Hevent=Performance  mpirun -n %d ./a.out" mpiSize
+          , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-01 -Hpa=1 mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-02 -Hpa=2 mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-03 -Hpa=3 mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-04 -Hpa=4 mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-05 -Hpa=5 mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-06 -Hpa=6 mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-mpi -Impi mpirun -n %d ./a.out" mpiSize
+          ]
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
   superCopy (exeDir ++"/submit.sh") (?qbc^.qbHostName++":"++remotedir++"/submit.sh")
@@ -410,6 +418,9 @@ benchmark it = do
 
 visualize :: WithQBConfig => IndExp -> IO IndExp
 visualize it = do
+  argv <- getArgs
+  let csvMode = "--csv" `elem` argv -- Generate csv for Fujitsu XLS
+
   let
       exeDir = it ^. xpLocalWorkDir
       localLN  = ?qbc ^. qbLabNotePath
@@ -418,22 +429,24 @@ visualize it = do
   let remotedir = exeDir & T.packed %~ T.replace (T.pack localLN) (T.pack remoteLN)
   withCurrentDirectory exeDir $ do
     writeFile "postprocess.sh" $ unlines
-      [ ""
-      -- , printf "fipppx -A  -Icpu,balance,call,hwm,src -d out/prof-ip > out/output_prof_ip.txt"
-      -- , printf "fipppx -A  -Icpu,call,hwm -tcsv -d out/prof-ip > out/output_prof_ip.csv"
-      -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-01 -o out/output_prof_1.csv"
-      -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-02 -o out/output_prof_2.csv"
-      -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-03 -o out/output_prof_3.csv"
-      -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-04 -o out/output_prof_4.csv"
-      -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-05 -o out/output_prof_5.csv"
-      -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-06 -o out/output_prof_6.csv"
-      -- , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-07 -o out/output_prof_7.csv"
-      -- , printf "fapppx -A -Impi  -ttext -d out/prof-mpi -o out/output_prof_mpi.txt"
-      -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-C -o out/output_prof_C.txt"
-      -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-I -o out/output_prof_I.txt"
-      -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-M -o out/output_prof_M.txt"
-      -- , printf "fapppx -A -Ihwm,nompi  -d out/prof-P -o out/output_prof_P.txt"
-      -- ,        printf "fapppx -A -Ihwm,nompi  -d out/prof-S -o out/output_prof_S.txt"
+      [
+        if not csvMode then "" else
+          unlines
+          [ printf "fipppx -A  -Icpu,balance,call,hwm,src -d out/prof-ip > out/output_prof_ip.txt"
+          , printf "fipppx -A  -Icpu,call,hwm -tcsv -d out/prof-ip > out/output_prof_ip.csv"
+          , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-01 -o out/output_prof_1.csv"
+          , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-02 -o out/output_prof_2.csv"
+          , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-03 -o out/output_prof_3.csv"
+          , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-04 -o out/output_prof_4.csv"
+          , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-05 -o out/output_prof_5.csv"
+          , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-06 -o out/output_prof_6.csv"
+          , printf "fapppx -A  -l0 -tcsv -Hpa -d out/prof-07 -o out/output_prof_7.csv"
+          , printf "fapppx -A -Impi  -ttext -d out/prof-mpi -o out/output_prof_mpi.txt"
+          , printf "fapppx -A -Ihwm,nompi  -d out/prof-C -o out/output_prof_C.txt"
+          , printf "fapppx -A -Ihwm,nompi  -d out/prof-I -o out/output_prof_I.txt"
+          , printf "fapppx -A -Ihwm,nompi  -d out/prof-M -o out/output_prof_M.txt"
+          , printf "fapppx -A -Ihwm,nompi  -d out/prof-P -o out/output_prof_P.txt"
+          ]
       , unlines [ printf "fapppx -A -Ihwm,nompi  -d out/prof-X%d -o out/output_prof_X%d.txt" n n
                 | n <- extensionNSet]
       ]
