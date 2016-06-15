@@ -1,5 +1,9 @@
 {-# LANGUAGE ConstraintKinds, ImplicitParams, LambdaCase, MultiWayIf, OverloadedStrings, TemplateHaskell #-}
 
+out-procオプション等を設定したら、
+当該ファイルをステージアウトしなければならない。
+インキュベータにこれらの機能を組み込むべき
+
 module Main where
 
 import           Cases (snakify)
