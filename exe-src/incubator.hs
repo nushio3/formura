@@ -1,8 +1,5 @@
 {-# LANGUAGE ConstraintKinds, ImplicitParams, LambdaCase, MultiWayIf, OverloadedStrings, TemplateHaskell #-}
 
-out-procオプション等を設定したら、
-当該ファイルをステージアウトしなければならない。
-インキュベータにこれらの機能を組み込むべき
 
 module Main where
 
@@ -525,8 +522,10 @@ intPerturbers =
 
 main :: IO ()
 main = do
-  x <- doesFileExist qbConfigFilePath
+  putStrLn "out-procオプション等を設定したら、当該ファイルをステージアウトしなければならない。   インキュベータにこれらの機能を組み込むべき"
+{-x <- doesFileExist qbConfigFilePath
   if not x then mainInit else mainServer
+-}
 
 mainInit :: IO ()
 mainInit = do
