@@ -17,11 +17,8 @@ data TargetLanguage = MPICxx | MPIFortran
 
 targetLanguage :: WithCommandLineOption => TargetLanguage
 targetLanguage = case ?commandLineOption ^. outputFilename . extension of
-  "c" -> MPICxx
-  "cpp" -> MPICxx
-  "c++" -> MPICxx
-  "cxx" -> MPICxx
-  _     -> MPIFortran
+  ('f':_)     -> MPIFortran
+  _           -> MPICxx
 
 
 data WordF a = Raw T.Text
