@@ -1254,6 +1254,7 @@ genFortranFiles formuraProg mmProg0 = do
 
       writeAuxFile i con = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".f90"
+        putStrLn $ "writing to file: " ++ fn
         T.writeFile fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
         return fn
 

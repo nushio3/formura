@@ -78,6 +78,7 @@ codegen sugarcoated_prog = do
     mapM_ pprMMNode $ M.toList (mmProg ^. omStepGraph)
     putStrLn ""
 
+  putStrLn $ "Target language is:" ++ show targetLanguage
   case targetLanguage of
     MPICxx -> C.genCxxFiles prog mmProg
     MPIFortran -> F.genFortranFiles prog mmProg
