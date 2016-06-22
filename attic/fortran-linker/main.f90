@@ -1,6 +1,10 @@
 #include "parameter.h"
 program main
+  use library
+
   implicit none
+
+
 
   integer t
   call init()
