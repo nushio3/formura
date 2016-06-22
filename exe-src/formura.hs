@@ -26,7 +26,9 @@ import qualified Formura.Parser as P
 import           Formura.Desugar
 import           Formura.Compiler
 import           Formura.Syntax
+import           Formura.MPICxx.Language (TargetLanguage(..), targetLanguage)
 import qualified Formura.MPICxx.Translate as C
+import qualified Formura.MPIFortran.Translate as F
 
 main :: IO ()
 main = do
@@ -41,10 +43,10 @@ process fn = do
   mprog <- P.parseFromFileEx (P.runP $ P.program <* P.eof) fn
   case mprog of
       P.Failure doc -> Ppr.displayIO stdout $ Ppr.renderPretty 0.8 80 $ doc <> Ppr.linebreak
-      P.Success prog -> genMPICxx prog
+      P.Success prog -> codegen prog
 
-genMPICxx :: WithCommandLineOption => Program -> IO ()
-genMPICxx sugarcoated_prog = do
+codegen :: WithCommandLineOption => Program -> IO ()
+codegen sugarcoated_prog = do
   prog <- desugar sugarcoated_prog
 
   omProg <- genOMProgram prog
@@ -76,7 +78,9 @@ genMPICxx sugarcoated_prog = do
     mapM_ pprMMNode $ M.toList (mmProg ^. omStepGraph)
     putStrLn ""
 
-  C.genCxxFiles prog mmProg
+  case targetLanguage of
+    MPICxx -> C.genCxxFiles prog mmProg
+    MPIFortran -> F.genFortranFiles prog mmProg
 
 pprNode :: (OMNodeID, OMNode) -> IO ()
 pprNode (i,n) = do

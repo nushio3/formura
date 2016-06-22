@@ -63,6 +63,11 @@ cxxFilePath = case ?commandLineOption ^. outputFilename of
   "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".c"
   x  -> x
 
+fortranFilePath :: WithCommandLineOption => FilePath
+fortranFilePath = case ?commandLineOption ^. outputFilename of
+  "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ".fortran"
+  x  -> x
+
 cxxFileBodyPath :: WithCommandLineOption => FilePath
 cxxFileBodyPath = case ?commandLineOption ^. outputFilename of
   "" -> head (?commandLineOption ^. inputFilenames) & extension .~ ""
@@ -71,6 +76,9 @@ cxxFileBodyPath = case ?commandLineOption ^. outputFilename of
 
 hxxFilePath :: WithCommandLineOption => FilePath
 hxxFilePath = cxxFilePath & extension .~ ".h"
+
+fortranFileName :: WithCommandLineOption => FilePath
+fortranFileName = fortranFilePath ^. filename
 
 cxxFileName :: WithCommandLineOption => FilePath
 cxxFileName = cxxFilePath ^. filename

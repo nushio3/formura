@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, OverloadedStrings, TemplateHaskell, TypeSynonymInstances #-}
+{-# LANGUAGE DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, OverloadedStrings, TemplateHaskell, TypeSynonymInstances #-}
 
 module Formura.MPICxx.Language where
 import           Control.Lens
@@ -9,6 +9,20 @@ import           Data.String.ToString
 import qualified Data.Text as T
 import           Prelude hiding (show, Word, length)
 import qualified Prelude
+import           System.FilePath.Lens
+
+import           Formura.CommandLineOption
+
+data TargetLanguage = MPICxx | MPIFortran
+
+targetLanguage :: WithCommandLineOption => TargetLanguage
+targetLanguage = case ?commandLineOption ^. outputFilename . extension of
+  "c" -> MPICxx
+  "cpp" -> MPICxx
+  "c++" -> MPICxx
+  "cxx" -> MPICxx
+  _     -> MPIFortran
+
 
 data WordF a = Raw T.Text
              | Hole a
