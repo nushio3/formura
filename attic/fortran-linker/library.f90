@@ -1,11 +1,12 @@
 #include "parameter.h"
-program library
+module library
   implicit none
 
   double precision, dimension(NX,NY,NZ) :: u,v
   double precision, dimension(NX,NY,NZ) :: u_other,v_other
 
 contains
+
   subroutine init()
     integer x,y,z
     do z = 1, NZ
@@ -68,4 +69,4 @@ contains
     end do
 
   end subroutine proceed
-end program library
+end module library
