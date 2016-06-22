@@ -1,0 +1,27 @@
+dimension :: 3
+axes :: x, y, z
+
+ddx = fun(a) (a[i+1/2,j,k] - a[i-1/2,j,k])
+ddy = fun(a) (a[i,j+1/2,k] - a[i,j-1/2,k])
+ddz = fun(a) (a[i,j,k+1/2] - a[i,j,k-1/2])
+
+∂ = (ddx,ddy,ddz)
+
+Σ = fun (e) e(0) + e(1) + e(2)
+
+begin function init() returns (U,V)
+  double [] :: U = 0, V = 0
+end function
+
+begin function step(U,V) returns (U_next, V_next)
+  double :: Fu = 1/86400, Fv = 6/86400, Fe = 1/900, Du = 0.1*2.3e-9, Dv = 6.1e-11
+  double :: dt = 200, dx = 0.001
+
+  double [] ::  dU_dt, dV_dt
+
+  dU_dt = -Fe * U * V*V + Fu * (1-U) + Du/(dx*dx) * Σ fun(i) (∂ i . ∂ i) U
+  dV_dt =  Fe * U * V*V - Fv * V     + Dv/(dx*dx) * Σ fun(i) (∂ i . ∂ i) V
+
+  U_next = U + dt * dU_dt
+  V_next = V + dt * dV_dt
+end function
