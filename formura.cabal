@@ -48,6 +48,7 @@ library
                   Formura.MPICxx.Language
                   Formura.MPICxx.Cut
                   Formura.MPICxx.Translate
+                  Formura.MPIFortran.Translate
 
 
   -- other-modules:
