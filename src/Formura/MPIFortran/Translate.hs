@@ -1206,6 +1206,10 @@ joinSubroutines cprog0 = do
       auxSubroutineDefs :: M.Map FilePath C.Src
       auxSubroutineDefs = M.fromList [ (hc ^. _1, hc ^. _3) | hc <- subroutineCodes]
 
+writeFortranModule :: FilePath -> T.Text -> IO ()
+writeFortranModule fn con = do
+  let modName = T.pack $ fn^.basename
+  T.writeFile fn $ T.unlines ["module " <> modName, con, "end module " <> modName]
 
 genFortranFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
 genFortranFiles formuraProg mmProg0 = do
@@ -1242,7 +1246,7 @@ genFortranFiles formuraProg mmProg0 = do
   createDirectoryIfMissing True (cxxFilePath ^. directory)
 
   T.writeFile hxxFilePath $ C.toText hxxContent
-  T.writeFile cxxFilePath $ C.toText cxxContent
+  writeFortranModule cxxFilePath $ C.toText cxxContent
 
   let funcs = cluster [] $ M.elems auxFilesContent
       cluster :: [C.Src] -> [C.Src] -> [C.Src]
@@ -1255,7 +1259,7 @@ genFortranFiles formuraProg mmProg0 = do
       writeAuxFile i con = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".f90"
         putStrLn $ "writing to file: " ++ fn
-        T.writeFile fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
+        writeFortranModule fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
         return fn
 
   auxFilePaths <- zipWithM writeAuxFile [0..] funcs
@@ -1275,9 +1279,6 @@ genFortranFiles formuraProg mmProg0 = do
 cxxTemplate ::  WithCommandLineOption => C.Src
 cxxTemplate = C.unlines
   [ ""
-  , "#include <mpi.h>"
-  , "#include <math.h>"
-  , "#include <stdbool.h>"
   , "#include \"" <> fromString hxxFileName <> "\""
   , ""
   ]
