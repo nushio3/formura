@@ -995,6 +995,7 @@ tellProgram = do
         ]
 
   tellC $ "implicit none\n"
+  tellC $ "integer :: mpi_err\n"
 
   tsMPIPlanSelection .= False
   tellArrayDecls
@@ -1013,20 +1014,18 @@ tellProgram = do
         , let dmpi = rdg ^. ridgeDeltaMPI]
 
   -- how to define struct : http://www.nag-j.co.jp/fortran/FI_4.html#ExtendedTypes
-  tellHLn $ "struct Formura_Navigator {"
-  tellHLn $ "int time_step;"
+  tellCLn $ "type Formura_Navigator"
+  tellCLn $ "integer ::  time_step"
   forM_ ivars $ \i -> do
-    tellHLn $ "int lower_" <> i <> ";"
-    tellHLn $ "int upper_" <> i <> ";"
-    tellHLn $ "int offset_" <> i <> ";"
-  tellHLn $ "MPI_Comm mpi_comm;"
-  tellHLn $ "int mpi_my_rank;"
+    tellCLn $ "integer :: lower_" <> i <> ""
+    tellCLn $ "integer :: upper_" <> i <> ""
+    tellCLn $ "integer :: offset_" <> i <> ""
+  tellCLn $ "integer :: mpi_comm"
+  tellCLn $ "integer :: mpi_my_rank"
   forM_ deltaMPIs $ \r -> do
-    tellHLn $ "int " <> nameDeltaMPIRank r <> ";"
-  tellHLn $ "};"
+    tellCLn $ "integer :: " <> nameDeltaMPIRank r <> ""
+  tellCLn $ "end type Formura_Navigator"
 
-  tellH "extern struct Formura_Navigator navi;"
-  tellC "struct Formura_Navigator navi;"
 
   tellBoth "\n\n"
 
