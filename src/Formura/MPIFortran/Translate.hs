@@ -809,21 +809,21 @@ genMPISendRecvCode f = do
       dmpi = f ^. facetDeltaMPI
       mpiIsendIrecv :: C.Src
       mpiIsendIrecv = C.unwords $
-          [ "call mpi_irecv( (void*) &" <> facetNameRecv, ","
-          , "sizeof(struct " <> facetTypeName <>  ") ,"
+          [ "call mpi_irecv( " <> facetNameRecv, ","
+          , "sizeof(" <> facetNameRecv <>  ") ,"
           , "MPI_BYTE,"
-          , "navi->" <> nameDeltaMPIRank dmpi <> ","
+          , "navi%" <> nameDeltaMPIRank dmpi <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
-          , "navi->mpi_comm,"
-          , "&" <> reqName <> ",mpi_err )\n"]
+          , "navi%mpi_comm,"
+          , reqName <> ",mpi_err )\n"]
           ++
-          [ "call mpi_isend( (void*) &" <> facetNameSend, ","
-          , "sizeof(struct " <> facetTypeName <>  ") ,"
+          [ "call mpi_isend(" <> facetNameSend, ","
+          , "sizeof(" <> facetNameSend <>  ") ,"
           , "MPI_BYTE,"
-          , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
+          , "navi%" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
-          , "navi->mpi_comm,"
-          , "&" <> reqName <> ",mpi_err )\n"]
+          , "navi%mpi_comm,"
+          , reqName <> ",mpi_err )\n"]
   return mpiIsendIrecv
 
 genMPIWaitCode :: FacetID -> TranM C.Src
