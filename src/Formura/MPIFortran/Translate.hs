@@ -994,7 +994,7 @@ tellProgram = do
         , let nx = "N" <> (fromString $ map toUpper $ toString x)
         ]
 
-  tellC $ "implicit none"
+  tellC $ "implicit none\n"
 
   tsMPIPlanSelection .= False
   tellArrayDecls
