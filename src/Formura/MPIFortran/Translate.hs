@@ -119,6 +119,13 @@ tellBoth txt = tell $ CProgram txt txt  M.empty
 tellF :: (MonadWriter CProgram m) => FilePath -> C.Src -> m ()
 tellF fn txt = tell $ CProgram "" ""  (M.singleton fn txt)
 
+tellCBlock :: (MonadWriter CProgram m) => C.Src -> C.Src -> m () -> m ()
+tellCBlock btype bname con = do
+  tellCLn $ btype <> " " <> bname
+  con
+  tellCLn $ "end " <> btype <> " " <> bname
+
+
 tellHLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellHLn txt = tellH $ txt <> "\n"
 tellCLn :: (MonadWriter CProgram m) => C.Src -> m ()
@@ -1014,17 +1021,16 @@ tellProgram = do
         , let dmpi = rdg ^. ridgeDeltaMPI]
 
   -- how to define struct : http://www.nag-j.co.jp/fortran/FI_4.html#ExtendedTypes
-  tellCLn $ "type Formura_Navigator"
-  tellCLn $ "integer ::  time_step"
-  forM_ ivars $ \i -> do
-    tellCLn $ "integer :: lower_" <> i <> ""
-    tellCLn $ "integer :: upper_" <> i <> ""
-    tellCLn $ "integer :: offset_" <> i <> ""
-  tellCLn $ "integer :: mpi_comm"
-  tellCLn $ "integer :: mpi_my_rank"
-  forM_ deltaMPIs $ \r -> do
-    tellCLn $ "integer :: " <> nameDeltaMPIRank r <> ""
-  tellCLn $ "end type Formura_Navigator"
+  tellCBlock "type" "Formura_Navigator" $ do
+    tellCLn $ "integer ::  time_step"
+    forM_ ivars $ \i -> do
+      tellCLn $ "integer :: lower_" <> i <> ""
+      tellCLn $ "integer :: upper_" <> i <> ""
+      tellCLn $ "integer :: offset_" <> i <> ""
+    tellCLn $ "integer :: mpi_comm"
+    tellCLn $ "integer :: mpi_my_rank"
+    forM_ deltaMPIs $ \r -> do
+      tellCLn $ "integer :: " <> nameDeltaMPIRank r <> ""
 
 
   tellBoth "\n\n"
