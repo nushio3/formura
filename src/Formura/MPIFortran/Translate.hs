@@ -251,7 +251,7 @@ tellMPIRequestDecl name = do
     False -> do
       alreadyDeclaredResourceNames %= S.insert name
       tellH "extern "
-      tellBothLn $ "type (MPI_Request) ::  "<>name<>"\n"
+      tellBothLn $ "integer ::  "<>name<>"\n"
 tellResourceDecl :: C.Src -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl = tellResourceDecl' False
 
