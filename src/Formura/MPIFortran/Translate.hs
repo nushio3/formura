@@ -264,14 +264,14 @@ tellResourceDecl' isInClass name rsc box0 = do
       alreadyDeclaredResourceNames %= S.insert name
 
       typ <- elemTypeOfResource rsc
-      let szpt = foldMap (C.brackets . C.show) sz
+      let szpt = ("dimension"<>) $ C.parens $ C.intercalate "," $ map C.show $ toList sz
           sz = box0 ^.upperVertex - box0 ^. lowerVertex
 
       decl <- case typ of
         ElemType "void" -> return ""
-        ElemType "Rational" -> return $ "double " <> name <> szpt
-        ElemType x -> return $ fromString  x <> " " <> name <> szpt
-        _ -> raiseErr $ failed $ "Cannot translate type to C: " ++ show typ
+        ElemType "Rational" -> return $ "double precision, " <> szpt <> " :: " <>name
+        ElemType x -> return $ fromString  x <> " precision, " <> szpt <> " :: " <>name
+        _ -> raiseErr $ failed $ "Cannot translate type to Fortran: " ++ show typ
       when (decl /= "") $ do
 
         when isInClass $ do
