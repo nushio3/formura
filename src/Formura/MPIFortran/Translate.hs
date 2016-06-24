@@ -132,6 +132,15 @@ tellCBlockArg btype bname arg con = do
   tellCLn $ "end " <> btype <> " " <> bname
 
 
+fortranBlockArg :: C.Src -> C.Src -> C.Src -> C.Src -> C.Src
+fortranBlockArg btype bname arg con =
+  C.unlines [btype <> " " <> bname <> " " <> arg,
+             con,
+             "end " <> btype <> " " <> bname
+            ]
+
+
+
 tellHLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellHLn txt = tellH $ txt <> "\n"
 tellCLn :: (MonadWriter CProgram m) => C.Src -> m ()
@@ -800,21 +809,21 @@ genMPISendRecvCode f = do
       dmpi = f ^. facetDeltaMPI
       mpiIsendIrecv :: C.Src
       mpiIsendIrecv = C.unwords $
-          [ "MPI_Irecv( (void*) &" <> facetNameRecv, ","
+          [ "call mpi_irecv( (void*) &" <> facetNameRecv, ","
           , "sizeof(struct " <> facetTypeName <>  ") ,"
           , "MPI_BYTE,"
           , "navi->" <> nameDeltaMPIRank dmpi <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi->mpi_comm,"
-          , "&" <> reqName <> " );\n"]
+          , "&" <> reqName <> ",mpi_err )\n"]
           ++
-          [ "MPI_Isend( (void*) &" <> facetNameSend, ","
+          [ "call mpi_isend( (void*) &" <> facetNameSend, ","
           , "sizeof(struct " <> facetTypeName <>  ") ,"
           , "MPI_BYTE,"
           , "navi->" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi->mpi_comm,"
-          , "&" <> reqName <> " );\n"]
+          , "&" <> reqName <> ",mpi_err )\n"]
   return mpiIsendIrecv
 
 genMPIWaitCode :: FacetID -> TranM C.Src
@@ -824,7 +833,7 @@ genMPIWaitCode f = do
       dmpi = f ^. facetDeltaMPI
       mpiWait :: C.Src
       mpiWait = C.unwords $
-          ["MPI_Wait(&" <> reqName <>  ",MPI_STATUS_IGNORE);\n"]
+          ["call mpi_wait(" <> reqName <>  ",MPI_STATUS_IGNORE,mpi_err)\n"]
   return mpiWait
 
 
@@ -909,14 +918,12 @@ genDistributedProgram insts0 = do
         case isGenerateFunction of
           True -> do
             funName <- genFreeName "Formura_internal"
-            tellH $ "void "<> funName <> "();\n"
-            tellF (toString $  funName <> ".f90") $ C.unlines $
-              ["void "<> funName <> "(){"]
-              ++ (if "omp" `elem` ?ncOpts then ["#pragma omp parallel\n{"] else [])
+            tellF (toString $  funName <> ".f90") $
+              fortranBlockArg "subroutine"  funName "()" $ C.unlines $
+              (if "omp" `elem` ?ncOpts then ["#pragma omp parallel\n{"] else [])
               ++ body
               ++ (if "omp" `elem` ?ncOpts then ["}"] else [])
-              ++ ["}"]
-            return $ funName <> "();\n"
+            return $ "call " <> funName <> "()\n"
           False -> do
             return $ C.unlines $ body
 
@@ -1114,7 +1121,7 @@ tellProgram = do
     tellCLn $ "integer :: " <> timeStepVarName
     tellC $ C.unlines
       [ openTimeLoop
-      , C.unlines [cprogcon!!0,"/* HALFWAYS */" , cprogcon!!1]
+      , C.unlines [cprogcon!!0,"! HALFWAYS " , cprogcon!!1]
       , closeTimeLoop
       , "navi%time_step = navi%time_step + "  <> C.show monitorInterval2  <> ""
       , "\n"
