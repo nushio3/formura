@@ -251,7 +251,7 @@ tellMPIRequestDecl name = do
     False -> do
       alreadyDeclaredResourceNames %= S.insert name
       tellH "extern "
-      tellBothLn $ "MPI_Request "<>name<>";\n"
+      tellBothLn $ "type (MPI_Request) ::  "<>name<>"\n"
 tellResourceDecl :: C.Src -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl = tellResourceDecl' False
 
@@ -306,10 +306,11 @@ tellFacetDecl f rs = do
 
   tellH "};"
 
-  tellH $ "extern struct " <> name <> " " <> name <> "_Send;"
-  tellH $ "extern struct " <> name <> " " <> name <> "_Recv;"
-  tellC $ "struct " <> name <> " " <> name <> "_Send;"
-  tellC $ "struct " <> name <> " " <> name <> "_Recv;"
+  -- xxx: do not need these for fortran?
+  -- tellH $ "extern struct " <> name <> " " <> name <> "_Send;"
+  -- tellH $ "extern struct " <> name <> " " <> name <> "_Recv;"
+  -- tellC $ "struct " <> name <> " " <> name <> "_Send;"
+  -- tellC $ "struct " <> name <> " " <> name <> "_Recv;"
   return ()
 
 
@@ -1209,7 +1210,7 @@ joinSubroutines cprog0 = do
 writeFortranModule :: FilePath -> T.Text -> IO ()
 writeFortranModule fn con = do
   let modName = T.pack $ fn^.basename
-  T.writeFile fn $ T.unlines ["module " <> modName, con, "end module " <> modName]
+  T.writeFile fn $ T.unlines ["module " <> modName, "implicit none", con, "end module " <> modName]
 
 genFortranFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
 genFortranFiles formuraProg mmProg0 = do
