@@ -125,6 +125,12 @@ tellCBlock btype bname con = do
   con
   tellCLn $ "end " <> btype <> " " <> bname
 
+tellCBlockArg :: (MonadWriter CProgram m) => C.Src -> C.Src -> C.Src -> m () -> m ()
+tellCBlockArg btype bname arg con = do
+  tellCLn $ btype <> " " <> bname <> " " <> arg
+  con
+  tellCLn $ "end " <> btype <> " " <> bname
+
 
 tellHLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellHLn txt = tellH $ txt <> "\n"
@@ -1035,44 +1041,48 @@ tellProgram = do
 
   tellBoth "\n\n"
 
-  tellCLn $ "void Formura_decode_mpi_rank (int r" <> C.unwords[", int *i" <> x | x<-toList ivars] <>  "){"
-  tellCLn "int s=r;"
-  forM_ (zip (reverse $ toList ivars) (reverse $ toList mpiGrid0)) $ \(x, g) -> do
-    tellCLn $ "*i" <> x <> "=s%" <> C.show g <> ";"
-    tellCLn $ "s=s/" <> C.show g <> ";"
-  tellCLn "}"
+  tellCLn "contains"
 
-  tellCLn $ "int Formura_encode_mpi_rank (" <> C.intercalate "," [" int i" <> x | x<-toList ivars] <>  "){"
-  tellCLn "int s = 0;"
-  forM_ (zip (toList ivars) (toList mpiGrid0)) $ \(x, ig) -> do
-    let g=C.show ig
-    tellCLn $ "s *= " <>g<>";"
-    tellCLn $ "s += (i"<>x<>"%"<>g<>"+"<>g<>")%"<>g<>";"
-  tellCLn "return s;}"
-
-  tellBoth "int Formura_Init (struct Formura_Navigator *navi, MPI_Comm comm)"
-  tellH ";"
+  tellCBlockArg "subroutine" "Formura_decode_mpi_rank" ("(s" <> C.unwords[", i" <> x | x<-toList ivars] <>  ")") $ do
+    tellCLn $ C.unlines["integer :: i" <> x | x<-toList ivars]
+    tellCLn "integer :: s"
+    forM_ (zip (reverse $ toList ivars) (reverse $ toList mpiGrid0)) $ \(x, g) -> do
+      tellCLn $ "i" <> x <> "=mod(s," <> C.show g <> ")"
+      tellCLn $ "s=s/" <> C.show g
 
 
+  tellC "integer "
+  tellCBlockArg "function" "Formura_encode_mpi_rank" ("(" <> C.intercalate "," ["i" <> x | x<-toList ivars] <>  ")") $ do
+    tellCLn $ C.unlines["integer :: i" <> x | x<-toList ivars]
+    tellCLn "integer :: s"
+    tellCLn "s = 0"
+    forM_ (zip (toList ivars) (toList mpiGrid0)) $ \(x, ig) -> do
+      let g=C.show ig
+      tellCLn $ "s = s * " <>g<>""
+      tellCLn $ "s = s + mod((mod(i"<>x<>","<>g<>")+"<>g<>"),"<>g<>")"
+    tellCLn "Formura_encode_mpi_rank = s"
 
-  csb0 <- use tsCommonStaticBox
-  let mpiivars = fmap ("i"<>) ivars
-      lower_offset = negate $ csb0 ^.lowerVertex
-  tellCLn "{"
-  tellCLn $ "int " <> C.intercalate "," (toList mpiivars) <> ";"
-  tellCLn $ "navi->mpi_comm = comm;"
-  tellCLn $ "{int r; MPI_Comm_rank(comm,&r);navi->mpi_my_rank = r;}"
-  tellCLn $ "Formura_decode_mpi_rank( navi->mpi_my_rank" <> C.unwords [ ", &" <> x| x<- toList mpiivars]  <> ");"
-  forM_ deltaMPIs $ \r@(MPIRank rv) -> do
-    let terms = zipWith nPlusK (toList mpiivars) (toList rv)
-    tellC $ "navi->" <> nameDeltaMPIRank r <> "="
-    tellCLn $ "Formura_encode_mpi_rank( " <> C.intercalate "," terms  <> ");"
-  tellCLn "navi->time_step=0;"
-  forM_ (zip3 (toList ivars) (toList intraExtents) (toList lower_offset)) $ \(x, e, o) -> do
-    tellCLn $ "navi->offset_" <> x <> "=" <> "i"<> x <> "*"<>C.show e <> "-" <> C.show o <> ";"
-    tellCLn $ "navi->lower_" <> x <> "=" <> C.show o<>";"
-    tellCLn $ "navi->upper_" <> x <> "=" <> C.show o <> "+"<>C.show e <> ";"
-  tellCLn "return 0;}"
+  tellCBlockArg "subroutine" "Formura_Init" "(navi,comm)" $ do
+    tellCLn "type(Formura_Navigator) :: navi"
+    tellCLn "integer :: comm"
+
+
+    csb0 <- use tsCommonStaticBox
+    let mpiivars = fmap ("i"<>) ivars
+        lower_offset = negate $ csb0 ^.lowerVertex
+    tellCLn $ "integer ::  " <> C.intercalate "," (toList mpiivars)
+    tellCLn $ "navi%mpi_comm = comm"
+    tellCLn $ "MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
+    tellCLn $ "Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", &" <> x| x<- toList mpiivars]  <> ")"
+    forM_ deltaMPIs $ \r@(MPIRank rv) -> do
+      let terms = zipWith nPlusK (toList mpiivars) (toList rv)
+      tellC $ "navi%" <> nameDeltaMPIRank r <> "="
+      tellCLn $ "Formura_encode_mpi_rank( " <> C.intercalate "," terms  <> ")"
+    tellCLn "navi%time_step=0"
+    forM_ (zip3 (toList ivars) (toList intraExtents) (toList lower_offset)) $ \(x, e, o) -> do
+      tellCLn $ "navi%offset_" <> x <> "=" <> "i"<> x <> "*"<>C.show e <> "-" <> C.show o <> ""
+      tellCLn $ "navi%lower_" <> x <> "=" <> C.show o<>""
+      tellCLn $ "navi%upper_" <> x <> "=" <> C.show o <> "+"<>C.show e <> ""
 
 
 
@@ -1095,23 +1105,20 @@ tellProgram = do
     liftIO $ putStrLn "Warning : Monitor interval must be multiple of (2 * temporal blocking interval)"
   let monitorInterval2 = head $ filter (\x -> x`mod`(2*temporalBlockingInterval0)==0)[monitorInterval0 ..]
 
-  let openTimeLoop = "for(int " <> timeStepVarName <> "=0;" <>
-                     timeStepVarName <> "<"
-                     <> C.show (monitorInterval2`div`(2*temporalBlockingInterval0))
-                     <> ";" <> "++" <> timeStepVarName <>  "){"
-      closeTimeLoop = "}"
+  let openTimeLoop = "do " <> timeStepVarName <> "=0," <>
+         C.show (monitorInterval2`div`(2*temporalBlockingInterval0)-1)
+      closeTimeLoop = "end do"
 
-  tellBoth "int Formura_Forward (struct Formura_Navigator *navi)"
-  tellH ";"
-
-  tellC $ C.unlines
-    [ "{"
-    , openTimeLoop
-    , C.unlines [cprogcon!!0,"/* HALFWAYS */" , cprogcon!!1]
-    , closeTimeLoop
-    , "navi->time_step += "  <> C.show monitorInterval2  <> ";"
-    , "return 0;}"
-    ]
+  tellCBlockArg "subroutine" "Formura_Forward" "(navi)" $ do
+    tellCLn "type(Formura_Navigator) :: navi"
+    tellCLn $ "integer :: " <> timeStepVarName
+    tellC $ C.unlines
+      [ openTimeLoop
+      , C.unlines [cprogcon!!0,"/* HALFWAYS */" , cprogcon!!1]
+      , closeTimeLoop
+      , "navi%time_step = navi%time_step + "  <> C.show monitorInterval2  <> ""
+      , "\n"
+      ]
 
 
   tellH $ C.unlines
