@@ -994,6 +994,8 @@ tellProgram = do
         , let nx = "N" <> (fromString $ map toUpper $ toString x)
         ]
 
+  tellC $ "implicit none"
+
   tsMPIPlanSelection .= False
   tellArrayDecls
   srmap0 <- use planSharedResourceNames
@@ -1210,7 +1212,7 @@ joinSubroutines cprog0 = do
 writeFortranModule :: FilePath -> T.Text -> IO ()
 writeFortranModule fn con = do
   let modName = T.pack $ fn^.basename
-  T.writeFile fn $ T.unlines ["module " <> modName, "implicit none", con, "end module " <> modName]
+  T.writeFile fn $ T.unlines ["module " <> modName, con, "end module " <> modName]
 
 genFortranFiles :: WithCommandLineOption => Program -> MMProgram -> IO ()
 genFortranFiles formuraProg mmProg0 = do
