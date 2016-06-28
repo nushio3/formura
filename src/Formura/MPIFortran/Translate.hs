@@ -574,7 +574,7 @@ genMMInstruction ir0 mminst = do
               thisName <- genFreeLocalName "a"
               nodeIDtoLocalName %= M.insert nid0 thisName
               return $ (M.singleton thisName microTypDecl,) $ thisName <> "=" <> code
-                <> "/*"<> C.show (doesSpine nid0) <> "*/" <> ";\n"
+                <> "\n"
             False -> do
               nodeIDtoLocalName %= M.insert nid0 code
               return (M.empty, "")
