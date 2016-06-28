@@ -1291,9 +1291,10 @@ genFortranFiles formuraProg mmProg0 = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".f90"
             internalModuleHeader = C.unlines
               [ "use " <> (C.raw $ T.pack $ cxxFilePath ^. basename)
+              , tranState1 ^. tsCxxTemplateWithMacro
               , "contains"]
         putStrLn $ "writing to file: " ++ fn
-        writeFortranModule fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> internalModuleHeader<>con
+        writeFortranModule fn $ C.toText $ internalModuleHeader<>con
         return fn
 
   auxFilePaths <- zipWithM writeAuxFile [0..] funcs
