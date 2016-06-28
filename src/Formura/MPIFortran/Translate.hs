@@ -816,7 +816,7 @@ genMPISendRecvCode f = do
           [ "call mpi_irecv( " <> facetNameRecv, ","
 --          , "sizeof(" <> facetTypeName <>  ") ,"
           , "sizeof(" <> facetNameRecv <>  ") ,"
-          , "MPI_BYTE,"
+          , "MPI_DOUBLE_PRECISION,"
           , "navi%" <> nameDeltaMPIRank dmpi <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi%mpi_comm,"
@@ -825,7 +825,7 @@ genMPISendRecvCode f = do
           [ "call mpi_isend(" <> facetNameSend, ","
 --          , "sizeof(" <> facetTypeName <>  ") ,"
           , "sizeof(" <> facetNameSend <>  ") ,"
-          , "MPI_BYTE,"
+          , "MPI_DOUBLE_PRECISION,"
           , "navi%" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi%mpi_comm,"
@@ -1088,8 +1088,8 @@ tellProgram = do
         lower_offset = negate $ csb0 ^.lowerVertex
     tellCLn $ "integer ::  " <> C.intercalate "," (toList mpiivars)
     tellCLn $ "navi%mpi_comm = comm"
-    tellCLn $ "MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
-    tellCLn $ "Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", &" <> x| x<- toList mpiivars]  <> ")"
+    tellCLn $ "call MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
+    tellCLn $ "call Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", " <> x| x<- toList mpiivars]  <> ")"
     forM_ deltaMPIs $ \r@(MPIRank rv) -> do
       let terms = zipWith nPlusK (toList mpiivars) (toList rv)
       tellC $ "navi%" <> nameDeltaMPIRank r <> "="
@@ -1310,7 +1310,8 @@ genFortranFiles formuraProg mmProg0 = do
 cxxTemplate ::  WithCommandLineOption => C.Src
 cxxTemplate = C.unlines
   [ ""
-  , "#include \"" <> fromString hxxFileName <> "\""
+  --, "#include \"" <> fromString hxxFileName <> "\""
+  , "include \"mpif.h\""
   , ""
   ]
 
