@@ -1,14 +1,16 @@
-program main where
+program main
   use finalist
 
   implicit none
+  type(Formura_Navigator) :: navi
+  Formura_Init(navi, MPI_COMM_WORLD)
 
   call init()
 
 
 contains
   subroutine init()
-    print *, 42
+
   end subroutine init
 
 end program main
