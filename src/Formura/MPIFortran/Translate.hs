@@ -712,7 +712,7 @@ genComputation (ir0, nid0) destRsc0 = do
       (letBs,rhss) <- genMMInstruction ir0 mmInst
 
       let bodyExpr = C.unlines
-            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs <> ";"
+            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs
             | (rhs, c) <- rhss ]
           ivarExpr
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
