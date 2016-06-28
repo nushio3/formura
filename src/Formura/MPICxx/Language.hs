@@ -2,6 +2,7 @@
 
 module Formura.MPICxx.Language where
 import           Control.Lens
+import           Data.Foldable(toList)
 import           Data.List (intersperse)
 import           Data.Monoid
 import           Data.String
@@ -121,8 +122,8 @@ unlines = mconcat . map (<> "\n")
 intercalate :: Src -> [Src] -> Src
 intercalate x ys = mconcat $ intersperse x ys
 
-parensTuple :: [Src] -> Src
-parensTuple = parens . intercalate ","
+parensTuple :: Foldable t => t Src -> Src
+parensTuple = parens . intercalate "," . toList
 
 replace :: Src -> Src -> Src -> Src
 replace src dest (Src xs) = Src $ map go xs

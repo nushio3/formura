@@ -515,7 +515,7 @@ genMMInstruction ir0 mminst = do
     accAtMargin box0 vi = accAt (indOffset + vi - (box0 ^. lowerVertex))
 
     accAt :: Vec Int -> C.Src
-    accAt v = C.parensTuple $ toList $ nPlusK  <$> indNames <*> v
+    accAt v = C.parensTuple $ nPlusK  <$> indNames <*> v
 
 
   alreadyGivenLocalNames .= S.empty
@@ -713,7 +713,7 @@ genComputation (ir0, nid0) destRsc0 = do
       ((fortranBinds,letBs),rhss) <- genMMInstruction ir0 mmInst
 
       let bodyExpr = C.unlines
-            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs
+            [ lhsName2 <> C.parensTuple (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs
             | (rhs, c) <- rhss ]
           ivarExpr
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
@@ -783,8 +783,8 @@ genStagingCode isStaging rid = do
 
 
       rdgName = if isStaging then rdgNameSend else rdgNameRecv
-      rdgTerm = rdgName <> C.parensTuple (toList $ ivars)
-      arrTerm = arrName <> C.parensTuple (toList $ liftVec2 nPlusK ivars otherOffset)
+      rdgTerm = rdgName <> C.parensTuple ivars
+      arrTerm = arrName <> C.parensTuple (liftVec2 nPlusK ivars otherOffset)
 
       body
         | isStaging = rdgTerm <> "=" <> arrTerm
@@ -1291,7 +1291,7 @@ genFortranFiles formuraProg mmProg0 = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".f90"
             internalModuleHeader = C.unlines
               [ "use " <> (C.raw $ T.pack $ cxxFilePath ^. basename)
-              , tranState1 ^. tsCxxTemplateWithMacro
+              -- , tranState1 ^. tsCxxTemplateWithMacro
               , "contains"]
         putStrLn $ "writing to file: " ++ fn
         writeFortranModule fn $ C.toText $ internalModuleHeader<>con
