@@ -1012,6 +1012,7 @@ tellProgram = do
     ]
 
 
+  tellC $ "implicit none\n"
 
   tellH $ C.unlines ["#include <mpi.h>"]
   tellC $ cxxTemplateWithMacro
@@ -1023,7 +1024,6 @@ tellProgram = do
         , let nx = "N" <> (fromString $ map toUpper $ toString x)
         ]
 
-  tellC $ "implicit none\n"
   tellC $ "integer :: mpi_err\n"
 
   tsMPIPlanSelection .= False
