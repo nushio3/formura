@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, LambdaCase, MultiParamTypeClasses, OverloadedStrings, PackageImports, ScopedTypeVariables, TemplateHaskell #-}
+{-# LANGUAGE ConstraintKinds, DeriveFunctor, DeriveFoldable, DeriveTraversable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, ImplicitParams, LambdaCase, MultiParamTypeClasses, OverloadedStrings, PackageImports, ScopedTypeVariables, TemplateHaskell, TupleSections #-}
 
 module Formura.MPIFortran.Translate where
 
@@ -43,6 +43,8 @@ import qualified Formura.MPICxx.Language as C
 import           Formura.MPICxx.Cut hiding (cut)
 
 newtype VariableName = VariableName C.Src
+type FortranBinding = M.Map C.Src C.Src -- Mapping from variable name to type name
+
 
 
 -- | The struct for generating unique names, and holds already given names.
@@ -87,7 +89,6 @@ data TranState = TranState
   , _tsCxxTemplateWithMacro :: C.Src
   }
 makeClassy ''TranState
-
 
 instance HasCompilerSyntacticState TranState where
   compilerSyntacticState = tranSyntacticState
@@ -397,7 +398,7 @@ nameRidgeResource' isInClass r sr0  = do
             else do
     let Just f = M.lookup r fdict
     fname <- nameFacet f sr0
-    return $ fname <> "."
+    return $ fname <> "%"
 
   let (sr1, suffix) = (SendRecv, "")
 --   let (sr1, suffix) = case doesRidgeNeedMPI r of
@@ -665,12 +666,12 @@ mmFindTailIDs mminst = rets
 
 ompEveryLoopPragma :: (?ncOpts :: [String]) => Int -> C.Src
 ompEveryLoopPragma n
-  | "omp-collapse" `elem` ?ncOpts = "#pragma omp for collapse(" <> C.show n <> ")"
+  | "omp-collapse" `elem` ?ncOpts = "!$omp for collapse(" <> C.show n <> ")"
   | otherwise                 = ""
 
 -- | generate a formura function body.
 
-genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM C.Src
+genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM (FortranBinding, C.Src)
 genComputation (ir0, nid0) destRsc0 = do
   dim <- view dimension
   ivars <- use loopIndexNames
@@ -718,7 +719,7 @@ genComputation (ir0, nid0) destRsc0 = do
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
 
-      return $ C.potentialSubroutine $ C.unlines $
+      return $ (M.empty, ) $ C.potentialSubroutine $ C.unlines $
         [ompEveryLoopPragma $ dim-1] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
@@ -729,18 +730,18 @@ genComputation (ir0, nid0) destRsc0 = do
         Store n _ -> do
           lhsName <- nameArrayResource (ResourceStatic n ())
           genGrid True lhsName
-        _ -> return "// void"
+        _ -> return (M.empty, "// void")
     GridType _ typ -> do
       lhsName <- nameArrayResource (ResourceOMNode nid0 ir0)
       genGrid False (C.typedHole rscPtrTypename (C.toText lhsName))
 
     _ -> do
-      return $ fromString $  "// dunno how gen " ++ show mmInst
+      return (M.empty, fromString $  "// dunno how gen " ++ show mmInst)
 
 
 -- | generate a staging/unstaging code
 
-genStagingCode :: (?ncOpts :: [String]) => Bool -> RidgeID -> TranM C.Src
+genStagingCode :: (?ncOpts :: [String]) => Bool -> RidgeID -> TranM (FortranBinding, C.Src)
 genStagingCode isStaging rid = do
   dim <- view dimension
   ridgeDict <- use planRidgeAlloc
@@ -774,16 +775,16 @@ genStagingCode isStaging rid = do
 
   let openLoops =
         [ C.unwords
-          ["for (int ", i, "=", C.show l ,";", i,  "<", C.show h, ";++", i, "){"]
+          ["do", i, "=", C.show (l+1) ,",", C.show h]
         | (i,(l,h)) <- (toList ivars) `zip`
           zip (toList loopFroms) (toList loopTos)]
       closeLoops =
-        ["}" | _ <- toList ivars]
+        ["end do" | _ <- toList ivars]
 
 
       rdgName = if isStaging then rdgNameSend else rdgNameRecv
-      rdgTerm = rdgName <> foldMap C.brackets ivars
-      arrTerm = arrName  <> foldMap C.brackets (liftVec2 nPlusK ivars otherOffset)
+      rdgTerm = rdgName <> C.parensTuple (toList $ ivars)
+      arrTerm = arrName <> C.parensTuple (toList $ liftVec2 nPlusK ivars otherOffset)
 
       body
         | isStaging = rdgTerm <> "=" <> arrTerm
@@ -793,10 +794,12 @@ genStagingCode isStaging rid = do
   let pragma =
         if "collapse-ridge" `elem` ?ncOpts then ompEveryLoopPragma dim
         else ompEveryLoopPragma (dim -1)
-  return $ pragma <> "\n" <>
-    C.unlines openLoops <> body <> ";" <> C.unlines closeLoops
 
-genMPISendRecvCode :: FacetID -> TranM C.Src
+      fortranBinds = M.fromList [(i, "integer") |i <- toList ivars]
+  return $ (fortranBinds,) $ pragma <> "\n" <>
+    C.unlines openLoops <> body <> "\n" <> C.unlines closeLoops
+
+genMPISendRecvCode :: FacetID -> TranM (FortranBinding, C.Src)
 genMPISendRecvCode f = do
   reqName <- nameFacetRequest f
   facetNameSend <- nameFacet f Send
@@ -826,9 +829,9 @@ genMPISendRecvCode f = do
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi%mpi_comm,"
           , reqName <> ",mpi_err )\n"]
-  return mpiIsendIrecv
+  return (M.empty, mpiIsendIrecv)
 
-genMPIWaitCode :: FacetID -> TranM C.Src
+genMPIWaitCode :: FacetID -> TranM (FortranBinding, C.Src)
 genMPIWaitCode f = do
   reqName <- nameFacetRequest f
   let
@@ -836,7 +839,7 @@ genMPIWaitCode f = do
       mpiWait :: C.Src
       mpiWait = C.unwords $
           ["call mpi_wait(" <> reqName <>  ",MPI_STATUS_IGNORE,mpi_err)\n"]
-  return mpiWait
+  return (M.empty, mpiWait)
 
 
 -- | generate a distributed program
@@ -888,46 +891,49 @@ genDistributedProgram insts0 = do
         | otherwise  = reverse accum : grp [] (x:xs)
 
 
-      go2 :: DistributedInst -> TranM (DistributedInst, C.Src)
+      go2 :: DistributedInst -> TranM (DistributedInst, (FortranBinding, C.Src))
       go2 i = do
         j <- go i
         return (i,j)
 
-      剔算 = "knockout-computation"   `elem` ?ncOpts
-      剔通 = "knockout-communication" `elem` ?ncOpts
+      剔算 = knockout $ "knockout-computation"   `elem` ?ncOpts
+      剔通 = knockout $ "knockout-communication" `elem` ?ncOpts
 
-      knockout :: Bool -> TranM C.Src -> TranM C.Src
+      knockout :: Bool -> TranM (FortranBinding, C.Src) -> TranM (FortranBinding, C.Src)
       knockout flag m = do
         t <- m
-        return $ if flag then "" else t
+        return $ if flag then (M.empty, "") else t
 
-      go :: DistributedInst -> TranM C.Src
-      go (Computation cmp destRsc) = knockout 剔算 $ genComputation cmp destRsc
-      go (Unstage rid)             = knockout 剔算 $ genStagingCode False rid
-      go (Stage rid)               = knockout 剔算 $ genStagingCode True rid
-      go (FreeResource _)          = knockout 剔算 $ return ""
-      go (CommunicationSendRecv f) = knockout 剔通 $ genMPISendRecvCode f
-      go (CommunicationWait f)     = knockout 剔通 $ genMPIWaitCode f
+      go :: DistributedInst -> TranM (FortranBinding, C.Src)
+      go (Computation cmp destRsc) = 剔算 $ genComputation cmp destRsc
+      go (Unstage rid)             = 剔算 $ genStagingCode False rid
+      go (Stage rid)               = 剔算 $ genStagingCode True rid
+      go (FreeResource _)          = 剔算 $ return (M.empty, "")
+      go (CommunicationSendRecv f) = 剔通 $ genMPISendRecvCode f
+      go (CommunicationWait f)     = 剔通 $ genMPIWaitCode f
 
-      genCall :: [(DistributedInst, C.Src)] -> TranM C.Src
+      genCall :: [(DistributedInst, (FortranBinding, C.Src))] -> TranM C.Src
       genCall instPairs = do
-        let body = map snd instPairs
+        let body = map (snd. snd) instPairs
             isGenerateFunction = case map fst instPairs of
               [(CommunicationWait     _)] -> False
               [(CommunicationSendRecv _)] -> False
               _                           -> True
 
+            binds = [ t <> " :: " <> v
+              | (v,t) <- M.toList $ M.unions $ map (fst . snd) instPairs]
         case isGenerateFunction of
           True -> do
             funName <- genFreeName "Formura_internal"
             tellF (toString $  funName <> ".f90") $
               fortranBlockArg "subroutine"  funName "()" $ C.unlines $
-              (if "omp" `elem` ?ncOpts then ["#pragma omp parallel\n{"] else [])
+              (if "omp" `elem` ?ncOpts then ["!$omp parallel\n"] else [])
+              ++ binds
               ++ body
-              ++ (if "omp" `elem` ?ncOpts then ["}"] else [])
+              ++ (if "omp" `elem` ?ncOpts then ["!$omp end parallel\n"] else [])
             return $ "call " <> funName <> "()\n"
           False -> do
-            return $ C.unlines $ body
+            return $ C.unlines $ binds ++ body
 
 -- | Let the plans collaborate
 

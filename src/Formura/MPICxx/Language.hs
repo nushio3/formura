@@ -121,6 +121,9 @@ unlines = mconcat . map (<> "\n")
 intercalate :: Src -> [Src] -> Src
 intercalate x ys = mconcat $ intersperse x ys
 
+parensTuple :: [Src] -> Src
+parensTuple = parens . intercalate ","
+
 replace :: Src -> Src -> Src -> Src
 replace src dest (Src xs) = Src $ map go xs
   where
