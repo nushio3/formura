@@ -13,11 +13,11 @@ import           System.FilePath.Lens
 
 import           Formura.CommandLineOption
 
-data TargetLanguage = MPICxx | MPIFortran
+data TargetLanguage = MPICxx | MPIFortran deriving(Eq,Ord,Show,Read)
 
 targetLanguage :: WithCommandLineOption => TargetLanguage
 targetLanguage = case ?commandLineOption ^. outputFilename . extension of
-  ('f':_)     -> MPIFortran
+  ('.':'f':_)     -> MPIFortran
   _           -> MPICxx
 
 
@@ -120,6 +120,9 @@ unlines = mconcat . map (<> "\n")
 
 intercalate :: Src -> [Src] -> Src
 intercalate x ys = mconcat $ intersperse x ys
+
+parensTuple :: [Src] -> Src
+parensTuple = parens . intercalate ","
 
 replace :: Src -> Src -> Src -> Src
 replace src dest (Src xs) = Src $ map go xs
