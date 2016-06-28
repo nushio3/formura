@@ -115,29 +115,36 @@ tellH :: (MonadWriter CProgram m) => C.Src -> m ()
 tellH txt = tell $ CProgram txt "" M.empty
 tellC :: (MonadWriter CProgram m) => C.Src -> m ()
 tellC txt = tell $ CProgram "" txt M.empty
-tellBoth :: (MonadWriter CProgram m) => C.Src -> m ()
-tellBoth txt = tell $ CProgram txt txt  M.empty
 tellF :: (MonadWriter CProgram m) => FilePath -> C.Src -> m ()
 tellF fn txt = tell $ CProgram "" ""  (M.singleton fn txt)
+
+tellHBlock :: (MonadWriter CProgram m) => C.Src -> C.Src -> m () -> m ()
+tellHBlock btype bname con = do
+  tellHLn $ btype <> " " <> bname
+  con
+  tellHLn $ "end " <> btype <> " " <> bname
+  tellCLn ""
 
 tellCBlock :: (MonadWriter CProgram m) => C.Src -> C.Src -> m () -> m ()
 tellCBlock btype bname con = do
   tellCLn $ btype <> " " <> bname
   con
   tellCLn $ "end " <> btype <> " " <> bname
+  tellCLn ""
 
 tellCBlockArg :: (MonadWriter CProgram m) => C.Src -> C.Src -> C.Src -> m () -> m ()
 tellCBlockArg btype bname arg con = do
   tellCLn $ btype <> " " <> bname <> " " <> arg
   con
   tellCLn $ "end " <> btype <> " " <> bname
-
+  tellCLn ""
 
 fortranBlockArg :: C.Src -> C.Src -> C.Src -> C.Src -> C.Src
 fortranBlockArg btype bname arg con =
   C.unlines [btype <> " " <> bname <> " " <> arg,
              con,
-             "end " <> btype <> " " <> bname
+             "end " <> btype <> " " <> bname,
+             ""
             ]
 
 
@@ -146,8 +153,6 @@ tellHLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellHLn txt = tellH $ txt <> "\n"
 tellCLn :: (MonadWriter CProgram m) => C.Src -> m ()
 tellCLn txt = tellC $ txt <> "\n"
-tellBothLn :: (MonadWriter CProgram m) => C.Src -> m ()
-tellBothLn txt = tellBoth $ txt <> "\n"
 tellFLn :: (MonadWriter CProgram m) => FilePath -> C.Src -> m ()
 tellFLn fn txt = tellF fn $ txt <> "\n"
 
@@ -274,8 +279,7 @@ tellMPIRequestDecl name = do
     True -> return ()
     False -> do
       alreadyDeclaredResourceNames %= S.insert name
-      tellH "extern "
-      tellBothLn $ "integer ::  "<>name<>"\n"
+      tellHLn $ "integer ::  "<>name<>"\n"
 tellResourceDecl :: C.Src -> ResourceT a b -> Box -> TranM ()
 tellResourceDecl = tellResourceDecl' False
 
@@ -297,44 +301,24 @@ tellResourceDecl' isInClass name rsc box0 = do
         ElemType x -> return $ fromString  x <> " precision, " <> szpt <> " :: " <>name
         _ -> raiseErr $ failed $ "Cannot translate type to Fortran: " ++ show typ
       when (decl /= "") $ do
-
-        when isInClass $ do
-          tellH decl
-          tellHLn ";"
-        when (not isInClass) $ do
-          tellH "extern "
-          tellBoth decl
-          tellBothLn ";"
-
-
---       case rsc of
---         ResourceStatic _ _ -> do
---             tellH "extern "
---             tellBoth decl
---             tellBothLn ";"
---         _ -> do
---           when (decl /= "") $ tellCLn $ decl <> ";"
+        tellHLn decl
 
 
 tellFacetDecl :: FacetID -> [RidgeID] -> TranM ()
 tellFacetDecl f rs = do
   let name = fromString $ toCName f
-  tellH $ "struct " <> name <> "{"
+  tellHBlock "type" name $ do
 
-  ralloc <- use planRidgeAlloc
+    ralloc <- use planRidgeAlloc
 
-  forM_ rs $ \rk -> do
-    name <- nameRidgeResource' True rk SendRecv
-    let Just box0 = M.lookup rk ralloc
-    tellResourceDecl' True name (rk ^. ridgeDelta) box0
+    forM_ rs $ \rk -> do
+      name <- nameRidgeResource' True rk SendRecv
+      let Just box0 = M.lookup rk ralloc
+      tellResourceDecl' True name (rk ^. ridgeDelta) box0
 
-  tellH "};"
 
-  -- xxx: do not need these for fortran?
-  -- tellH $ "extern struct " <> name <> " " <> name <> "_Send;"
-  -- tellH $ "extern struct " <> name <> " " <> name <> "_Recv;"
-  -- tellC $ "struct " <> name <> " " <> name <> "_Send;"
-  -- tellC $ "struct " <> name <> " " <> name <> "_Recv;"
+  tellHLn $ "type(" <> name <> ") :: " <> name <> "_Send"
+  tellHLn $ "type(" <> name <> ") :: " <> name <> "_Recv"
   return ()
 
 
@@ -443,7 +427,6 @@ tellArrayDecls = do
   let szpt = foldMap (C.brackets . C.show) (drop 1 $ toList sz)
       sz = commonBox ^.upperVertex - commonBox ^. lowerVertex
 
-  tellHLn $ "typedef double " <> C.raw rscSfcTypename <> szpt <> ";"
   forM_ (M.toList aalloc) $ \(rsc, box0) -> do
     name <- nameArrayResource rsc
     let box1 = case rsc of
@@ -475,7 +458,7 @@ tellIntermediateVariables = do
       let typ = subFix $ node ^. nodeType
           Just (VariableName vname) = A.viewMaybe node
       decl <- genTypeDecl (toString vname) typ
-      when (decl /= "") $ tellCLn $ "static " <> decl <> ";"
+      when (decl /= "") $ tellCLn $ "static " <> decl <> "\n"
 
 -- | lookup node by its index
 lookupNode :: OMNodeID -> TranM MMNode
@@ -516,7 +499,7 @@ genMMInstruction ir0 mminst = do
     accAtMargin box0 vi = accAt (indOffset + vi - (box0 ^. lowerVertex))
 
     accAt :: Vec Int -> C.Src
-    accAt v = C.parensTuple $ toList $ nPlusK  <$> indNames <*> v
+    accAt v = C.parensTuple $ nPlusK  <$> indNames <*> v
 
 
   alreadyGivenLocalNames .= S.empty
@@ -714,7 +697,7 @@ genComputation (ir0, nid0) destRsc0 = do
       ((fortranBinds,letBs),rhss) <- genMMInstruction ir0 mmInst
 
       let bodyExpr = C.unlines
-            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs
+            [ lhsName2 <> C.parensTuple (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs
             | (rhs, c) <- rhss ]
           ivarExpr
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
@@ -784,8 +767,8 @@ genStagingCode isStaging rid = do
 
 
       rdgName = if isStaging then rdgNameSend else rdgNameRecv
-      rdgTerm = rdgName <> C.parensTuple (toList $ ivars)
-      arrTerm = arrName <> C.parensTuple (toList $ liftVec2 nPlusK ivars otherOffset)
+      rdgTerm = rdgName <> C.parensTuple ivars
+      arrTerm = arrName <> C.parensTuple (liftVec2 nPlusK ivars otherOffset)
 
       body
         | isStaging = rdgTerm <> "=" <> arrTerm
@@ -928,8 +911,8 @@ genDistributedProgram insts0 = do
             funName <- genFreeName "Formura_internal"
             tellF (toString $  funName <> ".f90") $
               fortranBlockArg "subroutine"  funName "()" $ C.unlines $
-              (if "omp" `elem` ?ncOpts then ["!$omp parallel\n"] else [])
-              ++ binds
+              binds
+              ++ (if "omp" `elem` ?ncOpts then ["!$omp parallel\n"] else [])
               ++ body
               ++ (if "omp" `elem` ?ncOpts then ["!$omp end parallel\n"] else [])
             return $ "call " <> funName <> "()\n"
@@ -1002,29 +985,18 @@ tellProgram = do
 
   collaboratePlans
 
+
+
+  tellH $ "implicit none\n"
+
+
+  tellH "\n\n"
   tellH $ C.unlines
-    [ ""
-    , "#pragma once"
-    , "#ifdef __cplusplus"
-    , "extern \"C\""
-    , "{"
-    , "#endif"
-    ]
-
-
-
-  tellH $ C.unlines ["#include <mpi.h>"]
-  tellC $ cxxTemplateWithMacro
-
-  tellBoth "\n\n"
-  tellH $ C.unlines
-        [ "#define " <> nx <> "  " <> C.show (i*g)
+        [ "integer, parameter :: " <> nx <> " = " <> C.show (i*g)
         | (x,i,g) <- zip3 (toList ivars) (toList intraExtents) (toList mpiGrid0)
         , let nx = "N" <> (fromString $ map toUpper $ toString x)
         ]
 
-  tellC $ "implicit none\n"
-  tellC $ "integer :: mpi_err\n"
 
   tsMPIPlanSelection .= False
   tellArrayDecls
@@ -1034,7 +1006,6 @@ tellProgram = do
   tellArrayDecls
 
 
-  tellBoth "\n"
 
   allRidges0 <- use planRidgeAlloc
   let deltaMPIs :: [MPIRank]
@@ -1043,19 +1014,21 @@ tellProgram = do
         , let dmpi = rdg ^. ridgeDeltaMPI]
 
   -- how to define struct : http://www.nag-j.co.jp/fortran/FI_4.html#ExtendedTypes
-  tellCBlock "type" "Formura_Navigator" $ do
-    tellCLn $ "integer ::  time_step"
+  tellHBlock "type" "Formura_Navigator" $ do
+    tellHLn $ "integer ::  time_step"
     forM_ ivars $ \i -> do
-      tellCLn $ "integer :: lower_" <> i <> ""
-      tellCLn $ "integer :: upper_" <> i <> ""
-      tellCLn $ "integer :: offset_" <> i <> ""
-    tellCLn $ "integer :: mpi_comm"
-    tellCLn $ "integer :: mpi_my_rank"
+      tellHLn $ "integer :: lower_" <> i <> ""
+      tellHLn $ "integer :: upper_" <> i <> ""
+      tellHLn $ "integer :: offset_" <> i <> ""
+    tellHLn $ "integer :: mpi_comm"
+    tellHLn $ "integer :: mpi_my_rank"
     forM_ deltaMPIs $ \r -> do
-      tellCLn $ "integer :: " <> nameDeltaMPIRank r <> ""
+      tellHLn $ "integer :: " <> nameDeltaMPIRank r <> ""
 
-
-  tellBoth "\n\n"
+  tellCLn $ "!INSERT_USE_INTERNAL_HERE"
+  tellCLn $ "implicit none"
+  tellCLn $ "include \"mpif.h\""
+  tellCLn $ "integer :: mpi_err"
 
   tellCLn "contains"
 
@@ -1088,8 +1061,8 @@ tellProgram = do
         lower_offset = negate $ csb0 ^.lowerVertex
     tellCLn $ "integer ::  " <> C.intercalate "," (toList mpiivars)
     tellCLn $ "navi%mpi_comm = comm"
-    tellCLn $ "MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
-    tellCLn $ "Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", &" <> x| x<- toList mpiivars]  <> ")"
+    tellCLn $ "call MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
+    tellCLn $ "call Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", " <> x| x<- toList mpiivars]  <> ")"
     forM_ deltaMPIs $ \r@(MPIRank rv) -> do
       let terms = zipWith nPlusK (toList mpiivars) (toList rv)
       tellC $ "navi%" <> nameDeltaMPIRank r <> "="
@@ -1102,7 +1075,7 @@ tellProgram = do
 
 
 
-  tellBoth "\n\n"
+  tellCLn "\n\n"
 
 
   cprogcon <- forM [False, True] $ \ mps -> do
@@ -1110,7 +1083,6 @@ tellProgram = do
     dProg <- use planDistributedProgram
     genDistributedProgram dProg
 
-  tellH $ "/*INSERT SUBROUTINES HERE*/\n"
 
   monitorInterval0 <- use ncMonitorInterval
   temporalBlockingInterval0 <- use ncTemporalBlockingInterval
@@ -1137,12 +1109,6 @@ tellProgram = do
       ]
 
 
-  tellH $ C.unlines
-    [ ""
-    , "#ifdef __cplusplus"
-    , "}"
-    , "#endif"
-    ]
 
 useSubroutineCalls :: WithCommandLineOption => M.Map C.Src String -> CProgram -> IO CProgram
 useSubroutineCalls subroutineMap cprog0 =
@@ -1276,8 +1242,6 @@ genFortranFiles formuraProg mmProg0 = do
 
   createDirectoryIfMissing True (cxxFilePath ^. directory)
 
-  T.writeFile hxxFilePath $ C.toText hxxContent
-  writeFortranModule cxxFilePath $ C.toText cxxContent
 
   let funcs = cluster [] $ M.elems auxFilesContent
       cluster :: [C.Src] -> [C.Src] -> [C.Src]
@@ -1287,30 +1251,45 @@ genFortranFiles formuraProg mmProg0 = do
         | ac /= "" && C.length (ac<>x) > 64000 = cluster ("":ac:acs)  (x:xs)
         | otherwise                            = cluster (ac <> x : acs) xs
 
+      writeAuxFile :: Int -> C.Src -> IO FilePath
       writeAuxFile i con = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".f90"
+            internalModuleHeader = C.unlines
+              [ "use " <> (C.raw $ T.pack $ (fortranHeaderFilePath ^. basename))
+              , "contains"]
         putStrLn $ "writing to file: " ++ fn
-        writeFortranModule fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
+        writeFortranModule fn $ C.toText $ internalModuleHeader<>con
         return fn
 
   auxFilePaths <- zipWithM writeAuxFile [0..] funcs
+
+  let insertUseInternals :: T.Text -> T.Text
+      insertUseInternals = T.replace "!INSERT_USE_INTERNAL_HERE" useInternals
+      useInternals = T.unlines
+        [ T.pack $ "use " <> (fn ^. basename)
+        | fn <- fortranHeaderFilePath : auxFilePaths]
+
+  writeFortranModule fortranHeaderFilePath $ C.toText hxxContent
+  writeFortranModule cxxFilePath $ insertUseInternals $ C.toText cxxContent
 
   let wait = ?commandLineOption ^. sleepAfterGen
   when (wait>0) $ threadDelay (1000000 * wait)
 
 
-  mapM_ indent ([hxxFilePath, cxxFilePath] ++ auxFilePaths)
+  mapM_ indent ([fortranHeaderFilePath, cxxFilePath] ++ auxFilePaths)
   where
     indent fn = X.handle ignore $ callProcess "./scripts/indent-fortran.sh" [fn]
 
     ignore :: X.SomeException -> IO ()
     ignore _ = return ()
 
+    fortranHeaderFilePath = cxxFilePath & basename %~ (<> "_header")
 
 cxxTemplate ::  WithCommandLineOption => C.Src
 cxxTemplate = C.unlines
   [ ""
-  , "#include \"" <> fromString hxxFileName <> "\""
+  --, "#include \"" <> fromString hxxFileName <> "\""
+  , "include \"mpif.h\""
   , ""
   ]
 
