@@ -240,7 +240,8 @@ setNamingState = do
 genTypeDecl :: IdentName -> TypeExpr -> TranM C.Src
 genTypeDecl name typ = case typ of
   ElemType "void" -> return ""
-  ElemType "Rational" -> return $ "double " <> fromString name
+  ElemType "Rational" -> return $ "double precision " <> fromString name
+  ElemType "double" -> return $ "double precision " <> fromString name
   ElemType x -> return $ fromString  x <> " " <> fromString name
   GridType _ x -> do
     body <- genTypeDecl name x
@@ -498,7 +499,7 @@ nPlusK i d = i <> "+" <> C.parens (C.parameter "int" d)
 
 -- | generate bindings, and the final expression that contains the result of evaluation.
 
-genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM (C.Src, [(C.Src,Vec Int)])
+genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM ((FortranBinding, C.Src), [(C.Src,Vec Int)])
 genMMInstruction ir0 mminst = do
   axvars <- fmap fromString <$> view axesNames
 
@@ -515,7 +516,7 @@ genMMInstruction ir0 mminst = do
     accAtMargin box0 vi = accAt (indOffset + vi - (box0 ^. lowerVertex))
 
     accAt :: Vec Int -> C.Src
-    accAt v = foldMap C.brackets $ nPlusK  <$> indNames <*> v
+    accAt v = C.parensTuple $ toList $ nPlusK  <$> indNames <*> v
 
 
   alreadyGivenLocalNames .= S.empty
@@ -566,17 +567,17 @@ genMMInstruction ir0 mminst = do
 
   txts <- forM orderedMMInst $ \(nid0, Node inst microTyp _) -> do
     microTypDecl <- genTypeDecl "" (subFix microTyp)
-    let thisEq :: C.Src -> TranM C.Src
+    let thisEq :: C.Src -> TranM (FortranBinding, C.Src)
         thisEq code =
           case doesBind nid0 of
             True ->  do
               thisName <- genFreeLocalName "a"
               nodeIDtoLocalName %= M.insert nid0 thisName
-              return $ microTypDecl <> " " <> thisName <> "=" <> code
+              return $ (M.singleton thisName microTypDecl,) $ thisName <> "=" <> code
                 <> "/*"<> C.show (doesSpine nid0) <> "*/" <> ";\n"
             False -> do
               nodeIDtoLocalName %= M.insert nid0 code
-              return ""
+              return (M.empty, "")
 
         query :: MMNodeID -> TranM C.Src
         query nid1 = do
@@ -646,7 +647,7 @@ genMMInstruction ir0 mminst = do
                  | (i,c) <- mmFindTailIDs mminst
                  , tailName <- maybeToList $ M.lookup i nmap]
 
-  return $ (C.unwords txts, retPairs)
+  return $ ((M.unions $ map fst txts,  C.unwords $ map snd txts), retPairs)
 
 
 mmFindTailIDs :: MMInstruction -> [(MMNodeID, Vec Int)]
@@ -710,7 +711,7 @@ genComputation (ir0, nid0) destRsc0 = do
           closeLoops =
             ["end do" | _ <- toList ivars]
 
-      (letBs,rhss) <- genMMInstruction ir0 mmInst
+      ((fortranBinds,letBs),rhss) <- genMMInstruction ir0 mmInst
 
       let bodyExpr = C.unlines
             [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs
@@ -719,7 +720,7 @@ genComputation (ir0, nid0) destRsc0 = do
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
 
-      return $ (M.empty, ) $ C.potentialSubroutine $ C.unlines $
+      return $ (fortranBinds, ) $ C.potentialSubroutine $ C.unlines $
         [ompEveryLoopPragma $ dim-1] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
