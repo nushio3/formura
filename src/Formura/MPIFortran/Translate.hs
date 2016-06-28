@@ -297,14 +297,14 @@ tellResourceDecl' isInClass name rsc box0 = do
         ElemType x -> return $ fromString  x <> " precision, " <> szpt <> " :: " <>name
         _ -> raiseErr $ failed $ "Cannot translate type to Fortran: " ++ show typ
       when (decl /= "") $ do
-
-        when isInClass $ do
-          tellH decl
-          tellHLn ";"
-        when (not isInClass) $ do
-          tellH "extern "
-          tellBoth decl
-          tellBothLn ";"
+        tellCLn decl
+--        when isInClass $ do
+--          tellH decl
+--          tellHLn ";"
+--        when (not isInClass) $ do
+--          tellH "extern "
+--          tellBoth decl
+--          tellBothLn ";"
 
 
 --       case rsc of
@@ -319,22 +319,21 @@ tellResourceDecl' isInClass name rsc box0 = do
 tellFacetDecl :: FacetID -> [RidgeID] -> TranM ()
 tellFacetDecl f rs = do
   let name = fromString $ toCName f
-  tellH $ "struct " <> name <> "{"
+  tellCBlock "type" name $ do
 
-  ralloc <- use planRidgeAlloc
+    ralloc <- use planRidgeAlloc
 
-  forM_ rs $ \rk -> do
-    name <- nameRidgeResource' True rk SendRecv
-    let Just box0 = M.lookup rk ralloc
-    tellResourceDecl' True name (rk ^. ridgeDelta) box0
+    forM_ rs $ \rk -> do
+      name <- nameRidgeResource' True rk SendRecv
+      let Just box0 = M.lookup rk ralloc
+      tellResourceDecl' True name (rk ^. ridgeDelta) box0
 
-  tellH "};"
 
   -- xxx: do not need these for fortran?
   -- tellH $ "extern struct " <> name <> " " <> name <> "_Send;"
   -- tellH $ "extern struct " <> name <> " " <> name <> "_Recv;"
-  -- tellC $ "struct " <> name <> " " <> name <> "_Send;"
-  -- tellC $ "struct " <> name <> " " <> name <> "_Recv;"
+  tellCLn $ "type(" <> name <> ") :: " <> name <> "_Send"
+  tellCLn $ "type(" <> name <> ") :: " <> name <> "_Recv"
   return ()
 
 
@@ -816,7 +815,7 @@ genMPISendRecvCode f = do
           [ "call mpi_irecv( " <> facetNameRecv, ","
 --          , "sizeof(" <> facetTypeName <>  ") ,"
           , "sizeof(" <> facetNameRecv <>  ") ,"
-          , "MPI_DOUBLE_PRECISION,"
+          , "MPI_BYTE,"
           , "navi%" <> nameDeltaMPIRank dmpi <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi%mpi_comm,"
@@ -825,7 +824,7 @@ genMPISendRecvCode f = do
           [ "call mpi_isend(" <> facetNameSend, ","
 --          , "sizeof(" <> facetTypeName <>  ") ,"
           , "sizeof(" <> facetNameSend <>  ") ,"
-          , "MPI_DOUBLE_PRECISION,"
+          , "MPI_BYTE,"
           , "navi%" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi%mpi_comm,"
@@ -928,8 +927,8 @@ genDistributedProgram insts0 = do
             funName <- genFreeName "Formura_internal"
             tellF (toString $  funName <> ".f90") $
               fortranBlockArg "subroutine"  funName "()" $ C.unlines $
-              (if "omp" `elem` ?ncOpts then ["!$omp parallel\n"] else [])
-              ++ binds
+              binds
+              ++ (if "omp" `elem` ?ncOpts then ["!$omp parallel\n"] else [])
               ++ body
               ++ (if "omp" `elem` ?ncOpts then ["!$omp end parallel\n"] else [])
             return $ "call " <> funName <> "()\n"
@@ -1287,10 +1286,14 @@ genFortranFiles formuraProg mmProg0 = do
         | ac /= "" && C.length (ac<>x) > 64000 = cluster ("":ac:acs)  (x:xs)
         | otherwise                            = cluster (ac <> x : acs) xs
 
+      writeAuxFile :: Int -> C.Src -> IO FilePath
       writeAuxFile i con = do
         let fn = cxxFileBodyPath ++ "_internal_" ++ show i ++ ".f90"
+            internalModuleHeader = C.unlines
+              [ "use " <> (C.raw $ T.pack $ cxxFilePath ^. basename)
+              , "contains"]
         putStrLn $ "writing to file: " ++ fn
-        writeFortranModule fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> con
+        writeFortranModule fn $ C.toText $ (tranState1 ^. tsCxxTemplateWithMacro) <> internalModuleHeader<>con
         return fn
 
   auxFilePaths <- zipWithM writeAuxFile [0..] funcs
