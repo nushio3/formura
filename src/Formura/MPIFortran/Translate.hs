@@ -704,15 +704,15 @@ genComputation (ir0, nid0) destRsc0 = do
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
             [ C.unwords
-              ["for (int ", i, "=", C.parameter "int" l ,";", i,  "<", C.parameter "int" h, ";", i, "+=", C.show s ,"){"]
+              ["do ", i, "=", C.parameter "int" (l+1) ,",", C.parameter "int" h, ",", C.show s ,"\n"]
             | (i,s,l,h) <- zip4 (toList ivars) gridStride (toList loopFroms) (toList loopTos)]
           closeLoops =
-            ["}" | _ <- toList ivars]
+            ["end do" | _ <- toList ivars]
 
       (letBs,rhss) <- genMMInstruction ir0 mmInst
 
       let bodyExpr = C.unlines
-            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs <> ";"
+            [ lhsName2 <> foldMap C.brackets (nPlusK <$> ivarExpr <*> c) <> "=" <> rhs
             | (rhs, c) <- rhss ]
           ivarExpr
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
@@ -810,7 +810,8 @@ genMPISendRecvCode f = do
       mpiIsendIrecv :: C.Src
       mpiIsendIrecv = C.unwords $
           [ "call mpi_irecv( " <> facetNameRecv, ","
-          , "sizeof(" <> facetTypeName <>  ") ,"
+--          , "sizeof(" <> facetTypeName <>  ") ,"
+          , "sizeof(" <> facetNameRecv <>  ") ,"
           , "MPI_BYTE,"
           , "navi%" <> nameDeltaMPIRank dmpi <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
@@ -818,7 +819,8 @@ genMPISendRecvCode f = do
           , reqName <> ",mpi_err )\n"]
           ++
           [ "call mpi_isend(" <> facetNameSend, ","
-          , "sizeof(" <> facetTypeName <>  ") ,"
+--          , "sizeof(" <> facetTypeName <>  ") ,"
+          , "sizeof(" <> facetNameSend <>  ") ,"
           , "MPI_BYTE,"
           , "navi%" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
