@@ -1,6 +1,6 @@
 #!/bin/sh -x
-#PJM --rsc-list "node=1x1x1"
-#PJM --mpi "shape=1x1x1"
+#PJM --rsc-list "node=2x2x2"
+#PJM --mpi "shape=2x2x2"
 
 #time limit
 #PJM --name "Bfinalist-test"
@@ -38,8 +38,7 @@ export PATH=/opt/FJSVtclang/GM-1.2.0-20/bin:$PATH
 export LD_LIBRARY_PATH=/opt/FJSVtclang/GM-1.2.0-20/lib64:$LD_LIBRARY_PATH
 mpiexec /work/system/bin/msh "mkdir -p ./out"
 
-#mpiexec -n 1 -ofout-proc=out -oferr-proc=err ./a.out 
-mpiexec -n 1 -ofout-proc out -oferr-proc err ./a.out 
+mpiexec -n 8 -ofout-proc out -oferr-proc err ./a.out 
 
 
 
