@@ -4,7 +4,7 @@ program main
 
   implicit none
   type(Formura_Navigator) :: navi
-  integer :: seedsize, mpi_my_rank
+  integer :: seedsize
   integer,allocatable:: seed(:)
 
 
@@ -27,6 +27,7 @@ program main
 
   call init(navi)
 
+  call write_global_monitor(navi)
 
   call mpi_finalize(mpi_err)
 contains
@@ -66,9 +67,24 @@ contains
 
   subroutine write_global_monitor(navi)
     type(Formura_Navigator) :: navi
+    integer :: ix,iy,iz
+
     print *, "global monitor"
-    if (navi%offset_x + navi%lower_x == 0) then
+    print *, navi%offset_x + navi%lower_x
+    print *, navi%offset_y + navi%lower_y
+    print *, navi%offset_z + navi%lower_z
+    print *, navi%upper_x - navi%lower_x
+    print *, navi%upper_y - navi%lower_y
+    print *, navi%upper_z - navi%lower_z
+
+    if (navi%offset_z + navi%lower_z == 0) then
        print *, "global monitor output"
+       iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2
+       do iy = navi%lower_y+1, navi%upper_y
+          do ix = navi%lower_x+1, navi%upper_x
+             print *, U(ix,iy,iz), V(ix,iy,iz)
+          end do
+       end do
     end if
   end subroutine write_global_monitor
 
