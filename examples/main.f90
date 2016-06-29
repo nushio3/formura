@@ -22,6 +22,8 @@ program main
 
   call init(navi)
 
+  call write_global_monitor(navi)
+
   call Formura_Forward(navi)
 
   call write_global_monitor(navi)
