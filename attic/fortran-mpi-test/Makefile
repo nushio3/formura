@@ -1,13 +1,13 @@
 all: a.out
 FC=mpifrtpx -Cpp -Kfast,parallel  -Kopenmp -Koptmsg=2 -Kreduction -Ksimd=2 -O3
-OBJS=./main.o
+OBJS=./lib.o ./main.o
 a.out: $(OBJS)
 	$(FC) $(OBJS) -o a.out
 ./main.o: ./main.f90
-	$(FC) -c $^ -o $@ 2> $@.optmsg
+	$(FC) -c $^ -o $@ 
 
-# ./finalist.o: ./finalist.f90
-# 	$(FC) -c $^ -o $@ 2> $@.optmsg
+./lib.o: ./lib.f90
+	$(FC) -c $^ -o $@ 
 # 
 # ./finalist_header.o: ./finalist_header.f90
 # 	$(FC) -c $^ -o $@ 2> $@.optmsg

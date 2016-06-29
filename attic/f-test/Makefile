@@ -1,5 +1,6 @@
 all: a.out
-FC=mpifrtpx -Cpp -Kfast,parallel  -Kopenmp -Koptmsg=2 -Kreduction -Ksimd=2 -O3
+#FC=mpifrtpx -Cpp -Kfast,parallel  -Kopenmp -Koptmsg=2 -Kreduction -Ksimd=2 -O3
+FC=mpifrtpx -g
 OBJS=./finalist_header.o ./finalist_internal_0.o ./finalist_internal_1.o  ./finalist.o ./main.o 
 a.out: $(OBJS)
 	$(FC) $(OBJS) -o a.out
