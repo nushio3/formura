@@ -20,12 +20,9 @@ program main
   seed(1) = navi%mpi_my_rank       ! シードを摂動
   call random_seed(put=seed)       ! シードを格納
 
-
-  print *, "time step = ", navi%time_step
-  print *, "lower x = ", navi%lower_x
-  print *, "upper x = ", navi%upper_x
-
   call init(navi)
+
+  call Formura_Forward(navi)
 
   call write_global_monitor(navi)
 
