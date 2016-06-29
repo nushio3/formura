@@ -10,8 +10,8 @@ program main
      Iriguchi%U(i) = i*(i+1)
   end do
   
-  call mpi_irecv(Deguchi , 42*16, MPI_BYTE, 0, 0, mpi_comm_world, req_recv ,mpi_err)
-  call mpi_isend(Iriguchi, 42*16, MPI_BYTE, 0, 0, mpi_comm_world, req_send ,mpi_err)
+  call mpi_irecv(Deguchi , sizeof(Deguchi), MPI_BYTE, 0, 0, mpi_comm_world, req_recv ,mpi_err)
+  call mpi_isend(Iriguchi, sizeof(Iriguchi), MPI_BYTE, 0, 0, mpi_comm_world, req_send ,mpi_err)
   call mpi_wait(req_recv, mpi_status_ignore,mpi_err)
 
   do i = 1, 42
