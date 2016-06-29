@@ -37,6 +37,7 @@ contains
     do iz = navi%lower_z+1, navi%upper_z
        do iy = navi%lower_y+1, navi%upper_y
           do ix = navi%lower_x+1, navi%upper_x
+             print *,"init at:",ix,iy,iz
              U(ix,iy,iz) = 1.0
              V(ix,iy,iz) = 0.0
           end do

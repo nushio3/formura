@@ -797,9 +797,9 @@ genMPISendRecvCode f = do
       mpiIsendIrecv :: C.Src
       mpiIsendIrecv = C.unwords $
           [ "mpi_sizeof_value = " <> "sizeof(" <> facetNameRecv <>  ") \n"
-          , "mpi_comm_value = navi%mpi_comm"
-          , "mpi_src_value = "  <> "navi%" <> nameDeltaMPIRank dmpi
-          , "mpi_dest_value = " <> "navi%" <> nameDeltaMPIRank (negate dmpi)
+          , "mpi_comm_value = navi%mpi_comm\n"
+          , "mpi_src_value = "  <> "navi%" <> nameDeltaMPIRank dmpi <> "\n"
+          , "mpi_dest_value = " <> "navi%" <> nameDeltaMPIRank (negate dmpi) <> "\n"
             ] ++
           [ "call mpi_irecv( " <> facetNameRecv, ","
           , "mpi_sizeof_value,"
