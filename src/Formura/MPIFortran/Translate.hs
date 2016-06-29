@@ -687,7 +687,7 @@ genComputation (ir0, nid0) destRsc0 = do
       gridStride = [nbux, nbuy, 1]
   let
     genGrid useSystemOffset lhsName2 = do
-      let openLoops =
+      let openLoops = reverse $
             [ C.unwords
               ["do ", i, "=", C.parameter "int" (l+1) ,",", C.parameter "int" h, ",", C.show s ,"\n"]
             | (i,s,l,h) <- zip4 (toList ivars) gridStride (toList loopFroms) (toList loopTos)]
@@ -757,7 +757,7 @@ genStagingCode isStaging rid = do
       otherOffset = offset - box1^.lowerVertex
         - (if isStaging then  mpivec * intraShape else 0)
 
-  let openLoops =
+  let openLoops = reverse $
         [ C.unwords
           ["do", i, "=", C.show (l+1) ,",", C.show h]
         | (i,(l,h)) <- (toList ivars) `zip`
