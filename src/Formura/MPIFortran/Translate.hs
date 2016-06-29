@@ -797,20 +797,24 @@ genMPISendRecvCode f = do
       mpiIsendIrecv :: C.Src
       mpiIsendIrecv = C.unwords $
           [ "mpi_sizeof_value = " <> "sizeof(" <> facetNameRecv <>  ") \n"
-          , "call mpi_irecv( " <> facetNameRecv, ","
+          , "mpi_comm_value = navi%mpi_comm"
+          , "mpi_src_value = "  <> "navi%" <> nameDeltaMPIRank dmpi
+          , "mpi_dest_value = " <> "navi%" <> nameDeltaMPIRank (negate dmpi)
+            ] ++
+          [ "call mpi_irecv( " <> facetNameRecv, ","
           , "mpi_sizeof_value,"
           , "MPI_BYTE,"
-          , "navi%" <> nameDeltaMPIRank dmpi <> ","
+          , "mpi_src_value,"
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
-          , "navi%mpi_comm,"
+          , "mpi_comm_value,"
           , reqName <> ",mpi_err )\n"]
           ++
           [ "call mpi_isend(" <> facetNameSend, ","
           , "mpi_sizeof_value,"
           , "MPI_BYTE,"
-          , "navi%" <> nameDeltaMPIRank (negate dmpi) <> ","
+          , "mpi_dest_value,"
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
-          , "navi%mpi_comm,"
+          , "mpi_comm_value,"
           , "req_send_iranai, mpi_err )\n"]
   return (M.empty, mpiIsendIrecv)
 
@@ -1027,7 +1031,9 @@ tellProgram = do
   tellCLn $ "!INSERT_USE_INTERNAL_HERE"
   tellCLn $ "implicit none"
   tellCLn $ "include \"mpif.h\""
-  tellCLn $ "integer :: mpi_err, mpi_sizeof_value, req_send_iranai"
+  tellCLn $ "integer :: mpi_err, req_send_iranai"
+  tellCLn $ "integer :: mpi_sizeof_value, mpi_comm_value"
+  tellCLn $ "integer :: mpi_src_value, mpi_dest_value"
 
   tellCLn "contains"
 
