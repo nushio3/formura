@@ -796,9 +796,9 @@ genMPISendRecvCode f = do
       dmpi = f ^. facetDeltaMPI
       mpiIsendIrecv :: C.Src
       mpiIsendIrecv = C.unwords $
-          [ "call mpi_irecv( " <> facetNameRecv, ","
---          , "sizeof(" <> facetTypeName <>  ") ,"
-          , "sizeof(" <> facetNameRecv <>  ") ,"
+          [ "mpi_sizeof_value = " <> "sizeof(" <> facetNameRecv <>  ") \n"
+          , "call mpi_irecv( " <> facetNameRecv, ","
+          , "mpi_sizeof_value,"
           , "MPI_BYTE,"
           , "navi%" <> nameDeltaMPIRank dmpi <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
@@ -806,13 +806,12 @@ genMPISendRecvCode f = do
           , reqName <> ",mpi_err )\n"]
           ++
           [ "call mpi_isend(" <> facetNameSend, ","
---          , "sizeof(" <> facetTypeName <>  ") ,"
-          , "sizeof(" <> facetNameSend <>  ") ,"
+          , "mpi_sizeof_value,"
           , "MPI_BYTE,"
           , "navi%" <> nameDeltaMPIRank (negate dmpi) <> ","
           , let Just t = M.lookup f mpiTagDict in C.show t, ","
           , "navi%mpi_comm,"
-          , reqName <> ",mpi_err )\n"]
+          , "req_send_iranai, mpi_err )\n"]
   return (M.empty, mpiIsendIrecv)
 
 genMPIWaitCode :: FacetID -> TranM (FortranBinding, C.Src)
@@ -1028,7 +1027,7 @@ tellProgram = do
   tellCLn $ "!INSERT_USE_INTERNAL_HERE"
   tellCLn $ "implicit none"
   tellCLn $ "include \"mpif.h\""
-  tellCLn $ "integer :: mpi_err"
+  tellCLn $ "integer :: mpi_err, mpi_sizeof_value, req_send_iranai"
 
   tellCLn "contains"
 
