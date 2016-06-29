@@ -4,7 +4,7 @@ OBJS=./main.o
 a.out: $(OBJS)
 	$(FC) $(OBJS) -o a.out
 ./main.o: ./main.f90
-	$(FC) -c $^ -o $@ 2> $@.optmsg
+	$(FC) -c $^ -o $@ 
 
 # ./finalist.o: ./finalist.f90
 # 	$(FC) -c $^ -o $@ 2> $@.optmsg
