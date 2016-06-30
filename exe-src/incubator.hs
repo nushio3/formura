@@ -77,7 +77,7 @@ qbDefaultConfig = QBConfig
   { _qbHostName = "K"
   , _qbWorkDir = ".qb/"
   , _qbLabNotePath = "/home/nushio/hub/3d-mhd/individuals"
-  , _qbRemoteLabNotePath = "/volume81/data/ra000008/nushio/individuals"}
+  , _qbRemoteLabNotePath = "/volume73/data/ra000008/nushio/individuals"}
 
 type WithQBConfig = ?qbc :: QBConfig
 
@@ -101,15 +101,15 @@ $(deriveJSON (let toSnake = T.packed %~ snakify in
 
 defaultIndividual :: Individual
 defaultIndividual = Individual
-  { _idvFormuraVersion = "2f8eb9c50669914e17ba24105380d0f4f631ea59"
-  , _idvFmrSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd.fmr"
-  , _idvCppSourcecodeURL = "/home/nushio/hub/formura/examples/3d-mhd-main-prof.cpp"
+  { _idvFormuraVersion = "594b1415816255dd799b00782fa1332c58968b2d"
+  , _idvFmrSourcecodeURL = "/home/nushio/hub/formura/examples/finalist.fmr"
+  , _idvCppSourcecodeURL = "/home/nushio/hub/formura/examples/main.f90"
   , _idvBaseFilename = "3d-sim.fmr"
   , _idvNumericalConfig = defNC
   , _idvCompilerFlags = ["-O3", "-Kfast,parallel", "-Kocl", "-Klib", "-Koptmsg=2", "-Karray_private", "-Kinstance=8", "-Kdynamic_iteration", "-Kloop_fission", "-Kloop_part_parallel", "-Kloop_part_simd", "-Keval", "-Kreduction", "-Ksimd=2"]
   }
   where
-    defNC = unsafePerformIO $ fromJust <$> readYamlDef defaultNumericalConfig "/home/nushio/hub/formura/examples/3d-mhd.yaml"
+    defNC = unsafePerformIO $ fromJust <$> readYamlDef defaultNumericalConfig "/home/nushio/hub/formura/examples/finalist.yaml"
 
 data Experiment =
   Experiment
@@ -244,11 +244,10 @@ codegen it = do
     forM_ ["*.idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
       cmd $ "git add " ++ fn
     --cmd $ "git commit -m 'incubation in progress'"
-    cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr"
+    cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr" ++ " -o " ++ fnBase ++ ".f90"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
-          [fn | fn <- foundFiles, fn ^. extension == ".cpp"] ++
-          [fn | fn <- foundFiles, fn ^. extension == ".c"]
+          [fn | fn <- foundFiles, fn ^. extension == ".f90"] ++
         objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
         c2oCmd fn = unlines
@@ -257,7 +256,7 @@ codegen it = do
 
     writeFile "Makefile" $ unlines
       [ "all: a.out"
-      , "CC=mpiFCC " ++ unwords (it ^. idvCompilerFlags)
+      , "CC=mpifrtpx " ++ unwords (it ^. idvCompilerFlags)
       , "OBJS=" ++ unwords objFiles
       , "a.out: $(OBJS)"
       , "\t$(CC) $(OBJS) -o a.out"
@@ -382,26 +381,28 @@ benchmark it = do
       , ""
       , "# config environmental variables"
       , ". /work/system/Env_base"
-      , "mpiexec /work/system/bin/msh \"mkdir ./out\""
+      , "export PATH=/opt/FJSVtclang/GM-1.2.0-20/bin:$PATH"
+      , "export LD_LIBRARY_PATH=/opt/FJSVtclang/GM-1.2.0-20/lib64:$LD_LIBRARY_PATH"
+      , "mpiexec /work/system/bin/msh \"mkdir -p ./out\""
       , ""
-      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpirun -n %d ./a.out %d %d" n mpiSize x x
+      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics mpiexec -n %d  -ofout-proc out/out -oferr-proc out/err ./a.out %d %d" n mpiSize x x
                 | n <- extensionNSet, let x = 8192 * 2^n::Integer]
       ,
         if not csvMode then "" else
           unlines
-          [ printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-P -Hevent=Performance  mpirun -n %d ./a.out" mpiSize
-          , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-01 -Hpa=1 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-02 -Hpa=2 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-03 -Hpa=3 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-04 -Hpa=4 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-05 -Hpa=5 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-06 -Hpa=6 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-mpi -Impi mpirun -n %d ./a.out" mpiSize
+          [ printf "fapp -C -d prof-C -Hevent=Cache        mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-I -Hevent=Instructions mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-M -Hevent=MEM_access   mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-P -Hevent=Performance  mpiexec -n %d ./a.out" mpiSize
+          , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-01 -Hpa=1 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-02 -Hpa=2 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-03 -Hpa=3 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-04 -Hpa=4 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-05 -Hpa=5 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-06 -Hpa=6 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-07 -Hpa=7 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-mpi -Impi mpiexec -n %d ./a.out" mpiSize
           ]
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
@@ -521,10 +522,9 @@ intPerturbers =
 
 main :: IO ()
 main = do
-  putStrLn "out-procオプション等を設定したら、当該ファイルをステージアウトしなければならない。   インキュベータにこれらの機能を組み込むべき"
-{-x <- doesFileExist qbConfigFilePath
+  x <- doesFileExist qbConfigFilePath
   if not x then mainInit else mainServer
--}
+
 
 mainInit :: IO ()
 mainInit = do
