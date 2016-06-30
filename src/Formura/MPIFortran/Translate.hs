@@ -651,7 +651,8 @@ mmFindTailIDs mminst = rets
 ompEveryLoopPragma :: (?ncOpts :: [String]) => [C.Src] -> Int -> C.Src
 ompEveryLoopPragma privVars n
   | "omp-collapse" `elem` ?ncOpts = "!$omp do collapse(" <> C.show n <> ") private(" <> C.intercalate "," privVars <>")"
-  | otherwise                 = "!$omp do private(" <> C.intercalate "," privVars <>")"
+  | "omp" `elem` ?ncOpts     = "!$omp do private(" <> C.intercalate "," privVars <>")"
+  | otherwise                 = ""
 
 -- | generate a formura function body.
 
@@ -703,8 +704,10 @@ genComputation (ir0, nid0) destRsc0 = do
             | useSystemOffset = nPlusK <$> ivars <*> negate systemOffset0
             | otherwise       = ivars
 
+          privVars = M.keys fortranBinds
+
       return $ (fortranBinds, ) $ C.potentialSubroutine $ C.unlines $
-        [ompEveryLoopPragma (toList ivars) $ dim-1] ++
+        [ompEveryLoopPragma (toList ivars  ++ privVars) $ dim-1] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
 
