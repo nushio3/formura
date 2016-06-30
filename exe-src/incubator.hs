@@ -12,7 +12,7 @@ import           Data.Aeson.TH
 import qualified Data.ByteString as BS
 import           Data.Foldable
 import qualified Data.HashMap.Strict as HM
-import           Data.List (isPrefixOf, sort, intercalate, isInfixOf)
+import           Data.List (isPrefixOf, sort, intercalate, isInfixOf, isSuffixOf)
 import qualified Data.Map as M
 import           Data.Maybe
 import qualified Data.Set as S
@@ -236,12 +236,12 @@ codegen it = do
   cmd $ "mkdir -p " ++ codeDir
   codegenFn <- getCodegen $ it ^. idvFormuraVersion
   withCurrentDirectory codeDir $ do
-    cmd $ "rm *.c *.cpp *.h *.out"
+    cmd $ "rm *.f90 *.h *.out"
     let fnBase = it ^. idvBaseFilename . basename
     superCopy (it ^. idvFmrSourcecodeURL) (fnBase ++ ".fmr")
-    superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.cpp")
+    superCopy (it ^. idvCppSourcecodeURL) (fnBase ++ "-main.f90")
     writeYaml (fnBase ++ ".yaml") $ it ^. idvNumericalConfig
-    forM_ ["*.idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.cpp"] $ \fn -> do
+    forM_ ["*.idv", fnBase ++ ".fmr", fnBase ++ ".yaml", fnBase ++ "-main.f90"] $ \fn -> do
       cmd $ "git add " ++ fn
     --cmd $ "git commit -m 'incubation in progress'"
     cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr" ++ " -o " ++ fnBase ++ ".f90"
@@ -250,8 +250,19 @@ codegen it = do
           [fn | fn <- foundFiles, fn ^. extension == ".f90"]
         objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
+        headerFiles = [fn | fn <- csrcFiles, "_header.f90" `isSuffixOf`fn]
+        internalFiles = [fn | fn <- csrcFiles, "_internal_" `isInfixOf`fn]
+        mainFiles = [fn | fn <- csrcFiles, "-main.f90" `isSuffixOf` fn]
+        libFiles = [fn | fn <- csrcFiles, not (fn `elem` headerFiles), not (fn `elem` internalFiles), not(fn `elem` mainFiles)]
+
+        dependencyOf fn
+          | fn `elem` headerFiles = []
+          | fn `elem` internalFiles = [dfn & extension .~ "o"  | dfn <- headerFiles]
+          | fn `elem` libFiles = [dfn & extension .~ "o"  | dfn <- internalFiles]
+          | otherwise          = [dfn & extension .~ "o"  | dfn <- libFiles]
+
         c2oCmd fn = unlines
-          [ (fn & extension .~ "o") ++ ": " ++ fn
+          [ (fn & extension .~ "o") ++ ": " ++ unwords (fn: dependencyOf fn)
           , "\t$(CC) -c $^ -o $@ 2> $@.optmsg"]
 
     writeFile "Makefile" $ unlines
