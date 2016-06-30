@@ -650,8 +650,8 @@ mmFindTailIDs mminst = rets
 
 ompEveryLoopPragma :: (?ncOpts :: [String]) => [C.Src] -> Int -> C.Src
 ompEveryLoopPragma privVars n
-  | "omp-collapse" `elem` ?ncOpts = "!$omp do collapse(" <> C.show n <> ") private(" <> C.intercalate "," privVars <>")"
-  | "omp" `elem` ?ncOpts     = "!$omp do private(" <> C.intercalate "," privVars <>")"
+  | "omp-collapse" `elem` ?ncOpts = "!$omp do collapse(" <> C.show n <> ") private(" <> C.intercalate ", " privVars <>")"
+  | "omp" `elem` ?ncOpts     = "!$omp do private(" <> C.intercalate ", " privVars <>")"
   | otherwise                 = ""
 
 -- | generate a formura function body.
@@ -1049,7 +1049,7 @@ tellProgram = do
 
 
   tellC "integer "
-  tellCBlockArg "function" "Formura_encode_mpi_rank" ("(" <> C.intercalate "," ["i" <> x | x<-toList ivars] <>  ")") $ do
+  tellCBlockArg "function" "Formura_encode_mpi_rank" ("(" <> C.intercalate ", " ["i" <> x | x<-toList ivars] <>  ")") $ do
     tellCLn $ C.unlines["integer :: i" <> x | x<-toList ivars]
     tellCLn "integer :: s"
     tellCLn "s = 0"
@@ -1067,14 +1067,14 @@ tellProgram = do
     csb0 <- use tsCommonStaticBox
     let mpiivars = fmap ("i"<>) ivars
         lower_offset = negate $ csb0 ^.lowerVertex
-    tellCLn $ "integer ::  " <> C.intercalate "," (toList mpiivars)
+    tellCLn $ "integer ::  " <> C.intercalate ", " (toList mpiivars)
     tellCLn $ "navi%mpi_comm = comm"
     tellCLn $ "call MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
     tellCLn $ "call Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", " <> x| x<- toList mpiivars]  <> ")"
     forM_ deltaMPIs $ \r@(MPIRank rv) -> do
       let terms = zipWith nPlusK (toList mpiivars) (toList rv)
       tellC $ "navi%" <> nameDeltaMPIRank r <> "="
-      tellCLn $ "Formura_encode_mpi_rank( " <> C.intercalate "," terms  <> ")"
+      tellCLn $ "Formura_encode_mpi_rank( " <> C.intercalate ", " terms  <> ")"
     tellCLn "navi%time_step=0"
     forM_ (zip3 (toList ivars) (toList intraExtents) (toList lower_offset)) $ \(x, e, o) -> do
       tellCLn $ "navi%offset_" <> x <> "=" <> "i"<> x <> "*"<>C.show e <> "-" <> C.show o <> ""
@@ -1134,7 +1134,7 @@ useSubroutineInSrc subroutineMap (C.Src xs) = C.Src <$> mapM go xs
           argList :: [T.Text]
           argList = [(argN ^. C.holeExpr) | argN <-toList pssrc]
 
-      return $ C.Raw $ fromString funName <> "(" <> T.intercalate "," argList <> ");\n"
+      return $ C.Raw $ fromString funName <> "(" <> T.intercalate ", " argList <> ");\n"
 
 joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
@@ -1193,7 +1193,7 @@ joinSubroutines cprog0 = do
 
       genSubroutine :: String -> C.Src -> (C.Src, C.Src)
       genSubroutine fname tmpl = let
-        header = "void " <> fromString fname <> "(" <> C.intercalate "," argvList <> ")"
+        header = "void " <> fromString fname <> "(" <> C.intercalate ", " argvList <> ")"
         argvList = [C.raw (h ^. C.holeType) <> " " <>  argN | (h, argN) <- zip (toList tmpl) argvNames]
         sbody :: C.Src
         sbody = zipWithFT (\arg hole -> hole & C.holeExpr .~ C.toText arg) argvNames tmpl
