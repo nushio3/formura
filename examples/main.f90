@@ -22,10 +22,20 @@ program main
 
   call init(navi)
 
-  do epoch=1,100
+  call fapp_start("main", 0,0)
+  call start_collection("main")
+  do while (navi%time_step <8192)
      call Formura_Forward(navi)
   end do
-  call write_global_monitor(navi)
+  call stop_collection("main")
+  call fapp_stop("main", 0,0)
+
+
+
+  if (navi%mpi_my_rank == 0) then
+     print *, "time = ", navi%time_step
+  end if
+!  call write_global_monitor(navi)
 
   call mpi_finalize(mpi_err)
 contains
@@ -35,14 +45,14 @@ contains
     integer :: ix,iy,iz, sx,sy,sz
     double precision :: rx,ry,rz
 
-    do iz = 1,206
-       do iy = 1,206
-          do ix = 1,206
-             U(ix,iy,iz) = 1.0
-             V(ix,iy,iz) = 0.0
-          end do
-       end do
-    end do
+!    do iz = 1,206
+!       do iy = 1,206
+!          do ix = 1,206
+!             U(ix,iy,iz) = 1.0
+!             V(ix,iy,iz) = 0.0
+!          end do
+!       end do
+!    end do
 
     do iz = navi%lower_z+1, navi%upper_z
        do iy = navi%lower_y+1, navi%upper_y
