@@ -292,7 +292,7 @@ tellResourceDecl' isInClass name rsc box0 = do
       alreadyDeclaredResourceNames %= S.insert name
 
       typ <- elemTypeOfResource rsc
-      let szpt = ("dimension"<>) $ C.parens $ C.intercalate "," $ map C.show $ toList sz
+      let szpt = ("dimension"<>) $ C.parens $ C.intercalate ", " $ map C.show $ toList sz
           sz = box0 ^.upperVertex - box0 ^. lowerVertex
 
       decl <- case typ of
@@ -596,7 +596,7 @@ genMMInstruction ir0 mminst = do
         a_code <- query a
         b_code <- query b
         case op of
-          "**" -> thisEq $ ("pow"<>) $ C.parens $ a_code <> "," <> b_code
+          "**" -> thisEq $ ("pow"<>) $ C.parens $ a_code <> ", " <> b_code
           _ -> thisEq $ C.parens $ a_code <> fromString op <> b_code
       Triop "ite" a b c -> do
         a_code <- query a
@@ -605,7 +605,7 @@ genMMInstruction ir0 mminst = do
         thisEq $ C.parens $ a_code <> "?" <> b_code <> ":" <> c_code
       Naryop op xs -> do
         xs_code <- mapM query xs
-        let chain fname cs = foldr1 (\a b -> fname <> C.parens (a <> "," <> b) ) cs
+        let chain fname cs = foldr1 (\a b -> fname <> C.parens (a <> ", " <> b) ) cs
         case op of
           ">?" -> thisEq $ chain "fmax" xs_code
           "<?" -> thisEq $ chain "fmin" xs_code
@@ -690,7 +690,7 @@ genComputation (ir0, nid0) destRsc0 = do
     genGrid useSystemOffset lhsName2 = do
       let openLoops = reverse $
             [ C.unwords
-              ["do ", i, "=", C.parameter "int" (l+1) ,",", C.parameter "int" h, ",", C.show s ,"\n"]
+              ["do ", i, "=", C.parameter "int" (l+1) ,", ", C.parameter "int" h, ", ", C.show s ,"\n"]
             | (i,s,l,h) <- zip4 (toList ivars) gridStride (toList loopFroms) (toList loopTos)]
           closeLoops =
             ["end do" | _ <- toList ivars]
@@ -762,7 +762,7 @@ genStagingCode isStaging rid = do
 
   let openLoops = reverse $
         [ C.unwords
-          ["do", i, "=", C.show (l+1) ,",", C.show h]
+          ["do", i, "=", C.show (l+1) ,", ", C.show h]
         | (i,(l,h)) <- (toList ivars) `zip`
           zip (toList loopFroms) (toList loopTos)]
       closeLoops =
@@ -804,19 +804,19 @@ genMPISendRecvCode f = do
           , "mpi_src_value = "  <> "navi%" <> nameDeltaMPIRank dmpi <> "\n"
           , "mpi_dest_value = " <> "navi%" <> nameDeltaMPIRank (negate dmpi) <> "\n"
             ] ++
-          [ "call mpi_irecv( " <> facetNameRecv, ","
+          [ "call mpi_irecv( " <> facetNameRecv, ", "
           , "mpi_sizeof_value,"
           , "MPI_BYTE,"
           , "mpi_src_value,"
-          , let Just t = M.lookup f mpiTagDict in C.show t, ","
+          , let Just t = M.lookup f mpiTagDict in C.show t, ", "
           , "mpi_comm_value,"
           , reqName <> ",mpi_err )\n"]
           ++
-          [ "call mpi_isend(" <> facetNameSend, ","
+          [ "call mpi_isend(" <> facetNameSend, ", "
           , "mpi_sizeof_value,"
           , "MPI_BYTE,"
           , "mpi_dest_value,"
-          , let Just t = M.lookup f mpiTagDict in C.show t, ","
+          , let Just t = M.lookup f mpiTagDict in C.show t, ", "
           , "mpi_comm_value,"
           , "req_send_iranai, mpi_err )\n"]
   return (M.empty, mpiIsendIrecv)
@@ -1056,7 +1056,7 @@ tellProgram = do
     forM_ (zip (toList ivars) (toList mpiGrid0)) $ \(x, ig) -> do
       let g=C.show ig
       tellCLn $ "s = s * " <>g<>""
-      tellCLn $ "s = s + mod((mod(i"<>x<>","<>g<>")+"<>g<>"),"<>g<>")"
+      tellCLn $ "s = s + mod((mod(i"<>x<>", "<>g<>")+"<>g<>"),"<>g<>")"
     tellCLn "Formura_encode_mpi_rank = s"
 
   tellCBlockArg "subroutine" "Formura_Init" "(navi,comm)" $ do
