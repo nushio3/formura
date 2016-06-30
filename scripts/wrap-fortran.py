@@ -4,7 +4,7 @@ import re,sys
 
 limit=250
 
-for fn in argv[1:]:
+for fn in sys.argv[1:]:
     with open(fn,"r") as fp:
         con = fp.read()
 
