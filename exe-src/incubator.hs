@@ -256,7 +256,7 @@ codegen it = do
 
     writeFile "Makefile" $ unlines
       [ "all: a.out"
-      , "CC=mpifrtpx " ++ unwords (it ^. idvCompilerFlags)
+      , "CC=mpifrt " ++ unwords (it ^. idvCompilerFlags)
       , "OBJS=" ++ unwords objFiles
       , "a.out: $(OBJS)"
       , "\t$(CC) $(OBJS) -o a.out"
