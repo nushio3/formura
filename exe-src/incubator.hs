@@ -587,8 +587,8 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 25 compile it
-    Benchmark -> whenSlack 40 benchmark it
+    Compile ->  whenSlack 35 compile it
+    Benchmark -> whenSlack 50 benchmark it
     Visualize -> visualize it
     Wait _ _ | "--unwait" `elem` argv -> return $  it & xpAction .~ Codegen
     Wait _ waitlist -> do
