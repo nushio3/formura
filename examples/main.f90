@@ -22,11 +22,10 @@ program main
 
   call init(navi)
 
-  call write_global_monitor(navi)
-
-  call Formura_Forward(navi)
-
-  call write_global_monitor(navi)
+  do t=1,100
+     call write_global_monitor(navi)
+     call Formura_Forward(navi)
+  end do
 
   call mpi_finalize(mpi_err)
 contains
