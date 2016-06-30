@@ -264,7 +264,8 @@ codegen it = do
         c2oCmd fn = unlines
           [ (fn & extension .~ "o") ++ ": " ++ unwords (fn: dependencyOf fn)
           , "\t$(CC) -c $^ -o $@ 2> $@.optmsg"]
-
+    forM_ csrcFiles $ \fn -> do
+      cmd $ "/home/nushio/hub/formura/scripts/wrap-fortran.py " ++ fn
     writeFile "Makefile" $ unlines
       [ "all: a.out"
       , "CC=mpifrt " ++ unwords (it ^. idvCompilerFlags)
