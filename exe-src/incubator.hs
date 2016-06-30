@@ -563,7 +563,7 @@ mainServer = do
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
   case remainingTaskCount <= 5 && ("--perturb" `elem` argv) of
     True -> do
-      cmd "cd /home/nushio/hub/3d-mhd/individuals/understand-2; ./perturb.py"
+      cmd "cd /home/nushio/hub/3d-mhd/individuals/finalstage; ./perturb.py"
       return ()
     False -> do
       mapM_ proceed  idxps
