@@ -247,7 +247,7 @@ codegen it = do
     cmd $ codegenFn ++ " " ++ fnBase ++ ".fmr" ++ " -o " ++ fnBase ++ ".f90"
     foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
     let csrcFiles =
-          [fn | fn <- foundFiles, fn ^. extension == ".f90"] ++
+          [fn | fn <- foundFiles, fn ^. extension == ".f90"]
         objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
         c2oCmd fn = unlines
