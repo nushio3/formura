@@ -22,7 +22,7 @@ begin function step(U,V) returns (U_next, V_next)
   dU_dt = -Fe * U * V*V + Fu * (1-U) + Du*(ddx*ddx) * Σ fun(i) (∂ i . ∂ i) U
   dV_dt =  Fe * U * V*V - Fv * V     + Dv*(ddx*ddx) * Σ fun(i) (∂ i . ∂ i) V
 
-  manifest :: U_next, V_next
+  #manifest :: U_next, V_next
 
   U_next = U + dt * dU_dt
   V_next = V + dt * dV_dt
