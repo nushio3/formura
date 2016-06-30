@@ -6,7 +6,7 @@ program main
   type(Formura_Navigator) :: navi
   integer :: seedsize
   integer,allocatable:: seed(:)
-
+  integer :: epoch
 
   print *, "Formura test main program."
 
@@ -22,10 +22,10 @@ program main
 
   call init(navi)
 
-  do t=1,100
-     call write_global_monitor(navi)
+  do epoch=1,100
      call Formura_Forward(navi)
   end do
+  call write_global_monitor(navi)
 
   call mpi_finalize(mpi_err)
 contains
@@ -34,6 +34,15 @@ contains
     type(Formura_Navigator) :: navi
     integer :: ix,iy,iz, sx,sy,sz
     double precision :: rx,ry,rz
+
+    do iz = 1,206
+       do iy = 1,206
+          do ix = 1,206
+             U(ix,iy,iz) = 1.0
+             V(ix,iy,iz) = 0.0
+          end do
+       end do
+    end do
 
     do iz = navi%lower_z+1, navi%upper_z
        do iy = navi%lower_y+1, navi%upper_y
@@ -47,6 +56,10 @@ contains
     call random_number(rx)
     call random_number(ry)
     call random_number(rz)
+
+    rx = 0.5
+    ry = 0.5
+    rz = 0.5
 
     sx = (navi%upper_x-navi%lower_x-16)*rx
     sy = (navi%upper_y-navi%lower_y-16)*ry

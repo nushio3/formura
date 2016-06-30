@@ -15,12 +15,14 @@ end function
 
 begin function step(U,V) returns (U_next, V_next)
   double :: Fu = 1/86400, Fv = 6/86400, Fe = 1/900, Du = 0.1*2.3e-9, Dv = 6.1e-11
-  double :: dt = 200, dx = 0.001
+  double :: dt = 200, ddx = 1000
 
   double [] ::  dU_dt, dV_dt
 
-  dU_dt = -Fe * U * V*V + Fu * (1-U) + Du/(dx*dx) * Σ fun(i) (∂ i . ∂ i) U
-  dV_dt =  Fe * U * V*V - Fv * V     + Dv/(dx*dx) * Σ fun(i) (∂ i . ∂ i) V
+  dU_dt = -Fe * U * V*V + Fu * (1-U) + Du*(ddx*ddx) * Σ fun(i) (∂ i . ∂ i) U
+  dV_dt =  Fe * U * V*V - Fv * V     + Dv*(ddx*ddx) * Σ fun(i) (∂ i . ∂ i) V
+
+  #manifest :: U_next, V_next
 
   U_next = U + dt * dU_dt
   V_next = V + dt * dV_dt
