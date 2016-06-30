@@ -648,10 +648,10 @@ mmFindTailIDs mminst = rets
     maxNode = snd $ M.findMax mminst
 
 
-ompEveryLoopPragma :: (?ncOpts :: [String]) => Int -> C.Src
-ompEveryLoopPragma n
-  | "omp-collapse" `elem` ?ncOpts = "!$omp for collapse(" <> C.show n <> ")"
-  | otherwise                 = ""
+ompEveryLoopPragma :: (?ncOpts :: [String]) => [C.Src] -> Int -> C.Src
+ompEveryLoopPragma privVars n
+  | "omp-collapse" `elem` ?ncOpts = "!$omp do collapse(" <> C.show n <> ") private(" <> C.intercalate "," privVars <>")"
+  | otherwise                 = "!$omp do private(" <> C.intercalate "," privVars <>")"
 
 -- | generate a formura function body.
 
@@ -704,7 +704,7 @@ genComputation (ir0, nid0) destRsc0 = do
             | otherwise       = ivars
 
       return $ (fortranBinds, ) $ C.potentialSubroutine $ C.unlines $
-        [ompEveryLoopPragma $ dim-1] ++
+        [ompEveryLoopPragma (toList ivars) $ dim-1] ++
         openLoops ++ [letBs,bodyExpr] ++ closeLoops
 
 
@@ -776,8 +776,8 @@ genStagingCode isStaging rid = do
 
 
   let pragma =
-        if "collapse-ridge" `elem` ?ncOpts then ompEveryLoopPragma dim
-        else ompEveryLoopPragma (dim -1)
+        if "collapse-ridge" `elem` ?ncOpts then ompEveryLoopPragma (toList ivars) dim
+        else ompEveryLoopPragma (toList ivars) (dim -1)
 
       fortranBinds = M.fromList [(i, "integer") |i <- toList ivars]
   return $ (fortranBinds,) $ pragma <> "\n" <>
