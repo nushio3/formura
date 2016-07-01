@@ -279,7 +279,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=0:30:00\""
+      , "#PJM --rsc-list \"elapse=1:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -587,7 +587,7 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 35 compile it
+    Compile ->  whenSlack 30 compile it
     Benchmark -> whenSlack 50 benchmark it
     Visualize -> visualize it
     Wait _ _ | "--unwait" `elem` argv -> return $  it & xpAction .~ Codegen
