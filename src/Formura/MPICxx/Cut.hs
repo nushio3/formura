@@ -17,6 +17,7 @@
 module Formura.MPICxx.Cut where
 
 import           Algebra.Lattice.Levitated
+import           Control.Applicative
 import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
@@ -45,10 +46,13 @@ import System.IO.Unsafe
 
 
 newtype MPIRank = MPIRank (Vec Int) deriving (Eq, Ord, Show, Read, Num, Data)
-newtype IRank = IRank (Vec Int) deriving (Eq, Show, Read, Num, Data)
+data IRank = IRank IRankComparator (Vec Int) deriving (Eq, Show, Read, Data)
+data IRankComparator = IRankCompareStraight | IRankCompareReverse deriving (Eq, Show, Read, Data)
 
 instance Ord IRank where
-  (IRank (Vec xs)) `compare` (IRank (Vec ys)) = reverse xs `compare` reverse ys
+  (IRank c (Vec xs)) `compare` (IRank _ (Vec ys)) =
+    case c of IRankCompareStraight -> xs `compare` ys
+              IRankCompareReverse -> reverse xs `compare` reverse ys
   compare _ _ = error "Comparison between IRank (PureVec _) is undefined"
 
 data ResourceT a b = ResourceStatic IdentName a | ResourceOMNode OMNodeID b
@@ -230,6 +234,7 @@ cut = do
 
   stepGraph <- view omStepGraph
 
+  ncOpts <- view ncOptionStrings
 
   let wallMap :: M.Map OMNodeID Walls
       wallMap = M.mapWithKey go stepGraph
@@ -286,12 +291,16 @@ cut = do
       iRanks0 =
         (if inverted0 then reverse else id) $
         sort $
-        map IRank $
+        map (IRank iRankComparator) $
         sequence $
         fmap (\partitions0 -> [0..length partitions0-2]) walls0
 
+      iRankComparator
+        | "irank-order-f" `elem` ncOpts = IRankCompareStraight
+        | otherwise                     = IRankCompareReverse
+
       boxAt :: IRank -> Vec [Int] -> Box
-      boxAt (IRank vi) vw = Orthotope (liftVec2 (\i xs-> xs!!i) vi vw) (liftVec2 (\i xs-> xs!!(i+1)) vi vw)
+      boxAt (IRank _ vi) vw = Orthotope (liftVec2 (\i xs-> xs!!i) vi vw) (liftVec2 (\i xs-> xs!!(i+1)) vi vw)
 
       iRankMap :: M.Map OMNodeID (M.Map IRank Box)
       iRankMap = flip fmap wallEvolution $ \vi -> M.fromList
