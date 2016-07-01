@@ -1134,7 +1134,7 @@ useSubroutineInSrc subroutineMap (C.Src xs) = C.Src <$> mapM go xs
           argList :: [T.Text]
           argList = [(argN ^. C.holeExpr) | argN <-toList pssrc]
 
-      return $ C.Raw $ fromString funName <> "(" <> T.intercalate ", " argList <> ");\n"
+      return $ C.Raw $ "call " <> fromString funName <> "(" <> T.intercalate ", " argList <> ")\n"
 
 joinSubroutines :: WithCommandLineOption => CProgram -> IO CProgram
 joinSubroutines cprog0 = do
