@@ -597,7 +597,7 @@ proceed it = do
         Failed _ -> waits waitlist it -- Double check before choosing to fail.
         _ -> return ret
     Done -> return it
-    Failed act -> case it ^. xpFailureCounter > 2 of
+    Failed act -> case it ^. xpFailureCounter > 1 of
       True -> return it
       _ ->  return $ it & xpAction .~ Codegen
         & xpFailureCounter %~ (+1)
