@@ -575,7 +575,7 @@ proceed :: WithQBConfig => IndExp -> IO ()
 proceed it = do
   argv <- getArgs
   let whenSlack lmt perform it = do
-        kstat <- readCmd "ssh K kstat"
+        kstat <- readCmd "ssh K 'cat kstat'"
         let crowded = length (lines kstat) - 5 > lmt
         case crowded &&  (not $ "--unnice" `elem` argv) of
           True -> do
