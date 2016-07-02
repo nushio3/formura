@@ -123,7 +123,7 @@ intercalate :: Src -> [Src] -> Src
 intercalate x ys = mconcat $ intersperse x ys
 
 parensTuple :: Foldable t => t Src -> Src
-parensTuple = parens . intercalate "," . toList
+parensTuple = parens . intercalate ", " . toList
 
 replace :: Src -> Src -> Src -> Src
 replace src dest (Src xs) = Src $ map go xs
