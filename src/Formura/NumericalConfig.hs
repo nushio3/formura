@@ -52,6 +52,15 @@ nbuSize a nc = let kwd = "nbu" ++ a
   , kwd `isPrefixOf` opt
   ] ++ [1]
 
+exprBindSize :: NumericalConfig ->  Int
+exprBindSize nc = let kwd = "expr-bind-size-"
+  in head $ [ read $ drop (length kwd) opt
+  | opt <- nc ^. ncOptionStrings
+  , kwd `isPrefixOf` opt
+  ] ++ [1]
+
+
+
 
 sampleNumericalConfig :: NumericalConfig
 sampleNumericalConfig =

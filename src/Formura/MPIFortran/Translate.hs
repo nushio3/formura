@@ -485,6 +485,7 @@ nPlusK i d = i <> "+" <> C.parens (C.parameter "int" d)
 genMMInstruction :: (?ncOpts :: [String]) => IRank -> MMInstruction -> TranM ((FortranBinding, C.Src), [(C.Src,Vec Int)])
 genMMInstruction ir0 mminst = do
   axvars <- fmap fromString <$> view axesNames
+  nc <- view envNumericalConfig
 
   indNames <- use loopIndexNames
   indOffset <- use loopIndexOffset -- indNames + indOffset = real addr
@@ -540,7 +541,8 @@ genMMInstruction ir0 mminst = do
       doesBind' :: Int -> MicroInstruction -> Bool
       doesBind' _ (Imm _) = False
       doesBind' _ (Store _ x) = False
-      doesBind' n _ = n >= 1 -- TODO : Implement CSE and then reduce n
+      doesBind' n _ = n >= exprBindSize nc
+      -- TODO : Implement CSE and then reduce n
 
   let orderedMMInst :: [(MMNodeID, MicroNode)]
       orderedMMInst = sortBy (compare `on` (loc . snd)) $ M.toList mminst
@@ -597,7 +599,7 @@ genMMInstruction ir0 mminst = do
         b_code <- query b
         case op of
           "**" -> thisEq $ ("pow"<>) $ C.parens $ a_code <> ", " <> b_code
-          _ -> thisEq $ C.parens $ a_code <> fromString op <> b_code
+          _ -> thisEq $ C.parens $ C.unwords [" ", a_code, fromString op,  b_code, " "]
       Triop "ite" a b c -> do
         a_code <- query a
         b_code <- query b
