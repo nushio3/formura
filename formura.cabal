@@ -125,6 +125,7 @@ executable incubator
               , lens
               , mtl
               , process
+              , random-shuffle
               , temporary
               , text
               , time
