@@ -535,8 +535,6 @@ intPerturbers =
 
 main :: IO ()
 main = do
-  putStrLn "do you have kstat running?"
-  str <- getLine
   x <- doesFileExist qbConfigFilePath
   if not x then mainInit else mainServer
 
