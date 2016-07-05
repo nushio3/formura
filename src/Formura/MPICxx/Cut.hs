@@ -22,9 +22,10 @@ import           Control.Lens
 import           Control.Monad
 import           Control.Monad.IO.Class
 import           Data.Bits(xor)
-import           Data.List (sort)
+import           Data.List (sort, groupBy, sortBy)
 import           Data.Data
 import           Data.Foldable
+import           Data.Function (on)
 import qualified Data.Map as M
 import qualified Data.Sequence as Q
 import qualified Data.Set as S
@@ -596,4 +597,20 @@ cut = do
 
 
 optimizeCommunicationsOrder :: [DistributedInst] ->  [DistributedInst]
-optimizeCommunicationsOrder = id
+optimizeCommunicationsOrder dprog = dprog1
+  where
+    waitOrder :: M.Map FacetID Int
+    waitOrder = M.fromList [(fid, i)| (i, CommunicationWait fid) <- zip [0..] dprog ]
+
+    groupedProg :: [[DistributedInst]]
+    groupedProg = groupBy bothComm dprog
+
+    dprog1 = concat $ map (sortBy (compare `on` maybeWaitOrder)) groupedProg
+
+
+    bothComm (CommunicationSendRecv _) (CommunicationSendRecv _) = True
+    bothComm _ _ = False
+
+    maybeWaitOrder :: DistributedInst -> Maybe Int
+    maybeWaitOrder (CommunicationSendRecv fid) = M.lookup fid waitOrder
+    maybeWaitOrder _ = Nothing
