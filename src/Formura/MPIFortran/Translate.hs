@@ -1041,7 +1041,7 @@ tellProgram = do
   tellCLn $ "!INSERT_USE_INTERNAL_HERE"
   tellCLn $ "implicit none"
   tellCLn $ "include \"mpif.h\""
-  tellCLn $ "integer :: mpi_err, req_send_iranai"
+  tellCLn $ "integer :: mpi_err"
   tellCLn $ "integer :: mpi_sizeof_value, mpi_comm_value"
   tellCLn $ "integer :: mpi_src_value, mpi_dest_value"
 
