@@ -583,7 +583,7 @@ cut = do
       | ir <- iRanks0
       , nid <- M.keys stepGraph
       ]
-    , _planDistributedProgram = dProg1
+    , _planDistributedProgram = optimizeCommunicationsOrder $ dProg1
     , _planSystemOffset = systemOffset0
     , _planResourceSharing = resourceSharing0
     , _planSharedResourceExtent = largestBox
@@ -593,3 +593,7 @@ cut = do
     , _planFacetMPITag = M.fromList $ zip (M.keys allFacets) [0..]
     , _planMPIRequestNames = M.empty
     }
+
+
+optimizeCommunicationsOrder :: [DistributedInst] ->  [DistributedInst]
+optimizeCommunicationsOrder = id
