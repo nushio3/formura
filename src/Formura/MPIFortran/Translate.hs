@@ -824,7 +824,7 @@ genMPISendRecvCode f = do
           , "mpi_dest_value,"
           , let Just t = M.lookup f mpiTagDict in C.show t, ", "
           , "mpi_comm_value,"
-          , "req_send_iranai, mpi_err )\n"]
+          , reqName <> ",mpi_err )\n"]
   return (M.empty, mpiIsendIrecv)
 
 genMPIWaitCode :: FacetID -> TranM (FortranBinding, C.Src)
