@@ -1,9 +1,10 @@
 program main
   implicit none
 
-  integer, parameter :: sx = 640, sy = 480
+  integer, parameter :: sx = 640, sy = 480, crop = 100
   double precision, dimension (sx,sy) :: screen
   double precision, parameter :: ox = 320, oy = 240
+
   integer :: file_unit
   integer :: x,y
 
@@ -11,17 +12,25 @@ program main
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ! main program
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
   do y = 1, sy
      do x = 1, sx
+        screen(x,y) = -99999
+     end do
+  end do
+
+  do y = 1 + crop, sy - crop
+     do x = 1 + crop, sx - crop
         screen(x,y) = (x-ox) ** 2 + (y-oy) ** 2
      end do
   end do
 
   file_unit = get_file_unit()
   open(file_unit, file='test.bin', status='replace', access='stream')
-  write(file_unit), sx,sy
-  write(file_unit) screen
+  write(file_unit), sx-2*crop,sy-2*crop
+
+  do y = 1 + crop, sy - crop
+     write(file_unit), screen(1+crop:sx-crop, y)
+  end do
   close(file_unit)
 
 
