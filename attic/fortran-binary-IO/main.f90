@@ -1,7 +1,8 @@
 program main
   implicit none
 
-  double precision, dimension (640,480) :: screen
+  integer, parameter :: sx = 640, sy = 480
+  double precision, dimension (sx,sy) :: screen
   double precision, parameter :: ox = 320, oy = 240
   integer :: file_unit
   integer :: x,y
@@ -11,14 +12,15 @@ program main
   ! main program
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  do y = 1, 480
-     do x = 1, 640
+  do y = 1, sy
+     do x = 1, sx
         screen(x,y) = (x-ox) ** 2 + (y-oy) ** 2
      end do
   end do
 
   file_unit = get_file_unit()
-  open(file_unit, file='test.bin', status='new', access='stream')
+  open(file_unit, file='test.bin', status='replace', access='stream')
+  write(file_unit), sx,sy
   write(file_unit) screen
   close(file_unit)
 
