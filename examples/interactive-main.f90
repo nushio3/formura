@@ -102,7 +102,7 @@ contains !!! contains !!! contains
 
   subroutine write_global_monitor(navi)
     type(Formura_Navigator) :: navi
-    integer :: ix,iy,iz, file_unit, myrank, vz_lo, vz_hi
+    integer :: ix,iy,iz, file_unit, myrank, vx_lo, vx_hi
     character*256 :: filename
 
     myrank = navi%mpi_my_rank
@@ -120,7 +120,7 @@ contains !!! contains !!! contains
     write(file_unit), navi%upper_x - navi%lower_x
 
     vx_lo = navi%lower_x+1
-    vx_hi = navi%upper_x - navi%lower_x
+    vx_hi = navi%upper_x
 
     if (navi%offset_z + navi%lower_z == 0) then
        iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2

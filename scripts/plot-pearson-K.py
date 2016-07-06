@@ -48,7 +48,7 @@ for fn in sys.argv[2:]:
     with open(fn,'rb') as fp:
         gps = np.fromfile(fp, dtype=dtype_int32,count=6)
         print gps
-        x,y,z,sx,sy,sz = gps
+        z,y,x,sz,sy,sx = gps
         t = 0
         t_ax.add(t)
         x_ax.add(x)
@@ -56,10 +56,10 @@ for fn in sys.argv[2:]:
         z_ax.add(z)
 
 
-        secy_u = np.fromfile(fp, dtype=dtype_float64,count=sx*sz).reshape(sx,sz,1)
-        tmp = np.fromfile(fp, dtype=dtype_float64,count=sx*sz)
+        secy_u = np.fromfile(fp, dtype=dtype_float64,count=sx*sy).reshape(sy,sx,1)
+        tmp = np.fromfile(fp, dtype=dtype_float64,count=sx*sy)
         print tmp.shape
-        secy_v = tmp.reshape(sx,sz,1)
+        secy_v = tmp.reshape(sy,sx,1)
         print secy_u
         key = (t,x,y,z)
 
@@ -85,12 +85,12 @@ canvas_size_z = max(z_ax)+sz
 
 
 for t in t_ax:
-    field=np.zeros((canvas_size_x, canvas_size_z, 2))
+    field=np.zeros((canvas_size_y, canvas_size_x, 2))
     for key,val in secs_y.iteritems():
         t1, x1, y1, z1 = key
-        if t1 != t or y1 != 0:
+        if t1 != t or z1 != 0:
             continue
-        field[x1:x1+sx,z1:z1+sz,:] = val
+        field[y1:y1+sy,x1:x1+sx,:] = val
 
     secy_u = field[:, :, 0:1]
     secy_v = field[:, :, 1:2]
@@ -109,7 +109,7 @@ for t in t_ax:
     c_field = ndimage.filters.gaussian_filter(c_field,8.0,mode='wrap')
     c_field = ndimage.interpolation.zoom(c_field,4.0,order=3,mode='wrap')
 
-    pylab.rcParams['figure.figsize'] = (canvas_size_z/img_shrink,canvas_size_x/img_shrink)
+    pylab.rcParams['figure.figsize'] = (canvas_size_x/img_shrink,canvas_size_y/img_shrink)
     pylab.clf()
     pylab.imshow(canvas)
     if sys.argv[1] == 'big':
