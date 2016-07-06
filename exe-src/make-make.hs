@@ -9,7 +9,7 @@ main :: IO ()
 main = do
   foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
   let csrcFiles =
-        [fn | fn <- foundFiles, fn ^. extension == ".f90", fn /= "main.f90"]
+        [fn | fn <- foundFiles, fn ^. extension == ".f90", fn ^.basename /= "main"]
       objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
       headerFiles = [fn | fn <- csrcFiles, "_header.f90" `isSuffixOf`fn]
