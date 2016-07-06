@@ -28,8 +28,10 @@ if sys.argv[1] == 'big':
     dtype_float64= '>f8'
     #img_shrink=500.0
     #pylab.rcParams.update({'font.size': 48})
-    img_shrink=300.0
-    pylab.rcParams.update({'font.size': 72})
+    #    img_shrink=300.0
+    #    pylab.rcParams.update({'font.size': 72})
+    img_shrink=30.0
+    pylab.rcParams.update({'font.size': 12})
 
 elif sys.argv[1] == 'little':
     dtype_int32 = '<i4'
@@ -47,8 +49,8 @@ for fn in sys.argv[2:]:
         gps = np.fromfile(fp, dtype=dtype_int32,count=6)
         print gps
         x,y,z,sx,sy,sz = gps
-
-        t_ax.add(0)
+        t = 0
+        t_ax.add(t)
         x_ax.add(x)
         y_ax.add(y)
         z_ax.add(z)
@@ -118,4 +120,4 @@ for t in t_ax:
         if t ==262144:
             pylab.gca().add_patch(patches.Rectangle((10200,1450),2000,2000,fill=False,edgecolor='white',linewidth=8))
     pylab.title('t = {}'.format(t))
-    pylab.savefig('images/{:06}.png'.format(t))
+    pylab.savefig('images-K/{:06}.png'.format(t))

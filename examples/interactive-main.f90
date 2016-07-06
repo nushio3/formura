@@ -102,7 +102,7 @@ contains !!! contains !!! contains
 
   subroutine write_global_monitor(navi)
     type(Formura_Navigator) :: navi
-    integer :: ix,iy,iz, file_unit, myrank
+    integer :: ix,iy,iz, file_unit, myrank, vz_lo, vz_hi
     character*256 :: filename
 
     myrank = navi%mpi_my_rank
@@ -119,22 +119,25 @@ contains !!! contains !!! contains
     write(file_unit), navi%upper_y - navi%lower_y
     write(file_unit), navi%upper_x - navi%lower_x
 
+    vx_lo = navi%lower_x+1
+    vx_hi = navi%upper_x - navi%lower_x
+
     if (navi%offset_z + navi%lower_z == 0) then
        iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2
        do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), U(:,iy,iz)
+          write(file_unit), U(vx_lo:vx_hi,iy,iz)
        end do
        do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), V(:,iy,iz)
+          write(file_unit), V(vx_lo:vx_hi,iy,iz)
        end do
     end if
     if (navi%offset_y + navi%lower_y == 0) then
        iy = navi%lower_y + (navi%upper_y - navi%lower_y)/2
        do iz = navi%lower_z+1, navi%upper_z
-          write(file_unit), U(:,iy,iz)
+          write(file_unit), U(vx_lo:vx_hi,iy,iz)
        end do
        do iz = navi%lower_z+1, navi%upper_z
-          write(file_unit), V(:,iy,iz)
+          write(file_unit), V(vx_lo:vx_hi,iy,iz)
        end do
     end if
   end subroutine write_global_monitor
