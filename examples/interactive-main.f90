@@ -5,6 +5,7 @@ program main
   implicit none
   type(Formura_Navigator) :: navi
   integer :: seedsize,seed_un
+  double precision :: seed_throw
   integer,allocatable:: seed(:)
 
 
@@ -26,6 +27,10 @@ program main
      seed(seed_un) = lcg(navi%mpi_my_rank + 1341398 * seed_un)
   end do
   call random_seed(put=seed)       ! シードを格納
+  do seed_un=1,1024
+     call random_number(seed_throw)
+  end do
+
 
   call init(navi)
 
