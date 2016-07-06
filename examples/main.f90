@@ -35,24 +35,46 @@ program main
   if (navi%mpi_my_rank == 0) then
      print *, "time = ", navi%time_step
   end if
-!  call write_global_monitor(navi)
+
+  call write_global_monitor(navi)
 
   call mpi_finalize(mpi_err)
-contains
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!          CONTAINS          !!!
+contains !!! contains !!! contains
+!!!          CONTAINS          !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  ! http://fortranwiki.org/fortran/show/newunit
+  integer function get_file_unit()
+    integer, parameter :: LUN_MIN=10, LUN_MAX=1000
+    logical :: opened
+    integer :: lun
+
+    get_file_unit=-1
+    do lun=LUN_MIN,LUN_MAX
+       inquire(unit=lun,opened=opened)
+       if (.not. opened) then
+          get_file_unit=lun
+          exit
+       end if
+    end do
+  end function get_file_unit
 
   subroutine init(navi)
     type(Formura_Navigator) :: navi
     integer :: ix,iy,iz, sx,sy,sz
     double precision :: rx,ry,rz
 
-!    do iz = 1,206
-!       do iy = 1,206
-!          do ix = 1,206
-!             U(ix,iy,iz) = 1.0
-!             V(ix,iy,iz) = 0.0
-!          end do
-!       end do
-!    end do
+    do iz = 1,206
+       do iy = 1,206
+          do ix = 1,206
+             U(ix,iy,iz) = 1.0
+             V(ix,iy,iz) = 0.0
+          end do
+       end do
+    end do
 
     do iz = navi%lower_z+1, navi%upper_z
        do iy = navi%lower_y+1, navi%upper_y
@@ -90,21 +112,32 @@ contains
     type(Formura_Navigator) :: navi
     integer :: ix,iy,iz
 
-    print *, "global monitor"
-    print *, navi%offset_x + navi%lower_x
-    print *, navi%offset_y + navi%lower_y
-    print *, navi%offset_z + navi%lower_z
-    print *, navi%upper_x - navi%lower_x
-    print *, navi%upper_y - navi%lower_y
-    print *, navi%upper_z - navi%lower_z
+    file_unit = get_file_unit()
+    open(file_unit, file='monitor.bin', status='replace', access='stream')
+
+    write(file_unit), navi%offset_z + navi%lower_z
+    write(file_unit), navi%offset_y + navi%lower_y
+    write(file_unit), navi%offset_x + navi%lower_x
+    write(file_unit), navi%upper_z - navi%lower_z
+    write(file_unit), navi%upper_y - navi%lower_y
+    write(file_unit), navi%upper_x - navi%lower_x
 
     if (navi%offset_z + navi%lower_z == 0) then
-       print *, "global monitor output"
-       iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2
+       ix = navi%lower_x + (navi%upper_x - navi%lower_x)/2
        do iy = navi%lower_y+1, navi%upper_y
-          do ix = navi%lower_x+1, navi%upper_x
-             print *, U(ix,iy,iz), V(ix,iy,iz)
-          end do
+          write(file_unit), U(ix,iy,:)
+       end do
+       do iy = navi%lower_y+1, navi%upper_y
+          write(file_unit), V(ix,iy,:)
+       end do
+    end if
+    if (navi%offset_y + navi%lower_y == 0) then
+       ix = navi%lower_x + (navi%upper_x - navi%lower_x)/2
+       do iy = navi%lower_y+1, navi%upper_y
+          write(file_unit), U(ix,iy,:)
+       end do
+       do iy = navi%lower_y+1, navi%upper_y
+          write(file_unit), V(ix,iy,:)
        end do
     end if
   end subroutine write_global_monitor

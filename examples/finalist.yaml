@@ -4,6 +4,6 @@ initial_walls:
   z: [40]
 intra_node_shape: [512,64,64]
 monitor_interval: 16
-mpi_grid_shape: [4,4,4]
+mpi_grid_shape: [1,1,1]
 temporal_blocking_interval: 8
 option_strings: ['stick-single-comp',  'no-subroutine', 'omp', 'omp-collapse', 'expr-bind-size-2']
