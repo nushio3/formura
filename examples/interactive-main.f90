@@ -113,10 +113,10 @@ contains !!! contains !!! contains
     integer :: ix,iy,iz, file_unit
     character*256 :: filename
 
-    write (filename,'("TEST",I5,".TXT")') (navi%mpi_my_rank)
+    write (filename,'("monitor",I5,".bin")') (navi%mpi_my_rank)
 
     file_unit = get_file_unit()
-    open(file_unit, file='monitor.bin', status='replace', access='stream')
+    open(file_unit, file=filename, status='replace', access='stream')
 
     write(file_unit), navi%offset_z + navi%lower_z
     write(file_unit), navi%offset_y + navi%lower_y
