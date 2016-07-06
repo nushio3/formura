@@ -133,6 +133,16 @@ executable incubator
               , yaml
 
 
+executable make-make
+  hs-source-dirs: exe-src
+  main-is: make-make.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+                base == 4.*
+              , formura
+              , lens
+
 
 executable formura-parser
   buildable: False
