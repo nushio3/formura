@@ -43,16 +43,12 @@ else:
 
 for fn in sys.argv[2:]:
     print fn
-    m = re.search('monitorY-([\d]+)-([\d]+)',fn)
-    if m is None:
-        continue
-    t = int(m.group(1))
     with open(fn,'rb') as fp:
         gps = np.fromfile(fp, dtype=dtype_int32,count=6)
         print gps
         x,y,z,sx,sy,sz = gps
 
-        t_ax.add(t)
+        t_ax.add(0)
         x_ax.add(x)
         y_ax.add(y)
         z_ax.add(z)

@@ -67,14 +67,6 @@ contains !!! contains !!! contains
     integer :: ix,iy,iz, sx,sy,sz
     double precision :: rx,ry,rz
 
-    do iz = 1,206
-       do iy = 1,206
-          do ix = 1,206
-             U(ix,iy,iz) = 1.0
-             V(ix,iy,iz) = 0.0
-          end do
-       end do
-    end do
 
     do iz = navi%lower_z+1, navi%upper_z
        do iy = navi%lower_y+1, navi%upper_y
@@ -128,21 +120,21 @@ contains !!! contains !!! contains
     write(file_unit), navi%upper_x - navi%lower_x
 
     if (navi%offset_z + navi%lower_z == 0) then
-       ix = navi%lower_x + (navi%upper_x - navi%lower_x)/2
+       iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2
        do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), U(ix,iy,:)
+          write(file_unit), U(:,iy,iz)
        end do
        do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), V(ix,iy,:)
+          write(file_unit), V(:,iy,iz)
        end do
     end if
     if (navi%offset_y + navi%lower_y == 0) then
-       ix = navi%lower_x + (navi%upper_x - navi%lower_x)/2
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), U(ix,iy,:)
+       iy = navi%lower_y + (navi%upper_y - navi%lower_y)/2
+       do iz = navi%lower_z+1, navi%upper_z
+          write(file_unit), U(:,iy,iz)
        end do
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), V(ix,iy,:)
+       do iz = navi%lower_z+1, navi%upper_z
+          write(file_unit), V(:,iy,iz)
        end do
     end if
   end subroutine write_global_monitor
