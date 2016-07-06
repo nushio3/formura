@@ -4,7 +4,7 @@ program main
 
   implicit none
   type(Formura_Navigator) :: navi
-  integer :: seedsize
+  integer :: seedsize,seed_un
   integer,allocatable:: seed(:)
 
 
@@ -16,8 +16,15 @@ program main
 
   call random_seed(size=seedsize)  ! シードの格納に必要なサイズを取得する
   allocate(seed(seedsize))         ! シード格納領域を確保
-  call random_seed(get=seed)       ! シードを取得
-  seed(1) = navi%mpi_my_rank       ! シードを摂動
+!  seed_un = get_file_unit()
+!  open(unit=seed_un, file="/dev/urandom", access="stream", &
+!       form="unformatted", action="read", status="old")
+!  read(seed_un) seed
+  !  close(seed_un)
+
+  do seed_un=1,seedsize
+     seed(seed_un) = lcg(navi%mpi_my_rank + 1341398 * seed_un)
+  end do
   call random_seed(put=seed)       ! シードを格納
 
   call init(navi)
@@ -80,10 +87,13 @@ contains !!! contains !!! contains
     call random_number(rx)
     call random_number(ry)
     call random_number(rz)
+    print *, rx,ry,rz
 
-    sx = (navi%upper_x-navi%lower_x-16)*rx
-    sy = (navi%upper_y-navi%lower_y-16)*ry
-    sz = (navi%upper_z-navi%lower_z-16)*rz
+    sx = int(dble(navi%upper_x-navi%lower_x-16)*rx)
+    sy = int(dble(navi%upper_y-navi%lower_y-16)*ry)
+    sz = int(dble(navi%upper_z-navi%lower_z-16)*rz)
+
+    print *, sx,sy,sz
 
     do iz = sz+1,sz+16
        do iy = sy+1, sy+16
@@ -132,4 +142,16 @@ contains !!! contains !!! contains
     end do
   end subroutine write_global_monitor
 
+  function lcg(s)
+    integer :: s
+    integer :: lcg
+
+    if (s == 0) then
+       s = 104729
+    else
+       s = mod(s, 4294967296)
+    end if
+    s = mod(s * 279470273, 4294967291)
+    lcg = s
+  end function lcg
 end program main
