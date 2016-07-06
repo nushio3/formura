@@ -1068,7 +1068,7 @@ tellProgram = do
 
   tellCBlockArg "subroutine" "Formura_Init" "(navi,comm)" $ do
     tellCLn "type(Formura_Navigator) :: navi"
-    tellCLn "integer :: comm"
+    tellCLn "integer :: comm, mpi_my_rank_tmp"
 
 
     csb0 <- use tsCommonStaticBox
@@ -1076,8 +1076,8 @@ tellProgram = do
         lower_offset = negate $ csb0 ^.lowerVertex
     tellCLn $ "integer ::  " <> C.intercalate ", " (toList mpiivars)
     tellCLn $ "navi%mpi_comm = comm"
-    tellCLn $ "call MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
-    tellCLn $ "call Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", " <> x| x<- toList mpiivars]  <> ")"
+    tellCLn $ "call MPI_Comm_rank(comm,mpi_my_rank_tmp,mpi_err)\n navi%mpi_my_rank=mpi_my_rank_tmp"
+    tellCLn $ "call Formura_decode_mpi_rank( mpi_my_rank_tmp" <> C.unwords [ ", " <> x| x<- toList mpiivars]  <> ")"
     forM_ deltaMPIs $ \r@(MPIRank rv) -> do
       let terms = zipWith nPlusK (toList mpiivars) (toList rv)
       tellC $ "navi%" <> nameDeltaMPIRank r <> "="
