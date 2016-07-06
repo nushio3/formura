@@ -1,9 +1,9 @@
 initial_walls:
   x: [264]
-  y: [40]
-  z: [40]
-intra_node_shape: [512,64,64]
+  y: [31]
+  z: [29,50]
+intra_node_shape: [64,46,512]
 monitor_interval: 16
 mpi_grid_shape: [2,2,2]
 temporal_blocking_interval: 8
-option_strings: ['stick-single-comp',  'no-subroutine', 'omp', 'omp-collapse', 'expr-bind-size-2']
+option_strings: ['stick-single-comp',  'no-subroutine', 'omp', 'omp-collapse', 'expr-bind-size-2', 'nbuz2']
