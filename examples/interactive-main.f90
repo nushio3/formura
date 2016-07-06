@@ -81,10 +81,6 @@ contains !!! contains !!! contains
     call random_number(ry)
     call random_number(rz)
 
-    rx = 0.5
-    ry = 0.5
-    rz = 0.5
-
     sx = (navi%upper_x-navi%lower_x-16)*rx
     sy = (navi%upper_y-navi%lower_y-16)*ry
     sz = (navi%upper_z-navi%lower_z-16)*rz
@@ -105,6 +101,11 @@ contains !!! contains !!! contains
     integer :: ix,iy,iz, file_unit, myrank, vx_lo, vx_hi
     character*256 :: filename
 
+    if (navi%offset_z + navi%lower_z > 0) then
+       return
+    end if
+
+
     myrank = navi%mpi_my_rank
     print *, "my rank is ", myrank
     write (filename,'("monitor",I5.5,".bin")') myrank
@@ -122,24 +123,13 @@ contains !!! contains !!! contains
     vx_lo = navi%lower_x+1
     vx_hi = navi%upper_x
 
-    if (navi%offset_z + navi%lower_z == 0) then
-       iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), U(vx_lo:vx_hi,iy,iz)
-       end do
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), V(vx_lo:vx_hi,iy,iz)
-       end do
-    end if
-    if (navi%offset_y + navi%lower_y == 0) then
-       iy = navi%lower_y + (navi%upper_y - navi%lower_y)/2
-       do iz = navi%lower_z+1, navi%upper_z
-          write(file_unit), U(vx_lo:vx_hi,iy,iz)
-       end do
-       do iz = navi%lower_z+1, navi%upper_z
-          write(file_unit), V(vx_lo:vx_hi,iy,iz)
-       end do
-    end if
+    iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2
+    do iy = navi%lower_y+1, navi%upper_y
+       write(file_unit), U(vx_lo:vx_hi,iy,iz)
+    end do
+    do iy = navi%lower_y+1, navi%upper_y
+       write(file_unit), V(vx_lo:vx_hi,iy,iz)
+    end do
   end subroutine write_global_monitor
 
 end program main
