@@ -148,7 +148,7 @@ genMMInstruction omNodeID = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
-      nbuy = nbuSize "z" nc
+      nbuz = nbuSize "z" nc
   sequence_ $ reverse
     [ let ?nbuSpine = x==0&&y==0&&z==0 in rhsDelayedCodeAt (Vec [x,y,z]) omNodeID
     | x <- [0..nbux-1]
