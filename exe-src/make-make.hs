@@ -9,12 +9,12 @@ main :: IO ()
 main = do
   foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
   let csrcFiles =
-        [fn | fn <- foundFiles, fn ^. extension == ".f90"]
+        [fn | fn <- foundFiles, fn ^. extension == ".f90", fn /= "main.f90"]
       objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
 
       headerFiles = [fn | fn <- csrcFiles, "_header.f90" `isSuffixOf`fn]
       internalFiles = [fn | fn <- csrcFiles, "_internal_" `isInfixOf`fn]
-      mainFiles = [fn | fn <- csrcFiles, "main.f90" `isSuffixOf` fn]
+      mainFiles = [fn | fn <- csrcFiles, "-main.f90" `isSuffixOf` fn]
       libFiles = [fn | fn <- csrcFiles, not (fn `elem` headerFiles), not (fn `elem` internalFiles), not(fn `elem` mainFiles)]
 
       dependencyOf fn
