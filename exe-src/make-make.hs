@@ -14,7 +14,7 @@ main = do
 
       headerFiles = [fn | fn <- csrcFiles, "_header.f90" `isSuffixOf`fn]
       internalFiles = [fn | fn <- csrcFiles, "_internal_" `isInfixOf`fn]
-      mainFiles = [fn | fn <- csrcFiles, "-main.f90" `isSuffixOf` fn]
+      mainFiles = [fn | fn <- csrcFiles, "main.f90" `isSuffixOf` fn]
       libFiles = [fn | fn <- csrcFiles, not (fn `elem` headerFiles), not (fn `elem` internalFiles), not(fn `elem` mainFiles)]
 
       dependencyOf fn

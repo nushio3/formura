@@ -6,7 +6,7 @@ program main
   type(Formura_Navigator) :: navi
   integer :: seedsize
   integer,allocatable:: seed(:)
-  integer :: epoch
+
 
   print *, "Formura test main program."
 
@@ -110,7 +110,7 @@ contains !!! contains !!! contains
 
   subroutine write_global_monitor(navi)
     type(Formura_Navigator) :: navi
-    integer :: ix,iy,iz
+    integer :: ix,iy,iz, file_unit
 
     file_unit = get_file_unit()
     open(file_unit, file='monitor.bin', status='replace', access='stream')
