@@ -110,10 +110,12 @@ contains !!! contains !!! contains
 
   subroutine write_global_monitor(navi)
     type(Formura_Navigator) :: navi
-    integer :: ix,iy,iz, file_unit
+    integer :: ix,iy,iz, file_unit, myrank
     character*256 :: filename
 
-    write (filename,'("monitor",I5,".bin")') (navi%mpi_my_rank)
+    myrank = navi%mpi_my_rank
+    print *, "my rank is ", myrank
+    write (filename,'("monitor",I5.5,".bin")') myrank
 
     file_unit = get_file_unit()
     open(file_unit, file=filename, status='replace', access='stream')
