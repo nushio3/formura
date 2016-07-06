@@ -24,7 +24,7 @@ program main
 
   call fapp_start("main", 0,0)
   call start_collection("main")
-  do while (navi%time_step <1024)
+  do while (navi%time_step <65536)
      call Formura_Forward(navi)
   end do
   call stop_collection("main")
