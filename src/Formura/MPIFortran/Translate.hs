@@ -1293,7 +1293,7 @@ genFortranFiles formuraProg mmProg0 = do
 
   mapM_ indent ([fortranHeaderFilePath, cxxFilePath] ++ auxFilePaths)
   where
-    indent fn = X.handle ignore $ callProcess "./scripts/indent-fortran.sh" [fn]
+    indent fn = X.handle ignore $ callProcess "./scripts/wrap-fortran.py" [fn]
 
     ignore :: X.SomeException -> IO ()
     ignore _ = return ()
