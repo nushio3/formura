@@ -552,7 +552,7 @@ mainServer = do
   idxps <- catMaybes <$> mapM readIndExp idvFnsRnd
 
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
-  case remainingTaskCount <= 5 && ("--perturb" `elem` argv) of
+  case remainingTaskCount <= 15 && ("--perturb" `elem` argv) of
     True -> do
       cmd "cd /home/nushio/hub/3d-mhd/individuals/understand-2; ./perturb.py"
       return ()
