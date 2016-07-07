@@ -646,8 +646,25 @@ ompEveryLoopPragma n
   | "omp-collapse" `elem` ?ncOpts = "#pragma omp for collapse(" <> C.show n <> ")"
   | otherwise                 = ""
 
--- | generate a formura function body.
+withFineBench :: (?ncOpts :: [String]) => C.Src -> C.Src -> C.Src
+withFineBench benchLabel = addColl . addFapp
 
+  where
+    addColl src = case "bench-fine-collection" `elem` ?ncOpts of
+      False -> src
+      True -> C.unlines ["start_collection(\"" <> benchLabel <> "\");"
+                        , src
+                        , "stop_collection(\"" <> benchLabel <> "\");"
+                        ]
+
+    addFapp src = case "bench-fine-fapp" `elem` ?ncOpts of
+      False -> src
+      True -> C.unlines ["fapp_start(\"" <> benchLabel <> "\",0,0);"
+                        , src
+                        , "fapp_stop(\"" <> benchLabel <> ", 0, 0\");"
+                        ]
+
+-- | generate a formura function body.
 genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM C.Src
 genComputation (ir0, nid0) destRsc0 = do
   dim <- view dimension
@@ -873,18 +890,20 @@ genDistributedProgram insts0 = do
       剔算 = "knockout-computation"   `elem` ?ncOpts
       剔通 = "knockout-communication" `elem` ?ncOpts
 
+      m ⏲ str = withFineBench str <$> m
+
       knockout :: Bool -> TranM C.Src -> TranM C.Src
       knockout flag m = do
         t <- m
         return $ if flag then "" else t
 
       go :: DistributedInst -> TranM C.Src
-      go (Computation cmp destRsc) = knockout 剔算 $ genComputation cmp destRsc
-      go (Unstage rid)             = knockout 剔算 $ genStagingCode False rid
-      go (Stage rid)               = knockout 剔算 $ genStagingCode True rid
+      go (Computation cmp destRsc) = knockout 剔算 $ genComputation cmp destRsc ⏲ "computation"
+      go (Unstage rid)             = knockout 剔算 $ genStagingCode False rid ⏲ "stage-out"
+      go (Stage rid)               = knockout 剔算 $ genStagingCode True rid ⏲ "stage-in"
       go (FreeResource _)          = knockout 剔算 $ return ""
-      go (CommunicationSendRecv f) = knockout 剔通 $ genMPISendRecvCode f
-      go (CommunicationWait f)     = knockout 剔通 $ genMPIWaitCode f
+      go (CommunicationSendRecv f) = knockout 剔通 $ genMPISendRecvCode f ⏲ "mpi-sendrecv"
+      go (CommunicationWait f)     = knockout 剔通 $ genMPIWaitCode f ⏲ "mpi-wait"
 
       genCall :: [(DistributedInst, C.Src)] -> TranM C.Src
       genCall instPairs = do
