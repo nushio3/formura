@@ -677,7 +677,8 @@ genComputation (ir0, nid0) destRsc0 = do
   systemOffset0 <- use planSystemOffset
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
-      gridStride = [nbux, nbuy, 1]
+      nbuz = nbuSize "z" nc
+      gridStride = [nbux, nbuy, nbuz]
   let
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
@@ -915,7 +916,8 @@ collaboratePlans = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
-      nbuMargin = Vec [nbux-1+2, nbuy-1+2, 2]
+      nbuz = nbuSize "z" nc
+      nbuMargin = Vec [nbux-1+2, nbuy-1+2, nbuz-1+2]
 
   let commonStaticBox :: Box
       commonStaticBox =
