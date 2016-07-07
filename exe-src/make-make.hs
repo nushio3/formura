@@ -7,7 +7,7 @@ import           Formura.Utilities
 
 main :: IO ()
 main = do
-  foundFiles <- fmap (sort . lines) $ readCmd $ "find ."
+  foundFiles <- fmap (sort . lines) $ readCmd $ "find . | grep finalist"
   let csrcFiles =
         [fn | fn <- foundFiles, fn ^. extension == ".f90", fn ^.basename /= "main"]
       objFiles = [fn & extension .~ "o"  |fn <- csrcFiles]
