@@ -1,5 +1,5 @@
-rm  examples/finalist*.f90 examples/Makefile bin/finalist.out examples/*internal*
+rm  examples/champion*internal*
 stack install
-stack exec formura -- examples/finalist.fmr -o examples/finalist.f90
-(cd examples/; ../bin/make-make -F)
-rsync -avz ./examples/Makefile examples/*.f90 K:/volume73/data/ra000008/nushio/formura/attic/f-test
+stack exec formura -- examples/champion.fmr -o examples/champion.c
+(cd examples/; ../bin/make-make -C)
+rsync -avz ./examples/Makefile examples/*champion* K:/volume73/data/ra000008/nushio/formura/attic/c-test/

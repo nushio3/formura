@@ -22,13 +22,13 @@ program main
 
   call init(navi)
 
-  call fapp_start("main", 0,0)
   call start_collection("main")
+  call fapp_start("main", 0,0)
   do while (navi%time_step <65536)
      call Formura_Forward(navi)
   end do
-  call stop_collection("main")
   call fapp_stop("main", 0,0)
+  call stop_collection("main")
 
 
 
