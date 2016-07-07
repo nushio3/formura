@@ -677,7 +677,7 @@ withFineBench benchLabel = addColl . addFapp
       False -> src
       True -> C.unlines ["call fapp_start(\"" <> benchLabel <> "\",0,0)"
                         , src
-                        , "call fapp_stop(\"" <> benchLabel <> ", 0, 0\")"
+                        , "call fapp_stop(\"" <> benchLabel <> "\",0,0)"
                         ]
 
 

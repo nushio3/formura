@@ -661,7 +661,7 @@ withFineBench benchLabel = addColl . addFapp
       False -> src
       True -> C.unlines ["fapp_start(\"" <> benchLabel <> "\",0,0);"
                         , src
-                        , "fapp_stop(\"" <> benchLabel <> ", 0, 0\");"
+                        , "fapp_stop(\"" <> benchLabel <> "\",0,0);"
                         ]
 
 -- | generate a formura function body.

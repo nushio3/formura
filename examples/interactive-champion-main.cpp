@@ -187,11 +187,11 @@ int main (int argc, char **argv) {
   for(;;){
     double t = wctime();
     bool monitor_flag = navi.time_step >= last_monitor_t + T_MONITOR;
-    if(monitor_flag || navi.time_step <= 3 * T_MONITOR ) {
-      if(mpi_my_rank==0){
-        printf("marked %d step @ %lf sec\n", navi.time_step, t-t_begin);
-      }
-    }
+    // if(monitor_flag || navi.time_step <= 3 * T_MONITOR ) {
+    //   if(mpi_my_rank==0){
+    //     //printf("marked %d step @ %lf sec\n", navi.time_step, t-t_begin);
+    //   }
+    // }
     if(monitor_flag) {
       write_monitor();
       if(mpi_my_rank==0){
