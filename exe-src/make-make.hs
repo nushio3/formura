@@ -59,7 +59,7 @@ mainC = do
         , "\t$(CC) -c $^ -o $@ 2> $@.optmsg"]
   writeFile "Makefile" $ unlines
     [ "all: a.out"
-    , "CC=mpiFCCpx -Cpp  -Karray_private -Kdynamic_iteration -Keval -Kfast,parallel -Kinstance=8 -Klib -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Kocl -Kopenmp -Kparallel -Kpreex -Kreduction -Ksimd=2"
+    , "CC=mpiFCCpx  -Karray_private -Kdynamic_iteration -Keval -Kfast,parallel -Kinstance=8 -Klib -Kloop_fission -Kloop_part_parallel -Kloop_part_simd -Kocl -Kopenmp -Kparallel -Kpreex -Kreduction -Ksimd=2"
     , "OBJS=" ++ unwords objFiles
     , "a.out: $(OBJS)"
     , "\t$(CC) $(OBJS) -o a.out"
