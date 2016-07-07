@@ -30,6 +30,7 @@ import           System.IO
 import           System.IO.Temp
 import           System.IO.Unsafe
 import           System.Process
+import           System.Random.Shuffle(shuffleM)
 import           Text.Printf
 import           Formura.NumericalConfig
 import           Formura.Utilities
@@ -547,7 +548,8 @@ mainServer = do
         [] ->  sort $ lines findIdvs
         pats -> concat [sort $ filter (isInfixOf pat) $ lines findIdvs | pat <- pats]
 
-  idxps <- catMaybes <$> mapM readIndExp idvFns
+  idvFnsRnd <- shuffleM idvFns
+  idxps <- catMaybes <$> mapM readIndExp idvFnsRnd
 
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
   case remainingTaskCount <= 5 && ("--perturb" `elem` argv) of
