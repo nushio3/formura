@@ -1,5 +1,5 @@
 #!/bin/bash
 while true; do
-    ./bin/incubator "$@"
+    ./bin/c-incubator "$@"
     sleep 1
 done
