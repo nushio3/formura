@@ -12,7 +12,7 @@
 
 using namespace std;
 
-#include "pearson-3d.h"
+#include "champion.h"
 
 bool EXTEND_MISSION=false;
 int T_MAX;
