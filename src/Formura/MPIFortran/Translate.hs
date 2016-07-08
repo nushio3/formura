@@ -339,17 +339,17 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
     fix :: IdentName -> IdentName
     fix = T.packed %~ (T.replace "ResourceOMNode" "Om" .
                        T.replace "ResourceStatic" "St" .
-                      T.replace "IRank" "r".
-                      T.replace "ridgeDelta_" "".
-                      T.replace "MPIRank" "".
-                      T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge" .
-                      T.replace "facetIRSrc_IRank" "src" .
-                      T.replace "facetIRDest_IRank" "dest" .
-                      T.replace "FacetID_facetDeltaMPI_" "Facet".
-                      T.replace "IRankCompareStraight" "".
-                      T.replace "IRankCompareReverse" "".
-                      id
-                      )
+                       T.replace "IRank" "r".
+                       T.replace "ridgeDelta_" "".
+                       T.replace "MPIRank" "".
+                       T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge" .
+                       T.replace "facetIRSrc_IRank" "src" .
+                       T.replace "facetIRDest_IRank" "dest" .
+                       T.replace "FacetID_facetDeltaMPI_" "Facet".
+                       T.replace "IRankCompareStraight" "".
+                       T.replace "IRankCompareReverse" "".
+                       id
+                       )
 
 -- | Give name to Resources
 nameArrayResource :: (ResourceT () IRank) -> TranM C.Src
