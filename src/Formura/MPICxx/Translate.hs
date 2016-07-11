@@ -1301,6 +1301,8 @@ cxxTemplate = C.unlines
   , "#include <mpi.h>"
   , "#include <math.h>"
   , "#include <stdbool.h>"
+  , "#include <fj_tool/fapp.h>"
+  , "#include <fjcoll.h>"
   , "#include \"" <> fromString hxxFileName <> "\""
   , ""
   ]
