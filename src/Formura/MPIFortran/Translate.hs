@@ -927,11 +927,11 @@ genDistributedProgram insts0 = do
 
       go :: DistributedInst -> TranM (FortranBinding, C.Src)
       go (Computation cmp destRsc) = 剔算 $ genComputation cmp destRsc ⏲ "computation"
-      go (Unstage rid)             = 剔算 $ genStagingCode False rid ⏲ "stage-out"
-      go (Stage rid)               = 剔算 $ genStagingCode True rid ⏲ "stage-in"
+      go (Unstage rid)             = 剔算 $ genStagingCode False rid ⏲ "stageOut"
+      go (Stage rid)               = 剔算 $ genStagingCode True rid ⏲ "stageIn"
       go (FreeResource _)          = 剔算 $ return (M.empty, "")
-      go (CommunicationSendRecv f) = 剔通 $ genMPISendRecvCode f  ⏲ "mpi-sendrecv"
-      go (CommunicationWait f)     = 剔通 $ genMPIWaitCode f ⏲ "mpi-wait"
+      go (CommunicationSendRecv f) = 剔通 $ genMPISendRecvCode f  ⏲ "mpiSendrecv"
+      go (CommunicationWait f)     = 剔通 $ genMPIWaitCode f ⏲ "mpiWait"
 
       genCall :: [(DistributedInst, (FortranBinding, C.Src))] -> TranM C.Src
       genCall instPairs = do
