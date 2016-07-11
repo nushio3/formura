@@ -1295,17 +1295,21 @@ genCxxFiles formuraProg mmProg0 = do
     ignore _ = return ()
 
 
-cxxTemplate ::  WithCommandLineOption => C.Src
+cxxTemplate ::  (WithCommandLineOption, ?ncOpts :: [String]) => C.Src
 cxxTemplate = C.unlines
   [ ""
   , "#include <mpi.h>"
   , "#include <math.h>"
   , "#include <stdbool.h>"
-  , "#include <fj_tool/fapp.h>"
-  , "#include <fjcoll.h>"
+  , benchHeaders
   , "#include \"" <> fromString hxxFileName <> "\""
   , ""
   ]
+  where
+    isBenchFine = "bench-fine-collection" `elem` ?ncOpts || "bench-fine-fapp" `elem` ?ncOpts
+    benchHeaders
+      | isBenchFine = C.unlines ["#include <fj_tool/fapp.h>" , "#include <fjcoll.h>"]
+      | otherwise   = ""
 
 rscPtrTypename :: T.Text
 rscPtrTypename = rscSfcTypename <> " * __restrict "
