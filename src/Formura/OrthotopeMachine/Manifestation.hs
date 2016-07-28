@@ -148,10 +148,13 @@ genMMInstruction omNodeID = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
+      nbuz = nbuSize "z" nc
   sequence_ $ reverse
-    [ let ?nbuSpine = x==0&&y==0 in rhsDelayedCodeAt (Vec [x,y,0]) omNodeID
+    [ let ?nbuSpine = x==0&&y==0&&z==0 in rhsDelayedCodeAt (Vec [x,y,z]) omNodeID
     | x <- [0..nbux-1]
-    , y <- [0..nbuy-1]]
+    , y <- [0..nbuy-1]
+    , z <- [0..nbuz-1]
+    ]
   return ()
 
 
@@ -190,7 +193,8 @@ manifestG omg = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
-      boundaryFixer = Vec [nbux-1, nbuy-1, 0]
+      nbuz = nbuSize "z" nc
+      boundaryFixer = Vec [nbux-1, nbuy-1, nbuz-1]
   return $ boundaryAnalysis boundaryFixer $ M.fromList nodeList
 
 manifestation :: WithCommandLineOption => OMProgram -> TranM MMProgram

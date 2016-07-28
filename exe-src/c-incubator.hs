@@ -30,6 +30,7 @@ import           System.IO
 import           System.IO.Temp
 import           System.IO.Unsafe
 import           System.Process
+import           System.Random.Shuffle(shuffleM)
 import           Text.Printf
 import           Formura.NumericalConfig
 import           Formura.Utilities
@@ -384,24 +385,24 @@ benchmark it = do
       , ". /work/system/Env_base"
       , "mpiexec /work/system/bin/msh \"mkdir ./out\""
       , ""
-      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpirun -n %d ./a.out %d %d" n mpiSize x x
+      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpiexec -n %d   -ofout-proc out/out -oferr-proc out/err  ./a.out %d %d" n mpiSize x x
                 | n <- extensionNSet, let x = 8192 * 2^n::Integer]
       ,
         if not csvMode then "" else
           unlines
-          [ printf "fapp -C -d prof-C -Hevent=Cache        mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-I -Hevent=Instructions mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-M -Hevent=MEM_access   mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-P -Hevent=Performance  mpirun -n %d ./a.out" mpiSize
-          , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-01 -Hpa=1 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-02 -Hpa=2 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-03 -Hpa=3 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-04 -Hpa=4 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-05 -Hpa=5 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-06 -Hpa=6 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-07 -Hpa=7 mpirun -n %d ./a.out" mpiSize
-          , printf "fapp -C -d prof-mpi -Impi mpirun -n %d ./a.out" mpiSize
+          [ printf "fapp -C -d prof-C -Hevent=Cache        mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-I -Hevent=Instructions mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-M -Hevent=MEM_access   mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-P -Hevent=Performance  mpiexec -n %d ./a.out" mpiSize
+          , printf "fipp -m 30000 -C -d prof-ip -Icall,hwm mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-01 -Hpa=1 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-02 -Hpa=2 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-03 -Hpa=3 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-04 -Hpa=4 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-05 -Hpa=5 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-06 -Hpa=6 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-07 -Hpa=7 mpiexec -n %d ./a.out" mpiSize
+          , printf "fapp -C -d prof-mpi -Impi mpiexec -n %d ./a.out" mpiSize
           ]
       ]
     cmd $ "chmod 755 " ++ "submit.sh"
@@ -521,10 +522,10 @@ intPerturbers =
 
 main :: IO ()
 main = do
-  putStrLn "out-procオプション等を設定したら、当該ファイルをステージアウトしなければならない。   インキュベータにこれらの機能を組み込むべき"
-{-x <- doesFileExist qbConfigFilePath
+  x <- doesFileExist qbConfigFilePath
   if not x then mainInit else mainServer
--}
+
+
 
 mainInit :: IO ()
 mainInit = do
@@ -547,10 +548,11 @@ mainServer = do
         [] ->  sort $ lines findIdvs
         pats -> concat [sort $ filter (isInfixOf pat) $ lines findIdvs | pat <- pats]
 
-  idxps <- catMaybes <$> mapM readIndExp idvFns
+  idvFnsRnd <- shuffleM idvFns
+  idxps <- catMaybes <$> mapM readIndExp idvFnsRnd
 
   let remainingTaskCount = length [() | it <- idxps, it ^. xpAction < Done]
-  case remainingTaskCount <= 5 && ("--perturb" `elem` argv) of
+  case remainingTaskCount <= 15 && ("--perturb" `elem` argv) of
     True -> do
       cmd "cd /home/nushio/hub/3d-mhd/individuals/understand-2; ./perturb.py"
       return ()
@@ -563,7 +565,7 @@ proceed :: WithQBConfig => IndExp -> IO ()
 proceed it = do
   argv <- getArgs
   let whenSlack lmt perform it = do
-        kstat <- readCmd "ssh K kstat"
+        kstat <- readCmd "ssh K 'cat kstat'"
         let crowded = length (lines kstat) - 5 > lmt
         case crowded &&  (not $ "--unnice" `elem` argv) of
           True -> do

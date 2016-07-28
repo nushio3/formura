@@ -107,6 +107,31 @@ executable formura
               , trifecta
               , yaml
 
+executable c-incubator
+  hs-source-dirs: exe-src
+  main-is: c-incubator.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+--  ld-options: -static -pthread
+  build-depends:
+                base == 4.*
+              , aeson
+              , bytestring
+              , cases
+              , containers
+              , directory
+              , filepath
+              , formura
+              , lens
+              , mtl
+              , process
+              , random-shuffle
+              , temporary
+              , text
+              , time
+              , unordered-containers
+              , yaml
+
 executable incubator
   hs-source-dirs: exe-src
   main-is: incubator.hs
@@ -132,6 +157,16 @@ executable incubator
               , unordered-containers
               , yaml
 
+
+executable make-make
+  hs-source-dirs: exe-src
+  main-is: make-make.hs
+  default-language:    Haskell2010
+  ghc-options:         -O3 -Wall -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+                base == 4.*
+              , formura
+              , lens
 
 
 executable formura-parser

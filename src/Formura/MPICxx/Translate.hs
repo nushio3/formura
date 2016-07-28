@@ -331,14 +331,17 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
     fix :: IdentName -> IdentName
     fix = T.packed %~ (T.replace "ResourceOMNode" "Om" .
                        T.replace "ResourceStatic" "St" .
-                      T.replace "IRank" "r".
-                      T.replace "ridgeDelta_" "".
-                      T.replace "MPIRank" "".
-                      T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge" .
-                      T.replace "facetIRSrc_IRank" "src" .
-                      T.replace "facetIRDest_IRank" "dest" .
-                      T.replace "FacetID_facetDeltaMPI_" "Facet"
-                      )
+                       T.replace "IRank" "r".
+                       T.replace "ridgeDelta_" "".
+                       T.replace "MPIRank" "".
+                       T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge" .
+                       T.replace "facetIRSrc_IRank" "src" .
+                       T.replace "facetIRDest_IRank" "dest" .
+                       T.replace "FacetID_facetDeltaMPI_" "Facet".
+                       T.replace "IRankCompareStraight" "".
+                       T.replace "IRankCompareReverse" "".
+                       id
+                       )
 
 -- | Give name to Resources
 nameArrayResource :: (ResourceT () IRank) -> TranM C.Src
@@ -646,8 +649,25 @@ ompEveryLoopPragma n
   | "omp-collapse" `elem` ?ncOpts = "#pragma omp for collapse(" <> C.show n <> ")"
   | otherwise                 = ""
 
--- | generate a formura function body.
+withFineBench :: (?ncOpts :: [String]) => C.Src -> C.Src -> C.Src
+withFineBench benchLabel = addColl . addFapp
 
+  where
+    addColl src = case "bench-fine-collection" `elem` ?ncOpts of
+      False -> src
+      True -> C.unlines ["start_collection(\"" <> benchLabel <> "\");"
+                        , src
+                        , "stop_collection(\"" <> benchLabel <> "\");"
+                        ]
+
+    addFapp src = case "bench-fine-fapp" `elem` ?ncOpts of
+      False -> src
+      True -> C.unlines ["fapp_start(\"" <> benchLabel <> "\",0,0);"
+                        , src
+                        , "fapp_stop(\"" <> benchLabel <> "\",0,0);"
+                        ]
+
+-- | generate a formura function body.
 genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM C.Src
 genComputation (ir0, nid0) destRsc0 = do
   dim <- view dimension
@@ -677,7 +697,8 @@ genComputation (ir0, nid0) destRsc0 = do
   systemOffset0 <- use planSystemOffset
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
-      gridStride = [nbux, nbuy, 1]
+      nbuz = nbuSize "z" nc
+      gridStride = [nbux, nbuy, nbuz]
   let
     genGrid useSystemOffset lhsName2 = do
       let openLoops =
@@ -872,18 +893,20 @@ genDistributedProgram insts0 = do
       剔算 = "knockout-computation"   `elem` ?ncOpts
       剔通 = "knockout-communication" `elem` ?ncOpts
 
+      m ⏲ str = withFineBench str <$> m
+
       knockout :: Bool -> TranM C.Src -> TranM C.Src
       knockout flag m = do
         t <- m
         return $ if flag then "" else t
 
       go :: DistributedInst -> TranM C.Src
-      go (Computation cmp destRsc) = knockout 剔算 $ genComputation cmp destRsc
-      go (Unstage rid)             = knockout 剔算 $ genStagingCode False rid
-      go (Stage rid)               = knockout 剔算 $ genStagingCode True rid
+      go (Computation cmp destRsc) = knockout 剔算 $ genComputation cmp destRsc ⏲ "computation"
+      go (Unstage rid)             = knockout 剔算 $ genStagingCode False rid ⏲ "stageOut"
+      go (Stage rid)               = knockout 剔算 $ genStagingCode True rid ⏲ "stageIn"
       go (FreeResource _)          = knockout 剔算 $ return ""
-      go (CommunicationSendRecv f) = knockout 剔通 $ genMPISendRecvCode f
-      go (CommunicationWait f)     = knockout 剔通 $ genMPIWaitCode f
+      go (CommunicationSendRecv f) = knockout 剔通 $ genMPISendRecvCode f ⏲ "mpiSendrecv"
+      go (CommunicationWait f)     = knockout 剔通 $ genMPIWaitCode f ⏲ "mpiWait"
 
       genCall :: [(DistributedInst, C.Src)] -> TranM C.Src
       genCall instPairs = do
@@ -915,7 +938,8 @@ collaboratePlans = do
   nc <- view envNumericalConfig
   let nbux = nbuSize "x" nc
       nbuy = nbuSize "y" nc
-      nbuMargin = Vec [nbux-1+2, nbuy-1+2, 2]
+      nbuz = nbuSize "z" nc
+      nbuMargin = Vec [nbux-1+2, nbuy-1+2, nbuz-1+2]
 
   let commonStaticBox :: Box
       commonStaticBox =
@@ -1271,15 +1295,21 @@ genCxxFiles formuraProg mmProg0 = do
     ignore _ = return ()
 
 
-cxxTemplate ::  WithCommandLineOption => C.Src
+cxxTemplate ::  (WithCommandLineOption, ?ncOpts :: [String]) => C.Src
 cxxTemplate = C.unlines
   [ ""
   , "#include <mpi.h>"
   , "#include <math.h>"
   , "#include <stdbool.h>"
+  , benchHeaders
   , "#include \"" <> fromString hxxFileName <> "\""
   , ""
   ]
+  where
+    isBenchFine = "bench-fine-collection" `elem` ?ncOpts || "bench-fine-fapp" `elem` ?ncOpts
+    benchHeaders
+      | isBenchFine = C.unlines ["#include <fj_tool/fapp.h>" , "#include <fjcoll.h>"]
+      | otherwise   = ""
 
 rscPtrTypename :: T.Text
 rscPtrTypename = rscSfcTypename <> " * __restrict "

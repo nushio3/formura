@@ -339,17 +339,17 @@ toCName a = postfix $ fix $ go False $ prefix $ show a
     fix :: IdentName -> IdentName
     fix = T.packed %~ (T.replace "ResourceOMNode" "Om" .
                        T.replace "ResourceStatic" "St" .
-                      T.replace "IRank" "r".
-                      T.replace "ridgeDelta_" "".
-                      T.replace "MPIRank" "".
-                      T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge" .
-                      T.replace "facetIRSrc_IRank" "src" .
-                      T.replace "facetIRDest_IRank" "dest" .
-                      T.replace "FacetID_facetDeltaMPI_" "Facet".
-                      T.replace "IRankCompareStraight" "".
-                      T.replace "IRankCompareReverse" "".
-                      id
-                      )
+                       T.replace "IRank" "r".
+                       T.replace "ridgeDelta_" "".
+                       T.replace "MPIRank" "".
+                       T.replace "RidgeID_ridgeDeltaMPI_MPIRank" "Ridge" .
+                       T.replace "facetIRSrc_IRank" "src" .
+                       T.replace "facetIRDest_IRank" "dest" .
+                       T.replace "FacetID_facetDeltaMPI_" "Facet".
+                       T.replace "IRankCompareStraight" "".
+                       T.replace "IRankCompareReverse" "".
+                       id
+                       )
 
 -- | Give name to Resources
 nameArrayResource :: (ResourceT () IRank) -> TranM C.Src
@@ -659,8 +659,29 @@ ompEveryLoopPragma privVars n
   | "omp" `elem` ?ncOpts     = "!$omp do private(" <> C.intercalate ", " privVars <>")"
   | otherwise                 = ""
 
--- | generate a formura function body.
 
+
+
+withFineBench :: (?ncOpts :: [String]) => C.Src -> C.Src -> C.Src
+withFineBench benchLabel = addColl . addFapp
+
+  where
+    addColl src = case "bench-fine-collection" `elem` ?ncOpts of
+      False -> src
+      True -> C.unlines ["call start_collection(\"" <> benchLabel <> "\")"
+                        , src
+                        , "call stop_collection(\"" <> benchLabel <> "\")"
+                        ]
+
+    addFapp src = case "bench-fine-fapp" `elem` ?ncOpts of
+      False -> src
+      True -> C.unlines ["call fapp_start(\"" <> benchLabel <> "\",0,0)"
+                        , src
+                        , "call fapp_stop(\"" <> benchLabel <> "\",0,0)"
+                        ]
+
+
+-- | generate a formura function body.
 genComputation :: (?ncOpts :: [String]) => (IRank, OMNodeID) -> ArrayResourceKey -> TranM (FortranBinding, C.Src)
 genComputation (ir0, nid0) destRsc0 = do
   dim <- view dimension
@@ -827,7 +848,8 @@ genMPISendRecvCode f = do
           , reqName <> ",mpi_err )\n"]
   return (M.empty, mpiIsendIrecv)
 
-genMPIWaitCode :: FacetID -> TranM (FortranBinding, C.Src)
+
+genMPIWaitCode :: (?ncOpts :: [String]) => FacetID -> TranM (FortranBinding, C.Src)
 genMPIWaitCode f = do
   reqName <- nameFacetRequest f
   let
@@ -900,13 +922,16 @@ genDistributedProgram insts0 = do
         t <- m
         return $ if flag then (M.empty, "") else t
 
+      (⏲) :: TranM (FortranBinding, C.Src) -> C.Src -> TranM (FortranBinding, C.Src)
+      m ⏲ str = (_2 %~ withFineBench str) <$> m
+
       go :: DistributedInst -> TranM (FortranBinding, C.Src)
-      go (Computation cmp destRsc) = 剔算 $ genComputation cmp destRsc
-      go (Unstage rid)             = 剔算 $ genStagingCode False rid
-      go (Stage rid)               = 剔算 $ genStagingCode True rid
+      go (Computation cmp destRsc) = 剔算 $ genComputation cmp destRsc ⏲ "computation"
+      go (Unstage rid)             = 剔算 $ genStagingCode False rid ⏲ "stageOut"
+      go (Stage rid)               = 剔算 $ genStagingCode True rid ⏲ "stageIn"
       go (FreeResource _)          = 剔算 $ return (M.empty, "")
-      go (CommunicationSendRecv f) = 剔通 $ genMPISendRecvCode f
-      go (CommunicationWait f)     = 剔通 $ genMPIWaitCode f
+      go (CommunicationSendRecv f) = 剔通 $ genMPISendRecvCode f  ⏲ "mpiSendrecv"
+      go (CommunicationWait f)     = 剔通 $ genMPIWaitCode f ⏲ "mpiWait"
 
       genCall :: [(DistributedInst, (FortranBinding, C.Src))] -> TranM C.Src
       genCall instPairs = do
@@ -1068,7 +1093,7 @@ tellProgram = do
 
   tellCBlockArg "subroutine" "Formura_Init" "(navi,comm)" $ do
     tellCLn "type(Formura_Navigator) :: navi"
-    tellCLn "integer :: comm"
+    tellCLn "integer :: comm, mpi_my_rank_tmp"
 
 
     csb0 <- use tsCommonStaticBox
@@ -1076,8 +1101,8 @@ tellProgram = do
         lower_offset = negate $ csb0 ^.lowerVertex
     tellCLn $ "integer ::  " <> C.intercalate ", " (toList mpiivars)
     tellCLn $ "navi%mpi_comm = comm"
-    tellCLn $ "call MPI_Comm_rank(comm,navi%mpi_my_rank,mpi_err)"
-    tellCLn $ "call Formura_decode_mpi_rank( navi%mpi_my_rank" <> C.unwords [ ", " <> x| x<- toList mpiivars]  <> ")"
+    tellCLn $ "call MPI_Comm_rank(comm,mpi_my_rank_tmp,mpi_err)\n navi%mpi_my_rank=mpi_my_rank_tmp"
+    tellCLn $ "call Formura_decode_mpi_rank( mpi_my_rank_tmp" <> C.unwords [ ", " <> x| x<- toList mpiivars]  <> ")"
     forM_ deltaMPIs $ \r@(MPIRank rv) -> do
       let terms = zipWith nPlusK (toList mpiivars) (toList rv)
       tellC $ "navi%" <> nameDeltaMPIRank r <> "="
@@ -1293,7 +1318,7 @@ genFortranFiles formuraProg mmProg0 = do
 
   mapM_ indent ([fortranHeaderFilePath, cxxFilePath] ++ auxFilePaths)
   where
-    indent fn = X.handle ignore $ callProcess "./scripts/indent-fortran.sh" [fn]
+    indent fn = X.handle ignore $ callProcess "./scripts/wrap-fortran.py" [fn]
 
     ignore :: X.SomeException -> IO ()
     ignore _ = return ()

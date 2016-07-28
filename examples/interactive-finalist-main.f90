@@ -4,7 +4,8 @@ program main
 
   implicit none
   type(Formura_Navigator) :: navi
-  integer :: seedsize
+  integer :: seedsize,seed_un
+  double precision :: seed_throw
   integer,allocatable:: seed(:)
 
 
@@ -16,19 +17,30 @@ program main
 
   call random_seed(size=seedsize)  ! シードの格納に必要なサイズを取得する
   allocate(seed(seedsize))         ! シード格納領域を確保
-  call random_seed(get=seed)       ! シードを取得
-  seed(1) = navi%mpi_my_rank       ! シードを摂動
+!  seed_un = get_file_unit()
+!  open(unit=seed_un, file="/dev/urandom", access="stream", &
+!       form="unformatted", action="read", status="old")
+!  read(seed_un) seed
+  !  close(seed_un)
+
+  do seed_un=1,seedsize
+     seed(seed_un) = lcg(navi%mpi_my_rank + 1341398 * seed_un)
+  end do
   call random_seed(put=seed)       ! シードを格納
+  do seed_un=1,1024
+     call random_number(seed_throw)
+  end do
+
 
   call init(navi)
 
-  call start_collection("main")
   call fapp_start("main", 0,0)
-  do while (navi%time_step <65536)
+  call start_collection("main")
+  do while (navi%time_step <8192)
      call Formura_Forward(navi)
   end do
-  call fapp_stop("main", 0,0)
   call stop_collection("main")
+  call fapp_stop("main", 0,0)
 
 
 
@@ -67,14 +79,6 @@ contains !!! contains !!! contains
     integer :: ix,iy,iz, sx,sy,sz
     double precision :: rx,ry,rz
 
-    do iz = 1,206
-       do iy = 1,206
-          do ix = 1,206
-             U(ix,iy,iz) = 1.0
-             V(ix,iy,iz) = 0.0
-          end do
-       end do
-    end do
 
     do iz = navi%lower_z+1, navi%upper_z
        do iy = navi%lower_y+1, navi%upper_y
@@ -88,14 +92,13 @@ contains !!! contains !!! contains
     call random_number(rx)
     call random_number(ry)
     call random_number(rz)
+    print *, rx,ry,rz
 
-    rx = 0.5
-    ry = 0.5
-    rz = 0.5
+    sx = int(dble(navi%upper_x-navi%lower_x-16)*rx)
+    sy = int(dble(navi%upper_y-navi%lower_y-16)*ry)
+    sz = int(dble(navi%upper_z-navi%lower_z-16)*rz)
 
-    sx = (navi%upper_x-navi%lower_x-16)*rx
-    sy = (navi%upper_y-navi%lower_y-16)*ry
-    sz = (navi%upper_z-navi%lower_z-16)*rz
+    print *, sx,sy,sz
 
     do iz = sz+1,sz+16
        do iy = sy+1, sy+16
@@ -110,10 +113,20 @@ contains !!! contains !!! contains
 
   subroutine write_global_monitor(navi)
     type(Formura_Navigator) :: navi
-    integer :: ix,iy,iz, file_unit
+    integer :: ix,iy,iz, file_unit, myrank, vx_lo, vx_hi
+    character*256 :: filename
+
+    if (navi%offset_z + navi%lower_z > 0) then
+       return
+    end if
+
+
+    myrank = navi%mpi_my_rank
+    print *, "my rank is ", myrank
+    write (filename,'("monitor",I5.5,".bin")') myrank
 
     file_unit = get_file_unit()
-    open(file_unit, file='monitor.bin', status='replace', access='stream')
+    open(file_unit, file=filename, status='replace', access='stream')
 
     write(file_unit), navi%offset_z + navi%lower_z
     write(file_unit), navi%offset_y + navi%lower_y
@@ -122,24 +135,28 @@ contains !!! contains !!! contains
     write(file_unit), navi%upper_y - navi%lower_y
     write(file_unit), navi%upper_x - navi%lower_x
 
-    if (navi%offset_z + navi%lower_z == 0) then
-       ix = navi%lower_x + (navi%upper_x - navi%lower_x)/2
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), U(ix,iy,:)
-       end do
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), V(ix,iy,:)
-       end do
-    end if
-    if (navi%offset_y + navi%lower_y == 0) then
-       ix = navi%lower_x + (navi%upper_x - navi%lower_x)/2
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), U(ix,iy,:)
-       end do
-       do iy = navi%lower_y+1, navi%upper_y
-          write(file_unit), V(ix,iy,:)
-       end do
-    end if
+    vx_lo = navi%lower_x+1
+    vx_hi = navi%upper_x
+
+    iz = navi%lower_z + (navi%upper_z - navi%lower_z)/2
+    do iy = navi%lower_y+1, navi%upper_y
+       write(file_unit), U(vx_lo:vx_hi,iy,iz)
+    end do
+    do iy = navi%lower_y+1, navi%upper_y
+       write(file_unit), V(vx_lo:vx_hi,iy,iz)
+    end do
   end subroutine write_global_monitor
 
+  function lcg(s)
+    integer :: s
+    integer :: lcg
+
+    if (s == 0) then
+       s = 104729
+    else
+       s = mod(s, 4294967296)
+    end if
+    s = mod(s * 279470273, 4294967291)
+    lcg = s
+  end function lcg
 end program main
