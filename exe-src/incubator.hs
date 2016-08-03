@@ -577,7 +577,7 @@ proceed :: WithQBConfig => IndExp -> IO ()
 proceed it = do
   argv <- getArgs
   let whenSlack lmt perform it = do
-        kstat <- readCmd "ssh K 'cat kstat'"
+        kstat <- readCmd "ssh K kstat"
         let crowded = length (lines kstat) - 5 > lmt
         case crowded &&  (not $ "--unnice" `elem` argv) of
           True -> do
@@ -589,8 +589,8 @@ proceed it = do
   t_begin <- getCurrentTime
   newIt <- case it ^. xpAction of
     Codegen -> codegen it
-    Compile ->  whenSlack 30 compile it
-    Benchmark -> whenSlack 50 benchmark it
+    Compile ->  whenSlack 5 compile it
+    Benchmark -> whenSlack 5 benchmark it
     Visualize -> visualize it
     Wait _ _ | "--unwait" `elem` argv -> return $  it & xpAction .~ Codegen
     Wait _ waitlist -> do
