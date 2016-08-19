@@ -4,7 +4,7 @@
 
 # the following two variables are used by the target "waf dist"
 VERSION='0.0.1'
-APPNAME='cxx_test'
+APPNAME='xeon_test'
 
 # these variables are mandatory ('/' are converted automatically)
 top = '.'
@@ -20,10 +20,9 @@ def configure(conf):
 def build(bld):
 	bld.program(source='main.cpp', target='app', use='mylib')
 	bld.stlib(target='mylib', source='a.cpp')
-
+        bld(cxxflags=['-std=c++11', '-O3', '-Wall'])
 
 	if bld.cmd != 'clean':
 		from waflib import Logs
 		bld.logger = Logs.make_logger('test.log', 'build') # just to get a clean output
-		bld.check(header_name='sadlib.h', features='cxx cxxprogram', mandatory=False)
 		bld.logger = None
