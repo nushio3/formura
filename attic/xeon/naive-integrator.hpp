@@ -10,7 +10,7 @@ template <int NX, int NY, int NZ, class T> struct naive_integrator {
         y = (y+NY)%NY;
         z = (z+NZ)%NZ;
         return ar[x][y][z];
-      }
+      };
       for (int x=0;x<NX;++x) {
         for (int y=0;y<NY;++y) {
           for (int z=0;z<NZ;++z) {
@@ -18,8 +18,8 @@ template <int NX, int NY, int NZ, class T> struct naive_integrator {
           }
         }
       }
-      swap(U,U_other);
-      swap(V,V_other);
+      std::swap(U,U_other);
+      std::swap(V,V_other);
     }
   }
 };
