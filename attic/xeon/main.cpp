@@ -24,7 +24,7 @@ int main () {
     ostr << t << "\n";
     for (int y=0;y<NY;++y) {
       for (int z=0;z<NZ;++z) {
-        ostr<<int(std::round(U[NX/2][y][z]));
+        ostr<<int(std::floor(10*U[NX/2][y][z]));
       }
       ostr << "\n";
     }
