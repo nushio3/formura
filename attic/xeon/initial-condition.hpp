@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 
 template <int NX, int NY, int NZ, class T> void fill_initial_condition(T U[NX][NY][NZ], T V[NX][NY][NZ]) {
   for (int x=0;x<NX;++x) {
@@ -16,7 +17,7 @@ template <int NX, int NY, int NZ, class T> void fill_initial_condition(T U[NX][N
     for (int y=by;y<ey;++y){
       for (int z=bz;z<ez;++z){
         U[x][y][z] = 0.5;
-        V[x][y][z] = 0.25;
+        V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
       }
     }
   }

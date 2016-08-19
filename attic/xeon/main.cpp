@@ -17,10 +17,11 @@ int main () {
   fill_initial_condition<NX,NY,NZ,float>(U,V);
 
   naive_integrator<NX,NY,NZ,float> integrator;
-  while(true){
+  for(int t=0;;++t){
     integrator.proceed(1, U,V);
 
     std::ostringstream ostr;
+    ostr << t << "\n";
     for (int y=0;y<NY;++y) {
       for (int z=0;z<NZ;++z) {
         ostr<<int(std::round(U[NX/2][y][z]));
