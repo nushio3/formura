@@ -18,9 +18,9 @@ def configure(conf):
 	conf.check(header_name='stdio.h', features='cxx cxxprogram', mandatory=False)
 
 def build(bld):
-        bld(cxxflags=['-std=c++11', '-O3', '-Wall'])
-	bld.program(source='main.cpp', target='app', use='mylib')
+	bld.program(source='main.cpp', target='app', use='mylib',cxxflags=['-std=c++11', '-O3', '-Wall', '-mcmodel=large'])
 	bld.stlib(target='mylib', source='a.cpp')
+
 
 	if bld.cmd != 'clean':
 		from waflib import Logs
