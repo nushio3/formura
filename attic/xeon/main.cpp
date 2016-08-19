@@ -1,11 +1,13 @@
+#include <cmath>
 #include <unistd.h>
 #include <iostream>
+#include <sstream>
 #include "initial-condition.hpp"
 #include "naive-integrator.hpp"
 
-#define NX 1
-#define NY 50
-#define NZ 50
+#define NX 50
+#define NY 40
+#define NZ 100
 
 float U[NX][NY][NZ];
 float V[NX][NY][NZ];
@@ -17,13 +19,16 @@ int main () {
   naive_integrator<NX,NY,NZ,float> integrator;
   while(true){
     integrator.proceed(1, U,V);
+
+    std::ostringstream ostr;
     for (int y=0;y<NY;++y) {
       for (int z=0;z<NZ;++z) {
-        std::cout<<int(U[0][y][z]);
+        ostr<<int(std::round(U[NX/2][y][z]));
       }
-      std::cout << std::endl;
+      ostr << "\n";
     }
-    usleep(12345);
+    std::cout << ostr.str()<<std::endl;
+    usleep(10000);
   }
 
 }
