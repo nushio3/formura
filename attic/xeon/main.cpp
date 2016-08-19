@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <iostream>
 #include "initial-condition.hpp"
 #include "naive-integrator.hpp"
@@ -14,13 +15,15 @@ int main () {
   fill_initial_condition<NX,NY,NZ,float>(U,V);
 
   naive_integrator<NX,NY,NZ,float> integrator;
-  integrator.proceed(100, U,V);
-
-  for (int y=0;y<NY;++y) {
-    for (int z=0;z<NZ;++z) {
-      std::cout<<int(U[0][y][z]);
+  while(true){
+    integrator.proceed(1, U,V);
+    for (int y=0;y<NY;++y) {
+      for (int z=0;z<NZ;++z) {
+        std::cout<<int(U[0][y][z]);
+      }
+      std::cout << std::endl;
     }
-    std::cout << std::endl;
+    usleep(12345);
   }
 
 }
