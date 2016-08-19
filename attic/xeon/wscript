@@ -11,16 +11,16 @@ top = '.'
 out = 'build'
 
 def options(opt):
-	opt.load('compiler_cxx')
+        opt.load('compiler_cxx')
 
 def configure(conf):
-	conf.load('compiler_cxx')
+        conf.load('compiler_cxx')
 	conf.check(header_name='stdio.h', features='cxx cxxprogram', mandatory=False)
 
 def build(bld):
+        bld(cxxflags=['-std=c++11', '-O3', '-Wall'])
 	bld.program(source='main.cpp', target='app', use='mylib')
 	bld.stlib(target='mylib', source='a.cpp')
-        bld(cxxflags=['-std=c++11', '-O3', '-Wall'])
 
 	if bld.cmd != 'clean':
 		from waflib import Logs
