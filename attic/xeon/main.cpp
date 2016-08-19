@@ -1,20 +1,26 @@
 #include <iostream>
 #include "initial-condition.hpp"
+#include "naive-integrator.hpp"
 
 #define NX 1
 #define NY 50
 #define NZ 50
 
-double U[NX][NY][NZ];
-double V[NX][NY][NZ];
+float U[NX][NY][NZ];
+float V[NX][NY][NZ];
 
 
 int main () {
-  fill_initial_condition<NX,NY,NZ,double>(U,V);
+  fill_initial_condition<NX,NY,NZ,float>(U,V);
+
+  naive_integrator<NX,NY,NZ,float> integrator;
+  integrator.proceed(100, U,V);
+
   for (int y=0;y<NY;++y) {
     for (int z=0;z<NZ;++z) {
       std::cout<<int(U[0][y][z]);
     }
     std::cout << std::endl;
   }
+
 }
