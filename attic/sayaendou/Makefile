@@ -9,6 +9,9 @@ c.out: main.c Makefile
 f.out: main.f90 Makefile
 	$(FC) main.f90 -o f.out
 
+fx.out: main_xeon.f90 Makefile
+	gfortran -cpp -fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 main_xeon.f90 -o fx.out
+
 
 expnote.pdf: expnote.md
 	pandoc expnote.md -o expnote-body.tex
