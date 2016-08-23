@@ -1,7 +1,9 @@
 #include <cmath>
 #include <unistd.h>
+#include <fstream>
 #include <iostream>
 #include <sstream>
+#include <sys/time.h>
 
 #define NX 50
 #define NY 50
@@ -11,7 +13,7 @@
 #define SY 34
 #define SZ 34
 
-#define T_MAX 1000
+#define T_MAX 3000
 
 typedef double Real;
 
@@ -29,6 +31,13 @@ Real Vwx[T_MAX][2][SY][SZ], Vwy[T_MAX][SX][2][SZ], Vwz[T_MAX][SX][SY][2];
 Real sU0[SX][SY][SZ], sV0[SX][SY][SZ];
 Real sU[SX][SY][SZ], sV[SX][SY][SZ];
 Real sU_1[SX][SY][SZ], sV_1[SX][SY][SZ];
+
+double wctime() {
+  struct timeval tv;
+  gettimeofday(&tv,NULL);
+  return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
+}
+
 
 
 void fill_initial_condition() {
@@ -160,6 +169,7 @@ int main () {
   }
 
 
+  for(int trial=0;trial<10;++trial) {
   std::cerr << "Carrying out simulation..." << std::endl;
   // set initial condition
   for(int x=0;x<SX;++x) {
@@ -171,6 +181,7 @@ int main () {
     }
   }
 
+  double time_begin = wctime();
   for(int t = 0; t < T_MAX; ++t){
     // load communication values
 #pragma omp parallel for collapse(3)
@@ -238,6 +249,10 @@ int main () {
       }
     }
   }
+  double time_end = wctime();
+
+  double flop = 29.0 * (SX-2)*(SY-2)*(SZ-2) *T_MAX;
+  double time_elapse = time_end-time_begin;
 
   {
     const int t = T_MAX;
@@ -251,7 +266,12 @@ int main () {
         }
       }
     }
-    std::cout << "average error: " << (num/den) << std::endl;
+    std::ostringstream msg;
+    msg << SX << " " << SY << " " << SZ << " " << T_MAX << " "
+        << " t: " << time_elapse << " GFlops: " << flop/time_elapse/1e9<< " error: " << (num/den);
+    std::ofstream log_file("benchmark.txt", std::ios::app);
+    std::cout << msg.str() << std::endl;
+    log_file << msg.str() << std::endl;
   }
-
+  }
 }
