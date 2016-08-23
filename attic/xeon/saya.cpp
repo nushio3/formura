@@ -69,6 +69,7 @@ void naive_proceed() {
     return ret / dx / dx;
   };
 
+#pragma omp parallel for collapse(2)
   for (int x=0;x<NX;++x) {
     for (int y=0;y<NY;++y) {
       for (int z=0;z<NZ;++z) {
@@ -104,9 +105,11 @@ void get_solution_at(int t, int x, int y, int z, Real &u, Real &v) {
 }
 
 int main () {
+#pragma omp parallel
   fill_initial_condition();
 
   for(int t = 0;t<MAX_T;++t){
+    std::cout << t << std::endl;
     
     for(int x=SX-2;x<SX;++x) {
       for(int y=0;y<SY;++y) {
