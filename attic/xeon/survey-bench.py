@@ -28,11 +28,20 @@ def generate_modified_code(sx,sy,sz,t_max):
                 ret = "#define T_MAX {}\n".format(t_max)
             f_out.write(ret)
 
+class Param:
+    pass
+
 dims = [32,34,64,68,128,130,256,258]
 for sx in dims:
     for sy in dims:
         for sz in dims:
             for t in [1000,4000,8000]:
+                p = Param()
+                p.sx=sx
+                p.sy=sy
+                p.sz=sz
+                p.t=t
+
                 generate_modified_code(sx,sy,sz,t)
                 subprocess.call(["make","saya-mod.out"])
                 subprocess.call(["./run-saya-mod.sh"])
