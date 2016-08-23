@@ -44,4 +44,4 @@ for sx in dims:
 
                 generate_modified_code(sx,sy,sz,t)
                 subprocess.call(["make","saya-mod.out"])
-                subprocess.call(["./run-saya-mod.sh"])
+                subprocess.call("./run-saya-mod.sh",shell=True)
