@@ -3,15 +3,15 @@
 #include <iostream>
 #include <sstream>
 
-#define NX 30
-#define NY 30
-#define NZ 30
+#define NX 50
+#define NY 50
+#define NZ 50
 
 #define SX 34
 #define SY 34
 #define SZ 34
 
-#define T_MAX 300
+#define T_MAX 8000
 
 typedef double Real;
 
