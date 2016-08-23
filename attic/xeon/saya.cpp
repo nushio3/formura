@@ -11,7 +11,7 @@
 #define SY 34
 #define SZ 34
 
-#define T_MAX 8000
+#define T_MAX 1000
 
 typedef double Real;
 
@@ -28,6 +28,7 @@ Real Vwx[T_MAX][2][SY][SZ], Vwy[T_MAX][SX][2][SZ], Vwz[T_MAX][SX][SY][2];
 
 Real sU0[SX][SY][SZ], sV0[SX][SY][SZ];
 Real sU[SX][SY][SZ], sV[SX][SY][SZ];
+Real sU_1[SX][SY][SZ], sV_1[SX][SY][SZ];
 
 
 void fill_initial_condition() {
@@ -203,27 +204,6 @@ int main () {
     }
 
 
-    /*
-    std::cerr << "stat" <<std::endl;
-    for(int y=0;y<SY-2;++y) {
-      for(int z=0;z<SZ-2;++z) {
-        //        double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
-        std::cerr << int(9.999*sU[SX/2][y][z]);
-      }
-      std::cerr <<std::endl;
-    }
-    std::cerr << "sol" <<std::endl;
-    for(int y=0;y<SY-2;++y) {
-      for(int z=0;z<SZ-2;++z) {
-        int x=SX/2;
-        double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
-        std::cerr << int(9.999*u);
-      }
-      std::cerr <<std::endl;
-      }*/
-
-
-
 
     // destructively update the state
     const auto lap = [](Real ar[SX][SY][SZ],int x, int y, int z) {
@@ -243,8 +223,17 @@ int main () {
 
           auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(sU,x,y,z);
           auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(sV,x,y,z);
-          sU[x][y][z] = u+dt*du_dt;
-          sV[x][y][z] = v+dt*dv_dt;
+          sU_1[x][y][z] = u+dt*du_dt;
+          sV_1[x][y][z] = v+dt*dv_dt;
+        }
+      }
+    }
+#pragma omp parallel for collapse(2)
+    for(int x=0;x<SX-2;++x) {
+      for(int y=0;y<SY-2;++y) {
+        for(int z=0;z<SZ-2;++z) {
+          sU[x][y][z] = sU_1[x][y][z];
+          sV[x][y][z] = sV_1[x][y][z];
         }
       }
     }
@@ -266,4 +255,3 @@ int main () {
   }
 
 }
-
