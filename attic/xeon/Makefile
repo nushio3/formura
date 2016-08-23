@@ -7,7 +7,7 @@ x.out: main.cpp initial-condition.hpp naive-integrator.hpp Makefile
 saya.out: saya.cpp Makefile
 	g++ -std=c++11 \
 	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 \
-	-Wa,-adhln=tv.s -g -fverbose-asm -masm=intel \
+	-Wa,-adhln=saya.s -g -fverbose-asm -masm=intel \
 	saya.cpp -o saya.out
 
 
