@@ -76,7 +76,7 @@ void naive_proceed() {
     return ret / dx / dx;
   };
 
-#pragma omp for collapse(2)
+#pragma omp parallel for collapse(2)
   for (int x=0;x<NX;++x) {
     for (int y=0;y<NY;++y) {
       for (int z=0;z<NZ;++z) {
@@ -113,7 +113,7 @@ void get_solution_at(int t, int x, int y, int z, Real &u, Real &v) {
 }
 
 int main () {
-#pragma omp parallel
+
   fill_initial_condition();
   for(int x=0;x<SX;++x) {
     for(int y=0;y<SY;++y) {
@@ -172,6 +172,7 @@ int main () {
 
   for(int t = 0; t < T_MAX; ++t){
     // load communication values
+#pragma omp parallel for collapse(3)
     for(int x=SX-2;x<SX;++x) {
       for(int y=0;y<SY;++y) {
         for(int z=0;z<SZ;++z) {
@@ -181,6 +182,7 @@ int main () {
       }
     }
 
+#pragma omp parallel for collapse(3)
     for(int x=0;x<SX-2;++x) {
       for(int y=SY-2;y<SY;++y) {
         for(int z=0;z<SZ;++z) {
@@ -190,6 +192,7 @@ int main () {
       }
     }
 
+#pragma omp parallel for collapse(3)
     for(int x=0;x<SX-2;++x) {
       for(int y=0;y<SY-2;++y) {
         for(int z=SZ-2;z<SZ;++z) {
@@ -220,18 +223,6 @@ int main () {
       }*/
 
 
-    for(int x=0;x<SX-2;++x) {
-      for(int y=0;y<SY-2;++y) {
-        for(int z=0;z<SZ-2;++z) {
-          double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
-          if(u != sU[x][y][z]) {
-            std::cerr << "wrong: " << t  << " " <<  x  << " " <<  y  << " " <<  z << " "
-                      << u << " " << sU[x][y][z] << std::endl;
-            return 1;
-          }
-        }
-      }
-    }
 
 
     // destructively update the state
@@ -243,7 +234,7 @@ int main () {
       return ret / dx / dx;
     };
 
-#pragma omp for collapse(2)
+#pragma omp parallel for collapse(2)
     for(int x=0;x<SX-2;++x) {
       for(int y=0;y<SY-2;++y) {
         for(int z=0;z<SZ-2;++z) {
@@ -275,3 +266,4 @@ int main () {
   }
 
 }
+
