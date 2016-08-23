@@ -1,10 +1,10 @@
-   1              		.file	"main.cpp"
+   1              		.file	"saya.cpp"
    2              		.intel_syntax noprefix
    3              	# GNU C++ (GCC) version 4.8.3 20140911 (Red Hat 4.8.3-9) (x86_64-redhat-linux)
    4              	#	compiled by GNU C version 4.8.3 20140911 (Red Hat 4.8.3-9), GMP version 5.1.1, MPFR version 3.1.1
    5              	# warning: GMP header version 5.1.1 differs from library version 6.0.0.
    6              	# GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
-   7              	# 渡されたオプション:  -D_GNU_SOURCE -D_REENTRANT main.cpp
+   7              	# 渡されたオプション:  -D_GNU_SOURCE -D_REENTRANT saya.cpp
    8              	# -march=core-avx2 -masm=intel -g -O3 -std=c++11 -fopenmp -funroll-loops
    9              	# -ftree-vectorize -ftree-vectorizer-verbose=1 -fverbose-asm
   10              	# 有効オプション:  -faggressive-loop-optimizations
@@ -58,7 +58,7 @@
   58              	.Ltext0:
   59              		.section	.text.unlikely,"ax",@progbits
   61              	_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc.part.6:
-  62              	.LFB4547:
+  62              	.LFB1691:
   63              		.file 1 "/usr/include/c++/4.8.2/ostream"
    1:/usr/include/c++/4.8.2/ostream **** // Output streams -*- C++ -*-
    2:/usr/include/c++/4.8.2/ostream **** 
@@ -600,12 +600,12 @@
  533:/usr/include/c++/4.8.2/ostream **** 	__out.setstate(ios_base::badbit);
   69              		.loc 1 533 0
   70 0001 488B07   		mov	rax, QWORD PTR [rdi]	# __out_1(D)->_vptr.basic_ostream, __out_1(D)->_vptr.basic_ostream
-  71 0004 480378E8 		add	rdi, QWORD PTR [rax-24]	# D.72918, MEM[(long int *)_2 + -24B]
+  71 0004 480378E8 		add	rdi, QWORD PTR [rax-24]	# D.36424, MEM[(long int *)_2 + -24B]
   72              	.LVL1:
-  73              	.LBB468:
-  74              	.LBB469:
-  75              	.LBB470:
-  76              	.LBB471:
+  73              	.LBB454:
+  74              	.LBB455:
+  75              	.LBB456:
+  76              	.LBB457:
   77              		.file 2 "/usr/include/c++/4.8.2/bits/ios_base.h"
    1:/usr/include/c++/4.8.2/bits/ios_base.h **** // Iostreams base classes -*- C++ -*-
    2:/usr/include/c++/4.8.2/bits/ios_base.h **** 
@@ -766,10 +766,10 @@
  157:/usr/include/c++/4.8.2/bits/ios_base.h ****   operator|(_Ios_Iostate __a, _Ios_Iostate __b)
  158:/usr/include/c++/4.8.2/bits/ios_base.h ****   { return _Ios_Iostate(static_cast<int>(__a) | static_cast<int>(__b)); }
   78              		.loc 2 158 0
-  79 0008 8B7720   		mov	esi, DWORD PTR [rdi+32]	# D.72920, MEM[(const struct basic_ios *)_5 + 32B]
-  80 000b 83CE01   		or	esi, 1	# D.72920,
-  81              	.LBE471:
-  82              	.LBE470:
+  79 0008 8B7720   		mov	esi, DWORD PTR [rdi+32]	# D.36426, MEM[(const struct basic_ios *)_5 + 32B]
+  80 000b 83CE01   		or	esi, 1	# D.36426,
+  81              	.LBE457:
+  82              	.LBE456:
   83              		.file 3 "/usr/include/c++/4.8.2/bits/basic_ios.h"
    1:/usr/include/c++/4.8.2/bits/basic_ios.h **** // Iostreams base classes -*- C++ -*-
    2:/usr/include/c++/4.8.2/bits/basic_ios.h **** 
@@ -927,8 +927,8 @@
   85 000e E8000000 		call	_ZNSt9basic_iosIcSt11char_traitsIcEE5clearESt12_Ios_Iostate	#
   85      00
   86              	.LVL2:
-  87              	.LBE469:
-  88              	.LBE468:
+  87              	.LBE455:
+  88              	.LBE454:
  534:/usr/include/c++/4.8.2/ostream ****       else
  535:/usr/include/c++/4.8.2/ostream **** 	__ostream_insert(__out, __s,
  536:/usr/include/c++/4.8.2/ostream **** 			 static_cast<streamsize>(_Traits::length(__s)));
@@ -939,13 +939,13 @@
   91              		.cfi_def_cfa_offset 8
   92 0014 C3       		ret
   93              		.cfi_endproc
-  94              	.LFE4547:
+  94              	.LFE1691:
   96              		.section	.text._ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED2Ev,"axG",@progbits,_ZNSt15basic_s
   97              		.align 2
   98              		.p2align 4,,15
   99              		.weak	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED2Ev
  101              	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED2Ev:
- 102              	.LFB4359:
+ 102              	.LFB1538:
  103              		.file 4 "/usr/include/c++/4.8.2/sstream"
    1:/usr/include/c++/4.8.2/sstream **** // String based streams -*- C++ -*-
    2:/usr/include/c++/4.8.2/sstream **** 
@@ -1020,17 +1020,17 @@
  110 0001 4889FB   		mov	rbx, rdi	# this, this
  111 0004 4883EC10 		sub	rsp, 16	#,
  112              		.cfi_def_cfa_offset 32
- 113              	.LBB500:
+ 113              	.LBB486:
  114              		.loc 4 64 0
  115 0008 48C70700 		mov	QWORD PTR [rdi], OFFSET FLAT:_ZTVSt15basic_stringbufIcSt11char_traitsIcESaIcEE+16	# this_2(D)-
  115      000000
  116              	.LVL4:
- 117              	.LBB501:
- 118              	.LBB502:
- 119              	.LBB503:
- 120              	.LBB504:
- 121              	.LBB505:
- 122              	.LBB506:
+ 117              	.LBB487:
+ 118              	.LBB488:
+ 119              	.LBB489:
+ 120              	.LBB490:
+ 121              	.LBB491:
+ 122              	.LBB492:
  123              		.file 5 "/usr/include/c++/4.8.2/bits/basic_string.h"
    1:/usr/include/c++/4.8.2/bits/basic_string.h **** // Components for manipulating sequences of characters -*- C++ -*-
    2:/usr/include/c++/4.8.2/bits/basic_string.h **** 
@@ -1326,11 +1326,11 @@
  292:/usr/include/c++/4.8.2/bits/basic_string.h ****       _M_data() const
  293:/usr/include/c++/4.8.2/bits/basic_string.h ****       { return  _M_dataplus._M_p; }
  124              		.loc 5 293 0
- 125 000f 488B4748 		mov	rax, QWORD PTR [rdi+72]	# D.72941, MEM[(const struct basic_string *)this_2(D) + 72B]._M_datapl
- 126              	.LBE506:
- 127              	.LBE505:
- 128              	.LBE504:
- 129              	.LBE503:
+ 125 000f 488B4748 		mov	rax, QWORD PTR [rdi+72]	# D.36447, MEM[(const struct basic_string *)this_2(D) + 72B]._M_datapl
+ 126              	.LBE492:
+ 127              	.LBE491:
+ 128              	.LBE490:
+ 129              	.LBE489:
  294:/usr/include/c++/4.8.2/bits/basic_string.h **** 
  295:/usr/include/c++/4.8.2/bits/basic_string.h ****       _CharT*
  296:/usr/include/c++/4.8.2/bits/basic_string.h ****       _M_data(_CharT* __p)
@@ -1578,23 +1578,23 @@
  538:/usr/include/c++/4.8.2/bits/basic_string.h ****       ~basic_string() _GLIBCXX_NOEXCEPT
  539:/usr/include/c++/4.8.2/bits/basic_string.h ****       { _M_rep()->_M_dispose(this->get_allocator()); }
  130              		.loc 5 539 0
- 131 0013 488D78E8 		lea	rdi, [rax-24]	# D.72942,
+ 131 0013 488D78E8 		lea	rdi, [rax-24]	# D.36448,
  132              	.LVL5:
- 133              	.LBB507:
- 134              	.LBB508:
+ 133              	.LBB493:
+ 134              	.LBB494:
  240:/usr/include/c++/4.8.2/bits/basic_string.h **** 	  if (__builtin_expect(this != &_S_empty_rep(), false))
  135              		.loc 5 240 0
- 136 0017 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.72942,
+ 136 0017 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.36448,
  136      000000
  137 001e 7516     		jne	.L11	#,
  138              	.LVL6:
  139              	.L5:
- 140              	.LBE508:
- 141              	.LBE507:
- 142              	.LBE502:
- 143              	.LBE501:
- 144              	.LBB522:
- 145              	.LBB523:
+ 140              	.LBE494:
+ 141              	.LBE493:
+ 142              	.LBE488:
+ 143              	.LBE487:
+ 144              	.LBB508:
+ 145              	.LBB509:
  146              		.file 6 "/usr/include/c++/4.8.2/streambuf"
    1:/usr/include/c++/4.8.2/streambuf **** // Stream buffer classes -*- C++ -*-
    2:/usr/include/c++/4.8.2/streambuf **** 
@@ -1797,13 +1797,13 @@
  147              		.loc 6 198 0
  148 0020 48C70300 		mov	QWORD PTR [rbx], OFFSET FLAT:_ZTVSt15basic_streambufIcSt11char_traitsIcEE+16	# MEM[(struct bas
  148      000000
- 149 0027 488D7B38 		lea	rdi, [rbx+56]	# D.72943,
+ 149 0027 488D7B38 		lea	rdi, [rbx+56]	# D.36449,
  150 002b E8000000 		call	_ZNSt6localeD1Ev	#
  150      00
  151              	.LVL7:
- 152              	.LBE523:
- 153              	.LBE522:
- 154              	.LBE500:
+ 152              	.LBE509:
+ 153              	.LBE508:
+ 154              	.LBE486:
  155              		.loc 4 64 0
  156 0030 4883C410 		add	rsp, 16	#,
  157              		.cfi_remember_state
@@ -1815,17 +1815,17 @@
  163              	.LVL9:
  164              	.L11:
  165              		.cfi_restore_state
- 166              	.LBB525:
- 167              	.LBB524:
- 168              	.LBB521:
- 169              	.LBB520:
- 170              	.LBB519:
+ 166              	.LBB511:
+ 167              	.LBB510:
+ 168              	.LBB507:
+ 169              	.LBB506:
+ 170              	.LBB505:
  246:/usr/include/c++/4.8.2/bits/basic_string.h **** 							 -1) <= 0)
  171              		.loc 5 246 0
- 172 0036 488D5710 		lea	rdx, [rdi+16]	# D.72944,
+ 172 0036 488D5710 		lea	rdx, [rdi+16]	# D.36450,
  173              	.LVL10:
- 174              	.LBB509:
- 175              	.LBB510:
+ 174              	.LBB495:
+ 175              	.LBB496:
  176              		.file 7 "/usr/include/c++/4.8.2/ext/atomicity.h"
    1:/usr/include/c++/4.8.2/ext/atomicity.h **** // Support for atomic operations -*- C++ -*-
    2:/usr/include/c++/4.8.2/ext/atomicity.h **** 
@@ -1914,22 +1914,22 @@
  179 003f 4885C9   		test	rcx, rcx	# tmp69
  180 0042 741A     		je	.L6	#,
  181              	.LVL11:
- 182              	.LBB511:
- 183              	.LBB512:
+ 182              	.LBB497:
+ 183              	.LBB498:
   49:/usr/include/c++/4.8.2/ext/atomicity.h ****   { return __atomic_fetch_add(__mem, __val, __ATOMIC_ACQ_REL); }
  184              		.loc 7 49 0
- 185 0044 4183C9FF 		or	r9d, -1	# D.72945,
- 186 0048 F0440FC1 		lock xadd	DWORD PTR [rdx], r9d	#,* D.72944, D.72945
+ 185 0044 4183C9FF 		or	r9d, -1	# D.36451,
+ 186 0048 F0440FC1 		lock xadd	DWORD PTR [rdx], r9d	#,* D.36450, D.36451
  186      0A
  187              	.LVL12:
  188              	.L7:
- 189              	.LBE512:
- 190              	.LBE511:
- 191              	.LBE510:
- 192              	.LBE509:
+ 189              	.LBE498:
+ 190              	.LBE497:
+ 191              	.LBE496:
+ 192              	.LBE495:
  245:/usr/include/c++/4.8.2/bits/basic_string.h **** 	      if (__gnu_cxx::__exchange_and_add_dispatch(&this->_M_refcount,
  193              		.loc 5 245 0
- 194 004d 4585C9   		test	r9d, r9d	# D.72947
+ 194 004d 4585C9   		test	r9d, r9d	# D.36453
  195 0050 7FCE     		jg	.L5	#,
  249:/usr/include/c++/4.8.2/bits/basic_string.h **** 		  _M_destroy(__a);
  196              		.loc 5 249 0
@@ -1942,10 +1942,10 @@
  201 005c EBC2     		jmp	.L5	#
  202              	.LVL15:
  203              	.L6:
- 204              	.LBB518:
- 205              	.LBB517:
- 206              	.LBB513:
- 207              	.LBB514:
+ 204              	.LBB504:
+ 205              	.LBB503:
+ 206              	.LBB499:
+ 207              	.LBB500:
   67:/usr/include/c++/4.8.2/ext/atomicity.h ****     _Atomic_word __result = *__mem;
  208              		.loc 7 67 0
  209 005e 8B70F8   		mov	esi, DWORD PTR [rax-8]	# __result, MEM[(_Atomic_word *)_6 + -8B]
@@ -1953,30 +1953,30 @@
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
  211              		.loc 7 68 0
  212 0061 448D46FF 		lea	r8d, [rsi-1]	# tmp70,
- 213              	.LBE514:
- 214              	.LBE513:
+ 213              	.LBE500:
+ 214              	.LBE499:
   82:/usr/include/c++/4.8.2/ext/atomicity.h ****       return __exchange_and_add(__mem, __val);
   83:/usr/include/c++/4.8.2/ext/atomicity.h ****     else
   84:/usr/include/c++/4.8.2/ext/atomicity.h ****       return __exchange_and_add_single(__mem, __val);
  215              		.loc 7 84 0
- 216 0065 4189F1   		mov	r9d, esi	# D.72947, __result
- 217              	.LBB516:
- 218              	.LBB515:
+ 216 0065 4189F1   		mov	r9d, esi	# D.36453, __result
+ 217              	.LBB502:
+ 218              	.LBB501:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
  219              		.loc 7 68 0
  220 0068 448940F8 		mov	DWORD PTR [rax-8], r8d	# MEM[(_Atomic_word *)_6 + -8B], tmp70
  221 006c EBDF     		jmp	.L7	#
- 222              	.LBE515:
- 223              	.LBE516:
- 224              	.LBE517:
- 225              	.LBE518:
- 226              	.LBE519:
- 227              	.LBE520:
- 228              	.LBE521:
- 229              	.LBE524:
- 230              	.LBE525:
+ 222              	.LBE501:
+ 223              	.LBE502:
+ 224              	.LBE503:
+ 225              	.LBE504:
+ 226              	.LBE505:
+ 227              	.LBE506:
+ 228              	.LBE507:
+ 229              	.LBE510:
+ 230              	.LBE511:
  231              		.cfi_endproc
- 232              	.LFE4359:
+ 232              	.LFE1538:
  234              		.weak	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED1Ev
  235              		.set	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED1Ev,_ZNSt15basic_stringbufIcSt11char_traitsI
  236              		.section	.text._ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED0Ev,"axG",@progbits,_ZNSt15basic_s
@@ -1984,7 +1984,7 @@
  238              		.p2align 4,,15
  239              		.weak	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED0Ev
  241              	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED0Ev:
- 242              	.LFB4361:
+ 242              	.LFB1540:
  243              		.loc 4 64 0
  244              		.cfi_startproc
  245              	.LVL17:
@@ -1994,54 +1994,54 @@
  249 0001 4889FB   		mov	rbx, rdi	# this, this
  250 0004 4883EC10 		sub	rsp, 16	#,
  251              		.cfi_def_cfa_offset 32
- 252              	.LBB547:
- 253              	.LBB548:
+ 252              	.LBB533:
+ 253              	.LBB534:
  254              		.loc 4 64 0
  255 0008 48C70700 		mov	QWORD PTR [rdi], OFFSET FLAT:_ZTVSt15basic_stringbufIcSt11char_traitsIcESaIcEE+16	# this_2(D)-
  255      000000
  256              	.LVL18:
- 257              	.LBB549:
- 258              	.LBB550:
- 259              	.LBB551:
- 260              	.LBB552:
- 261              	.LBB553:
- 262              	.LBB554:
+ 257              	.LBB535:
+ 258              	.LBB536:
+ 259              	.LBB537:
+ 260              	.LBB538:
+ 261              	.LBB539:
+ 262              	.LBB540:
  293:/usr/include/c++/4.8.2/bits/basic_string.h ****       { return  _M_dataplus._M_p; }
  263              		.loc 5 293 0
- 264 000f 488B4748 		mov	rax, QWORD PTR [rdi+72]	# D.72965, MEM[(const struct basic_string *)this_2(D) + 72B]._M_datapl
- 265              	.LBE554:
- 266              	.LBE553:
- 267              	.LBE552:
- 268              	.LBE551:
+ 264 000f 488B4748 		mov	rax, QWORD PTR [rdi+72]	# D.36471, MEM[(const struct basic_string *)this_2(D) + 72B]._M_datapl
+ 265              	.LBE540:
+ 266              	.LBE539:
+ 267              	.LBE538:
+ 268              	.LBE537:
  269              		.loc 5 539 0
- 270 0013 488D78E8 		lea	rdi, [rax-24]	# D.72966,
+ 270 0013 488D78E8 		lea	rdi, [rax-24]	# D.36472,
  271              	.LVL19:
- 272              	.LBB555:
- 273              	.LBB556:
+ 272              	.LBB541:
+ 273              	.LBB542:
  240:/usr/include/c++/4.8.2/bits/basic_string.h **** 	  if (__builtin_expect(this != &_S_empty_rep(), false))
  274              		.loc 5 240 0
- 275 0017 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.72966,
+ 275 0017 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.36472,
  275      000000
  276 001e 751E     		jne	.L19	#,
  277              	.LVL20:
  278              	.L14:
- 279              	.LBE556:
- 280              	.LBE555:
- 281              	.LBE550:
- 282              	.LBE549:
- 283              	.LBB570:
- 284              	.LBB571:
+ 279              	.LBE542:
+ 280              	.LBE541:
+ 281              	.LBE536:
+ 282              	.LBE535:
+ 283              	.LBB556:
+ 284              	.LBB557:
  285              		.loc 6 198 0
- 286 0020 488D7B38 		lea	rdi, [rbx+56]	# D.72967,
+ 286 0020 488D7B38 		lea	rdi, [rbx+56]	# D.36473,
  287 0024 48C70300 		mov	QWORD PTR [rbx], OFFSET FLAT:_ZTVSt15basic_streambufIcSt11char_traitsIcEE+16	# MEM[(struct bas
  287      000000
  288 002b E8000000 		call	_ZNSt6localeD1Ev	#
  288      00
  289              	.LVL21:
- 290              	.LBE571:
- 291              	.LBE570:
- 292              	.LBE548:
- 293              	.LBE547:
+ 290              	.LBE557:
+ 291              	.LBE556:
+ 292              	.LBE534:
+ 293              	.LBE533:
  294              		.loc 4 64 0
  295 0030 4889DF   		mov	rdi, rbx	#, this
  296 0033 E8000000 		call	_ZdlPv	#
@@ -2057,18 +2057,18 @@
  305              	.LVL24:
  306              	.L19:
  307              		.cfi_restore_state
- 308              	.LBB574:
- 309              	.LBB573:
- 310              	.LBB572:
- 311              	.LBB569:
- 312              	.LBB568:
- 313              	.LBB567:
+ 308              	.LBB560:
+ 309              	.LBB559:
+ 310              	.LBB558:
+ 311              	.LBB555:
+ 312              	.LBB554:
+ 313              	.LBB553:
  246:/usr/include/c++/4.8.2/bits/basic_string.h **** 							 -1) <= 0)
  314              		.loc 5 246 0
- 315 003e 488D5710 		lea	rdx, [rdi+16]	# D.72968,
+ 315 003e 488D5710 		lea	rdx, [rdi+16]	# D.36474,
  316              	.LVL25:
- 317              	.LBB557:
- 318              	.LBB558:
+ 317              	.LBB543:
+ 318              	.LBB544:
   81:/usr/include/c++/4.8.2/ext/atomicity.h ****     if (__gthread_active_p())
  319              		.loc 7 81 0
  320 0042 B9000000 		mov	ecx, OFFSET FLAT:_ZL28__gthrw___pthread_key_createPjPFvPvE	# tmp69,
@@ -2076,22 +2076,22 @@
  321 0047 4885C9   		test	rcx, rcx	# tmp69
  322 004a 741A     		je	.L15	#,
  323              	.LVL26:
- 324              	.LBB559:
- 325              	.LBB560:
+ 324              	.LBB545:
+ 325              	.LBB546:
   49:/usr/include/c++/4.8.2/ext/atomicity.h ****   { return __atomic_fetch_add(__mem, __val, __ATOMIC_ACQ_REL); }
  326              		.loc 7 49 0
- 327 004c 4183C9FF 		or	r9d, -1	# D.72969,
- 328 0050 F0440FC1 		lock xadd	DWORD PTR [rdx], r9d	#,* D.72968, D.72969
+ 327 004c 4183C9FF 		or	r9d, -1	# D.36475,
+ 328 0050 F0440FC1 		lock xadd	DWORD PTR [rdx], r9d	#,* D.36474, D.36475
  328      0A
  329              	.LVL27:
  330              	.L16:
- 331              	.LBE560:
- 332              	.LBE559:
- 333              	.LBE558:
- 334              	.LBE557:
+ 331              	.LBE546:
+ 332              	.LBE545:
+ 333              	.LBE544:
+ 334              	.LBE543:
  245:/usr/include/c++/4.8.2/bits/basic_string.h **** 	      if (__gnu_cxx::__exchange_and_add_dispatch(&this->_M_refcount,
  335              		.loc 5 245 0
- 336 0055 4585C9   		test	r9d, r9d	# D.72971
+ 336 0055 4585C9   		test	r9d, r9d	# D.36477
  337 0058 7FC6     		jg	.L14	#,
  249:/usr/include/c++/4.8.2/bits/basic_string.h **** 		  _M_destroy(__a);
  338              		.loc 5 249 0
@@ -2104,10 +2104,10 @@
  343 0064 EBBA     		jmp	.L14	#
  344              	.LVL30:
  345              	.L15:
- 346              	.LBB566:
- 347              	.LBB565:
- 348              	.LBB561:
- 349              	.LBB562:
+ 346              	.LBB552:
+ 347              	.LBB551:
+ 348              	.LBB547:
+ 349              	.LBB548:
   67:/usr/include/c++/4.8.2/ext/atomicity.h ****     _Atomic_word __result = *__mem;
  350              		.loc 7 67 0
  351 0066 8B70F8   		mov	esi, DWORD PTR [rax-8]	# __result, MEM[(_Atomic_word *)_5 + -8B]
@@ -2115,3245 +2115,2972 @@
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
  353              		.loc 7 68 0
  354 0069 448D46FF 		lea	r8d, [rsi-1]	# tmp70,
- 355              	.LBE562:
- 356              	.LBE561:
+ 355              	.LBE548:
+ 356              	.LBE547:
  357              		.loc 7 84 0
- 358 006d 4189F1   		mov	r9d, esi	# D.72971, __result
- 359              	.LBB564:
- 360              	.LBB563:
+ 358 006d 4189F1   		mov	r9d, esi	# D.36477, __result
+ 359              	.LBB550:
+ 360              	.LBB549:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
  361              		.loc 7 68 0
  362 0070 448940F8 		mov	DWORD PTR [rax-8], r8d	# MEM[(_Atomic_word *)_5 + -8B], tmp70
  363 0074 EBDF     		jmp	.L16	#
- 364              	.LBE563:
- 365              	.LBE564:
- 366              	.LBE565:
- 367              	.LBE566:
- 368              	.LBE567:
- 369              	.LBE568:
- 370              	.LBE569:
- 371              	.LBE572:
- 372              	.LBE573:
- 373              	.LBE574:
+ 364              	.LBE549:
+ 365              	.LBE550:
+ 366              	.LBE551:
+ 367              	.LBE552:
+ 368              	.LBE553:
+ 369              	.LBE554:
+ 370              	.LBE555:
+ 371              	.LBE558:
+ 372              	.LBE559:
+ 373              	.LBE560:
  374              		.cfi_endproc
- 375              	.LFE4361:
- 377              		.section	.text._Z22fill_initial_conditionILi50ELi40ELi100EfEvPAT0__AT1__T2_S3_,"axG",@progbits,_Z2
+ 375              	.LFE1540:
+ 377              		.text
  378              		.p2align 4,,15
- 379              		.weak	_Z22fill_initial_conditionILi50ELi40ELi100EfEvPAT0__AT1__T2_S3_
- 381              	_Z22fill_initial_conditionILi50ELi40ELi100EfEvPAT0__AT1__T2_S3_:
- 382              	.LFB4351:
- 383              		.file 8 "initial-condition.hpp"
-   1:initial-condition.hpp **** #include <algorithm>
-   2:initial-condition.hpp **** #include <cmath>
-   3:initial-condition.hpp **** 
-   4:initial-condition.hpp **** template <int NX, int NY, int NZ, class T> void fill_initial_condition(T U[NX][NY][NZ], T V[NX][NY]
- 384              		.loc 8 4 0
+ 379              		.globl	_Z22fill_initial_conditionv
+ 381              	_Z22fill_initial_conditionv:
+ 382              	.LFB1474:
+ 383              		.file 8 "saya.cpp"
+   1:saya.cpp      **** #include <cmath>
+   2:saya.cpp      **** #include <unistd.h>
+   3:saya.cpp      **** #include <iostream>
+   4:saya.cpp      **** #include <sstream>
+   5:saya.cpp      **** 
+   6:saya.cpp      **** #define NX 50
+   7:saya.cpp      **** #define NY 40
+   8:saya.cpp      **** #define NZ 100
+   9:saya.cpp      **** 
+  10:saya.cpp      **** #define SX 34
+  11:saya.cpp      **** #define SY 34
+  12:saya.cpp      **** #define SZ 34
+  13:saya.cpp      **** 
+  14:saya.cpp      **** #define MAX_T 8000
+  15:saya.cpp      **** 
+  16:saya.cpp      **** typedef double Real;
+  17:saya.cpp      **** 
+  18:saya.cpp      **** Real U[NX][NY][NZ], V[NX][NY][NZ];
+  19:saya.cpp      **** Real U_other[NX][NY][NZ], V_other[NX][NY][NZ];
+  20:saya.cpp      **** int global_clock;
+  21:saya.cpp      **** 
+  22:saya.cpp      **** 
+  23:saya.cpp      **** Real Uwx[2][SY][SZ];
+  24:saya.cpp      **** 
+  25:saya.cpp      **** void fill_initial_condition() {
+ 384              		.loc 8 25 0
  385              		.cfi_startproc
- 386              	.LVL32:
- 387 0000 55       		push	rbp	#
- 388              		.cfi_def_cfa_offset 16
- 389              		.cfi_offset 6, -16
- 390 0001 4989FB   		mov	r11, rdi	# ivtmp.314, U
- 391              	.LBB575:
- 392              	.LBB576:
- 393              	.LBB577:
- 394              	.LBB578:
-   5:initial-condition.hpp ****   for (int x=0;x<NX;++x) {
-   6:initial-condition.hpp ****     for (int y=0;y<NY;++y) {
-   7:initial-condition.hpp ****       for (int z=0;z<NZ;++z) {
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
-   9:initial-condition.hpp ****         V[x][y][z] = 0;
- 395              		.loc 8 9 0
- 396 0004 C5F857C0 		vxorps	xmm0, xmm0, xmm0	# tmp228
- 397              	.LBE578:
- 398              	.LBE577:
- 399              	.LBE576:
- 400              	.LBE575:
-   4:initial-condition.hpp **** template <int NX, int NY, int NZ, class T> void fill_initial_condition(T U[NX][NY][NZ], T V[NX][NY]
- 401              		.loc 8 4 0
- 402 0008 4889E5   		mov	rbp, rsp	#,
- 403              		.cfi_def_cfa_register 6
- 404 000b 4157     		push	r15	#
- 405 000d 4156     		push	r14	#
- 406 000f 4155     		push	r13	#
- 407 0011 4154     		push	r12	#
- 408              		.cfi_offset 15, -24
- 409              		.cfi_offset 14, -32
- 410              		.cfi_offset 13, -40
- 411              		.cfi_offset 12, -48
- 412 0013 41BC3200 		mov	r12d, 50	# D.73093,
- 412      0000
- 413 0019 53       		push	rbx	#
- 414              		.cfi_offset 3, -56
- 415 001a 4889F3   		mov	rbx, rsi	# ivtmp.316, V
- 416 001d 4883EC58 		sub	rsp, 88	#,
- 417              	.LBB595:
- 418              	.LBB585:
- 419              	.LBB582:
- 420              	.LBB579:
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 421              		.loc 8 8 0
- 422 0021 C5FC280D 		vmovaps	ymm1, YMMWORD PTR .LC2[rip]	# tmp227,
- 422      00000000 
- 423              	.LVL33:
- 424 0029 0F1F8000 		.p2align 4,,10
- 424      000000
- 425              		.p2align 3
- 426              	.L21:
- 427              	.LBE579:
- 428              	.LBE582:
- 429              	.LBE585:
- 430              	.LBE595:
-   4:initial-condition.hpp **** template <int NX, int NY, int NZ, class T> void fill_initial_condition(T U[NX][NY][NZ], T V[NX][NY]
- 431              		.loc 8 4 0 discriminator 1
- 432 0030 4889D9   		mov	rcx, rbx	# ivtmp.301, ivtmp.316
- 433 0033 4C89DA   		mov	rdx, r11	# ivtmp.299, ivtmp.314
- 434 0036 4989D9   		mov	r9, rbx	# ivtmp.276, ivtmp.316
- 435 0039 4D89D8   		mov	r8, r11	# ivtmp.275, ivtmp.314
- 436 003c 4531D2   		xor	r10d, r10d	# y
- 437 003f E93C0100 		jmp	.L29	#
- 437      00
- 438              	.LVL34:
- 439              		.p2align 4,,10
- 440 0044 0F1F4000 		.p2align 3
- 441              	.L25:
- 442              	.LBB596:
- 443              	.LBB586:
- 444              	.LBB583:
- 445              	.LBB580:
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 446              		.loc 8 8 0
- 447 0048 C4C17C11 		vmovups	YMMWORD PTR [r8], ymm1	# MEM[base: vect_p.202_51, offset: 0B], tmp227
- 447      08
- 448              		.loc 8 9 0
- 449 004d C4C17C11 		vmovups	YMMWORD PTR [r9], ymm0	# MEM[base: vect_p.205_41, offset: 0B], tmp228
- 449      01
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 450              		.loc 8 8 0
- 451 0052 C4C17C11 		vmovups	YMMWORD PTR [r8+32], ymm1	# MEM[base: vect_p.202_51, offset: 32B], tmp227
- 451      4820
- 452              		.loc 8 9 0
- 453 0058 C4C17C11 		vmovups	YMMWORD PTR [r9+32], ymm0	# MEM[base: vect_p.205_41, offset: 32B], tmp228
- 453      4120
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 454              		.loc 8 8 0
- 455 005e C4C17C11 		vmovups	YMMWORD PTR [r8+64], ymm1	# MEM[base: vect_p.202_51, offset: 64B], tmp227
- 455      4840
- 456              		.loc 8 9 0
- 457 0064 C4C17C11 		vmovups	YMMWORD PTR [r9+64], ymm0	# MEM[base: vect_p.205_41, offset: 64B], tmp228
- 457      4140
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 458              		.loc 8 8 0
- 459 006a C4C17C11 		vmovups	YMMWORD PTR [r8+96], ymm1	# MEM[base: vect_p.202_51, offset: 96B], tmp227
- 459      4860
- 460              		.loc 8 9 0
- 461 0070 C4C17C11 		vmovups	YMMWORD PTR [r9+96], ymm0	# MEM[base: vect_p.205_41, offset: 96B], tmp228
- 461      4160
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 462              		.loc 8 8 0
- 463 0076 C4C17C11 		vmovups	YMMWORD PTR [r8+128], ymm1	# MEM[base: vect_p.202_51, offset: 128B], tmp227
- 463      88800000 
- 463      00
- 464              		.loc 8 9 0
- 465 007f C4C17C11 		vmovups	YMMWORD PTR [r9+128], ymm0	# MEM[base: vect_p.205_41, offset: 128B], tmp228
- 465      81800000 
- 465      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 466              		.loc 8 8 0
- 467 0088 C4C17C11 		vmovups	YMMWORD PTR [r8+160], ymm1	# MEM[base: vect_p.202_51, offset: 160B], tmp227
- 467      88A00000 
- 467      00
- 468              		.loc 8 9 0
- 469 0091 C4C17C11 		vmovups	YMMWORD PTR [r9+160], ymm0	# MEM[base: vect_p.205_41, offset: 160B], tmp228
- 469      81A00000 
- 469      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 470              		.loc 8 8 0
- 471 009a C4C17C11 		vmovups	YMMWORD PTR [r8+192], ymm1	# MEM[base: vect_p.202_51, offset: 192B], tmp227
- 471      88C00000 
- 471      00
- 472              		.loc 8 9 0
- 473 00a3 C4C17C11 		vmovups	YMMWORD PTR [r9+192], ymm0	# MEM[base: vect_p.205_41, offset: 192B], tmp228
- 473      81C00000 
- 473      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 474              		.loc 8 8 0
- 475 00ac C4C17C11 		vmovups	YMMWORD PTR [r8+224], ymm1	# MEM[base: vect_p.202_51, offset: 224B], tmp227
- 475      88E00000 
- 475      00
- 476              		.loc 8 9 0
- 477 00b5 C4C17C11 		vmovups	YMMWORD PTR [r9+224], ymm0	# MEM[base: vect_p.205_41, offset: 224B], tmp228
- 477      81E00000 
- 477      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 478              		.loc 8 8 0
- 479 00be C4C17C11 		vmovups	YMMWORD PTR [r8+256], ymm1	# MEM[base: vect_p.202_51, offset: 256B], tmp227
- 479      88000100 
- 479      00
- 480              		.loc 8 9 0
- 481 00c7 C4C17C11 		vmovups	YMMWORD PTR [r9+256], ymm0	# MEM[base: vect_p.205_41, offset: 256B], tmp228
- 481      81000100 
- 481      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 482              		.loc 8 8 0
- 483 00d0 C4C17C11 		vmovups	YMMWORD PTR [r8+288], ymm1	# MEM[base: vect_p.202_51, offset: 288B], tmp227
- 483      88200100 
- 483      00
- 484              		.loc 8 9 0
- 485 00d9 C4C17C11 		vmovups	YMMWORD PTR [r9+288], ymm0	# MEM[base: vect_p.205_41, offset: 288B], tmp228
- 485      81200100 
- 485      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 486              		.loc 8 8 0
- 487 00e2 C4C17C11 		vmovups	YMMWORD PTR [r8+320], ymm1	# MEM[base: vect_p.202_51, offset: 320B], tmp227
- 487      88400100 
- 487      00
- 488              		.loc 8 9 0
- 489 00eb C4C17C11 		vmovups	YMMWORD PTR [r9+320], ymm0	# MEM[base: vect_p.205_41, offset: 320B], tmp228
- 489      81400100 
- 489      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 490              		.loc 8 8 0
- 491 00f4 C4C17C11 		vmovups	YMMWORD PTR [r8+352], ymm1	# MEM[base: vect_p.202_51, offset: 352B], tmp227
- 491      88600100 
- 491      00
- 492              		.loc 8 9 0
- 493 00fd C4C17C11 		vmovups	YMMWORD PTR [r9+352], ymm0	# MEM[base: vect_p.205_41, offset: 352B], tmp228
- 493      81600100 
- 493      00
- 494              	.LVL35:
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 495              		.loc 8 8 0
- 496 0106 C7828001 		mov	DWORD PTR [rdx+384], 0x3f800000	# MEM[base: _198, offset: 384B],
- 496      00000000 
- 496      803F
- 497              		.loc 8 9 0
- 498 0110 C7818001 		mov	DWORD PTR [rcx+384], 0x00000000	# MEM[base: _193, offset: 384B],
- 498      00000000 
- 498      0000
- 499              	.LVL36:
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 500              		.loc 8 8 0
- 501 011a C7828401 		mov	DWORD PTR [rdx+388], 0x3f800000	# MEM[base: _198, offset: 388B],
- 501      00000000 
- 501      803F
- 502              		.loc 8 9 0
- 503 0124 C7818401 		mov	DWORD PTR [rcx+388], 0x00000000	# MEM[base: _193, offset: 388B],
- 503      00000000 
- 503      0000
- 504              	.LVL37:
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 505              		.loc 8 8 0
- 506 012e C7828801 		mov	DWORD PTR [rdx+392], 0x3f800000	# MEM[base: _198, offset: 392B],
- 506      00000000 
- 506      803F
- 507              		.loc 8 9 0
- 508 0138 C7818801 		mov	DWORD PTR [rcx+392], 0x00000000	# MEM[base: _193, offset: 392B],
- 508      00000000 
- 508      0000
- 509              	.LVL38:
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 510              		.loc 8 8 0
- 511 0142 C7828C01 		mov	DWORD PTR [rdx+396], 0x3f800000	# MEM[base: _198, offset: 396B],
- 511      00000000 
- 511      803F
- 512              		.loc 8 9 0
- 513 014c C7818C01 		mov	DWORD PTR [rcx+396], 0x00000000	# MEM[base: _193, offset: 396B],
- 513      00000000 
- 513      0000
- 514              	.LVL39:
- 515              	.L22:
- 516              	.LBE580:
-   6:initial-condition.hpp ****     for (int y=0;y<NY;++y) {
- 517              		.loc 8 6 0
- 518 0156 4183C201 		add	r10d, 1	# y,
- 519              	.LVL40:
- 520 015a 4981C090 		add	r8, 400	# ivtmp.275,
- 520      010000
- 521 0161 4981C190 		add	r9, 400	# ivtmp.276,
- 521      010000
- 522 0168 4881C290 		add	rdx, 400	# ivtmp.299,
- 522      010000
- 523 016f 4881C190 		add	rcx, 400	# ivtmp.301,
- 523      010000
- 524 0176 4183FA28 		cmp	r10d, 40	# y,
- 525 017a 0F84F000 		je	.L24	#,
- 525      0000
- 526              	.LVL41:
- 527              	.L29:
- 528 0180 498D4020 		lea	rax, [r8+32]	# D.73096,
- 529 0184 4939C1   		cmp	r9, rax	# ivtmp.276, D.73096
- 530 0187 0F83BBFE 		jae	.L25	#,
- 530      FFFF
- 531 018d 4D8D6920 		lea	r13, [r9+32]	# D.73096,
- 532 0191 4D39E8   		cmp	r8, r13	# ivtmp.275, D.73096
- 533 0194 0F83AEFE 		jae	.L25	#,
- 533      FFFF
- 534              	.LBE583:
- 535              	.LBE586:
- 536              	.LBE596:
-   4:initial-condition.hpp **** template <int NX, int NY, int NZ, class T> void fill_initial_condition(T U[NX][NY][NZ], T V[NX][NY]
- 537              		.loc 8 4 0
- 538 019a 4531F6   		xor	r14d, r14d	# ivtmp.263
- 539              	.LVL42:
- 540 019d 0F1F00   		.p2align 4,,10
- 541              		.p2align 3
- 542              	.L23:
- 543              	.LBB597:
- 544              	.LBB587:
- 545              	.LBB584:
- 546              	.LBB581:
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 547              		.loc 8 8 0
- 548 01a0 42C70432 		mov	DWORD PTR [rdx+r14], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 548      0000803F 
- 549              		.loc 8 9 0
- 550 01a8 42C70431 		mov	DWORD PTR [rcx+r14], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 550      00000000 
- 551 01b0 4983C628 		add	r14, 40	# ivtmp.263,
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 552              		.loc 8 8 0
- 553 01b4 41C74416 		mov	DWORD PTR [r14-36+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 553      DC000080 
- 553      3F
- 554              		.loc 8 9 0
- 555 01bd 41C7440E 		mov	DWORD PTR [r14-36+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 555      DC000000 
- 555      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 556              		.loc 8 8 0
- 557 01c6 41C74416 		mov	DWORD PTR [r14-32+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 557      E0000080 
- 557      3F
- 558              		.loc 8 9 0
- 559 01cf 41C7440E 		mov	DWORD PTR [r14-32+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 559      E0000000 
- 559      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 560              		.loc 8 8 0
- 561 01d8 41C74416 		mov	DWORD PTR [r14-28+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 561      E4000080 
- 561      3F
- 562              		.loc 8 9 0
- 563 01e1 41C7440E 		mov	DWORD PTR [r14-28+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 563      E4000000 
- 563      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 564              		.loc 8 8 0
- 565 01ea 41C74416 		mov	DWORD PTR [r14-24+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 565      E8000080 
- 565      3F
- 566              		.loc 8 9 0
- 567 01f3 41C7440E 		mov	DWORD PTR [r14-24+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 567      E8000000 
- 567      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 568              		.loc 8 8 0
- 569 01fc 41C74416 		mov	DWORD PTR [r14-20+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 569      EC000080 
- 569      3F
- 570              		.loc 8 9 0
- 571 0205 41C7440E 		mov	DWORD PTR [r14-20+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 571      EC000000 
- 571      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 572              		.loc 8 8 0
- 573 020e 41C74416 		mov	DWORD PTR [r14-16+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 573      F0000080 
- 573      3F
- 574              		.loc 8 9 0
- 575 0217 41C7440E 		mov	DWORD PTR [r14-16+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 575      F0000000 
- 575      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 576              		.loc 8 8 0
- 577 0220 41C74416 		mov	DWORD PTR [r14-12+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 577      F4000080 
- 577      3F
- 578              		.loc 8 9 0
- 579 0229 41C7440E 		mov	DWORD PTR [r14-12+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 579      F4000000 
- 579      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 580              		.loc 8 8 0
- 581 0232 41C74416 		mov	DWORD PTR [r14-8+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 581      F8000080 
- 581      3F
- 582              		.loc 8 9 0
- 583 023b 41C7440E 		mov	DWORD PTR [r14-8+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 583      F8000000 
- 583      00
-   8:initial-condition.hpp ****         U[x][y][z] = 1;
- 584              		.loc 8 8 0
- 585 0244 41C74416 		mov	DWORD PTR [r14-4+rdx], 0x3f800000	# MEM[base: _54, index: ivtmp.263_57, offset: 0B],
- 585      FC000080 
- 585      3F
- 586              		.loc 8 9 0
- 587 024d 41C7440E 		mov	DWORD PTR [r14-4+rcx], 0x00000000	# MEM[base: _181, index: ivtmp.263_57, offset: 0B],
- 587      FC000000 
- 587      00
-   7:initial-condition.hpp ****       for (int z=0;z<NZ;++z) {
- 588              		.loc 8 7 0
- 589 0256 4981FE90 		cmp	r14, 400	# ivtmp.263,
- 589      010000
- 590 025d 0F853DFF 		jne	.L23	#,
- 590      FFFF
- 591 0263 E9EEFEFF 		jmp	.L22	#
- 591      FF
- 592 0268 0F1F8400 		.p2align 4,,10
- 592      00000000 
- 593              		.p2align 3
- 594              	.L24:
- 595              	.LVL43:
- 596 0270 4981C380 		add	r11, 16000	# ivtmp.314,
- 596      3E0000
- 597 0277 4881C380 		add	rbx, 16000	# ivtmp.316,
- 597      3E0000
- 598              	.LBE581:
- 599              	.LBE584:
-   5:initial-condition.hpp ****   for (int x=0;x<NX;++x) {
- 600              		.loc 8 5 0
- 601 027e 4183EC01 		sub	r12d, 1	# D.73093,
- 602              	.LVL44:
- 603 0282 0F85A8FD 		jne	.L21	#,
- 603      FFFF
- 604 0288 488DBF80 		lea	rdi, [rdi+272000]	# D.73096,
- 604      260400
- 605              	.LVL45:
- 606 028f 48C74424 		mov	QWORD PTR [rsp+32], 0	# %sfp,
- 606      20000000 
- 606      00
- 607 0298 488DB680 		lea	rsi, [rsi+272000]	# D.73096,
- 607      260400
- 608              	.LVL46:
- 609              	.LBE587:
- 610              	.LBB588:
-  10:initial-condition.hpp ****       }
-  11:initial-condition.hpp ****     }
-  12:initial-condition.hpp ****   }
-  13:initial-condition.hpp ****   int bx = std::max(NX/4,NX/2-8),  ex = std::min(3*NX/4+1,NX/2+8);
-  14:initial-condition.hpp ****   int by = std::max(NY/4,NY/2-8),  ey = std::min(3*NY/4+1,NY/2+8);
-  15:initial-condition.hpp ****   int bz = std::max(NZ/4,NZ/2-8),  ez = std::min(3*NZ/4+1,NZ/2+8);
-  16:initial-condition.hpp ****   for (int x=bx;x<ex;++x){
- 611              		.loc 8 16 0
- 612 029f C7442428 		mov	DWORD PTR [rsp+40], 17	# %sfp,
- 612      11000000 
- 613 02a7 48897C24 		mov	QWORD PTR [rsp+24], rdi	# %sfp, D.73096
- 613      18
- 614 02ac 48897424 		mov	QWORD PTR [rsp+16], rsi	# %sfp, D.73096
- 614      10
- 615 02b1 C5F877   		vzeroupper
- 616              	.LVL47:
- 617              	.L28:
- 618 02b4 488B5424 		mov	rdx, QWORD PTR [rsp+32]	# ivtmp.252, %sfp
- 618      20
- 619              	.LBE588:
- 620              	.LBE597:
-   4:initial-condition.hpp **** template <int NX, int NY, int NZ, class T> void fill_initial_condition(T U[NX][NY][NZ], T V[NX][NY]
- 621              		.loc 8 4 0 discriminator 1
- 622 02b9 4531FF   		xor	r15d, r15d	# ivtmp.240
- 623 02bc C744242C 		mov	DWORD PTR [rsp+44], 12	# %sfp,
- 623      0C000000 
- 624 02c4 488B4C24 		mov	rcx, QWORD PTR [rsp+24]	# D.73096, %sfp
- 624      18
- 625 02c9 4C8B4424 		mov	r8, QWORD PTR [rsp+16]	# D.73096, %sfp
- 625      10
- 626 02ce C5CB2A74 		vcvtsi2sd	xmm6, xmm6, DWORD PTR [rsp+40]	# D.73091, %sfp
- 626      2428
- 627 02d4 4C8D8C11 		lea	r9, [rcx+4800+rdx]	# D.73096,
- 627      C0120000 
- 628 02dc 4D8D9410 		lea	r10, [r8+4800+rdx]	# D.73096,
- 628      C0120000 
- 629 02e4 4C894C24 		mov	QWORD PTR [rsp+8], r9	# %sfp, D.73096
- 629      08
- 630 02e9 C5FB1174 		vmovsd	QWORD PTR [rsp+72], xmm6	# %sfp, D.73091
- 630      2448
- 631 02ef 4C891424 		mov	QWORD PTR [rsp], r10	# %sfp, D.73096
- 632              	.LVL48:
- 633              	.L36:
- 634 02f3 C5D32A6C 		vcvtsi2sd	xmm5, xmm5, DWORD PTR [rsp+44]	# D.73091, %sfp
- 634      242C
- 635 02f9 4531F6   		xor	r14d, r14d	# ivtmp.220
- 636 02fc 488B4424 		mov	rax, QWORD PTR [rsp+8]	# D.73096, %sfp
- 636      08
- 637 0301 4C8B2C24 		mov	r13, QWORD PTR [rsp]	# D.73096, %sfp
- 638 0305 C52351DD 		vsqrtsd	xmm11, xmm11, xmm5	# tmp209, D.73091
- 639 0309 C5FB116C 		vmovsd	QWORD PTR [rsp+48], xmm5	# %sfp, D.73091
- 639      2430
- 640 030f 4E8D2438 		lea	r12, [rax+r15]	# D.73096,
- 641 0313 4B8D5C3D 		lea	rbx, [r13+0+r15]	# D.73096,
- 641      00
- 642              	.LVL49:
- 643 0318 0F1F8400 		.p2align 4,,10
- 643      00000000 
- 644              		.p2align 3
- 645              	.L34:
- 646              	.LBB598:
- 647              	.LBB593:
- 648              	.LBB589:
- 649              	.LBB590:
-  17:initial-condition.hpp ****     for (int y=by;y<ey;++y){
-  18:initial-condition.hpp ****       for (int z=bz;z<ez;++z){
-  19:initial-condition.hpp ****         U[x][y][z] = 0.5;
-  20:initial-condition.hpp ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
- 650              		.loc 8 20 0 discriminator 2
- 651 0320 C441792E 		vucomisd	xmm11, xmm11	# tmp209, tmp209
- 651      DB
- 652 0325 C57B115C 		vmovsd	QWORD PTR [rsp+64], xmm11	# %sfp, tmp209
- 652      2440
-  19:initial-condition.hpp ****         U[x][y][z] = 0.5;
- 653              		.loc 8 19 0 discriminator 2
- 654 032b 43C784B4 		mov	DWORD PTR [r12+168+r14*4], 0x3f000000	# MEM[base: _201, index: ivtmp.220_85, step: 4, offset: 
- 654      A8000000 
- 654      0000003F 
- 655              		.loc 8 20 0 discriminator 2
- 656 0337 0F8A3402 		jp	.L63	#,
- 656      0000
- 657              	.L30:
- 658 033d 458D5E2A 		lea	r11d, [r14+42]	# D.73093,
- 659 0341 C57B115C 		vmovsd	QWORD PTR [rsp+56], xmm11	# %sfp, tmp209
- 659      2438
- 660 0347 C4C17B2A 		vcvtsi2sd	xmm0, xmm0, r11d	# D.73091, D.73093
- 660      C3
- 661 034c E8000000 		call	cos	#
- 661      00
- 662              	.LVL50:
- 663 0351 C5FB105C 		vmovsd	xmm3, QWORD PTR [rsp+72]	# D.73091, %sfp
- 663      2448
- 664 0357 C5E35854 		vaddsd	xmm2, xmm3, QWORD PTR [rsp+64]	# D.73091, D.73091, %sfp
- 664      2440
- 665 035d C5EB58C0 		vaddsd	xmm0, xmm2, xmm0	# D.73091, D.73091, D.73091
- 666 0361 E8000000 		call	sin	#
- 666      00
- 667              	.LVL51:
- 668 0366 C57B104C 		vmovsd	xmm9, QWORD PTR [rsp+56]	# tmp209, %sfp
- 668      2438
- 669 036c C5FB1025 		vmovsd	xmm4, QWORD PTR .LC5[rip]	# tmp290,
- 669      00000000 
- 670 0374 C57B114C 		vmovsd	QWORD PTR [rsp+64], xmm9	# %sfp, tmp209
- 670      2440
- 671 037a C4E2D999 		vfmadd132sd	xmm0, xmm4, QWORD PTR .LC4[rip]	# D.73091, tmp290,
- 671      05000000 
- 671      00
- 672 0383 C5FB12F8 		vmovddup	xmm7, xmm0	# tmp291, D.73091
- 673 0387 C5795AC7 		vcvtpd2ps	xmm8, xmm7	# tmp291, tmp291
- 674 038b C4217A11 		vmovss	DWORD PTR [rbx+168+r14*4], xmm8	# MEM[base: _191, index: ivtmp.220_85, step: 4, offset: 168
- 674      84B3A800 
- 674      0000
- 675 0395 4983C601 		add	r14, 1	# tmp231,
- 676 0399 C441792E 		vucomisd	xmm9, xmm9	# tmp209, tmp209
- 676      C9
-  19:initial-condition.hpp ****         U[x][y][z] = 0.5;
- 677              		.loc 8 19 0 discriminator 2
- 678 039e 43C784B4 		mov	DWORD PTR [r12+168+r14*4], 0x3f000000	# MEM[base: _201, index: ivtmp.220_85, step: 4, offset: 
- 678      A8000000 
- 678      0000003F 
- 679              		.loc 8 20 0 discriminator 2
- 680 03aa 0F8A9F01 		jp	.L64	#,
- 680      0000
- 681              	.L57:
- 682 03b0 418D7E2A 		lea	edi, [r14+42]	# D.73093,
- 683 03b4 C57B114C 		vmovsd	QWORD PTR [rsp+56], xmm9	# %sfp, tmp209
- 683      2438
- 684              		.loc 8 20 0 is_stmt 0
- 685 03ba C5FB2AC7 		vcvtsi2sd	xmm0, xmm0, edi	# D.73091, D.73093
- 686 03be 4D8D6E01 		lea	r13, [r14+1]	# ivtmp.220,
- 687 03c2 E8000000 		call	cos	#
- 687      00
- 688              	.LVL52:
- 689 03c7 C57B1054 		vmovsd	xmm10, QWORD PTR [rsp+72]	# D.73091, %sfp
- 689      2448
- 690 03cd C52B585C 		vaddsd	xmm11, xmm10, QWORD PTR [rsp+64]	# D.73091, D.73091, %sfp
- 690      2440
- 691 03d3 C5A358C0 		vaddsd	xmm0, xmm11, xmm0	# D.73091, D.73091, D.73091
- 692 03d7 E8000000 		call	sin	#
- 692      00
- 693              	.LVL53:
- 694 03dc C57B107C 		vmovsd	xmm15, QWORD PTR [rsp+56]	# tmp209, %sfp
- 694      2438
- 695 03e2 C57B1025 		vmovsd	xmm12, QWORD PTR .LC5[rip]	# tmp303,
- 695      00000000 
- 696 03ea C441792E 		vucomisd	xmm15, xmm15	# tmp209, tmp209
- 696      FF
- 697 03ef C57B117C 		vmovsd	QWORD PTR [rsp+64], xmm15	# %sfp, tmp209
- 697      2440
- 698 03f5 C4E29999 		vfmadd132sd	xmm0, xmm12, QWORD PTR .LC4[rip]	# D.73091, tmp303,
- 698      05000000 
- 698      00
- 699 03fe C57B12E8 		vmovddup	xmm13, xmm0	# tmp304, D.73091
- 700 0402 C441795A 		vcvtpd2ps	xmm14, xmm13	# tmp304, tmp304
- 700      F5
- 701 0407 C4217A11 		vmovss	DWORD PTR [rbx+168+r14*4], xmm14	# MEM[base: _191, index: ivtmp.220_85, step: 4, offset: 16
- 701      B4B3A800 
- 701      0000
-  19:initial-condition.hpp ****         U[x][y][z] = 0.5;
- 702              		.loc 8 19 0 is_stmt 1
- 703 0411 43C784AC 		mov	DWORD PTR [r12+168+r13*4], 0x3f000000	# MEM[base: _201, index: ivtmp.220_85, step: 4, offset: 
- 703      A8000000 
- 703      0000003F 
- 704              		.loc 8 20 0
- 705 041d 0F8A7001 		jp	.L65	#,
- 705      0000
- 706              	.L58:
- 707 0423 418D752A 		lea	esi, [r13+42]	# D.73093,
- 708 0427 C57B117C 		vmovsd	QWORD PTR [rsp+56], xmm15	# %sfp, tmp209
- 708      2438
- 709 042d C5FB2AC6 		vcvtsi2sd	xmm0, xmm0, esi	# D.73091, D.73093
- 710 0431 E8000000 		call	cos	#
- 710      00
- 711              	.LVL54:
- 712 0436 C5FB104C 		vmovsd	xmm1, QWORD PTR [rsp+72]	# D.73091, %sfp
- 712      2448
- 713 043c C5F35874 		vaddsd	xmm6, xmm1, QWORD PTR [rsp+64]	# D.73091, D.73091, %sfp
- 713      2440
- 714 0442 C5CB58C0 		vaddsd	xmm0, xmm6, xmm0	# D.73091, D.73091, D.73091
- 715 0446 E8000000 		call	sin	#
- 715      00
- 716              	.LVL55:
- 717 044b C5FB1054 		vmovsd	xmm2, QWORD PTR [rsp+56]	# tmp209, %sfp
- 717      2438
- 718 0451 C5FB102D 		vmovsd	xmm5, QWORD PTR .LC5[rip]	# tmp306,
- 718      00000000 
- 719 0459 C5F92ED2 		vucomisd	xmm2, xmm2	# tmp209, tmp209
- 720 045d C5FB1154 		vmovsd	QWORD PTR [rsp+64], xmm2	# %sfp, tmp209
- 720      2440
- 721 0463 C4E2D199 		vfmadd132sd	xmm0, xmm5, QWORD PTR .LC4[rip]	# D.73091, tmp306,
- 721      05000000 
- 721      00
- 722 046c C5FB12C0 		vmovddup	xmm0, xmm0	# tmp307, D.73091
- 723 0470 C5F95AD8 		vcvtpd2ps	xmm3, xmm0	# tmp307, tmp307
- 724 0474 C4A17A11 		vmovss	DWORD PTR [rbx+168+r13*4], xmm3	# MEM[base: _191, index: ivtmp.220_85, step: 4, offset: 168
- 724      9CABA800 
- 724      0000
- 725 047e 4D8D6E02 		lea	r13, [r14+2]	# ivtmp.220,
-  19:initial-condition.hpp ****         U[x][y][z] = 0.5;
- 726              		.loc 8 19 0
- 727 0482 43C784AC 		mov	DWORD PTR [r12+168+r13*4], 0x3f000000	# MEM[base: _201, index: ivtmp.220_85, step: 4, offset: 
- 727      A8000000 
- 727      0000003F 
- 728              		.loc 8 20 0
- 729 048e 0F8A9F00 		jp	.L66	#,
- 729      0000
- 730              	.L59:
- 731 0494 418D4D2A 		lea	ecx, [r13+42]	# D.73093,
- 732 0498 C5FB1154 		vmovsd	QWORD PTR [rsp+56], xmm2	# %sfp, tmp209
- 732      2438
- 733 049e 4983C603 		add	r14, 3	# ivtmp.220,
- 734 04a2 C5FB2AC1 		vcvtsi2sd	xmm0, xmm0, ecx	# D.73091, D.73093
- 735 04a6 E8000000 		call	cos	#
- 735      00
- 736              	.LVL56:
- 737 04ab C5FB1064 		vmovsd	xmm4, QWORD PTR [rsp+72]	# D.73091, %sfp
- 737      2448
- 738 04b1 C5DB587C 		vaddsd	xmm7, xmm4, QWORD PTR [rsp+64]	# D.73091, D.73091, %sfp
- 738      2440
- 739 04b7 C5C358C0 		vaddsd	xmm0, xmm7, xmm0	# D.73091, D.73091, D.73091
- 740 04bb E8000000 		call	sin	#
- 740      00
- 741              	.LVL57:
-  18:initial-condition.hpp ****       for (int z=bz;z<ez;++z){
- 742              		.loc 8 18 0
- 743 04c0 4983FE10 		cmp	r14, 16	# ivtmp.220,
- 744 04c4 C57B105C 		vmovsd	xmm11, QWORD PTR [rsp+56]	# tmp209, %sfp
- 744      2438
- 745              		.loc 8 20 0
- 746 04ca C57B1005 		vmovsd	xmm8, QWORD PTR .LC5[rip]	# tmp309,
- 746      00000000 
- 747 04d2 C4E2B999 		vfmadd132sd	xmm0, xmm8, QWORD PTR .LC4[rip]	# D.73091, tmp309,
- 747      05000000 
- 747      00
- 748 04db C57B12C8 		vmovddup	xmm9, xmm0	# tmp310, D.73091
- 749 04df C441795A 		vcvtpd2ps	xmm10, xmm9	# tmp310, tmp310
- 749      D1
- 750 04e4 C4217A11 		vmovss	DWORD PTR [rbx+168+r13*4], xmm10	# MEM[base: _191, index: ivtmp.220_85, step: 4, offset: 16
- 750      94ABA800 
- 750      0000
-  18:initial-condition.hpp ****       for (int z=bz;z<ez;++z){
- 751              		.loc 8 18 0
- 752 04ee 0F852CFE 		jne	.L34	#,
- 752      FFFF
- 753              	.LBE590:
-  17:initial-condition.hpp ****     for (int y=by;y<ey;++y){
- 754              		.loc 8 17 0
- 755 04f4 8344242C 		add	DWORD PTR [rsp+44], 1	# %sfp,
- 755      01
- 756              	.LVL58:
- 757 04f9 4981C790 		add	r15, 400	# ivtmp.240,
- 757      010000
- 758 0500 837C242C 		cmp	DWORD PTR [rsp+44], 28	# %sfp,
- 758      1C
- 759 0505 0F85E8FD 		jne	.L36	#,
- 759      FFFF
- 760              	.LBE589:
-  16:initial-condition.hpp ****   for (int x=bx;x<ex;++x){
- 761              		.loc 8 16 0
- 762 050b 83442428 		add	DWORD PTR [rsp+40], 1	# %sfp,
- 762      01
- 763              	.LVL59:
- 764 0510 48814424 		add	QWORD PTR [rsp+32], 16000	# %sfp,
- 764      20803E00 
- 764      00
- 765 0519 837C2428 		cmp	DWORD PTR [rsp+40], 33	# %sfp,
- 765      21
- 766 051e 0F8590FD 		jne	.L28	#,
- 766      FFFF
- 767              	.LBE593:
- 768              	.LBE598:
-  21:initial-condition.hpp ****       }
-  22:initial-condition.hpp ****     }
-  23:initial-condition.hpp ****   }
-  24:initial-condition.hpp **** }
- 769              		.loc 8 24 0
- 770 0524 4883C458 		add	rsp, 88	#,
- 771              	.LVL60:
- 772 0528 5B       		pop	rbx	#
- 773              	.LVL61:
- 774 0529 415C     		pop	r12	#
- 775              	.LVL62:
- 776 052b 415D     		pop	r13	#
- 777              	.LVL63:
- 778 052d 415E     		pop	r14	#
- 779              	.LVL64:
- 780 052f 415F     		pop	r15	#
- 781              	.LVL65:
- 782 0531 5D       		pop	rbp	#
- 783              		.cfi_remember_state
- 784              		.cfi_def_cfa 7, 8
- 785              	.LVL66:
- 786 0532 C3       		ret
- 787              	.LVL67:
- 788              	.L66:
- 789              		.cfi_restore_state
- 790              	.LBB599:
- 791              	.LBB594:
- 792              	.LBB592:
- 793              	.LBB591:
-  20:initial-condition.hpp ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
- 794              		.loc 8 20 0
- 795 0533 C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+48]	#, %sfp
- 795      2430
- 796 0539 E8000000 		call	sqrt	#
- 796      00
- 797              	.LVL68:
- 798 053e C5FB1054 		vmovsd	xmm2, QWORD PTR [rsp+56]	# tmp209, %sfp
- 798      2438
- 799 0544 C5FB1144 		vmovsd	QWORD PTR [rsp+64], xmm0	# %sfp,
- 799      2440
- 800 054a E945FFFF 		jmp	.L59	#
- 800      FF
- 801              	.L64:
- 802 054f C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+48]	#, %sfp
- 802      2430
- 803 0555 C57B114C 		vmovsd	QWORD PTR [rsp+56], xmm9	# %sfp, tmp209
- 803      2438
- 804 055b E8000000 		call	sqrt	#
- 804      00
- 805              	.LVL69:
- 806 0560 C57B104C 		vmovsd	xmm9, QWORD PTR [rsp+56]	# tmp209, %sfp
- 806      2438
- 807 0566 C5FB1144 		vmovsd	QWORD PTR [rsp+64], xmm0	# %sfp,
- 807      2440
- 808 056c E93FFEFF 		jmp	.L57	#
- 808      FF
- 809              	.L63:
-  20:initial-condition.hpp ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
- 810              		.loc 8 20 0 is_stmt 0 discriminator 2
- 811 0571 C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+48]	#, %sfp
- 811      2430
- 812 0577 C57B115C 		vmovsd	QWORD PTR [rsp+56], xmm11	# %sfp, tmp209
- 812      2438
- 813 057d E8000000 		call	sqrt	#
- 813      00
- 814              	.LVL70:
- 815 0582 C57B105C 		vmovsd	xmm11, QWORD PTR [rsp+56]	# tmp209, %sfp
- 815      2438
- 816 0588 C5FB1144 		vmovsd	QWORD PTR [rsp+64], xmm0	# %sfp,
- 816      2440
- 817 058e E9AAFDFF 		jmp	.L30	#
- 817      FF
- 818              	.L65:
-  20:initial-condition.hpp ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
- 819              		.loc 8 20 0
- 820 0593 C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+48]	#, %sfp
- 820      2430
- 821 0599 E8000000 		call	sqrt	#
- 821      00
- 822              	.LVL71:
- 823 059e C57B107C 		vmovsd	xmm15, QWORD PTR [rsp+56]	# tmp209, %sfp
- 823      2438
- 824 05a4 C5FB1144 		vmovsd	QWORD PTR [rsp+64], xmm0	# %sfp,
- 824      2440
- 825 05aa E974FEFF 		jmp	.L58	#
- 825      FF
- 826              	.LBE591:
- 827              	.LBE592:
- 828              	.LBE594:
- 829              	.LBE599:
- 830              		.cfi_endproc
- 831              	.LFE4351:
- 833              		.section	.rodata.str1.1,"aMS",@progbits,1
- 834              	.LC32:
- 835 0000 0A00     		.string	"\n"
- 836              		.section	.rodata.str1.8,"aMS",@progbits,1
- 837              		.align 8
- 838              	.LC34:
- 839 0000 62617369 		.string	"basic_string::_S_construct null not valid"
- 839      635F7374 
- 839      72696E67 
- 839      3A3A5F53 
- 839      5F636F6E 
- 840              		.section	.text.startup,"ax",@progbits
- 841              		.p2align 4,,15
- 842              		.globl	main
- 844              	main:
- 845              	.LFB4288:
- 846              		.file 9 "main.cpp"
-   1:main.cpp      **** #include <cmath>
-   2:main.cpp      **** #include <unistd.h>
-   3:main.cpp      **** #include <iostream>
-   4:main.cpp      **** #include <sstream>
-   5:main.cpp      **** #include "initial-condition.hpp"
-   6:main.cpp      **** #include "naive-integrator.hpp"
-   7:main.cpp      **** 
-   8:main.cpp      **** #define NX 50
-   9:main.cpp      **** #define NY 40
-  10:main.cpp      **** #define NZ 100
-  11:main.cpp      **** 
-  12:main.cpp      **** float U[NX][NY][NZ];
-  13:main.cpp      **** float V[NX][NY][NZ];
-  14:main.cpp      **** 
-  15:main.cpp      **** 
-  16:main.cpp      **** int main () {
- 847              		.loc 9 16 0 is_stmt 1
- 848              		.cfi_startproc
- 849              		.cfi_personality 0x3,__gxx_personality_v0
- 850              		.cfi_lsda 0x3,.LLSDA4288
- 851 0000 55       		push	rbp	#
- 852              		.cfi_def_cfa_offset 16
- 853              		.cfi_offset 6, -16
- 854              	.LBB889:
-  17:main.cpp      ****   fill_initial_condition<NX,NY,NZ,float>(U,V);
- 855              		.loc 9 17 0
- 856 0001 BE000000 		mov	esi, OFFSET FLAT:V	#,
- 856      00
- 857 0006 BF000000 		mov	edi, OFFSET FLAT:U	#,
- 857      00
- 858              	.LBE889:
-  16:main.cpp      **** int main () {
- 859              		.loc 9 16 0
- 860 000b 4889E5   		mov	rbp, rsp	#,
- 861              		.cfi_def_cfa_register 6
- 862 000e 4157     		push	r15	#
- 863 0010 4156     		push	r14	#
- 864 0012 4155     		push	r13	#
- 865 0014 4154     		push	r12	#
- 866 0016 53       		push	rbx	#
- 867 0017 4883E4E0 		and	rsp, -32	#,
- 868 001b 4881ECE0 		sub	rsp, 736	#,
- 868      020000
- 869              		.cfi_offset 15, -24
- 870              		.cfi_offset 14, -32
- 871              		.cfi_offset 13, -40
- 872              		.cfi_offset 12, -48
- 873              		.cfi_offset 3, -56
- 874              	.LBB1638:
- 875              		.loc 9 17 0
- 876 0022 E8000000 		call	_Z22fill_initial_conditionILi50ELi40ELi100EfEvPAT0__AT1__T2_S3_	#
- 876      00
- 877              	.LVL72:
- 878 0027 C5FD6F3D 		vmovdqa	ymm7, YMMWORD PTR .LC7[rip]	# tmp1705,
- 878      00000000 
- 879              	.LBB890:
-  18:main.cpp      **** 
-  19:main.cpp      ****   naive_integrator<NX,NY,NZ,float> integrator;
-  20:main.cpp      ****   for(int t=0;;++t){
- 880              		.loc 9 20 0
- 881 002f C7042400 		mov	DWORD PTR [rsp], 0	# %sfp,
- 881      000000
- 882 0036 C5FD73D7 		vpsrlq	ymm0, ymm7, 32	# tmp1524, tmp1705,
- 882      20
- 883 003b C5FD7F44 		vmovdqa	YMMWORD PTR [rsp+32], ymm0	# %sfp, tmp1524
- 883      2420
- 884              	.LVL73:
- 885              	.L134:
- 886              	.LBB891:
- 887              	.LBB892:
- 888              	.LBB893:
- 889              	.LBB894:
- 890              	.LBB895:
- 891              	.LBB896:
- 892              	.LBB897:
- 893              	.LBB898:
- 894              		.file 10 "naive-integrator.hpp"
-   1:naive-integrator.hpp **** 
-   2:naive-integrator.hpp **** template <int NX, int NY, int NZ, class T> struct naive_integrator {
-   3:naive-integrator.hpp ****   typedef T surface[NX][NY];
-   4:naive-integrator.hpp ****   void proceed(int timesteps, T U[NX][NY][NZ], T V[NX][NY][NZ]) {
-   5:naive-integrator.hpp ****     static T U_other[NX][NY][NZ], V_other[NX][NY][NZ];
-   6:naive-integrator.hpp **** 
-   7:naive-integrator.hpp ****     const double Fu = 1.0/86400, Fv = 6.0/86400, Fe = 1.0/900, Du = 0.1*2.3e-9, Dv = 12.2e-11;
-   8:naive-integrator.hpp ****     const double dt = 200, dx = 0.001;
-   9:naive-integrator.hpp **** 
-  10:naive-integrator.hpp ****     auto periodic = [](T ar[NX][NY][NZ],int x, int y, int z) {
-  11:naive-integrator.hpp ****       x = (x+NX)%NX;
-  12:naive-integrator.hpp ****       y = (y+NY)%NY;
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
-  14:naive-integrator.hpp ****       return ar[x][y][z];
-  15:naive-integrator.hpp ****     };
-  16:naive-integrator.hpp ****     auto lap = [&periodic, &dx](T ar[NX][NY][NZ],int x, int y, int z) {
-  17:naive-integrator.hpp ****       auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
-  18:naive-integrator.hpp ****       + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
-  19:naive-integrator.hpp ****       + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
-  21:naive-integrator.hpp ****       return ret / dx / dx;
-  22:naive-integrator.hpp ****     };
-  23:naive-integrator.hpp **** 
-  24:naive-integrator.hpp ****     for (int t=0;t<timesteps;++t){
-  25:naive-integrator.hpp ****       for (int x=0;x<NX;++x) {
-  26:naive-integrator.hpp ****         for (int y=0;y<NY;++y) {
-  27:naive-integrator.hpp ****           for (int z=0;z<NZ;++z) {
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
-  32:naive-integrator.hpp ****             V_other[x][y][z] = V[x][y][z] + dt*dv_dt;
- 895              		.loc 10 32 0
- 896 0041 48C78424 		mov	QWORD PTR [rsp+144], OFFSET FLAT:V	# %sfp,
- 896      90000000 
- 896      00000000 
- 897 004d 48C78424 		mov	QWORD PTR [rsp+136], OFFSET FLAT:U	# %sfp,
- 897      88000000 
- 897      00000000 
- 898 0059 48C74424 		mov	QWORD PTR [rsp+64], 0	# %sfp,
- 898      40000000 
- 898      00
- 899 0062 C7442404 		mov	DWORD PTR [rsp+4], 0	# %sfp,
- 899      00000000 
- 900              	.LVL74:
- 901              	.L68:
- 902 006a 8B5C2404 		mov	ebx, DWORD PTR [rsp+4]	# x, %sfp
- 903 006e 41B81F85 		mov	r8d, 1374389535	# tmp1276,
- 903      EB51
- 904 0074 BF320000 		mov	edi, 50	#,
- 904      00
- 905 0079 41BF3200 		mov	r15d, 50	#,
- 905      0000
- 906 007f 41BC3200 		mov	r12d, 50	#,
- 906      0000
- 907 0085 48C74424 		mov	QWORD PTR [rsp+80], 0	# %sfp,
- 907      50000000 
- 907      00
- 908 008e C78424A8 		mov	DWORD PTR [rsp+168], 0	# %sfp,
- 908      00000000 
- 908      000000
- 909 0099 8D4B31   		lea	ecx, [rbx+49]	# D.73740,
- 910 009c 448D6B33 		lea	r13d, [rbx+51]	# D.73740,
- 911 00a0 89C8     		mov	eax, ecx	# tmp1701, D.73740
- 912 00a2 89CE     		mov	esi, ecx	# tmp1278, D.73740
- 913 00a4 41F7E8   		imul	r8d	# tmp1276
- 914 00a7 C1FE1F   		sar	esi, 31	# tmp1278,
- 915 00aa 4489E8   		mov	eax, r13d	# tmp1702, D.73740
- 916 00ad 4589EE   		mov	r14d, r13d	# tmp1287, D.73740
- 917 00b0 41C1FE1F 		sar	r14d, 31	# tmp1287,
- 918 00b4 C1FA04   		sar	edx, 4	# tmp1274,
- 919 00b7 29F2     		sub	edx, esi	# tmp1274, tmp1278
- 920 00b9 0FAFD7   		imul	edx, edi	# tmp1279,
- 921 00bc 29D1     		sub	ecx, edx	# D.73734, tmp1279
- 922 00be 41F7E8   		imul	r8d	# tmp1276
- 923 00c1 4C63C9   		movsx	r9, ecx	# D.73759, D.73734
- 924 00c4 4D69D180 		imul	r10, r9, 16000	# D.73759, D.73759,
- 924      3E0000
- 925 00cb C1FA04   		sar	edx, 4	# tmp1283,
- 926 00ce 4429F2   		sub	edx, r14d	# tmp1283, tmp1287
- 927 00d1 410FAFD7 		imul	edx, r15d	# tmp1288,
- 928 00d5 4C8B7C24 		mov	r15, QWORD PTR [rsp+64]	# ivtmp.580, %sfp
- 928      40
- 929 00da 4D8D9A00 		lea	r11, U[r10]	# D.73741,
- 929      000000
- 930 00e1 4981C200 		add	r10, OFFSET FLAT:V	# D.73741,
- 930      000000
- 931 00e8 4C899C24 		mov	QWORD PTR [rsp+152], r11	# %sfp, D.73741
- 931      98000000 
- 932 00f0 448D5B32 		lea	r11d, [rbx+50]	# D.73740,
- 933 00f4 4129D5   		sub	r13d, edx	# D.73734, tmp1288
- 934 00f7 4489D8   		mov	eax, r11d	# tmp1703, D.73740
- 935 00fa 4963CD   		movsx	rcx, r13d	# D.73759, D.73734
- 936 00fd 4863DB   		movsx	rbx, ebx	# x, x
- 937 0100 41F7E8   		imul	r8d	# tmp1276
- 938 0103 4589D8   		mov	r8d, r11d	# tmp1296, D.73740
- 939 0106 4489D8   		mov	eax, r11d	# D.73734, D.73740
- 940 0109 4869F180 		imul	rsi, rcx, 16000	# D.73759, D.73759,
- 940      3E0000
- 941 0110 41C1F81F 		sar	r8d, 31	# tmp1296,
- 942 0114 4C895424 		mov	QWORD PTR [rsp+88], r10	# %sfp, D.73741
- 942      58
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 943              		.loc 10 31 0
- 944 0119 4869CBA0 		imul	rcx, rbx, 4000	# tmp1512, x,
- 944      0F0000
- 945 0120 4C897C24 		mov	QWORD PTR [rsp+120], r15	# %sfp, ivtmp.580
- 945      78
- 946 0125 C1FA04   		sar	edx, 4	# tmp1292,
- 947 0128 4429C2   		sub	edx, r8d	# tmp1292, tmp1296
- 948 012b 410FAFD4 		imul	edx, r12d	# tmp1297,
- 949 012f 488DBE00 		lea	rdi, U[rsi]	# D.73741,
- 949      000000
- 950 0136 4C8D9600 		lea	r10, V[rsi]	# D.73741,
- 950      000000
- 951 013d 4889BC24 		mov	QWORD PTR [rsp+296], rdi	# %sfp, D.73741
- 951      28010000 
- 952 0145 29D0     		sub	eax, edx	# D.73734, tmp1297
- 953 0147 4C899424 		mov	QWORD PTR [rsp+288], r10	# %sfp, D.73741
- 953      20010000 
- 954 014f 4898     		cdqe
- 955 0151 48894C24 		mov	QWORD PTR [rsp+8], rcx	# %sfp, tmp1512
- 955      08
- 956 0156 4C69E880 		imul	r13, rax, 16000	# D.73759, D.73759,
- 956      3E0000
- 957 015d 4D8D9D00 		lea	r11, U[r13]	# D.73741,
- 957      000000
- 958 0164 4D8DB500 		lea	r14, V[r13]	# D.73741,
- 958      000000
- 959              	.LVL75:
- 960 016b 0F1F4400 		.p2align 4,,10
+ 386 0000 55       		push	rbp	#
+ 387              		.cfi_def_cfa_offset 16
+ 388              		.cfi_offset 6, -16
+ 389 0001 4889E5   		mov	rbp, rsp	#,
+ 390              		.cfi_def_cfa_register 6
+ 391 0004 4157     		push	r15	#
+ 392 0006 4156     		push	r14	#
+ 393 0008 4155     		push	r13	#
+ 394              		.cfi_offset 15, -24
+ 395              		.cfi_offset 14, -32
+ 396              		.cfi_offset 13, -40
+ 397 000a 41BD0000 		mov	r13d, OFFSET FLAT:V-800	# D.36545,
+ 397      0000
+ 398 0010 4154     		push	r12	#
+ 399 0012 4981ED00 		sub	r13, OFFSET FLAT:U	# D.36545,
+ 399      000000
+ 400              		.cfi_offset 12, -48
+ 401 0019 41BC0000 		mov	r12d, OFFSET FLAT:U+32800	# ivtmp.263,
+ 401      0000
+ 402 001f 53       		push	rbx	#
+ 403 0020 4883E4E0 		and	rsp, -32	#,
+ 404 0024 4883EC40 		sub	rsp, 64	#,
+ 405              		.cfi_offset 3, -56
+ 406              	.LBB561:
+  26:saya.cpp      ****   global_clock=0;
+ 407              		.loc 8 26 0
+ 408 0028 C7050000 		mov	DWORD PTR global_clock[rip], 0	# global_clock,
+ 408      00000000 
+ 408      0000
+ 409              	.LVL32:
+ 410 0032 C5FD2805 		vmovapd	ymm0, YMMWORD PTR .LC0[rip]	# tmp145,
+ 410      00000000 
+ 411              	.LVL33:
+ 412              	.L21:
+ 413 003a 498D9C24 		lea	rbx, [r12-32000]	# ivtmp.256,
+ 413      0083FFFF 
+ 414              	.LVL34:
+ 415              		.p2align 4,,10
+ 416 0042 660F1F44 		.p2align 3
+ 416      0000
+ 417              	.L27:
+ 418              	.LBB562:
+ 419              	.LBB563:
+ 420              	.LBB564:
+  27:saya.cpp      ****   for (int x=0;x<NX;++x) {
+  28:saya.cpp      ****     for (int y=0;y<NY;++y) {
+  29:saya.cpp      ****       for (int z=0;z<NZ;++z) {
+  30:saya.cpp      ****         U[x][y][z] = 1;
+ 421              		.loc 8 30 0 discriminator 1
+ 422 0048 C5FD2983 		vmovapd	YMMWORD PTR [rbx-800], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 422      E0FCFFFF 
+ 423              	.LVL35:
+ 424 0050 488D8300 		lea	rax, [rbx-768]	# ivtmp.245,
+ 424      FDFFFF
+ 425              	.L23:
+ 426              		.loc 8 30 0 is_stmt 0
+ 427 0057 C5FD2900 		vmovapd	YMMWORD PTR [rax], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 428 005b 48050001 		add	rax, 256	# ivtmp.245,
+ 428      0000
+ 429 0061 C5FD2980 		vmovapd	YMMWORD PTR [rax-224], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 429      20FFFFFF 
+ 430 0069 C5FD2980 		vmovapd	YMMWORD PTR [rax-192], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 430      40FFFFFF 
+ 431 0071 C5FD2980 		vmovapd	YMMWORD PTR [rax-160], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 431      60FFFFFF 
+ 432 0079 C5FD2940 		vmovapd	YMMWORD PTR [rax-128], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 432      80
+ 433 007e C5FD2940 		vmovapd	YMMWORD PTR [rax-96], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 433      A0
+ 434 0083 C5FD2940 		vmovapd	YMMWORD PTR [rax-64], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 434      C0
+ 435 0088 C5FD2940 		vmovapd	YMMWORD PTR [rax-32], ymm0	# MEM[base: _1, offset: 0B], tmp145
+ 435      E0
+ 436 008d 4839C3   		cmp	rbx, rax	# ivtmp.256, ivtmp.245
+ 437 0090 75C5     		jne	.L23	#,
+ 438 0092 498D7C1D 		lea	rdi, [r13+0+rbx]	# D.36545,
+ 438      00
+ 439 0097 BA200300 		mov	edx, 800	#,
+ 439      00
+ 440 009c 31F6     		xor	esi, esi	#
+ 441 009e C5FD2944 		vmovapd	YMMWORD PTR [rsp+32], ymm0	# %sfp, tmp145
+ 441      2420
+ 442 00a4 C5F877   		vzeroupper
+ 443 00a7 4881C320 		add	rbx, 800	# ivtmp.256,
+ 443      030000
+ 444 00ae E8000000 		call	memset	#
+ 444      00
+ 445              	.LVL36:
+ 446              	.LBE564:
+  28:saya.cpp      ****     for (int y=0;y<NY;++y) {
+ 447              		.loc 8 28 0 is_stmt 1
+ 448 00b3 4939DC   		cmp	r12, rbx	# ivtmp.263, ivtmp.256
+ 449 00b6 C5FD2844 		vmovapd	ymm0, YMMWORD PTR [rsp+32]	# tmp145, %sfp
+ 449      2420
+ 450 00bc 758A     		jne	.L27	#,
+ 451 00be 4981C400 		add	r12, 32000	# ivtmp.263,
+ 451      7D0000
+ 452              	.LBE563:
+  27:saya.cpp      ****   for (int x=0;x<NX;++x) {
+ 453              		.loc 8 27 0
+ 454 00c5 4981FC00 		cmp	r12, OFFSET FLAT:U+1632800	# ivtmp.263,
+ 454      000000
+ 455 00cc 0F8568FF 		jne	.L21	#,
+ 455      FFFF
+ 456              	.LBE562:
+ 457              	.LBB565:
+  31:saya.cpp      ****         V[x][y][z] = 0;
+  32:saya.cpp      ****       }
+  33:saya.cpp      ****     }
+  34:saya.cpp      ****   }
+  35:saya.cpp      ****   int bx = std::max(NX/4,NX/2-8),  ex = std::min(3*NX/4+1,NX/2+8);
+  36:saya.cpp      ****   int by = std::max(NY/4,NY/2-8),  ey = std::min(3*NY/4+1,NY/2+8);
+  37:saya.cpp      ****   int bz = std::max(NZ/4,NZ/2-8),  ez = std::min(3*NZ/4+1,NZ/2+8);
+  38:saya.cpp      ****   for (int x=bx;x<ex;++x){
+ 458              		.loc 8 38 0
+ 459 00d2 41BD1100 		mov	r13d, 17	# x,
+ 459      0000
+ 460              	.LBE565:
+ 461              	.LBB570:
+  27:saya.cpp      ****   for (int x=0;x<NX;++x) {
+ 462              		.loc 8 27 0
+ 463 00d8 48C70424 		mov	QWORD PTR [rsp], 553600	# %sfp,
+ 463      80720800 
+ 464 00e0 C5F877   		vzeroupper
+ 465              	.L26:
+ 466              	.LVL37:
+ 467 00e3 C4C14B2A 		vcvtsi2sd	xmm6, xmm6, r13d	# D.36544, x
+ 467      F5
+ 468              	.LBE570:
+ 469              	.LBE561:
+  25:saya.cpp      **** void fill_initial_condition() {
+ 470              		.loc 8 25 0 discriminator 1
+ 471 00e8 488B1C24 		mov	rbx, QWORD PTR [rsp]	# ivtmp.229, %sfp
+ 472 00ec 41BE0C00 		mov	r14d, 12	# y,
+ 472      0000
+ 473 00f2 C5FB1174 		vmovsd	QWORD PTR [rsp+32], xmm6	# %sfp, D.36544
+ 473      2420
+ 474              	.LVL38:
+ 475              	.L34:
+ 476 00f8 C4C1532A 		vcvtsi2sd	xmm5, xmm5, r14d	# D.36544, y
+ 476      EE
+ 477 00fd 4531E4   		xor	r12d, r12d	# ivtmp.210
+ 478 0100 C5F351CD 		vsqrtsd	xmm1, xmm1, xmm5	# tmp148, D.36544
+ 479 0104 C5FB116C 		vmovsd	QWORD PTR [rsp+8], xmm5	# %sfp, D.36544
+ 479      2408
+ 480              	.LVL39:
+ 481 010a 660F1F44 		.p2align 4,,10
+ 481      0000
+ 482              		.p2align 3
+ 483              	.L32:
+ 484              	.LBB573:
+ 485              	.LBB571:
+ 486              	.LBB566:
+ 487              	.LBB567:
+  39:saya.cpp      ****     for (int y=by;y<ey;++y){
+  40:saya.cpp      ****       for (int z=bz;z<ez;++z){
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+  42:saya.cpp      ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
+ 488              		.loc 8 42 0 discriminator 2
+ 489 0110 C5F92EC9 		vucomisd	xmm1, xmm1	# tmp148, tmp148
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+ 490              		.loc 8 41 0 discriminator 2
+ 491 0114 C5FB101D 		vmovsd	xmm3, QWORD PTR .LC1[rip]	# tmp190,
+ 491      00000000 
+ 492              		.loc 8 42 0 discriminator 2
+ 493 011c C5FB114C 		vmovsd	QWORD PTR [rsp+24], xmm1	# %sfp, tmp148
+ 493      2418
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+ 494              		.loc 8 41 0 discriminator 2
+ 495 0122 C4A17B11 		vmovsd	QWORD PTR U[rbx+336+r12*8], xmm3	# MEM[symbol: U, base: ivtmp.229_66, index: ivtmp.210_37, 
+ 495      9CE30000 
+ 495      0000
+ 496              		.loc 8 42 0 discriminator 2
+ 497 012c 0F8A2202 		jp	.L56	#,
+ 497      0000
+ 498              	.L28:
+ 499 0132 418D5424 		lea	edx, [r12+42]	# D.36546,
+ 499      2A
+ 500 0137 C5FB114C 		vmovsd	QWORD PTR [rsp+16], xmm1	# %sfp, tmp148
+ 500      2410
+ 501 013d C5FB2AC2 		vcvtsi2sd	xmm0, xmm0, edx	# D.36544, D.36546
+ 502 0141 E8000000 		call	cos	#
+ 502      00
+ 503              	.LVL40:
+ 504 0146 C5FB1064 		vmovsd	xmm4, QWORD PTR [rsp+32]	# D.36544, %sfp
+ 504      2420
+ 505 014c C5DB5854 		vaddsd	xmm2, xmm4, QWORD PTR [rsp+24]	# D.36544, D.36544, %sfp
+ 505      2418
+ 506 0152 C5EB58C0 		vaddsd	xmm0, xmm2, xmm0	# D.36544, D.36544, D.36544
+ 507 0156 E8000000 		call	sin	#
+ 507      00
+ 508              	.LVL41:
+ 509 015b C57B1044 		vmovsd	xmm8, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 509      2410
+ 510 0161 C5FB100D 		vmovsd	xmm1, QWORD PTR .LC3[rip]	# tmp192,
+ 510      00000000 
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+ 511              		.loc 8 41 0 discriminator 2
+ 512 0169 C5FB103D 		vmovsd	xmm7, QWORD PTR .LC1[rip]	# tmp193,
+ 512      00000000 
+ 513              		.loc 8 42 0 discriminator 2
+ 514 0171 C57B1144 		vmovsd	QWORD PTR [rsp+24], xmm8	# %sfp, tmp148
+ 514      2418
+ 515 0177 C4E2F199 		vfmadd132sd	xmm0, xmm1, QWORD PTR .LC2[rip]	# D.36544, tmp192,
+ 515      05000000 
+ 515      00
+ 516 0180 C4A17B11 		vmovsd	QWORD PTR V[rbx+336+r12*8], xmm0	# MEM[symbol: V, base: ivtmp.229_66, index: ivtmp.210_37, 
+ 516      84E30000 
+ 516      0000
+ 517 018a 4983C401 		add	r12, 1	# tmp153,
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+ 518              		.loc 8 41 0 discriminator 2
+ 519 018e C4A17B11 		vmovsd	QWORD PTR U[rbx+336+r12*8], xmm7	# MEM[symbol: U, base: ivtmp.229_66, index: ivtmp.210_37, 
+ 519      BCE30000 
+ 519      0000
+ 520              		.loc 8 42 0 discriminator 2
+ 521 0198 C441792E 		vucomisd	xmm8, xmm8	# tmp148, tmp148
+ 521      C0
+ 522 019d 0F8A8F01 		jp	.L57	#,
+ 522      0000
+ 523              	.L50:
+ 524 01a3 418D4C24 		lea	ecx, [r12+42]	# D.36546,
+ 524      2A
+ 525 01a8 C57B1144 		vmovsd	QWORD PTR [rsp+16], xmm8	# %sfp, tmp148
+ 525      2410
+ 526              		.loc 8 42 0 is_stmt 0
+ 527 01ae C5FB2AC1 		vcvtsi2sd	xmm0, xmm0, ecx	# D.36544, D.36546
+ 528 01b2 4D8D7C24 		lea	r15, [r12+1]	# ivtmp.210,
+ 528      01
+ 529 01b7 E8000000 		call	cos	#
+ 529      00
+ 530              	.LVL42:
+ 531 01bc C57B104C 		vmovsd	xmm9, QWORD PTR [rsp+32]	# D.36544, %sfp
+ 531      2420
+ 532 01c2 C5335854 		vaddsd	xmm10, xmm9, QWORD PTR [rsp+24]	# D.36544, D.36544, %sfp
+ 532      2418
+ 533 01c8 C5AB58C0 		vaddsd	xmm0, xmm10, xmm0	# D.36544, D.36544, D.36544
+ 534 01cc E8000000 		call	sin	#
+ 534      00
+ 535              	.LVL43:
+ 536 01d1 C57B106C 		vmovsd	xmm13, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 536      2410
+ 537 01d7 C57B101D 		vmovsd	xmm11, QWORD PTR .LC3[rip]	# tmp197,
+ 537      00000000 
+ 538 01df C441792E 		vucomisd	xmm13, xmm13	# tmp148, tmp148
+ 538      ED
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+ 539              		.loc 8 41 0 is_stmt 1
+ 540 01e4 C57B1025 		vmovsd	xmm12, QWORD PTR .LC1[rip]	# tmp198,
+ 540      00000000 
+ 541              		.loc 8 42 0
+ 542 01ec C57B116C 		vmovsd	QWORD PTR [rsp+24], xmm13	# %sfp, tmp148
+ 542      2418
+ 543 01f2 C4E2A199 		vfmadd132sd	xmm0, xmm11, QWORD PTR .LC2[rip]	# D.36544, tmp197,
+ 543      05000000 
+ 543      00
+ 544 01fb C4A17B11 		vmovsd	QWORD PTR V[rbx+336+r12*8], xmm0	# MEM[symbol: V, base: ivtmp.229_66, index: ivtmp.210_37, 
+ 544      84E30000 
+ 544      0000
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+ 545              		.loc 8 41 0
+ 546 0205 C4217B11 		vmovsd	QWORD PTR U[rbx+336+r15*8], xmm12	# MEM[symbol: U, base: ivtmp.229_66, index: ivtmp.210_37,
+ 546      A4FB0000 
+ 546      0000
+ 547              		.loc 8 42 0
+ 548 020f 0F8A6101 		jp	.L58	#,
+ 548      0000
+ 549              	.L51:
+ 550 0215 418D772A 		lea	esi, [r15+42]	# D.36546,
+ 551 0219 C57B116C 		vmovsd	QWORD PTR [rsp+16], xmm13	# %sfp, tmp148
+ 551      2410
+ 552 021f C5FB2AC6 		vcvtsi2sd	xmm0, xmm0, esi	# D.36544, D.36546
+ 553 0223 E8000000 		call	cos	#
+ 553      00
+ 554              	.LVL44:
+ 555 0228 C57B1074 		vmovsd	xmm14, QWORD PTR [rsp+32]	# D.36544, %sfp
+ 555      2420
+ 556 022e C50B587C 		vaddsd	xmm15, xmm14, QWORD PTR [rsp+24]	# D.36544, D.36544, %sfp
+ 556      2418
+ 557 0234 C58358C0 		vaddsd	xmm0, xmm15, xmm0	# D.36544, D.36544, D.36544
+ 558 0238 E8000000 		call	sin	#
+ 558      00
+ 559              	.LVL45:
+ 560 023d C5FB106C 		vmovsd	xmm5, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 560      2410
+ 561 0243 C5FB1035 		vmovsd	xmm6, QWORD PTR .LC3[rip]	# tmp200,
+ 561      00000000 
+ 562 024b C5F92EED 		vucomisd	xmm5, xmm5	# tmp148, tmp148
+ 563 024f C5FB116C 		vmovsd	QWORD PTR [rsp+24], xmm5	# %sfp, tmp148
+ 563      2418
+ 564 0255 C4E2C999 		vfmadd132sd	xmm0, xmm6, QWORD PTR .LC2[rip]	# D.36544, tmp200,
+ 564      05000000 
+ 564      00
+ 565 025e C4A17B11 		vmovsd	QWORD PTR V[rbx+336+r15*8], xmm0	# MEM[symbol: V, base: ivtmp.229_66, index: ivtmp.210_37, 
+ 565      84FB0000 
+ 565      0000
+ 566 0268 4D8D7C24 		lea	r15, [r12+2]	# ivtmp.210,
+ 566      02
+  41:saya.cpp      ****         U[x][y][z] = 0.5;
+ 567              		.loc 8 41 0
+ 568 026d C5FB1005 		vmovsd	xmm0, QWORD PTR .LC1[rip]	# tmp201,
+ 568      00000000 
+ 569 0275 C4A17B11 		vmovsd	QWORD PTR U[rbx+336+r15*8], xmm0	# MEM[symbol: U, base: ivtmp.229_66, index: ivtmp.210_37, 
+ 569      84FB0000 
+ 569      0000
+ 570              		.loc 8 42 0
+ 571 027f 0F8A9100 		jp	.L59	#,
+ 571      0000
+ 572              	.L52:
+ 573 0285 418D7F2A 		lea	edi, [r15+42]	# D.36546,
+ 574 0289 C5FB116C 		vmovsd	QWORD PTR [rsp+16], xmm5	# %sfp, tmp148
+ 574      2410
+ 575 028f 4983C403 		add	r12, 3	# ivtmp.210,
+ 576 0293 C5FB2AC7 		vcvtsi2sd	xmm0, xmm0, edi	# D.36544, D.36546
+ 577 0297 E8000000 		call	cos	#
+ 577      00
+ 578              	.LVL46:
+ 579 029c C5FB105C 		vmovsd	xmm3, QWORD PTR [rsp+32]	# D.36544, %sfp
+ 579      2420
+ 580 02a2 C5E35864 		vaddsd	xmm4, xmm3, QWORD PTR [rsp+24]	# D.36544, D.36544, %sfp
+ 580      2418
+ 581 02a8 C5DB58C0 		vaddsd	xmm0, xmm4, xmm0	# D.36544, D.36544, D.36544
+ 582 02ac E8000000 		call	sin	#
+ 582      00
+ 583              	.LVL47:
+  40:saya.cpp      ****       for (int z=bz;z<ez;++z){
+ 584              		.loc 8 40 0
+ 585 02b1 4983FC10 		cmp	r12, 16	# ivtmp.210,
+ 586 02b5 C5FB104C 		vmovsd	xmm1, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 586      2410
+ 587              		.loc 8 42 0
+ 588 02bb C5FB1015 		vmovsd	xmm2, QWORD PTR .LC3[rip]	# tmp203,
+ 588      00000000 
+ 589 02c3 C4E2E999 		vfmadd132sd	xmm0, xmm2, QWORD PTR .LC2[rip]	# D.36544, tmp203,
+ 589      05000000 
+ 589      00
+ 590 02cc C4A17B11 		vmovsd	QWORD PTR V[rbx+336+r15*8], xmm0	# MEM[symbol: V, base: ivtmp.229_66, index: ivtmp.210_37, 
+ 590      84FB0000 
+ 590      0000
+  40:saya.cpp      ****       for (int z=bz;z<ez;++z){
+ 591              		.loc 8 40 0
+ 592 02d6 0F8534FE 		jne	.L32	#,
+ 592      FFFF
+ 593              	.LBE567:
+  39:saya.cpp      ****     for (int y=by;y<ey;++y){
+ 594              		.loc 8 39 0
+ 595 02dc 4183C601 		add	r14d, 1	# y,
+ 596              	.LVL48:
+ 597 02e0 4881C320 		add	rbx, 800	# ivtmp.229,
+ 597      030000
+ 598 02e7 4183FE1C 		cmp	r14d, 28	# y,
+ 599 02eb 0F8507FE 		jne	.L34	#,
+ 599      FFFF
+ 600 02f1 48810424 		add	QWORD PTR [rsp], 32000	# %sfp,
+ 600      007D0000 
+ 601              	.LBE566:
+  38:saya.cpp      ****   for (int x=bx;x<ex;++x){
+ 602              		.loc 8 38 0
+ 603 02f9 4183C501 		add	r13d, 1	# x,
+ 604              	.LVL49:
+ 605 02fd 4183FD21 		cmp	r13d, 33	# x,
+ 606 0301 0F85DCFD 		jne	.L26	#,
+ 606      FFFF
+ 607              	.LBE571:
+ 608              	.LBE573:
+  43:saya.cpp      ****       }
+  44:saya.cpp      ****     }
+  45:saya.cpp      ****   }
+  46:saya.cpp      **** }
+ 609              		.loc 8 46 0
+ 610 0307 488D65D8 		lea	rsp, [rbp-40]	#,
+ 611 030b 5B       		pop	rbx	#
+ 612 030c 415C     		pop	r12	#
+ 613 030e 415D     		pop	r13	#
+ 614              	.LVL50:
+ 615 0310 415E     		pop	r14	#
+ 616              	.LVL51:
+ 617 0312 415F     		pop	r15	#
+ 618 0314 5D       		pop	rbp	#
+ 619              		.cfi_remember_state
+ 620              		.cfi_def_cfa 7, 8
+ 621 0315 C3       		ret
+ 622              	.LVL52:
+ 623              	.L59:
+ 624              		.cfi_restore_state
+ 625              	.LBB574:
+ 626              	.LBB572:
+ 627              	.LBB569:
+ 628              	.LBB568:
+  42:saya.cpp      ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
+ 629              		.loc 8 42 0
+ 630 0316 C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+8]	#, %sfp
+ 630      2408
+ 631 031c E8000000 		call	sqrt	#
+ 631      00
+ 632              	.LVL53:
+ 633 0321 C5FB106C 		vmovsd	xmm5, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 633      2410
+ 634 0327 C5FB1144 		vmovsd	QWORD PTR [rsp+24], xmm0	# %sfp,
+ 634      2418
+ 635 032d E953FFFF 		jmp	.L52	#
+ 635      FF
+ 636              	.L57:
+ 637 0332 C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+8]	#, %sfp
+ 637      2408
+ 638 0338 C57B1144 		vmovsd	QWORD PTR [rsp+16], xmm8	# %sfp, tmp148
+ 638      2410
+ 639 033e E8000000 		call	sqrt	#
+ 639      00
+ 640              	.LVL54:
+ 641 0343 C57B1044 		vmovsd	xmm8, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 641      2410
+ 642 0349 C5FB1144 		vmovsd	QWORD PTR [rsp+24], xmm0	# %sfp,
+ 642      2418
+ 643 034f E94FFEFF 		jmp	.L50	#
+ 643      FF
+ 644              	.L56:
+  42:saya.cpp      ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
+ 645              		.loc 8 42 0 is_stmt 0 discriminator 2
+ 646 0354 C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+8]	#, %sfp
+ 646      2408
+ 647 035a C5FB114C 		vmovsd	QWORD PTR [rsp+16], xmm1	# %sfp, tmp148
+ 647      2410
+ 648 0360 E8000000 		call	sqrt	#
+ 648      00
+ 649              	.LVL55:
+ 650 0365 C5FB104C 		vmovsd	xmm1, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 650      2410
+ 651 036b C5FB1144 		vmovsd	QWORD PTR [rsp+24], xmm0	# %sfp,
+ 651      2418
+ 652 0371 E9BCFDFF 		jmp	.L28	#
+ 652      FF
+ 653              	.L58:
+  42:saya.cpp      ****         V[x][y][z] = 0.25+0.1*sin(x+sqrt(y)+cos(z));
+ 654              		.loc 8 42 0
+ 655 0376 C5FB1044 		vmovsd	xmm0, QWORD PTR [rsp+8]	#, %sfp
+ 655      2408
+ 656 037c E8000000 		call	sqrt	#
+ 656      00
+ 657              	.LVL56:
+ 658 0381 C57B106C 		vmovsd	xmm13, QWORD PTR [rsp+16]	# tmp148, %sfp
+ 658      2410
+ 659 0387 C5FB1144 		vmovsd	QWORD PTR [rsp+24], xmm0	# %sfp,
+ 659      2418
+ 660 038d E983FEFF 		jmp	.L51	#
+ 660      FF
+ 661              	.LBE568:
+ 662              	.LBE569:
+ 663              	.LBE572:
+ 664              	.LBE574:
+ 665              		.cfi_endproc
+ 666              	.LFE1474:
+ 668 0392 66666666 		.p2align 4,,15
+ 668      662E0F1F 
+ 668      84000000 
+ 668      0000
+ 669              		.globl	_Z13naive_proceedv
+ 671              	_Z13naive_proceedv:
+ 672              	.LFB1476:
+  47:saya.cpp      **** 
+  48:saya.cpp      **** 
+  49:saya.cpp      **** inline Real periodic(Real ar[NX][NY][NZ],int x, int y, int z) {
+  50:saya.cpp      ****   x = (x+NX)%NX;
+  51:saya.cpp      ****   y = (y+NY)%NY;
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+  53:saya.cpp      ****   return ar[x][y][z];
+  54:saya.cpp      **** }
+  55:saya.cpp      **** 
+  56:saya.cpp      **** 
+  57:saya.cpp      **** void naive_proceed() {
+ 673              		.loc 8 57 0 is_stmt 1
+ 674              		.cfi_startproc
+ 675 03a0 55       		push	rbp	#
+ 676              		.cfi_def_cfa_offset 16
+ 677              		.cfi_offset 6, -16
+ 678              	.LBB618:
+  58:saya.cpp      ****   ++global_clock;
+ 679              		.loc 8 58 0
+ 680 03a1 B9310000 		mov	ecx, 49	# ivtmp.528,
+ 680      00
+ 681              	.LBE618:
+  57:saya.cpp      **** void naive_proceed() {
+ 682              		.loc 8 57 0
+ 683 03a6 4889E5   		mov	rbp, rsp	#,
+ 684              		.cfi_def_cfa_register 6
+ 685 03a9 4157     		push	r15	#
+ 686 03ab 4156     		push	r14	#
+ 687 03ad 4155     		push	r13	#
+ 688 03af 4154     		push	r12	#
+ 689 03b1 53       		push	rbx	#
+ 690 03b2 4883E4E0 		and	rsp, -32	#,
+ 691 03b6 4881ECA0 		sub	rsp, 416	#,
+ 691      010000
+ 692              		.cfi_offset 15, -24
+ 693              		.cfi_offset 14, -32
+ 694              		.cfi_offset 13, -40
+ 695              		.cfi_offset 12, -48
+ 696              		.cfi_offset 3, -56
+ 697 03bd C5FD6F05 		vmovdqa	ymm0, YMMWORD PTR .LC6[rip]	# tmp1093,
+ 697      00000000 
+ 698              	.LBB964:
+ 699              		.loc 8 58 0
+ 700 03c5 48C70424 		mov	QWORD PTR [rsp], OFFSET FLAT:U	# %sfp,
+ 700      00000000 
+ 701 03cd 83050000 		add	DWORD PTR global_clock[rip], 1	# global_clock,
+ 701      000001
+ 702              	.LVL57:
+ 703 03d4 48C74424 		mov	QWORD PTR [rsp+16], OFFSET FLAT:V	# %sfp,
+ 703      10000000 
+ 703      00
+ 704 03dd C5F573D0 		vpsrlq	ymm1, ymm0, 32	# tmp969, tmp1093,
+ 704      20
+ 705 03e2 C5FD281D 		vmovapd	ymm3, YMMWORD PTR .LC9[rip]	# tmp910,
+ 705      00000000 
+ 706 03ea 48C74424 		mov	QWORD PTR [rsp+8], 0	# %sfp,
+ 706      08000000 
+ 706      00
+ 707 03f3 C57D282D 		vmovapd	ymm13, YMMWORD PTR .LC13[rip]	# tmp923,
+ 707      00000000 
+ 708 03fb C5FD7F8C 		vmovdqa	YMMWORD PTR [rsp+128], ymm1	# %sfp, tmp969
+ 708      24800000 
+ 708      00
+ 709              	.LVL58:
+ 710              	.L61:
+ 711 0404 B81F85EB 		mov	eax, 1374389535	# tmp1089,
+ 711      51
+ 712 0409 89CB     		mov	ebx, ecx	# tmp861, ivtmp.528
+ 713 040b BE320000 		mov	esi, 50	#,
+ 713      00
+ 714 0410 F7E9     		imul	ecx	# ivtmp.528
+ 715 0412 C1FB1F   		sar	ebx, 31	# tmp861,
+ 716 0415 89CF     		mov	edi, ecx	# D.36884, ivtmp.528
+ 717 0417 448D5902 		lea	r11d, [rcx+2]	# D.36885,
+ 718 041b B81F85EB 		mov	eax, 1374389535	# tmp1090,
+ 718      51
+ 719 0420 41BD3200 		mov	r13d, 50	#,
+ 719      0000
+ 720 0426 8D4901   		lea	ecx, [rcx+1]	# D.36885,
+ 721 0429 4589DC   		mov	r12d, r11d	# tmp870, D.36885
+ 722 042c C1FA04   		sar	edx, 4	# tmp857,
+ 723 042f 41C1FC1F 		sar	r12d, 31	# tmp870,
+ 724 0433 894C2468 		mov	DWORD PTR [rsp+104], ecx	# %sfp, D.36885
+ 725 0437 29DA     		sub	edx, ebx	# tmp857, tmp861
+ 726 0439 0FAFD6   		imul	edx, esi	# tmp862,
+ 727              	.LBB619:
+ 728              	.LBB620:
+ 729              	.LBB621:
+ 730              	.LBB622:
+  59:saya.cpp      ****   
+  60:saya.cpp      ****   const Real Fu = 1.0/86400, Fv = 6.0/86400, Fe = 1.0/900, Du = 0.1*2.3e-9, Dv = 12.2e-11;
+  61:saya.cpp      ****   const Real dt = 200, dx = 0.001;
+  62:saya.cpp      **** 
+  63:saya.cpp      ****   auto lap = [&dx](Real ar[NX][NY][NZ],int x, int y, int z) {
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+  68:saya.cpp      ****     return ret / dx / dx;
+  69:saya.cpp      ****   };
+  70:saya.cpp      **** 
+  71:saya.cpp      ****   for (int x=0;x<NX;++x) {
+  72:saya.cpp      ****     for (int y=0;y<NY;++y) {
+  73:saya.cpp      ****       for (int z=0;z<NZ;++z) {
+  74:saya.cpp      **** 	auto u = U[x][y][z],  v = V[x][y][z];
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+  77:saya.cpp      **** 	U_other[x][y][z] = U[x][y][z] + dt*du_dt;
+  78:saya.cpp      **** 	V_other[x][y][z] = V[x][y][z] + dt*dv_dt;
+ 731              		.loc 8 78 0 discriminator 1
+ 732 043c 488B7424 		mov	rsi, QWORD PTR [rsp+16]	# ivtmp.533, %sfp
+ 732      10
+ 733 0441 29D7     		sub	edi, edx	# D.36884, tmp862
+ 734 0443 41F7EB   		imul	r11d	# D.36885
+ 735 0446 B81F85EB 		mov	eax, 1374389535	# tmp1091,
+ 735      51
+ 736 044b 4C63C7   		movsx	r8, edi	# D.36893, D.36884
+ 737 044e 89CF     		mov	edi, ecx	# tmp878, D.36885
+ 738 0450 4D69D000 		imul	r10, r8, 32000	# D.36893, D.36893,
+ 738      7D0000
+ 739 0457 C1FF1F   		sar	edi, 31	# tmp878,
+ 740 045a 41B83200 		mov	r8d, 50	#,
+ 740      0000
+ 741 0460 C1FA04   		sar	edx, 4	# tmp866,
+ 742 0463 4429E2   		sub	edx, r12d	# tmp866, tmp870
+ 743 0466 410FAFD5 		imul	edx, r13d	# tmp871,
+ 744 046a 4989F5   		mov	r13, rsi	# ivtmp.519, ivtmp.533
+ 745 046d 4D8D8A00 		lea	r9, U[r10]	# D.36887,
+ 745      000000
+ 746 0474 4C894C24 		mov	QWORD PTR [rsp+96], r9	# %sfp, D.36887
+ 746      60
+ 747 0479 4D8D9200 		lea	r10, V[r10]	# D.36887,
+ 747      000000
+ 748 0480 4129D3   		sub	r11d, edx	# D.36884, tmp871
+ 749 0483 F7E9     		imul	ecx	# D.36885
+ 750 0485 4D63F3   		movsx	r14, r11d	# D.36893, D.36884
+ 751 0488 89C8     		mov	eax, ecx	# D.36884, D.36885
+ 752 048a 4D69FE00 		imul	r15, r14, 32000	# D.36893, D.36893,
+ 752      7D0000
+ 753 0491 488B4C24 		mov	rcx, QWORD PTR [rsp+8]	# ivtmp.532, %sfp
+ 753      08
+ 754 0496 4C895424 		mov	QWORD PTR [rsp+80], r10	# %sfp, D.36887
+ 754      50
+ 755 049b C1FA04   		sar	edx, 4	# tmp874,
+ 756 049e 29FA     		sub	edx, edi	# tmp874, tmp878
+ 757 04a0 BF280000 		mov	edi, 40	# ivtmp.511,
+ 757      00
+ 758 04a5 410FAFD0 		imul	edx, r8d	# tmp879,
+ 759 04a9 4829CE   		sub	rsi, rcx	# D.36886, ivtmp.532
+ 760 04ac 498D9F00 		lea	rbx, U[r15]	# D.36887,
+ 760      000000
+ 761 04b3 48897424 		mov	QWORD PTR [rsp+32], rsi	# %sfp, D.36886
+ 761      20
+ 762 04b8 48895C24 		mov	QWORD PTR [rsp+120], rbx	# %sfp, D.36887
+ 762      78
+ 763 04bd 488B1C24 		mov	rbx, QWORD PTR [rsp]	# ivtmp.531, %sfp
+ 764 04c1 4D8DA700 		lea	r12, V[r15]	# D.36887,
+ 764      000000
+ 765 04c8 29D0     		sub	eax, edx	# D.36884, tmp879
+ 766 04ca 4C896424 		mov	QWORD PTR [rsp+112], r12	# %sfp, D.36887
+ 766      70
+ 767 04cf 4989CF   		mov	r15, rcx	# ivtmp.514, ivtmp.532
+ 768 04d2 4898     		cdqe
+ 769 04d4 4C69C800 		imul	r9, rax, 32000	# D.36893, D.36893,
+ 769      7D0000
+ 770 04db 4889DA   		mov	rdx, rbx	# D.36886, ivtmp.531
+ 771 04de 4989DE   		mov	r14, rbx	# ivtmp.518, ivtmp.531
+ 772 04e1 4829CA   		sub	rdx, rcx	# D.36886, ivtmp.532
+ 773 04e4 48895424 		mov	QWORD PTR [rsp+24], rdx	# %sfp, D.36886
+ 773      18
+ 774 04e9 4D8D9900 		lea	r11, U[r9]	# D.36887,
+ 774      000000
+ 775 04f0 4981C100 		add	r9, OFFSET FLAT:V	# D.36887,
+ 775      000000
+ 776 04f7 4C895C24 		mov	QWORD PTR [rsp+88], r11	# %sfp, D.36887
+ 776      58
+ 777 04fc 4C894C24 		mov	QWORD PTR [rsp+72], r9	# %sfp, D.36887
+ 777      48
+ 778              	.LVL59:
+ 779              		.p2align 4,,10
+ 780 0501 0F1F8000 		.p2align 3
+ 780      000000
+ 781              	.L70:
+ 782 0508 B8676666 		mov	eax, 1717986919	# tmp1086,
+ 782      66
+ 783 050d 4189F8   		mov	r8d, edi	# tmp814, ivtmp.511
+ 784 0510 4189FB   		mov	r11d, edi	# D.36884, ivtmp.511
+ 785 0513 F7EF     		imul	edi	# ivtmp.511
+ 786 0515 41C1F81F 		sar	r8d, 31	# tmp814,
+ 787 0519 B8676666 		mov	eax, 1717986919	# tmp1087,
+ 787      66
+ 788 051e 8D7701   		lea	esi, [rdi+1]	# D.36885,
+ 789 0521 4C897C24 		mov	QWORD PTR [rsp+40], r15	# %sfp, ivtmp.514
+ 789      28
+ 790 0526 C57D6F3D 		vmovdqa	ymm15, YMMWORD PTR .LC4[rip]	# vect_vec_iv_.275,
+ 790      00000000 
+ 791 052e 448D57FF 		lea	r10d, [rdi-1]	# D.36885,
+ 792 0532 89F7     		mov	edi, esi	# tmp831, D.36885
+ 793 0534 89F3     		mov	ebx, esi	# D.36885, D.36885
+ 794 0536 C1FA04   		sar	edx, 4	# D.36884,
+ 795 0539 4589D4   		mov	r12d, r10d	# tmp823, D.36885
+ 796 053c C1FF1F   		sar	edi, 31	# tmp831,
+ 797 053f 4429C2   		sub	edx, r8d	# D.36884, tmp814
+ 798 0542 41C1FC1F 		sar	r12d, 31	# tmp823,
+ 799 0546 8974246C 		mov	DWORD PTR [rsp+108], esi	# %sfp, D.36885
+ 800 054a 448D0C92 		lea	r9d, [rdx+rdx*4]	# tmp817,
+ 801 054e 41F7EA   		imul	r10d	# D.36885
+ 802 0551 B8676666 		mov	eax, 1717986919	# tmp1088,
+ 802      66
+ 803 0556 41C1E103 		sal	r9d, 3	# tmp818,
+ 804 055a 4529CB   		sub	r11d, r9d	# D.36884, tmp818
+ 805 055d C1FA04   		sar	edx, 4	# D.36884,
+ 806 0560 4D63DB   		movsx	r11, r11d	# D.36884, D.36884
+ 807 0563 4429E2   		sub	edx, r12d	# D.36884, tmp823
+ 808 0566 4C895C24 		mov	QWORD PTR [rsp+64], r11	# %sfp, D.36884
+ 808      40
+ 809 056b 8D0C92   		lea	ecx, [rdx+rdx*4]	# tmp826,
+ 810 056e F7EE     		imul	esi	# D.36885
+ 811 0570 488B4424 		mov	rax, QWORD PTR [rsp+112]	# D.36887, %sfp
+ 811      70
+ 812 0575 4F8D249B 		lea	r12, [r11+r11*4]	# tmp839,
+ 813 0579 C1E103   		sal	ecx, 3	# tmp827,
+ 814 057c 4129CA   		sub	r10d, ecx	# D.36884, tmp827
+ 815 057f 488B4C24 		mov	rcx, QWORD PTR [rsp+96]	# D.36887, %sfp
+ 815      60
+ 816 0584 C1FA04   		sar	edx, 4	# D.36884,
+ 817 0587 4D63D2   		movsx	r10, r10d	# D.36884, D.36884
+ 818 058a 4B8D3492 		lea	rsi, [r10+r10*4]	# tmp846,
+ 819 058e 29FA     		sub	edx, edi	# D.36884, tmp831
+ 820 0590 4C895424 		mov	QWORD PTR [rsp+56], r10	# %sfp, D.36884
+ 820      38
+ 821 0595 448D0492 		lea	r8d, [rdx+rdx*4]	# tmp834,
+ 822 0599 488D3CB6 		lea	rdi, [rsi+rsi*4]	# tmp849,
+ 823 059d 41C1E003 		sal	r8d, 3	# tmp835,
+ 824 05a1 4B8D14A4 		lea	rdx, [r12+r12*4]	# tmp842,
+ 825 05a5 4429C3   		sub	ebx, r8d	# D.36884, tmp835
+ 826 05a8 4C8B4424 		mov	r8, QWORD PTR [rsp+88]	# D.36887, %sfp
+ 826      58
+ 827 05ad 48C1E205 		sal	rdx, 5	# tmp842,
+ 828 05b1 4C63CB   		movsx	r9, ebx	#, D.36884
+ 829 05b4 48C1E705 		sal	rdi, 5	# tmp849,
+ 830 05b8 4C894C24 		mov	QWORD PTR [rsp+48], r9	# %sfp, D.36884
+ 830      30
+ 831 05bd 4F8D0C89 		lea	r9, [r9+r9*4]	# tmp853,
+ 832 05c1 488B5C24 		mov	rbx, QWORD PTR [rsp+120]	# D.36887, %sfp
+ 832      78
+ 833 05c6 4B8D3489 		lea	rsi, [r9+r9*4]	# tmp856,
+ 834 05ca 4C8D2411 		lea	r12, [rcx+rdx]	# D.36889,
+ 835 05ce 48C1E605 		sal	rsi, 5	# tmp856,
+ 836 05d2 4E8D1C07 		lea	r11, [rdi+r8]	# D.36889,
+ 837 05d6 4E8D1406 		lea	r10, [rsi+r8]	# D.36889,
+ 838 05da 4801D3   		add	rbx, rdx	# D.36889, tmp842
+ 839 05dd 498D0C10 		lea	rcx, [r8+rdx]	# D.36889,
+ 840 05e1 4C8B4424 		mov	r8, QWORD PTR [rsp+80]	# D.36887, %sfp
+ 840      50
+ 841 05e6 4D8D0C10 		lea	r9, [r8+rdx]	# D.36889,
+ 842 05ea 4C8D0410 		lea	r8, [rax+rdx]	# D.36889,
+ 843 05ee 488B4424 		mov	rax, QWORD PTR [rsp+72]	# D.36887, %sfp
+ 843      48
+ 844 05f3 4801C6   		add	rsi, rax	# D.36889, D.36887
+ 845 05f6 4801C7   		add	rdi, rax	# D.36889, D.36887
+ 846 05f9 4801C2   		add	rdx, rax	# D.36889, D.36887
+ 847 05fc 498D8700 		lea	rax, U_other[r15]	# D.36894,
+ 847      000000
+ 848 0603 4889B424 		mov	QWORD PTR [rsp+192], rsi	# %sfp, D.36889
+ 848      C0000000 
+ 849 060b 48898424 		mov	QWORD PTR [rsp+384], rax	# %sfp, D.36894
+ 849      80010000 
+ 850 0613 498D8700 		lea	rax, V_other[r15]	# D.36894,
+ 850      000000
+ 851 061a 48898424 		mov	QWORD PTR [rsp+200], rax	# %sfp, D.36894
+ 851      C8000000 
+ 852 0622 4C8BBC24 		mov	r15, QWORD PTR [rsp+384]	# D.36894, %sfp
+ 852      80010000 
+ 853 062a 31C0     		xor	eax, eax	# ivtmp.486
+ 854 062c EB13     		jmp	.L67	#
+ 855              	.LVL60:
+ 856 062e 6690     		.p2align 4,,10
+ 857              		.p2align 3
+ 858              	.L62:
+ 859 0630 488BB424 		mov	rsi, QWORD PTR [rsp+192]	# D.36889, %sfp
+ 859      C0000000 
+ 860              		.loc 8 78 0 is_stmt 0
+ 861 0638 C57D6FBC 		vmovdqa	ymm15, YMMWORD PTR [rsp+160]	# vect_vec_iv_.275, %sfp
+ 861      24A00000 
+ 861      00
+ 862              	.LVL61:
+ 863              	.L67:
+ 864              	.LBB623:
+ 865              	.LBB624:
+ 866              	.LBB625:
+ 867              	.LBB626:
+ 868              	.LBB627:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 869              		.loc 8 52 0 is_stmt 1 discriminator 2
+ 870 0641 C585FE35 		vpaddd	ymm6, ymm15, YMMWORD PTR .LC5[rip]	# vect_var_.297, vect_vec_iv_.275,
+ 870      00000000 
+ 871 0649 C585FE15 		vpaddd	ymm2, ymm15, YMMWORD PTR .LC31[rip]	# vect_vec_iv_.275, vect_vec_iv_.275,
+ 871      00000000 
+ 872 0651 C57D6FA4 		vmovdqa	ymm12, YMMWORD PTR [rsp+128]	# tmp969, %sfp
+ 872      24800000 
+ 872      00
+ 873 065a C5DD73D6 		vpsrlq	ymm4, ymm6, 32	# tmp426, vect_var_.297,
+ 873      20
+ 874              	.LBE627:
+ 875              	.LBE626:
+ 876              	.LBE625:
+ 877              	.LBE624:
+ 878              	.LBE623:
+  74:saya.cpp      **** 	auto u = U[x][y][z],  v = V[x][y][z];
+ 879              		.loc 8 74 0 discriminator 2
+ 880 065f C4C17D28 		vmovapd	ymm1, YMMWORD PTR [r13+0+rax]	# vect_v.286, MEM[base: vect_pV.285_402, index: ivtmp.486_58
+ 880      4C0500
+ 881 0666 C4E24D28 		vpmuldq	ymm5, ymm6, YMMWORD PTR .LC6[rip]	# tmp422, vect_var_.297,
+ 881      2D000000 
+ 881      00
+ 882 066f C4C25D28 		vpmuldq	ymm7, ymm4, ymm12	# tmp424, tmp426, tmp969
+ 882      FC
+ 883              	.LBB770:
+ 884              	.LBB740:
+ 885              	.LBB710:
+ 886              	.LBB637:
+ 887              	.LBB628:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 888              		.loc 8 53 0 discriminator 2
+ 889 0674 C5FD28E3 		vmovapd	ymm4, ymm3	# tmp1059, tmp910
+ 890 0678 C4625500 		vpshufb	ymm8, ymm5, YMMWORD PTR .LC7[rip]	# tmp430, tmp422,
+ 890      05000000 
+ 890      00
+ 891 0681 C58D72E6 		vpsrad	ymm14, ymm6, 31	# vect_patt.302, vect_var_.297,
+ 891      1F
+ 892              	.LBE628:
+ 893              	.LBE637:
+ 894              	.LBE710:
+ 895              	.LBE740:
+ 896              	.LBE770:
+  74:saya.cpp      **** 	auto u = U[x][y][z],  v = V[x][y][z];
+ 897              		.loc 8 74 0 discriminator 2
+ 898 0686 C4C17D28 		vmovapd	ymm0, YMMWORD PTR [r13+32+rax]	# vect_v.287, MEM[base: vect_pV.285_402, index: ivtmp.486_5
+ 898      440520
+ 899 068d C5FD7F94 		vmovdqa	YMMWORD PTR [rsp+160], ymm2	# %sfp, vect_vec_iv_.275
+ 899      24A00000 
+ 899      00
+ 900              	.LVL62:
+ 901 0696 C4624500 		vpshufb	ymm9, ymm7, YMMWORD PTR .LC8[rip]	# tmp432, tmp424,
+ 901      0D000000 
+ 901      00
+ 902 069f C4413DEB 		vpor	ymm10, ymm8, ymm9	# vect_patt.299, tmp430, tmp432
+ 902      D1
+ 903 06a4 C4C12572 		vpsrad	ymm11, ymm10, 5	# vect_patt.301, vect_patt.299,
+ 903      E205
+ 904 06aa C4C125FA 		vpsubd	ymm2, ymm11, ymm14	# vect_patt.303, vect_patt.301, vect_patt.302
+ 904      D6
+ 905              	.LBB771:
+ 906              	.LBB741:
+ 907              	.LBB711:
+ 908              	.LBB638:
+ 909              	.LBB629:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 910              		.loc 8 53 0 discriminator 2
+ 911 06af C57D28CB 		vmovapd	ymm9, ymm3	# tmp1060, tmp910
+ 912              	.LBE629:
+ 913              	.LBE638:
+ 914              	.LBB639:
+ 915              	.LBB640:
+ 916 06b3 C57D28F3 		vmovapd	ymm14, ymm3	# tmp1061, tmp910
+ 917 06b7 C4E26D40 		vpmulld	ymm5, ymm2, YMMWORD PTR .LC5[rip]	# vect_patt.304, vect_patt.303,
+ 917      2D000000 
+ 917      00
+ 918 06c0 C5CDFAFD 		vpsubd	ymm7, ymm6, ymm5	# vect_patt.306, vect_var_.297, vect_patt.304
+ 919              	.LVL63:
+ 920 06c4 C5FD28D3 		vmovapd	ymm2, ymm3	# tmp1062, tmp910
+ 921              	.LBE640:
+ 922              	.LBE639:
+ 923              	.LBB643:
+ 924              	.LBB630:
+ 925 06c8 C5F96FF7 		vmovdqa	xmm6, xmm7	# tmp438,
+ 926 06cc C4634546 		vperm2i128	ymm8, ymm7, ymm7, 17	# vect_var_.309, vect_patt.306, vect_patt.306,
+ 926      C711
+ 927 06d2 C5797FC7 		vmovdqa	xmm7, xmm8	# tmp441,
+ 928 06d6 C442B592 		vgatherdpd	ymm10, QWORD PTR [r12+xmm7*8], ymm9	# vect_var_.307,, tmp1060
+ 928      14FC
+ 929              	.LBE630:
+ 930              	.LBE643:
+ 931              	.LBB644:
+ 932              	.LBB645:
+ 933 06dc C57D28C3 		vmovapd	ymm8, ymm3	# tmp1064, tmp910
+ 934              	.LBE645:
+ 935              	.LBE644:
+ 936              	.LBB649:
+ 937              	.LBB631:
+ 938 06e0 C442DD92 		vgatherdpd	ymm11, QWORD PTR [r12+xmm6*8], ymm4	# vect_var_.307,, tmp1059
+ 938      1CF4
+ 939 06e6 C57D2994 		vmovapd	YMMWORD PTR [rsp+320], ymm10	# %sfp, vect_var_.307
+ 939      24400100 
+ 939      00
+ 940              	.LBE631:
+ 941              	.LBE649:
+ 942              	.LBB650:
+ 943              	.LBB646:
+ 944 06ef C5FD28E3 		vmovapd	ymm4, ymm3	# tmp1063, tmp910
+ 945              	.LBE646:
+ 946              	.LBE650:
+ 947              	.LBB651:
+ 948              	.LBB641:
+ 949 06f3 C4E2ED92 		vgatherdpd	ymm5, QWORD PTR [rbx+xmm7*8], ymm2	# vect_var_.310,, tmp1062
+ 949      2CFB
+ 950              	.LBE641:
+ 951              	.LBE651:
+ 952              	.LBB652:
+ 953              	.LBB653:
+ 954 06f9 C5FD28D3 		vmovapd	ymm2, ymm3	# tmp1065, tmp910
+ 955              	.LBE653:
+ 956              	.LBE652:
+ 957              	.LBB656:
+ 958              	.LBB642:
+ 959 06fd C4628D92 		vgatherdpd	ymm10, QWORD PTR [rbx+xmm6*8], ymm14	# vect_var_.310,, tmp1061
+ 959      14F3
+ 960 0703 C5FD29AC 		vmovapd	YMMWORD PTR [rsp+352], ymm5	# %sfp, vect_var_.310
+ 960      24600100 
  960      00
- 961              		.p2align 3
- 962              	.L79:
- 963 0170 448B8C24 		mov	r9d, DWORD PTR [rsp+168]	# y, %sfp
- 963      A8000000 
- 964 0178 41B86766 		mov	r8d, 1717986919	# tmp1025,
- 964      6666
- 965 017e 4C8B5424 		mov	r10, QWORD PTR [rsp+120]	# ivtmp.568, %sfp
- 965      78
- 966 0183 418D7928 		lea	edi, [r9+40]	# D.73740,
- 967 0187 458D7927 		lea	r15d, [r9+39]	# D.73740,
- 968 018b 89F8     		mov	eax, edi	# tmp1695, D.73740
- 969 018d 4189FC   		mov	r12d, edi	# tmp1027, D.73740
- 970 0190 41F7E8   		imul	r8d	# tmp1025
- 971 0193 41C1FC1F 		sar	r12d, 31	# tmp1027,
- 972 0197 4489F8   		mov	eax, r15d	# tmp1696, D.73740
- 973 019a 418D7129 		lea	esi, [r9+41]	# D.73740,
- 974 019e 4489FB   		mov	ebx, r15d	# tmp1036, D.73740
- 975 01a1 4D8D8A00 		lea	r9, U[r10]	# D.73735,
- 975      000000
- 976 01a8 C1FB1F   		sar	ebx, 31	# tmp1036,
- 977 01ab C1FA04   		sar	edx, 4	# D.73734,
- 978 01ae 4183E11F 		and	r9d, 31	# D.73735,
- 979 01b2 4429E2   		sub	edx, r12d	# D.73734, tmp1027
- 980 01b5 49C1E902 		shr	r9, 2	# D.73735,
- 981 01b9 448D2C92 		lea	r13d, [rdx+rdx*4]	# tmp1030,
- 982 01bd 41F7E8   		imul	r8d	# tmp1025
- 983 01c0 89F0     		mov	eax, esi	# tmp1697, D.73740
- 984 01c2 41C1E503 		sal	r13d, 3	# tmp1031,
- 985 01c6 49F7D9   		neg	r9	# D.73735
- 986 01c9 4429EF   		sub	edi, r13d	# D.73734, tmp1031
- 987 01cc C1FA04   		sar	edx, 4	# D.73734,
- 988 01cf 29DA     		sub	edx, ebx	# D.73734, tmp1036
- 989 01d1 8D0C92   		lea	ecx, [rdx+rdx*4]	# tmp1039,
- 990 01d4 41F7E8   		imul	r8d	# tmp1025
- 991 01d7 4189F0   		mov	r8d, esi	# tmp1045, D.73740
- 992 01da 41C1F81F 		sar	r8d, 31	# tmp1045,
- 993 01de C1E103   		sal	ecx, 3	# tmp1040,
- 994 01e1 4129CF   		sub	r15d, ecx	# D.73734, tmp1040
- 995 01e4 C1FA04   		sar	edx, 4	# D.73734,
- 996 01e7 4429C2   		sub	edx, r8d	# D.73734, tmp1045
- 997 01ea 448D2492 		lea	r12d, [rdx+rdx*4]	# tmp1048,
- 998 01ee 41C1E403 		sal	r12d, 3	# tmp1049,
- 999 01f2 4429E6   		sub	esi, r12d	# D.73734, tmp1049
- 1000 01f5 4183E107 		and	r9d, 7	# prolog_loop_niters.323,
- 1001 01f9 4C63EE   		movsx	r13, esi	#, D.73734
- 1002 01fc 0F841E12 		je	.L140	#,
- 1002      0000
- 1003 0202 488B4424 		mov	rax, QWORD PTR [rsp+64]	# ivtmp.580, %sfp
- 1003      40
- 1004 0207 4963F7   		movsx	rsi, r15d	# D.73750, D.73734
- 1005 020a 4863FF   		movsx	rdi, edi	# D.73750, D.73734
- 1006 020d 4C8BA424 		mov	r12, QWORD PTR [rsp+136]	# D.73735, %sfp
- 1006      88000000 
- 1007 0215 4D89D7   		mov	r15, r10	# ivtmp.568, ivtmp.568
- 1008 0218 4C896C24 		mov	QWORD PTR [rsp+96], r13	# %sfp, D.73750
- 1008      60
- 1009 021d 488B9C24 		mov	rbx, QWORD PTR [rsp+144]	# D.73735, %sfp
- 1009      90000000 
- 1010              	.LBB899:
- 1011              	.LBB900:
- 1012              	.LBB901:
- 1013              	.LBB902:
- 1014              	.LBB903:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1015              		.loc 10 14 0
- 1016 0225 488D14B6 		lea	rdx, [rsi+rsi*4]	# tmp1493,
- 1017              	.LBE903:
- 1018              	.LBE902:
- 1019              	.LBE901:
- 1020              	.LBE900:
- 1021              	.LBE899:
- 1022              		.loc 10 32 0
- 1023 0229 31C9     		xor	ecx, ecx	# ivtmp.538
- 1024 022b 48897C24 		mov	QWORD PTR [rsp+112], rdi	# %sfp, D.73750
- 1024      70
- 1025 0230 C57B100D 		vmovsd	xmm9, QWORD PTR .LC27[rip]	# tmp1545,
- 1025      00000000 
- 1026              	.LBB1046:
- 1027              	.LBB1047:
- 1028              	.LBB1048:
- 1029              	.LBB1049:
- 1030              	.LBB1050:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1031              		.loc 10 13 0
- 1032 0238 41B81F85 		mov	r8d, 1374389535	# tmp1486,
- 1032      EB51
- 1033 023e 48897424 		mov	QWORD PTR [rsp+104], rsi	# %sfp, D.73750
- 1033      68
- 1034 0243 C57B1005 		vmovsd	xmm8, QWORD PTR .LC28[rip]	# tmp1546,
- 1034      00000000 
- 1035 024b 4929C4   		sub	r12, rax	# D.73735, ivtmp.580
- 1036 024e C57B1015 		vmovsd	xmm10, QWORD PTR .LC29[rip]	# tmp1547,
- 1036      00000000 
- 1037 0256 44898C24 		mov	DWORD PTR [rsp+256], r9d	# %sfp, prolog_loop_niters.323
- 1037      00010000 
- 1038 025e 4829C3   		sub	rbx, rax	# D.73735, ivtmp.580
- 1039 0261 4D01D4   		add	r12, r10	# D.73735, ivtmp.568
- 1040 0264 C5FB102D 		vmovsd	xmm5, QWORD PTR .LC30[rip]	# tmp1548,
+ 961              	.LBE642:
+ 962              	.LBE656:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 963              		.loc 8 64 0 discriminator 2
+ 964 070c C4412558 		vaddpd	ymm11, ymm11, ymm10	# vect_var_.313, vect_var_.307, vect_var_.310
+ 964      DA
+ 965              	.LBB657:
+ 966              	.LBB647:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 967              		.loc 8 53 0 discriminator 2
+ 968 0711 C442BD92 		vgatherdpd	ymm14, QWORD PTR [r11+xmm7*8], ymm8	# vect_var_.314,, tmp1064
+ 968      34FB
+ 969 0717 C442DD92 		vgatherdpd	ymm9, QWORD PTR [r11+xmm6*8], ymm4	# vect_var_.314,, tmp1063
+ 969      0CF3
+ 970              	.LBE647:
+ 971              	.LBE657:
+ 972              	.LBB658:
+ 973              	.LBB654:
+ 974 071d C5F97FB4 		vmovdqa	XMMWORD PTR [rsp+288], xmm6	# %sfp, tmp438
+ 974      24200100 
+ 974      00
+ 975              	.LBE654:
+ 976              	.LBE658:
+ 977              	.LBB659:
+ 978              	.LBB648:
+ 979 0726 C57D29B4 		vmovapd	YMMWORD PTR [rsp+384], ymm14	# %sfp, vect_var_.314
+ 979      24800100 
+ 979      00
+ 980              	.LBE648:
+ 981              	.LBE659:
+ 982              	.LBB660:
+ 983              	.LBB655:
+ 984 072f C442ED92 		vgatherdpd	ymm8, QWORD PTR [r10+xmm6*8], ymm2	# vect_var_.318,, tmp1065
+ 984      04F2
+ 985 0735 C5FD28F3 		vmovapd	ymm6, ymm3	# tmp1066, tmp910
+ 986 0739 C5F97FBC 		vmovdqa	XMMWORD PTR [rsp+272], xmm7	# %sfp, tmp441
+ 986      24100100 
+ 986      00
+ 987 0742 C442CD92 		vgatherdpd	ymm14, QWORD PTR [r10+xmm7*8], ymm6	# vect_var_.318,, tmp1066
+ 987      34FA
+ 988              	.LVL64:
+ 989              	.LBE655:
+ 990              	.LBE660:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 991              		.loc 8 65 0 discriminator 2
+ 992 0748 C4412558 		vaddpd	ymm10, ymm11, ymm9	# vect_var_.317, vect_var_.313, vect_var_.314
+ 992      D1
+ 993              	.LBB661:
+ 994              	.LBB662:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 995              		.loc 8 52 0 discriminator 2
+ 996 074d C585FE3D 		vpaddd	ymm7, ymm15, YMMWORD PTR .LC10[rip]	# vect_var_.322, vect_vec_iv_.275,
+ 996      00000000 
+ 997 0755 C4E24528 		vpmuldq	ymm5, ymm7, YMMWORD PTR .LC6[rip]	# tmp463, vect_var_.322,
+ 997      2D000000 
+ 997      00
+ 998 075e C5DD73D7 		vpsrlq	ymm4, ymm7, 32	# tmp467, vect_var_.322,
+ 998      20
+ 999 0763 C4E25500 		vpshufb	ymm6, ymm5, YMMWORD PTR .LC7[rip]	# tmp471, tmp463,
+ 999      35000000 
+ 999      00
+ 1000 076c C4C25D28 		vpmuldq	ymm2, ymm4, ymm12	# tmp465, tmp467, tmp969
+ 1000      D4
+ 1001              	.LBE662:
+ 1002              	.LBE661:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1003              		.loc 8 65 0 discriminator 2
+ 1004 0771 C4412D58 		vaddpd	ymm9, ymm10, ymm8	# vect_var_.321, vect_var_.317, vect_var_.318
+ 1004      C8
+ 1005 0776 C4E26D00 		vpshufb	ymm5, ymm2, YMMWORD PTR .LC8[rip]	# tmp473, tmp465,
+ 1005      2D000000 
+ 1005      00
+ 1006 077f C5ED72E7 		vpsrad	ymm2, ymm7, 31	# vect_patt.327, vect_var_.322,
+ 1006      1F
+ 1007 0784 C5CDEBE5 		vpor	ymm4, ymm6, ymm5	# vect_patt.324, tmp471, tmp473
+ 1008 0788 C5CD72E4 		vpsrad	ymm6, ymm4, 5	# vect_patt.326, vect_patt.324,
+ 1008      05
+ 1009 078d C5CDFAEA 		vpsubd	ymm5, ymm6, ymm2	# vect_patt.328, vect_patt.326, vect_patt.327
+ 1010              	.LBB672:
+ 1011              	.LBB663:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1012              		.loc 8 53 0 discriminator 2
+ 1013 0791 C5FD28D3 		vmovapd	ymm2, ymm3	# tmp1067, tmp910
+ 1014 0795 C4E25540 		vpmulld	ymm4, ymm5, YMMWORD PTR .LC5[rip]	# vect_patt.329, vect_patt.328,
+ 1014      25000000 
+ 1014      00
+ 1015 079e C5C5FAF4 		vpsubd	ymm6, ymm7, ymm4	# vect_patt.331, vect_var_.322, vect_patt.329
+ 1016 07a2 C5F96FEE 		vmovdqa	xmm5, xmm6	# tmp479,
+ 1017 07a6 C4E34D46 		vperm2i128	ymm4, ymm6, ymm6, 17	# vect_var_.334, vect_patt.331, vect_patt.331,
+ 1017      E611
+ 1018 07ac C5F97FAC 		vmovdqa	XMMWORD PTR [rsp+256], xmm5	# %sfp, tmp479
+ 1018      24000100 
+ 1018      00
+ 1019              	.LBE663:
+ 1020              	.LBE672:
+ 1021              	.LBB673:
+ 1022              	.LBB674:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1023              		.loc 8 52 0 discriminator 2
+ 1024 07b5 C505FE3D 		vpaddd	ymm15, ymm15, YMMWORD PTR .LC11[rip]	# vect_var_.336, vect_vec_iv_.275,
+ 1024      00000000 
+ 1025              	.LBE674:
+ 1026              	.LBE673:
+ 1027              	.LBB686:
+ 1028              	.LBB664:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1029              		.loc 8 53 0 discriminator 2
+ 1030 07bd C4E2ED92 		vgatherdpd	ymm7, QWORD PTR [rcx+xmm5*8], ymm2	# vect_var_.332,, tmp1067
+ 1030      3CE9
+ 1031 07c3 C5FD28EB 		vmovapd	ymm5, ymm3	# tmp1068, tmp910
+ 1032              	.LBE664:
+ 1033              	.LBE686:
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1034              		.loc 8 66 0 discriminator 2
+ 1035 07c7 C53558C7 		vaddpd	ymm8, ymm9, ymm7	# vect_var_.335, vect_var_.321, vect_var_.332
+ 1036              	.LBE711:
+ 1037              	.LBE741:
+ 1038              	.LBE771:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1039              		.loc 8 75 0 discriminator 2
+ 1040 07cb C57D2815 		vmovapd	ymm10, YMMWORD PTR .LC0[rip]	# tmp1123,
  1040      00000000 
- 1041              	.LBE1050:
- 1042              	.LBE1049:
- 1043              	.LBE1048:
- 1044              	.LBE1047:
- 1045              	.LBE1046:
- 1046              	.LBB1197:
- 1047              	.LBB1018:
- 1048              	.LBB990:
- 1049              	.LBB914:
- 1050              	.LBB915:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1051              		.loc 10 14 0
- 1052 026c 4B8D44AD 		lea	rax, [r13+0+r13*4]	# tmp1498,
+ 1041              	.LBB772:
+ 1042              	.LBB742:
+ 1043              	.LBB712:
+ 1044              	.LBB687:
+ 1045              	.LBB665:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1046              		.loc 8 53 0 discriminator 2
+ 1047 07d3 C5F97FA4 		vmovdqa	XMMWORD PTR [rsp+240], xmm4	# %sfp, tmp482
+ 1047      24F00000 
+ 1047      00
+ 1048 07dc C4E20528 		vpmuldq	ymm2, ymm15, YMMWORD PTR .LC6[rip]	# tmp486, vect_var_.336,
+ 1048      15000000 
+ 1048      00
+ 1049 07e5 C4E2D592 		vgatherdpd	ymm6, QWORD PTR [rcx+xmm4*8], ymm5	# vect_var_.332,, tmp1068
+ 1049      34E1
+ 1050              	.LVL65:
+ 1051 07eb C4C15D73 		vpsrlq	ymm4, ymm15, 32	# tmp490, vect_var_.336,
+ 1051      D720
+ 1052 07f1 C4E26D00 		vpshufb	ymm5, ymm2, YMMWORD PTR .LC7[rip]	# tmp494, tmp486,
+ 1052      2D000000 
  1052      00
- 1053 0271 4C01D3   		add	rbx, r10	# D.73735, ivtmp.568
- 1054 0274 4C8B6C24 		mov	r13, QWORD PTR [rsp+88]	# D.73741, %sfp
- 1054      58
- 1055              	.LBE915:
- 1056              	.LBE914:
- 1057              	.LBB926:
- 1058              	.LBB927:
- 1059 0279 4C8D14BF 		lea	r10, [rdi+rdi*4]	# tmp1488,
- 1060 027d 4D89F9   		mov	r9, r15	# ivtmp.568, ivtmp.568
- 1061 0280 48899C24 		mov	QWORD PTR [rsp+192], rbx	# %sfp, D.73735
- 1061      C0000000 
- 1062 0288 4B8D3C92 		lea	rdi, [r10+r10*4]	# tmp1490,
- 1063              	.LBE927:
- 1064              	.LBE926:
- 1065              	.LBB939:
- 1066              	.LBB916:
- 1067 028c 488D3480 		lea	rsi, [rax+rax*4]	# tmp1500,
- 1068              	.LBE916:
- 1069              	.LBE939:
- 1070              	.LBB940:
- 1071              	.LBB928:
- 1072 0290 48C1E702 		sal	rdi, 2	# tmp1491,
- 1073              	.LBE928:
- 1074              	.LBE940:
- 1075              	.LBB941:
- 1076              	.LBB904:
- 1077 0294 4C8D1492 		lea	r10, [rdx+rdx*4]	# tmp1495,
- 1078              	.LBE904:
- 1079              	.LBE941:
- 1080              	.LBB942:
- 1081              	.LBB917:
- 1082 0298 48C1E602 		sal	rsi, 2	# tmp1501,
- 1083              	.LBE917:
- 1084              	.LBE942:
- 1085              	.LBB943:
- 1086              	.LBB905:
- 1087 029c 49C1E202 		sal	r10, 2	# tmp1496,
- 1088              	.LBE905:
- 1089              	.LBE943:
- 1090              	.LBB944:
- 1091              	.LBB918:
- 1092 02a0 4889B424 		mov	QWORD PTR [rsp+224], rsi	# %sfp, tmp1501
- 1092      E0000000 
- 1093 02a8 4C899424 		mov	QWORD PTR [rsp+184], r10	# %sfp, tmp1496
- 1093      B8000000 
- 1094              	.LVL76:
- 1095              		.p2align 4,,10
- 1096              		.p2align 3
- 1097              	.L75:
- 1098              	.LBE918:
- 1099              	.LBE944:
- 1100              	.LBE990:
- 1101              	.LBE1018:
- 1102              	.LBE1197:
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 1103              		.loc 10 28 0
- 1104 02b0 4C8BBC24 		mov	r15, QWORD PTR [rsp+192]	# D.73735, %sfp
- 1104      C0000000 
- 1105              	.LBB1198:
- 1106              	.LBB1168:
- 1107              	.LBB1139:
- 1108              	.LBB1066:
- 1109              	.LBB1051:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1110              		.loc 10 13 0
- 1111 02b8 41BA6400 		mov	r10d, 100	#,
- 1111      0000
- 1112              	.LBE1051:
- 1113              	.LBE1066:
- 1114              	.LBE1139:
- 1115              	.LBE1168:
- 1116              	.LBE1198:
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 1117              		.loc 10 28 0
- 1118 02be C4C17A10 		vmovss	xmm4, DWORD PTR [r12+rcx*4]	# u, MEM[base: _359, index: ivtmp.538_763, step: 4, offset: 0B]
- 1118      248C
- 1119              	.LVL77:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1120              		.loc 10 29 0
- 1121 02c4 C55814DC 		vunpcklps	xmm11, xmm4, xmm4	# u, u, u
- 1122 02c8 C4C1785A 		vcvtps2pd	xmm3, xmm11	# D.73757, u
- 1122      DB
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 1123              		.loc 10 28 0
- 1124 02cd C4C17A10 		vmovss	xmm1, DWORD PTR [r15+rcx*4]	# v, MEM[base: _353, index: ivtmp.538_763, step: 4, offset: 0B]
- 1124      0C8F
- 1125              	.LVL78:
- 1126 02d3 448D7964 		lea	r15d, [rcx+100]	# D.73740,
- 1127              	.LBB1199:
- 1128              	.LBB1169:
- 1129              	.LBB1140:
- 1130              	.LBB1067:
- 1131              	.LBB1052:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1132              		.loc 10 13 0
- 1133 02d7 4489F8   		mov	eax, r15d	# tmp1698, D.73740
- 1134 02da 4489FB   		mov	ebx, r15d	# tmp1062, D.73740
- 1135 02dd 41F7E8   		imul	r8d	# tmp1486
- 1136 02e0 C1FB1F   		sar	ebx, 31	# tmp1062,
- 1137              	.LBE1052:
- 1138              	.LBE1067:
- 1139              	.LBE1140:
- 1140              	.LBE1169:
- 1141              	.LBE1199:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1142              		.loc 10 29 0
- 1143 02e3 C5F014F1 		vunpcklps	xmm6, xmm1, xmm1	# v, v, v
- 1144 02e7 C5785AE6 		vcvtps2pd	xmm12, xmm6	# D.73757, v
- 1145              	.LVL79:
- 1146              	.LBB1200:
- 1147              	.LBB1170:
- 1148              	.LBB1141:
- 1149              	.LBB1068:
- 1150              	.LBB1053:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1151              		.loc 10 13 0
- 1152 02eb C1FA05   		sar	edx, 5	# z,
- 1153 02ee 29DA     		sub	edx, ebx	# z, tmp1062
- 1154              	.LBE1053:
- 1155              	.LBE1068:
- 1156              	.LBB1069:
- 1157              	.LBB1070:
- 1158 02f0 BB640000 		mov	ebx, 100	#,
- 1158      00
- 1159              	.LBE1070:
- 1160              	.LBE1069:
- 1161              	.LBB1081:
- 1162              	.LBB1054:
- 1163 02f5 410FAFD2 		imul	edx, r10d	# tmp1063,
- 1164 02f9 448D5163 		lea	r10d, [rcx+99]	# D.73740,
- 1165              	.LBE1054:
- 1166              	.LBE1081:
- 1167              	.LBB1082:
- 1168              	.LBB1071:
- 1169 02fd 4489D0   		mov	eax, r10d	# tmp1699, D.73740
- 1170 0300 4489D6   		mov	esi, r10d	# tmp1068, D.73740
- 1171 0303 C1FE1F   		sar	esi, 31	# tmp1068,
- 1172              	.LBE1071:
- 1173              	.LBE1082:
- 1174              	.LBB1083:
- 1175              	.LBB1055:
- 1176 0306 4129D7   		sub	r15d, edx	# z, tmp1063
- 1177              	.LVL80:
- 1178              	.LBE1055:
- 1179              	.LBE1083:
- 1180              	.LBB1084:
- 1181              	.LBB1072:
- 1182 0309 41F7E8   		imul	r8d	# tmp1486
- 1183 030c C1FA05   		sar	edx, 5	# z,
- 1184 030f 29F2     		sub	edx, esi	# z, tmp1068
- 1185 0311 0FAFD3   		imul	edx, ebx	# tmp1069,
- 1186 0314 8D7165   		lea	esi, [rcx+101]	# D.73740,
- 1187              	.LBE1072:
- 1188              	.LBE1084:
- 1189              	.LBB1085:
- 1190              	.LBB1086:
- 1191 0317 89F0     		mov	eax, esi	# tmp1700, D.73740
- 1192 0319 89F3     		mov	ebx, esi	# tmp1074, D.73740
- 1193 031b C1FB1F   		sar	ebx, 31	# tmp1074,
- 1194              	.LBE1086:
- 1195              	.LBE1085:
- 1196              	.LBB1097:
- 1197              	.LBB1073:
- 1198 031e 4129D2   		sub	r10d, edx	# z, tmp1069
- 1199              	.LVL81:
- 1200              	.LBE1073:
- 1201              	.LBE1097:
- 1202              	.LBB1098:
- 1203              	.LBB1087:
- 1204 0321 41F7E8   		imul	r8d	# tmp1486
- 1205 0324 B8640000 		mov	eax, 100	#,
- 1205      00
- 1206              	.LBE1087:
- 1207              	.LBE1098:
- 1208              	.LBE1141:
- 1209              	.LBE1170:
- 1210              	.LBE1200:
- 1211              	.LBB1201:
- 1212              	.LBB1019:
- 1213              	.LBB991:
- 1214              	.LBB945:
- 1215              	.LBB946:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1216              		.loc 10 14 0
- 1217 0329 4D63D2   		movsx	r10, r10d	# z, z
- 1218 032c 4901FA   		add	r10, rdi	# tmp1124, tmp1491
- 1219              	.LBE946:
- 1220              	.LBE945:
- 1221              	.LBE991:
- 1222              	.LBE1019:
- 1223              	.LBE1201:
- 1224              	.LBB1202:
- 1225              	.LBB1171:
- 1226              	.LBB1142:
- 1227              	.LBB1099:
- 1228              	.LBB1088:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1229              		.loc 10 13 0
- 1230 032f C1FA05   		sar	edx, 5	# z,
- 1231 0332 29DA     		sub	edx, ebx	# z, tmp1074
- 1232              	.LBE1088:
- 1233              	.LBE1099:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1234              		.loc 10 20 0
- 1235 0334 488B9C24 		mov	rbx, QWORD PTR [rsp+152]	# D.73741, %sfp
- 1235      98000000 
- 1236              	.LBB1100:
- 1237              	.LBB1089:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1238              		.loc 10 13 0
- 1239 033c 0FAFD0   		imul	edx, eax	# tmp1075,
- 1240              	.LBE1089:
- 1241              	.LBE1100:
- 1242              	.LBE1142:
- 1243              	.LBE1171:
- 1244              	.LBE1202:
- 1245              	.LBB1203:
- 1246              	.LBB1020:
- 1247              	.LBB992:
- 1248              	.LBB950:
- 1249              	.LBB929:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1250              		.loc 10 14 0
- 1251 033f 4963C7   		movsx	rax, r15d	# z, z
- 1252              	.LBE929:
- 1253              	.LBE950:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1254              		.loc 10 20 0
- 1255 0342 4C8BBC24 		mov	r15, QWORD PTR [rsp+288]	# D.73741, %sfp
- 1255      20010000 
- 1256              	.LBE992:
- 1257              	.LBE1020:
- 1258              	.LBE1203:
- 1259              	.LBB1204:
- 1260              	.LBB1172:
- 1261              	.LBB1143:
- 1262              	.LBB1101:
- 1263              	.LBB1090:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1264              		.loc 10 13 0
- 1265 034a 29D6     		sub	esi, edx	# z, tmp1075
- 1266              	.LVL82:
- 1267              	.LBE1090:
- 1268              	.LBE1101:
- 1269              	.LBE1143:
- 1270              	.LBE1172:
- 1271              	.LBE1204:
- 1272              	.LBB1205:
- 1273              	.LBB1021:
- 1274              	.LBB993:
- 1275              	.LBB951:
- 1276              	.LBB930:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1277              		.loc 10 14 0
- 1278 034c 488D1407 		lea	rdx, [rdi+rax]	# tmp1084,
- 1279              	.LBE930:
- 1280              	.LBE951:
- 1281              	.LBB952:
- 1282              	.LBB953:
- 1283 0350 4863F6   		movsx	rsi, esi	# z, z
- 1284              	.LBE953:
- 1285              	.LBE952:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1286              		.loc 10 20 0
- 1287 0353 C4C17A10 		vmovss	xmm2, DWORD PTR [r13+0+rdx*4]	# tmp1095, MEM[(float[40][100] *)_964]
- 1287      549500
- 1288              	.LBB958:
- 1289              	.LBB954:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1290              		.loc 10 14 0
- 1291 035a 4801FE   		add	rsi, rdi	# tmp1134, tmp1491
- 1292              	.LBE954:
- 1293              	.LBE958:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1294              		.loc 10 20 0
- 1295 035d C4416A58 		vaddss	xmm13, xmm2, DWORD PTR [r15+rdx*4]	# D.73733, tmp1095, MEM[(float[40][100] *)_965]
- 1295      2C97
- 1296              	.LBB959:
- 1297              	.LBB906:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1298              		.loc 10 14 0
- 1299 0363 4C8BBC24 		mov	r15, QWORD PTR [rsp+184]	# tmp1496, %sfp
- 1299      B8000000 
- 1300              	.LVL83:
- 1301              	.LBE906:
- 1302              	.LBE959:
- 1303              	.LBE993:
- 1304              	.LBE1021:
- 1305              	.LBE1205:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1306              		.loc 10 30 0
- 1307 036b C5E35915 		vmulsd	xmm2, xmm3, QWORD PTR .LC25[rip]	# D.73757, D.73757,
- 1307      00000000 
- 1308              	.LBB1206:
- 1309              	.LBB1022:
- 1310              	.LBB994:
- 1311              	.LBB960:
- 1312              	.LBB907:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1313              		.loc 10 14 0
- 1314 0373 4901C7   		add	r15, rax	# tmp1104, z
- 1315              	.LBE907:
- 1316              	.LBE960:
- 1317              	.LBB961:
- 1318              	.LBB919:
- 1319 0376 48038424 		add	rax, QWORD PTR [rsp+224]	# tmp1114, %sfp
- 1319      E0000000 
- 1320              	.LBE919:
- 1321              	.LBE961:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1322              		.loc 10 20 0
- 1323 037e C4011258 		vaddss	xmm14, xmm13, DWORD PTR [r14+r15*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 1323      34BE
- 1324 0384 C4410A58 		vaddss	xmm15, xmm14, DWORD PTR [r14+rax*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 1324      3C86
- 1325              	.LBE994:
- 1326              	.LBE1022:
- 1327              	.LBE1206:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1328              		.loc 10 30 0
- 1329 038a C51B5935 		vmulsd	xmm14, xmm12, QWORD PTR .LC24[rip]	# D.73757, D.73757,
- 1329      00000000 
- 1330              	.LBB1207:
- 1331              	.LBB1023:
- 1332              	.LBB995:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1333              		.loc 10 20 0
- 1334 0392 C4810258 		vaddss	xmm7, xmm15, DWORD PTR [r14+r10*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 1334      3C96
- 1335              	.LBE995:
- 1336              	.LBE1023:
- 1337              	.LBE1207:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1338              		.loc 10 30 0
- 1339 0398 C51B59FA 		vmulsd	xmm15, xmm12, xmm2	# D.73757, D.73757, D.73757
- 1340              	.LBB1208:
- 1341              	.LBB1024:
- 1342              	.LBB996:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1343              		.loc 10 20 0
- 1344 039c C4C14258 		vaddss	xmm0, xmm7, DWORD PTR [r14+rsi*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 1344      04B6
- 1345              	.LBE996:
- 1346              	.LBE1024:
- 1347              	.LBE1208:
- 1348              	.LBB1209:
- 1349              	.LBB1173:
- 1350              	.LBB1144:
- 1351 03a2 C5FA103C 		vmovss	xmm7, DWORD PTR [rbx+rdx*4]	# tmp1170, MEM[(float[40][100] *)_949]
- 1351      93
- 1352 03a7 488B9C24 		mov	rbx, QWORD PTR [rsp+296]	# D.73741, %sfp
- 1352      28010000 
- 1353              	.LVL84:
- 1354              	.LBE1144:
- 1355              	.LBE1173:
- 1356              	.LBE1209:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1357              		.loc 10 30 0
- 1358 03af C442899B 		vfmsub132sd	xmm15, xmm14, xmm12	# D.73757, D.73757, D.73757
- 1358      FC
- 1359              	.LBB1210:
- 1360              	.LBB1025:
- 1361              	.LBB997:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1362              		.loc 10 20 0
- 1363 03b4 C4E2799D 		vfnmadd132ss	xmm6, xmm0, DWORD PTR .LC22[rip]	# ret, D.73733,
- 1363      35000000 
- 1363      00
- 1364              	.LVL85:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1365              		.loc 10 21 0
- 1366 03bd C5C814E6 		vunpcklps	xmm4, xmm6, xmm6	# ret, ret, ret
- 1367              	.LVL86:
- 1368 03c1 C5F85ACC 		vcvtps2pd	xmm1, xmm4	# D.73757, ret
- 1369              	.LVL87:
- 1370 03c5 C5F35E35 		vdivsd	xmm6, xmm1, QWORD PTR .LC23[rip]	# D.73757, D.73757,
- 1370      00000000 
- 1371 03cd C54B5E2D 		vdivsd	xmm13, xmm6, QWORD PTR .LC23[rip]	# D.73757, D.73757,
- 1371      00000000 
- 1372              	.LBE997:
- 1373              	.LBE1025:
- 1374              	.LBE1210:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1375              		.loc 10 30 0
- 1376 03d5 C4628199 		vfmadd132sd	xmm13, xmm15, QWORD PTR .LC26[rip]	# D.73757, D.73757,
- 1376      2D000000 
- 1376      00
- 1377              	.LVL88:
- 1378              		.loc 10 32 0
- 1379 03de C4629999 		vfmadd132sd	xmm13, xmm12, xmm5	# D.73757, D.73757, tmp1548
- 1379      ED
- 1380              	.LVL89:
- 1381              	.LBB1211:
- 1382              	.LBB1174:
- 1383              	.LBB1145:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1384              		.loc 10 20 0
- 1385 03e3 C5C25804 		vaddss	xmm0, xmm7, DWORD PTR [rbx+rdx*4]	# D.73733, tmp1170, MEM[(float[40][100] *)_954]
- 1385      93
- 1386 03e8 8D5101   		lea	edx, [rcx+1]	# z,
- 1387              	.LVL90:
- 1388 03eb C4817A58 		vaddss	xmm4, xmm0, DWORD PTR [r11+r15*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 1388      24BB
- 1389 03f1 C4C15A58 		vaddss	xmm1, xmm4, DWORD PTR [r11+rax*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 1389      0C83
- 1390 03f7 B8630000 		mov	eax, 99	# D.73740,
- 1390      00
- 1391              	.LBE1145:
- 1392              	.LBE1174:
- 1393              	.LBE1211:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1394              		.loc 10 29 0
- 1395 03fc C5FA1025 		vmovss	xmm4, DWORD PTR .LC0[rip]	# tmp1777,
- 1395      00000000 
- 1396 0404 29C8     		sub	eax, ecx	# D.73740, ivtmp.538
- 1397              	.LBB1212:
- 1398              	.LBB1175:
- 1399              	.LBB1146:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1400              		.loc 10 20 0
- 1401 0406 C4817258 		vaddss	xmm6, xmm1, DWORD PTR [r11+r10*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 1401      3493
- 1402              	.LVL91:
- 1403 040c C4414A58 		vaddss	xmm14, xmm6, DWORD PTR [r11+rsi*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 1403      34B3
- 1404 0412 C46221BD 		vfnmadd231ss	xmm14, xmm11, DWORD PTR .LC22[rip]	# ret, u,
- 1404      35000000 
- 1404      00
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1405              		.loc 10 21 0
- 1406 041b C4C10814 		vunpcklps	xmm2, xmm14, xmm14	# ret, ret, ret
- 1406      D6
- 1407 0420 C5785AFA 		vcvtps2pd	xmm15, xmm2	# D.73757, ret
- 1408              	.LBE1146:
- 1409              	.LBE1175:
- 1410              	.LBE1212:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1411              		.loc 10 29 0
- 1412 0424 C4C16359 		vmulsd	xmm2, xmm3, xmm8	# D.73757, D.73757, tmp1546
- 1412      D0
- 1413 0429 C4415A5C 		vsubss	xmm11, xmm4, xmm11	# D.73733, tmp1777, u
- 1413      DB
- 1414              	.LVL92:
- 1415              	.LBB1213:
- 1416              	.LBB1176:
- 1417              	.LBB1147:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1418              		.loc 10 21 0
- 1419 042e C5835E3D 		vdivsd	xmm7, xmm15, QWORD PTR .LC23[rip]	# D.73757, D.73757,
- 1419      00000000 
- 1420 0436 C5C35E05 		vdivsd	xmm0, xmm7, QWORD PTR .LC23[rip]	# D.73757, D.73757,
- 1420      00000000 
- 1421              	.LBE1147:
- 1422              	.LBE1176:
- 1423              	.LBE1213:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1424              		.loc 10 29 0
- 1425 043e C4C12014 		vunpcklps	xmm1, xmm11, xmm11	# D.73733, D.73733, D.73733
- 1425      CB
- 1426 0443 C5F85AF1 		vcvtps2pd	xmm6, xmm1	# D.73757, D.73733
- 1427 0447 C4414B59 		vmulsd	xmm14, xmm6, xmm9	# D.73757, D.73757, tmp1545
- 1427      F1
- 1428 044c C4416B59 		vmulsd	xmm15, xmm2, xmm12	# D.73757, D.73757, D.73757
- 1428      FC
- 1429 0451 C4428999 		vfmadd132sd	xmm15, xmm14, xmm12	# D.73757, D.73757, D.73757
- 1429      FC
- 1430              		.loc 10 32 0
- 1431 0456 C4417B12 		vmovddup	xmm12, xmm13	# tmp1779, D.73757
- 1431      E5
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1432              		.loc 10 29 0
- 1433 045b C4C28199 		vfmadd132sd	xmm0, xmm15, xmm10	# D.73757, D.73757, tmp1547
- 1433      C2
- 1434              		.loc 10 32 0
- 1435 0460 C441795A 		vcvtpd2ps	xmm13, xmm12	# tmp1779, tmp1779
- 1435      EC
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 1436              		.loc 10 31 0
- 1437 0465 C4E2E199 		vfmadd132sd	xmm0, xmm3, xmm5	# D.73757, D.73757, tmp1548
- 1437      C5
- 1438 046a C5FB12D8 		vmovddup	xmm3, xmm0	# tmp1778, D.73757
- 1439              		.loc 10 32 0
- 1440 046e C4417A11 		vmovss	DWORD PTR _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7V_other[r9+rcx
- 1440      AC890000 
- 1440      0000
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 1441              		.loc 10 31 0
- 1442 0478 C5F95AFB 		vcvtpd2ps	xmm7, xmm3	# tmp1778, tmp1778
- 1443 047c C4C17A11 		vmovss	DWORD PTR _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7U_other[r9+rcx
- 1443      BC890000 
- 1443      0000
- 1444 0486 4883C101 		add	rcx, 1	# ivtmp.538,
- 1445              	.LVL93:
- 1446 048a 398C2400 		cmp	DWORD PTR [rsp+256], ecx	# %sfp, ivtmp.538
- 1446      010000
- 1447 0491 0F8719FE 		ja	.L75	#,
- 1447      FFFF
- 1448 0497 448B8C24 		mov	r9d, DWORD PTR [rsp+256]	# prolog_loop_niters.323, %sfp
- 1448      00010000 
- 1449 049f 8944244C 		mov	DWORD PTR [rsp+76], eax	# %sfp, D.73740
- 1450 04a3 89D3     		mov	ebx, edx	# z, z
- 1451 04a5 89942480 		mov	DWORD PTR [rsp+128], edx	# %sfp, z
- 1451      000000
- 1452              	.LVL94:
- 1453              	.L74:
- 1454 04ac 488B7424 		mov	rsi, QWORD PTR [rsp+80]	# ivtmp.569, %sfp
- 1454      50
- 1455 04b1 4489CA   		mov	edx, r9d	# prolog_loop_adjusted_niters.324, prolog_loop_niters.323
- 1456 04b4 4189DC   		mov	r12d, ebx	# z, z
- 1457 04b7 448D4302 		lea	r8d, [rbx+2]	# stmp_var_.330,
- 1458 04bb C5796EDB 		vmovd	xmm11, ebx	# z, z
- 1459 04bf 488B4424 		mov	rax, QWORD PTR [rsp+112]	# D.73750, %sfp
- 1459      70
- 1460 04c4 448D6B03 		lea	r13d, [rbx+3]	# stmp_var_.330,
- 1461 04c8 4183C401 		add	r12d, 1	# stmp_var_.330,
- 1462 04cc C441796E 		vmovd	xmm9, r8d	# stmp_var_.330, stmp_var_.330
- 1462      C8
- 1463 04d1 8D7B04   		lea	edi, [rbx+4]	# stmp_var_.330,
- 1464 04d4 C4C32122 		vpinsrd	xmm1, xmm11, r12d, 1	# tmp1247, z, stmp_var_.330
- 1464      CC01
- 1465 04da C4C33122 		vpinsrd	xmm4, xmm9, r13d, 1	# tmp1246, stmp_var_.330, stmp_var_.330
- 1465      E501
- 1466 04e0 448D7B06 		lea	r15d, [rbx+6]	# stmp_var_.330,
- 1467 04e4 4801D6   		add	rsi, rdx	# D.73750, prolog_loop_adjusted_niters.324
- 1468 04e7 C5796EC7 		vmovd	xmm8, edi	# stmp_var_.330, stmp_var_.330
- 1469 04eb 448D5307 		lea	r10d, [rbx+7]	# stmp_var_.330,
- 1470 04ef C441796E 		vmovd	xmm10, r15d	# stmp_var_.330, stmp_var_.330
- 1470      D7
- 1471 04f4 48C1E602 		sal	rsi, 2	# base_off.336,
- 1472 04f8 C4C32922 		vpinsrd	xmm5, xmm10, r10d, 1	# tmp1244, stmp_var_.330, stmp_var_.330
- 1472      EA01
- 1473 04fe 4C8B5424 		mov	r10, QWORD PTR [rsp+96]	# D.73750, %sfp
- 1473      60
- 1474 0503 C7842484 		mov	DWORD PTR [rsp+132], 100	# %sfp,
- 1474      00000064 
- 1474      000000
- 1475 050e 488B7C24 		mov	rdi, QWORD PTR [rsp+104]	# D.73750, %sfp
- 1475      68
- 1476 0513 C5F16CF4 		vpunpcklqdq	xmm6, xmm1, xmm4	# tmp1248, tmp1247, tmp1246
- 1477 0517 4C895C24 		mov	QWORD PTR [rsp+24], r11	# %sfp, D.73741
- 1477      18
- 1478 051c 44298C24 		sub	DWORD PTR [rsp+132], r9d	# %sfp, prolog_loop_niters.323
- 1478      84000000 
- 1479 0524 448D4B05 		lea	r9d, [rbx+5]	# stmp_var_.330,
- 1480 0528 4C897424 		mov	QWORD PTR [rsp+16], r14	# %sfp, D.73741
- 1480      10
- 1481 052d 488B9C24 		mov	rbx, QWORD PTR [rsp+136]	# ivtmp.579, %sfp
- 1481      88000000 
- 1482 0535 C4C33922 		vpinsrd	xmm0, xmm8, r9d, 1	# tmp1245, stmp_var_.330, stmp_var_.330
- 1482      C101
- 1483 053b C5796CF5 		vpunpcklqdq	xmm14, xmm0, xmm5	# tmp1249, tmp1245, tmp1244
- 1484 053f 4C8BA424 		mov	r12, QWORD PTR [rsp+152]	# D.73741, %sfp
- 1484      98000000 
- 1485              		.loc 10 32 0
- 1486 0547 C4C34D38 		vinserti128	ymm2, ymm6, xmm14, 0x1	# vect_vec_iv_.333, tmp1248, tmp1249
- 1486      D601
- 1487 054d C5FD6FE2 		vmovdqa	ymm4, ymm2	# vect_vec_iv_.333, vect_vec_iv_.333
- 1488 0551 4C8B8424 		mov	r8, QWORD PTR [rsp+296]	# D.73741, %sfp
- 1488      28010000 
- 1489 0559 4C8D0CBF 		lea	r9, [rdi+rdi*4]	# tmp1261,
- 1490 055d 8B8C2484 		mov	ecx, DWORD PTR [rsp+132]	# bnd.326, %sfp
- 1490      000000
- 1491 0564 4B8D3C89 		lea	rdi, [r9+r9*4]	# tmp1264,
- 1492 0568 4C8D3C33 		lea	r15, [rbx+rsi]	# vect_p.337,
- 1493 056c 4803B424 		add	rsi, QWORD PTR [rsp+144]	# vect_p.342, %sfp
- 1493      90000000 
- 1494 0574 48C1E704 		sal	rdi, 4	# tmp1264,
- 1495 0578 4C8B4C24 		mov	r9, QWORD PTR [rsp+88]	# D.73741, %sfp
- 1495      58
- 1496 057d 4A8D1C1F 		lea	rbx, [rdi+r11]	# D.73754,
- 1497 0581 4C01F7   		add	rdi, r14	# D.73754, D.73741
- 1498 0584 C57D6F44 		vmovdqa	ymm8, YMMWORD PTR [rsp+32]	# tmp1524, %sfp
- 1498      2420
- 1499 058a C1E903   		shr	ecx, 3	# bnd.326,
- 1500 058d 4889BC24 		mov	QWORD PTR [rsp+160], rdi	# %sfp, D.73754
- 1500      A0000000 
- 1501 0595 4889B424 		mov	QWORD PTR [rsp+224], rsi	# %sfp, vect_p.342
- 1501      E0000000 
- 1502 059d 4B8D3492 		lea	rsi, [r10+r10*4]	# tmp1268,
- 1503 05a1 898C24AC 		mov	DWORD PTR [rsp+172], ecx	# %sfp, bnd.326
- 1503      000000
- 1504 05a8 C1E103   		sal	ecx, 3	# ratio_mult_vf.327,
- 1505 05ab 894C2448 		mov	DWORD PTR [rsp+72], ecx	# %sfp, ratio_mult_vf.327
- 1506 05af 488D0C80 		lea	rcx, [rax+rax*4]	# tmp1254,
- 1507 05b3 488D04B6 		lea	rax, [rsi+rsi*4]	# tmp1271,
- 1508 05b7 488D0C89 		lea	rcx, [rcx+rcx*4]	# tmp1257,
- 1509 05bb 48C1E004 		sal	rax, 4	# tmp1271,
- 1510 05bf 4E8D1418 		lea	r10, [rax+r11]	# D.73754,
- 1511 05c3 4C01F0   		add	rax, r14	# D.73754, D.73741
- 1512 05c6 48C1E104 		sal	rcx, 4	# tmp1257,
- 1513 05ca 48898424 		mov	QWORD PTR [rsp+256], rax	# %sfp, D.73754
- 1513      00010000 
- 1514 05d2 488B4424 		mov	rax, QWORD PTR [rsp+120]	# ivtmp.568, %sfp
- 1514      78
- 1515 05d7 4901C9   		add	r9, rcx	# D.73754, tmp1257
- 1516 05da 4D8D2C0C 		lea	r13, [r12+rcx]	# D.73754,
- 1517 05de 4D8D2408 		lea	r12, [r8+rcx]	# D.73754,
- 1518 05e2 4C8B8424 		mov	r8, QWORD PTR [rsp+288]	# D.73741, %sfp
- 1518      20010000 
- 1519 05ea 498D340B 		lea	rsi, [r11+rcx]	# D.73754,
- 1520 05ee 4C8B9C24 		mov	r11, QWORD PTR [rsp+256]	# D.73754, %sfp
- 1520      00010000 
- 1521 05f6 488D0490 		lea	rax, [rax+rdx*4]	# base_off.455,
- 1522 05fa 488D9000 		lea	rdx, _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7U_other[rax]	# vect_pU
- 1522      000000
- 1523 0601 488D8000 		lea	rax, _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7V_other[rax]	# vect_pV
- 1523      000000
- 1524 0608 4901C8   		add	r8, rcx	# D.73754, tmp1257
- 1525 060b 48899424 		mov	QWORD PTR [rsp+176], rdx	# %sfp, vect_pU_other.456
- 1525      B0000000 
- 1526 0613 4C01F1   		add	rcx, r14	# D.73754, D.73741
- 1527 0616 48898424 		mov	QWORD PTR [rsp+184], rax	# %sfp, vect_pV_other.464
- 1527      B8000000 
- 1528 061e 31D2     		xor	edx, edx	# ivtmp.525
- 1529 0620 31C0     		xor	eax, eax	# ivtmp.529
- 1530 0622 4C8BB424 		mov	r14, QWORD PTR [rsp+224]	# vect_p.342, %sfp
- 1530      E0000000 
- 1531 062a EB15     		jmp	.L76	#
- 1532              	.LVL95:
- 1533 062c 0F1F4000 		.p2align 4,,10
- 1534              		.p2align 3
- 1535              	.L69:
- 1536 0630 488BBC24 		mov	rdi, QWORD PTR [rsp+160]	# D.73754, %sfp
- 1536      A0000000 
- 1537 0638 C5FD6FA4 		vmovdqa	ymm4, YMMWORD PTR [rsp+192]	# vect_vec_iv_.333, %sfp
- 1537      24C00000 
- 1537      00
- 1538              	.LVL96:
- 1539              	.L76:
- 1540              	.LBB1214:
- 1541              	.LBB1177:
- 1542              	.LBB1148:
- 1543              	.LBB1102:
- 1544              	.LBB1056:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1545              		.loc 10 13 0
- 1546 0641 C55DFE15 		vpaddd	ymm10, ymm4, YMMWORD PTR .LC6[rip]	# vect_var_.356, vect_vec_iv_.333,
- 1546      00000000 
- 1547 0649 C55DFE3D 		vpaddd	ymm15, ymm4, YMMWORD PTR .LC31[rip]	# vect_vec_iv_.333, vect_vec_iv_.333,
- 1547      00000000 
- 1548 0651 83C201   		add	edx, 1	# ivtmp.525,
- 1549              	.LBE1056:
- 1550              	.LBE1102:
- 1551              	.LBE1148:
- 1552              	.LBE1177:
- 1553              	.LBE1214:
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 1554              		.loc 10 28 0
- 1555 0654 C4C17C28 		vmovaps	ymm3, YMMWORD PTR [r15+rax]	# vect_u.338, MEM[base: vect_p.337_764, index: ivtmp.529_127, 
- 1555      1C07
- 1556 065a C4C17D73 		vpsrlq	ymm0, ymm10, 32	# tmp652, vect_var_.356,
- 1556      D220
- 1557 0660 C4C17C10 		vmovups	ymm7, YMMWORD PTR [r14+rax]	# tmp643, MEM[base: vect_p.342_753, index: ivtmp.529_127, offs
- 1557      3C06
- 1558 0666 C57D7FBC 		vmovdqa	YMMWORD PTR [rsp+192], ymm15	# %sfp, vect_vec_iv_.333
- 1558      24C00000 
- 1558      00
- 1559 066f C4427D28 		vpmuldq	ymm14, ymm0, ymm8	# tmp650, tmp652, tmp1524
- 1559      F0
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1560              		.loc 10 29 0
- 1561 0674 C4C37D19 		vextractf128	xmm12, ymm3, 0x1	# tmp644, vect_u.338
- 1561      DC01
- 1562 067a C4C17C5A 		vcvtps2pd	ymm5, xmm12	# vect_var_.344, tmp644
- 1562      EC
- 1563 067f C4C37D19 		vextractf128	xmm13, ymm7, 0x1	# tmp645, tmp643
- 1563      FD01
- 1564 0685 C4C17C5A 		vcvtps2pd	ymm1, xmm13	# vect_var_.347, tmp645
- 1564      CD
- 1565 068a C5FC5AF3 		vcvtps2pd	ymm6, xmm3	# vect_var_.344, vect_u.338
- 1566 068e C4622D28 		vpmuldq	ymm11, ymm10, YMMWORD PTR .LC7[rip]	# tmp648, vect_var_.356,
- 1566      1D000000 
- 1566      00
- 1567 0697 C57C280D 		vmovaps	ymm9, YMMWORD PTR .LC2[rip]	# tmp1707,
- 1567      00000000 
- 1568 069f C5FC5AD7 		vcvtps2pd	ymm2, xmm7	# vect_var_.347, tmp643
- 1569 06a3 C4622500 		vpshufb	ymm15, ymm11, YMMWORD PTR .LC8[rip]	# tmp656, tmp648,
- 1569      3D000000 
- 1569      00
- 1570 06ac C4C12572 		vpsrad	ymm11, ymm10, 31	# vect_patt.361, vect_var_.356,
- 1570      E21F
- 1571 06b2 C4620D00 		vpshufb	ymm12, ymm14, YMMWORD PTR .LC9[rip]	# tmp658, tmp650,
- 1571      25000000 
- 1571      00
- 1572 06bb C44105EB 		vpor	ymm13, ymm15, ymm12	# vect_patt.358, tmp656, tmp658
- 1572      EC
- 1573 06c0 C4C17D72 		vpsrad	ymm0, ymm13, 5	# vect_patt.360, vect_patt.358,
- 1573      E505
- 1574 06c6 C4417DFA 		vpsubd	ymm14, ymm0, ymm11	# vect_patt.362, vect_patt.360, vect_patt.361
- 1574      F3
- 1575              	.LBB1215:
- 1576              	.LBB1178:
- 1577              	.LBB1149:
- 1578              	.LBB1103:
- 1579              	.LBB1104:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1580              		.loc 10 14 0
- 1581 06cb C57C281D 		vmovaps	ymm11, YMMWORD PTR .LC10[rip]	# tmp1681,
- 1581      00000000 
- 1582              	.LBE1104:
- 1583              	.LBE1103:
- 1584              	.LBE1149:
- 1585              	.LBE1178:
- 1586              	.LBE1215:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1587              		.loc 10 29 0
- 1588 06d3 C5345CCB 		vsubps	ymm9, ymm9, ymm3	# vect_var_.350, tmp1707, vect_u.338
- 1589              	.LVL97:
- 1590 06d7 C4620D40 		vpmulld	ymm15, ymm14, YMMWORD PTR .LC6[rip]	# vect_patt.363, vect_patt.362,
- 1590      3D000000 
- 1590      00
- 1591 06e0 C4C12DFA 		vpsubd	ymm0, ymm10, ymm15	# vect_patt.365, vect_var_.356, vect_patt.363
- 1591      C7
- 1592              	.LVL98:
- 1593              	.LBB1216:
- 1594              	.LBB1179:
- 1595              	.LBB1150:
- 1596              	.LBB1107:
- 1597              	.LBB1057:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1598              		.loc 10 14 0
- 1599 06e5 C57C2815 		vmovaps	ymm10, YMMWORD PTR .LC10[rip]	# tmp1680,
- 1599      00000000 
- 1600              	.LBE1057:
- 1601              	.LBE1107:
- 1602              	.LBB1108:
- 1603              	.LBB1109:
- 1604 06ed C57C283D 		vmovaps	ymm15, YMMWORD PTR .LC10[rip]	# tmp1683,
- 1604      00000000 
- 1605              	.LBE1109:
- 1606              	.LBE1108:
- 1607              	.LBB1111:
- 1608              	.LBB1058:
- 1609 06f5 C4422D92 		vgatherdps	ymm12, DWORD PTR [r13+0+ymm0*4], ymm10	# vect_var_.366,, tmp1680
- 1609      648500
- 1610              	.LBE1058:
- 1611              	.LBE1111:
- 1612              	.LBB1112:
- 1613              	.LBB1113:
- 1614 06fc C57C2835 		vmovaps	ymm14, YMMWORD PTR .LC10[rip]	# tmp1682,
- 1614      00000000 
- 1615              	.LBE1113:
- 1616              	.LBE1112:
- 1617              	.LBB1115:
- 1618              	.LBB1059:
- 1619 0704 C57C29A4 		vmovaps	YMMWORD PTR [rsp+224], ymm12	# %sfp, vect_var_.366
- 1619      24E00000 
- 1619      00
- 1620              	.LBE1059:
- 1621              	.LBE1115:
- 1622              	.LBB1116:
- 1623              	.LBB1105:
- 1624 070d C4422592 		vgatherdps	ymm13, DWORD PTR [r12+ymm0*4], ymm11	# vect_var_.368,, tmp1681
- 1624      2C84
- 1625              	.LBE1105:
- 1626              	.LBE1116:
- 1627              	.LBB1117:
- 1628              	.LBB1074:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1629              		.loc 10 13 0
- 1630 0713 C55DFE1D 		vpaddd	ymm11, ymm4, YMMWORD PTR .LC11[rip]	# vect_var_.377, vect_vec_iv_.333,
- 1630      00000000 
- 1631              	.LBE1074:
- 1632              	.LBE1117:
- 1633              	.LBB1118:
- 1634              	.LBB1106:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1635              		.loc 10 14 0
- 1636 071b C57C29AC 		vmovaps	YMMWORD PTR [rsp+256], ymm13	# %sfp, vect_var_.368
- 1636      24000100 
- 1636      00
- 1637              	.LBE1106:
- 1638              	.LBE1118:
- 1639              	.LBB1119:
- 1640              	.LBB1091:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1641              		.loc 10 13 0
- 1642 0724 C5DDFE25 		vpaddd	ymm4, ymm4, YMMWORD PTR .LC12[rip]	# vect_var_.390, vect_vec_iv_.333,
+ 1053 07fa C4425D28 		vpmuldq	ymm12, ymm4, ymm12	# tmp488, tmp490, tmp969
+ 1053      E4
+ 1054              	.LBE665:
+ 1055              	.LBE687:
+ 1056              	.LBE712:
+ 1057              	.LBE742:
+ 1058              	.LBE772:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1059              		.loc 8 75 0 discriminator 2
+ 1060 07ff C4412D5C 		vsubpd	ymm9, ymm10, YMMWORD PTR [r14+rax]	# vect_var_.292, tmp1123, MEM[base: vect_pU.279_413, ind
+ 1060      0C06
+ 1061 0805 C4E21D00 		vpshufb	ymm2, ymm12, YMMWORD PTR .LC8[rip]	# tmp496, tmp488,
+ 1061      15000000 
+ 1061      00
+ 1062 080e C5D5EBE2 		vpor	ymm4, ymm5, ymm2	# vect_patt.338, tmp494, tmp496
+ 1063 0812 C4C15572 		vpsrad	ymm5, ymm15, 31	# vect_patt.341, vect_var_.336,
+ 1063      E71F
+ 1064 0818 C59D72E4 		vpsrad	ymm12, ymm4, 5	# vect_patt.340, vect_patt.338,
+ 1064      05
+ 1065 081d C59DFAD5 		vpsubd	ymm2, ymm12, ymm5	# vect_patt.342, vect_patt.340, vect_patt.341
+ 1066 0821 C4E26D40 		vpmulld	ymm4, ymm2, YMMWORD PTR .LC5[rip]	# vect_patt.343, vect_patt.342,
+ 1066      25000000 
+ 1066      00
+ 1067 082a C585FAEC 		vpsubd	ymm5, ymm15, ymm4	# vect_patt.345, vect_var_.336, vect_patt.343
+ 1068              	.LBB773:
+ 1069              	.LBB743:
+ 1070              	.LBB713:
+ 1071              	.LBB688:
+ 1072              	.LBB675:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1073              		.loc 8 53 0 discriminator 2
+ 1074 082e C5FD28D3 		vmovapd	ymm2, ymm3	# tmp1069, tmp910
+ 1075 0832 C5796FFD 		vmovdqa	xmm15, xmm5	# tmp502,
+ 1076 0836 C4E35546 		vperm2i128	ymm4, ymm5, ymm5, 17	# vect_var_.348, vect_patt.345, vect_patt.345,
+ 1076      E511
+ 1077 083c C5797FBC 		vmovdqa	XMMWORD PTR [rsp+224], xmm15	# %sfp, tmp502
+ 1077      24E00000 
+ 1077      00
+ 1078 0845 C422ED92 		vgatherdpd	ymm12, QWORD PTR [rcx+xmm15*8], ymm2	# vect_var_.346,, tmp1069
+ 1078      24F9
+ 1079              	.LBE675:
+ 1080              	.LBE688:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1081              		.loc 8 67 0 discriminator 2
+ 1082 084b C4C17D10 		vmovupd	ymm2, YMMWORD PTR [r14+rax]	# vect_ret.358, MEM[base: vect_pU.279_413, index: ivtmp.486_58
+ 1082      1406
+ 1083              	.LBB689:
+ 1084              	.LBB676:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1085              		.loc 8 53 0 discriminator 2
+ 1086 0851 C5F97FA4 		vmovdqa	XMMWORD PTR [rsp+208], xmm4	# %sfp, tmp505
+ 1086      24D00000 
+ 1086      00
+ 1087              	.LBE676:
+ 1088              	.LBE689:
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1089              		.loc 8 66 0 discriminator 2
+ 1090 085a C4C13D58 		vaddpd	ymm7, ymm8, ymm12	# vect_var_.349, vect_var_.335, vect_var_.346
+ 1090      FC
+ 1091              	.LBB690:
+ 1092              	.LBB677:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1093              		.loc 8 53 0 discriminator 2
+ 1094 085f C57D28FB 		vmovapd	ymm15, ymm3	# tmp1070, tmp910
+ 1095              	.LBE677:
+ 1096              	.LBE690:
+ 1097              	.LBE713:
+ 1098              	.LBE743:
+ 1099              	.LBE773:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1100              		.loc 8 75 0 discriminator 2
+ 1101 0863 C5355905 		vmulpd	ymm8, ymm9, YMMWORD PTR .LC15[rip]	# vect_var_.294, vect_var_.292,
+ 1101      00000000 
+ 1102              	.LBB774:
+ 1103              	.LBB744:
+ 1104              	.LBB714:
+ 1105              	.LBB691:
+ 1106              	.LBB678:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1107              		.loc 8 53 0 discriminator 2
+ 1108 086b C4E28592 		vgatherdpd	ymm5, QWORD PTR [rcx+xmm4*8], ymm15	# vect_var_.346,, tmp1070
+ 1108      2CE1
+ 1109              	.LBE678:
+ 1110              	.LBE691:
+ 1111              	.LBE714:
+ 1112              	.LBE744:
+ 1113              	.LBE774:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1114              		.loc 8 75 0 discriminator 2
+ 1115 0871 C4417D28 		vmovapd	ymm15, YMMWORD PTR [r14+rax]	# tmp1122, MEM[base: vect_pU.279_413, index: ivtmp.486_586, o
+ 1115      3C06
+ 1116 0877 C4417D28 		vmovapd	ymm9, YMMWORD PTR [r14+32+rax]	# tmp1125, MEM[base: vect_pU.279_413, index: ivtmp.486_586,
+ 1116      4C0620
+ 1117              	.LBB775:
+ 1118              	.LBB745:
+ 1119              	.LBB715:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1120              		.loc 8 67 0 discriminator 2
+ 1121 087e C4E2C59C 		vfnmadd132pd	ymm2, ymm7, YMMWORD PTR .LC12[rip]	# vect_ret.358, vect_var_.349,
+ 1121      15000000 
+ 1121      00
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1122              		.loc 8 68 0 discriminator 2
+ 1123 0887 C4416D5E 		vdivpd	ymm12, ymm2, ymm13	# vect_var_.359, vect_ret.358, tmp923
+ 1123      E5
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1124              		.loc 8 64 0 discriminator 2
+ 1125 088c C5FD28BC 		vmovapd	ymm7, YMMWORD PTR [rsp+352]	# vect_var_.310, %sfp
+ 1125      24600100 
+ 1125      00
+ 1126              	.LBE715:
+ 1127              	.LBE745:
+ 1128              	.LBE775:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1129              		.loc 8 75 0 discriminator 2
+ 1130 0895 C5855915 		vmulpd	ymm2, ymm15, YMMWORD PTR .LC14[rip]	# vect_var_.288, tmp1122,
+ 1130      00000000 
+ 1131 089d C56D59D9 		vmulpd	ymm11, ymm2, ymm1	# vect_var_.296, vect_var_.288, vect_v.286
+ 1132              	.LBB776:
+ 1133              	.LBB746:
+ 1134              	.LBB716:
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1135              		.loc 8 68 0 discriminator 2
+ 1136 08a1 C4C11D5E 		vdivpd	ymm4, ymm12, ymm13	# vect_var_.414, vect_var_.359, tmp923
+ 1136      E5
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1137              		.loc 8 64 0 discriminator 2
+ 1138 08a6 C54558BC 		vaddpd	ymm15, ymm7, YMMWORD PTR [rsp+320]	# vect_var_.313, vect_var_.310, %sfp
+ 1138      24400100 
+ 1138      00
+ 1139              	.LBE716:
+ 1140              	.LBE746:
+ 1141              	.LBE776:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1142              		.loc 8 75 0 discriminator 2
+ 1143 08af C462BD98 		vfmadd132pd	ymm11, ymm8, ymm1	# vect_var_.296, vect_var_.294, vect_v.286
+ 1143      D9
+ 1144 08b4 C5355905 		vmulpd	ymm8, ymm9, YMMWORD PTR .LC14[rip]	# vect_var_.288, tmp1125,
+ 1144      00000000 
+ 1145 08bc C4C12D5C 		vsubpd	ymm7, ymm10, YMMWORD PTR [r14+32+rax]	# vect_var_.292, tmp1126, MEM[base: vect_pU.279_413, 
+ 1145      7C0620
+ 1146              	.LBB777:
+ 1147              	.LBB778:
+ 1148              	.LBB779:
+ 1149              	.LBB780:
+ 1150              	.LBB781:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1151              		.loc 8 53 0 discriminator 2
+ 1152 08c3 C57D28CB 		vmovapd	ymm9, ymm3	# tmp1073, tmp910
+ 1153              	.LBE781:
+ 1154              	.LBE780:
+ 1155              	.LBE779:
+ 1156              	.LBE778:
+ 1157              	.LBE777:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1158              		.loc 8 75 0 discriminator 2
+ 1159 08c7 C4E2A598 		vfmadd132pd	ymm4, ymm11, YMMWORD PTR .LC16[rip]	# vect_var_.414, vect_var_.296,
+ 1159      25000000 
+ 1159      00
+ 1160              	.LBB914:
+ 1161              	.LBB747:
+ 1162              	.LBB717:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1163              		.loc 8 67 0 discriminator 2
+ 1164 08d0 C4417D10 		vmovupd	ymm12, YMMWORD PTR [r14+32+rax]	# vect_ret.358, MEM[base: vect_pU.279_413, index: ivtmp.48
+ 1164      640620
+ 1165              	.LBE717:
+ 1166              	.LBE747:
+ 1167              	.LBE914:
+ 1168              	.LBB915:
+ 1169              	.LBB892:
+ 1170              	.LBB870:
+ 1171              	.LBB785:
+ 1172              	.LBB786:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1173              		.loc 8 53 0 discriminator 2
+ 1174 08d7 C57D28D3 		vmovapd	ymm10, ymm3	# tmp1075, tmp910
+ 1175              	.LBE786:
+ 1176              	.LBE785:
+ 1177              	.LBE870:
+ 1178              	.LBE892:
+ 1179              	.LBE915:
+ 1180              	.LBB916:
+ 1181              	.LBB748:
+ 1182              	.LBB718:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1183              		.loc 8 65 0 discriminator 2
+ 1184 08db C5855894 		vaddpd	ymm2, ymm15, YMMWORD PTR [rsp+384]	# vect_var_.317, vect_var_.313, %sfp
+ 1184      24800100 
+ 1184      00
+ 1185              	.LBE718:
+ 1186              	.LBE748:
+ 1187              	.LBE916:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1188              		.loc 8 75 0 discriminator 2
+ 1189 08e4 C545593D 		vmulpd	ymm15, ymm7, YMMWORD PTR .LC15[rip]	# vect_var_.294, vect_var_.292,
+ 1189      00000000 
+ 1190              	.LBB917:
+ 1191              	.LBB893:
+ 1192              	.LBB871:
+ 1193              	.LBB795:
+ 1194              	.LBB796:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1195              		.loc 8 53 0 discriminator 2
+ 1196 08ec C5F96FBC 		vmovdqa	xmm7, XMMWORD PTR [rsp+272]	# tmp441, %sfp
+ 1196      24100100 
+ 1196      00
+ 1197              	.LBE796:
+ 1198              	.LBE795:
+ 1199              	.LBE871:
+ 1200              	.LBE893:
+ 1201              	.LBE917:
+ 1202              	.LBB918:
+ 1203              	.LBB749:
+ 1204              	.LBB719:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1205              		.loc 8 65 0 discriminator 2
+ 1206 08f5 C4416D58 		vaddpd	ymm14, ymm2, ymm14	# vect_var_.321, vect_var_.317, vect_var_.318
+ 1206      F6
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1207              		.loc 8 66 0 discriminator 2
+ 1208 08fa C58D58F6 		vaddpd	ymm6, ymm14, ymm6	# vect_var_.335, vect_var_.321, vect_var_.332
+ 1209              	.LBE719:
+ 1210              	.LBE749:
+ 1211              	.LBE918:
+ 1212              	.LBB919:
+ 1213              	.LBB894:
+ 1214              	.LBB872:
+ 1215              	.LBB809:
+ 1216              	.LBB797:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1217              		.loc 8 53 0 discriminator 2
+ 1218 08fe C57D28F3 		vmovapd	ymm14, ymm3	# tmp1071, tmp910
+ 1219              	.LBE797:
+ 1220              	.LBE809:
+ 1221              	.LBE872:
+ 1222              	.LBE894:
+ 1223              	.LBE919:
+ 1224              	.LBB920:
+ 1225              	.LBB750:
+ 1226              	.LBB720:
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1227              		.loc 8 66 0 discriminator 2
+ 1228 0902 C5CD58ED 		vaddpd	ymm5, ymm6, ymm5	# vect_var_.349, vect_var_.335, vect_var_.346
+ 1229              	.LBE720:
+ 1230              	.LBE750:
+ 1231              	.LBE920:
+ 1232              	.LBB921:
+ 1233              	.LBB895:
+ 1234              	.LBB873:
+ 1235              	.LBB810:
+ 1236              	.LBB798:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1237              		.loc 8 53 0 discriminator 2
+ 1238 0906 C5F96FB4 		vmovdqa	xmm6, XMMWORD PTR [rsp+288]	# tmp438, %sfp
+ 1238      24200100 
+ 1238      00
+ 1239              	.LBE798:
+ 1240              	.LBE810:
+ 1241              	.LBE873:
+ 1242              	.LBE895:
+ 1243              	.LBE921:
+ 1244              	.LBB922:
+ 1245              	.LBB751:
+ 1246              	.LBB721:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1247              		.loc 8 67 0 discriminator 2
+ 1248 090f C462D59C 		vfnmadd132pd	ymm12, ymm5, YMMWORD PTR .LC12[rip]	# vect_ret.358, vect_var_.349,
+ 1248      25000000 
+ 1248      00
+ 1249              	.LBE721:
+ 1250              	.LBE751:
+ 1251              	.LBE922:
+ 1252              	.LBB923:
+ 1253              	.LBB896:
+ 1254              	.LBB874:
+ 1255              	.LBB811:
+ 1256              	.LBB799:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1257              		.loc 8 53 0 discriminator 2
+ 1258 0918 C5FD28EB 		vmovapd	ymm5, ymm3	# tmp1072, tmp910
+ 1259              	.LBE799:
+ 1260              	.LBE811:
+ 1261              	.LBE874:
+ 1262              	.LBE896:
+ 1263              	.LBE923:
+ 1264              	.LBB924:
+ 1265              	.LBB752:
+ 1266              	.LBB722:
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1267              		.loc 8 68 0 discriminator 2
+ 1268 091c C4411D5E 		vdivpd	ymm11, ymm12, ymm13	# vect_var_.359, vect_ret.358, tmp923
+ 1268      DD
+ 1269 0921 C4C1255E 		vdivpd	ymm2, ymm11, ymm13	# vect_var_.414, vect_var_.359, tmp923
+ 1269      D5
+ 1270              	.LBE722:
+ 1271              	.LBE752:
+ 1272              	.LBE924:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1273              		.loc 8 75 0 discriminator 2
+ 1274 0926 C53D59E0 		vmulpd	ymm12, ymm8, ymm0	# vect_var_.296, vect_var_.288, vect_v.287
+ 1275 092a C4628598 		vfmadd132pd	ymm12, ymm15, ymm0	# vect_var_.296, vect_var_.294, vect_v.287
+ 1275      E0
+ 1276              	.LBB925:
+ 1277              	.LBB897:
+ 1278              	.LBB875:
+ 1279              	.LBB812:
+ 1280              	.LBB800:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1281              		.loc 8 53 0 discriminator 2
+ 1282 092f C442D592 		vgatherdpd	ymm11, QWORD PTR [r9+xmm7*8], ymm5	# vect_var_.373,, tmp1072
+ 1282      1CF9
+ 1283              	.LBE800:
+ 1284              	.LBE812:
+ 1285              	.LBB813:
+ 1286              	.LBB787:
+ 1287 0935 C5FD28EB 		vmovapd	ymm5, ymm3	# tmp1076, tmp910
+ 1288              	.LBE787:
+ 1289              	.LBE813:
+ 1290              	.LBB814:
+ 1291              	.LBB801:
+ 1292 0939 C4428D92 		vgatherdpd	ymm15, QWORD PTR [r9+xmm6*8], ymm14	# vect_var_.373,, tmp1071
+ 1292      3CF1
+ 1293              	.LBE801:
+ 1294              	.LBE814:
+ 1295              	.LBE875:
+ 1296              	.LBE897:
+ 1297              	.LBE925:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1298              		.loc 8 75 0 discriminator 2
+ 1299 093f C4E29D98 		vfmadd132pd	ymm2, ymm12, YMMWORD PTR .LC16[rip]	# vect_var_.414, vect_var_.296,
+ 1299      15000000 
+ 1299      00
+ 1300              	.LVL66:
+ 1301              	.LBB926:
+ 1302              	.LBB898:
+ 1303              	.LBB876:
+ 1304              	.LBB815:
+ 1305              	.LBB782:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1306              		.loc 8 53 0 discriminator 2
+ 1307 0948 C57D28E3 		vmovapd	ymm12, ymm3	# tmp1074, tmp910
+ 1308              	.LBE782:
+ 1309              	.LBE815:
+ 1310              	.LBB816:
+ 1311              	.LBB802:
+ 1312 094c C57D299C 		vmovapd	YMMWORD PTR [rsp+288], ymm11	# %sfp, vect_var_.373
+ 1312      24200100 
+ 1312      00
+ 1313              	.LVL67:
+ 1314              	.LBE802:
+ 1315              	.LBE816:
+ 1316              	.LBB817:
+ 1317              	.LBB783:
+ 1318 0955 C442B592 		vgatherdpd	ymm14, QWORD PTR [r8+xmm6*8], ymm9	# vect_var_.376,, tmp1073
+ 1318      34F0
+ 1319              	.LBE783:
+ 1320              	.LBE817:
+ 1321              	.LBB818:
+ 1322              	.LBB819:
+ 1323 095b C57D28CB 		vmovapd	ymm9, ymm3	# tmp1077, tmp910
+ 1324              	.LBE819:
+ 1325              	.LBE818:
+ 1326              	.LBB826:
+ 1327              	.LBB784:
+ 1328 095f C4429D92 		vgatherdpd	ymm8, QWORD PTR [r8+xmm7*8], ymm12	# vect_var_.376,, tmp1074
+ 1328      04F8
+ 1329 0965 C57D2984 		vmovapd	YMMWORD PTR [rsp+320], ymm8	# %sfp, vect_var_.376
+ 1329      24400100 
+ 1329      00
+ 1330              	.LBE784:
+ 1331              	.LBE826:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1332              		.loc 8 64 0 discriminator 2
+ 1333 096e C4410558 		vaddpd	ymm15, ymm15, ymm14	# vect_var_.379, vect_var_.373, vect_var_.376
+ 1333      FE
+ 1334              	.LBB827:
+ 1335              	.LBB788:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1336              		.loc 8 53 0 discriminator 2
+ 1337 0973 C462AD92 		vgatherdpd	ymm12, QWORD PTR [rdi+xmm6*8], ymm10	# vect_var_.380,, tmp1075
+ 1337      24F7
+ 1338 0979 C462D592 		vgatherdpd	ymm11, QWORD PTR [rdi+xmm7*8], ymm5	# vect_var_.380,, tmp1076
+ 1338      1CFF
+ 1339              	.LBE788:
+ 1340              	.LBE827:
+ 1341              	.LBB828:
+ 1342              	.LBB829:
+ 1343 097f C5F96FAC 		vmovdqa	xmm5, XMMWORD PTR [rsp+256]	# tmp479, %sfp
+ 1343      24000100 
+ 1343      00
+ 1344              	.LBE829:
+ 1345              	.LBE828:
+ 1346              	.LBB835:
+ 1347              	.LBB789:
+ 1348 0988 C57D299C 		vmovapd	YMMWORD PTR [rsp+352], ymm11	# %sfp, vect_var_.380
+ 1348      24600100 
+ 1348      00
+ 1349              	.LBE789:
+ 1350              	.LBE835:
+ 1351              	.LBB836:
+ 1352              	.LBB820:
+ 1353 0991 C462B592 		vgatherdpd	ymm11, QWORD PTR [rsi+xmm6*8], ymm9	# vect_var_.384,, tmp1077
+ 1353      1CF6
+ 1354              	.LBE820:
+ 1355              	.LBE836:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1356              		.loc 8 65 0 discriminator 2
+ 1357 0997 C4410558 		vaddpd	ymm14, ymm15, ymm12	# vect_var_.383, vect_var_.379, vect_var_.380
+ 1357      F4
+ 1358              	.LBB837:
+ 1359              	.LBB821:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1360              		.loc 8 53 0 discriminator 2
+ 1361 099c C5FD28F3 		vmovapd	ymm6, ymm3	# tmp1078, tmp910
+ 1362 09a0 C462CD92 		vgatherdpd	ymm8, QWORD PTR [rsi+xmm7*8], ymm6	# vect_var_.384,, tmp1078
+ 1362      04FE
+ 1363              	.LVL68:
+ 1364              	.LBE821:
+ 1365              	.LBE837:
+ 1366              	.LBB838:
+ 1367              	.LBB830:
+ 1368 09a6 C5FD28FB 		vmovapd	ymm7, ymm3	# tmp1079, tmp910
+ 1369 09aa C57D28CB 		vmovapd	ymm9, ymm3	# tmp1080, tmp910
+ 1370 09ae C5F96FB4 		vmovdqa	xmm6, XMMWORD PTR [rsp+240]	# tmp482, %sfp
+ 1370      24F00000 
+ 1370      00
+ 1371              	.LBE830:
+ 1372              	.LBE838:
+ 1373              	.LBE876:
+ 1374              	.LBE898:
+ 1375              	.LBE926:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1376              		.loc 8 76 0 discriminator 2
+ 1377 09b7 C575593D 		vmulpd	ymm15, ymm1, YMMWORD PTR .LC17[rip]	# vect_var_.370, vect_v.286,
+ 1377      00000000 
+ 1378              	.LBB927:
+ 1379              	.LBB899:
+ 1380              	.LBB877:
+ 1381              	.LBB839:
+ 1382              	.LBB831:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1383              		.loc 8 53 0 discriminator 2
+ 1384 09bf C462C592 		vgatherdpd	ymm10, QWORD PTR [rdx+xmm5*8], ymm7	# vect_var_.388,, tmp1079
+ 1384      14EA
+ 1385              	.LBE831:
+ 1386              	.LBE839:
+ 1387              	.LBB840:
+ 1388              	.LBB841:
+ 1389 09c5 C5F96FAC 		vmovdqa	xmm5, XMMWORD PTR [rsp+224]	# tmp502, %sfp
+ 1389      24E00000 
+ 1389      00
+ 1390              	.LBE841:
+ 1391              	.LBE840:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1392              		.loc 8 65 0 discriminator 2
+ 1393 09ce C4410D58 		vaddpd	ymm12, ymm14, ymm11	# vect_var_.387, vect_var_.383, vect_var_.384
+ 1393      E3
+ 1394              	.LBB847:
+ 1395              	.LBB832:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1396              		.loc 8 53 0 discriminator 2
+ 1397 09d3 C4E2B592 		vgatherdpd	ymm7, QWORD PTR [rdx+xmm6*8], ymm9	# vect_var_.388,, tmp1080
+ 1397      3CF2
+ 1398              	.LBE832:
+ 1399              	.LBE847:
+ 1400              	.LBB848:
+ 1401              	.LBB842:
+ 1402 09d9 C5FD28F3 		vmovapd	ymm6, ymm3	# tmp1081, tmp910
+ 1403              	.LBE842:
+ 1404              	.LBE848:
+ 1405              	.LBB849:
+ 1406              	.LBB833:
+ 1407 09dd C5FD29BC 		vmovapd	YMMWORD PTR [rsp+384], ymm7	# %sfp, vect_var_.388
+ 1407      24800100 
+ 1407      00
+ 1408              	.LBE833:
+ 1409              	.LBE849:
+ 1410              	.LBB850:
+ 1411              	.LBB843:
+ 1412 09e6 C5FD28FB 		vmovapd	ymm7, ymm3	# tmp1082, tmp910
+ 1413 09ea C462CD92 		vgatherdpd	ymm9, QWORD PTR [rdx+xmm5*8], ymm6	# vect_var_.392,, tmp1081
+ 1413      0CEA
+ 1414              	.LBE843:
+ 1415              	.LBE850:
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1416              		.loc 8 66 0 discriminator 2
+ 1417 09f0 C4411D58 		vaddpd	ymm11, ymm12, ymm10	# vect_var_.391, vect_var_.387, vect_var_.388
+ 1417      DA
+ 1418              	.LBB851:
+ 1419              	.LBB844:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1420              		.loc 8 53 0 discriminator 2
+ 1421 09f5 C5F96FAC 		vmovdqa	xmm5, XMMWORD PTR [rsp+208]	# tmp505, %sfp
+ 1421      24D00000 
+ 1421      00
+ 1422 09fe C4E2C592 		vgatherdpd	ymm6, QWORD PTR [rdx+xmm5*8], ymm7	# vect_var_.392,, tmp1082
+ 1422      34EA
+ 1423              	.LBE844:
+ 1424              	.LBE851:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1425              		.loc 8 67 0 discriminator 2
+ 1426 0a04 C4C17D10 		vmovupd	ymm7, YMMWORD PTR [r13+0+rax]	# vect_ret.404, MEM[base: vect_pV.285_402, index: ivtmp.486_
+ 1426      7C0500
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1427              		.loc 8 66 0 discriminator 2
+ 1428 0a0b C4412558 		vaddpd	ymm10, ymm11, ymm9	# vect_var_.395, vect_var_.391, vect_var_.392
+ 1428      D1
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1429              		.loc 8 67 0 discriminator 2
+ 1430 0a10 C4417D10 		vmovupd	ymm11, YMMWORD PTR [r13+32+rax]	# vect_ret.404, MEM[base: vect_pV.285_402, index: ivtmp.48
+ 1430      5C0520
+ 1431 0a17 C4E2AD9C 		vfnmadd132pd	ymm7, ymm10, YMMWORD PTR .LC12[rip]	# vect_ret.404, vect_var_.395,
+ 1431      3D000000 
+ 1431      00
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1432              		.loc 8 68 0 discriminator 2
+ 1433 0a20 C441455E 		vdivpd	ymm9, ymm7, ymm13	# vect_var_.405, vect_ret.404, tmp923
+ 1433      CD
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1434              		.loc 8 64 0 discriminator 2
+ 1435 0a25 C57D2894 		vmovapd	ymm10, YMMWORD PTR [rsp+320]	# vect_var_.376, %sfp
+ 1435      24400100 
+ 1435      00
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1436              		.loc 8 68 0 discriminator 2
+ 1437 0a2e C4C1355E 		vdivpd	ymm5, ymm9, ymm13	# vect_var_.421, vect_var_.405, tmp923
+ 1437      ED
+ 1438              	.LBE877:
+ 1439              	.LBE899:
+ 1440              	.LBE927:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1441              		.loc 8 76 0 discriminator 2
+ 1442 0a33 C4C17D28 		vmovapd	ymm7, YMMWORD PTR [r14+rax]	# tmp1154, MEM[base: vect_pU.279_413, index: ivtmp.486_586, of
+ 1442      3C06
+ 1443              	.LBB928:
+ 1444              	.LBB900:
+ 1445              	.LBB878:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1446              		.loc 8 64 0 discriminator 2
+ 1447 0a39 C52D588C 		vaddpd	ymm9, ymm10, YMMWORD PTR [rsp+288]	# vect_var_.379, vect_var_.376, %sfp
+ 1447      24200100 
+ 1447      00
+ 1448              	.LBE878:
+ 1449              	.LBE900:
+ 1450              	.LBE928:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1451              		.loc 8 76 0 discriminator 2
+ 1452 0a42 C5455935 		vmulpd	ymm14, ymm7, YMMWORD PTR .LC18[rip]	# vect_var_.366, tmp1154,
+ 1452      00000000 
+ 1453 0a4a C50D59E1 		vmulpd	ymm12, ymm14, ymm1	# vect_var_.372, vect_var_.366, vect_v.286
+ 1454 0a4e C462859A 		vfmsub132pd	ymm12, ymm15, ymm1	# vect_var_.372, vect_var_.370, vect_v.286
+ 1454      E1
+ 1455 0a53 C4E29D98 		vfmadd132pd	ymm5, ymm12, YMMWORD PTR .LC19[rip]	# vect_var_.421, vect_var_.372,
+ 1455      2D000000 
+ 1455      00
+ 1456 0a5c C4417D28 		vmovapd	ymm10, YMMWORD PTR [r14+32+rax]	# tmp1156, MEM[base: vect_pU.279_413, index: ivtmp.486_586
+ 1456      540620
+ 1457              	.LBB929:
+ 1458              	.LBB901:
+ 1459              	.LBB879:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1460              		.loc 8 65 0 discriminator 2
+ 1461 0a63 C53558BC 		vaddpd	ymm15, ymm9, YMMWORD PTR [rsp+352]	# vect_var_.383, vect_var_.379, %sfp
+ 1461      24600100 
+ 1461      00
+ 1462              	.LBE879:
+ 1463              	.LBE901:
+ 1464              	.LBE929:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1465              		.loc 8 76 0 discriminator 2
+ 1466 0a6c C52D590D 		vmulpd	ymm9, ymm10, YMMWORD PTR .LC18[rip]	# vect_var_.366, tmp1156,
+ 1466      00000000 
+ 1467              	.LBB930:
+ 1468              	.LBB902:
+ 1469              	.LBB880:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1470              		.loc 8 65 0 discriminator 2
+ 1471 0a74 C4410558 		vaddpd	ymm8, ymm15, ymm8	# vect_var_.387, vect_var_.383, vect_var_.384
+ 1471      C0
+ 1472              	.LBE880:
+ 1473              	.LBE902:
+ 1474              	.LBE930:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1475              		.loc 8 76 0 discriminator 2
+ 1476 0a79 C53559F8 		vmulpd	ymm15, ymm9, ymm0	# vect_var_.372, vect_var_.366, vect_v.287
+ 1477              	.LBB931:
+ 1478              	.LBB903:
+ 1479              	.LBB881:
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1480              		.loc 8 66 0 discriminator 2
+ 1481 0a7d C5BD58BC 		vaddpd	ymm7, ymm8, YMMWORD PTR [rsp+384]	# vect_var_.391, vect_var_.387, %sfp
+ 1481      24800100 
+ 1481      00
+ 1482              	.LBE881:
+ 1483              	.LBE903:
+ 1484              	.LBE931:
+  77:saya.cpp      **** 	U_other[x][y][z] = U[x][y][z] + dt*du_dt;
+ 1485              		.loc 8 77 0 discriminator 2
+ 1486 0a86 C4417D28 		vmovapd	ymm8, YMMWORD PTR [r14+rax]	# tmp1157, MEM[base: vect_pU.279_413, index: ivtmp.486_586, of
+ 1486      0406
+ 1487 0a8c C4E2BD98 		vfmadd132pd	ymm4, ymm8, YMMWORD PTR .LC20[rip]	# vect_var_.414, tmp1157,
+ 1487      25000000 
+ 1487      00
+ 1488              	.LBB932:
+ 1489              	.LBB904:
+ 1490              	.LBB882:
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1491              		.loc 8 66 0 discriminator 2
+ 1492 0a95 C5C558F6 		vaddpd	ymm6, ymm7, ymm6	# vect_var_.395, vect_var_.391, vect_var_.392
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1493              		.loc 8 67 0 discriminator 2
+ 1494 0a99 C462CD9C 		vfnmadd132pd	ymm11, ymm6, YMMWORD PTR .LC12[rip]	# vect_ret.404, vect_var_.395,
+ 1494      1D000000 
+ 1494      00
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1495              		.loc 8 68 0 discriminator 2
+ 1496 0aa2 C441255E 		vdivpd	ymm14, ymm11, ymm13	# vect_var_.405, vect_ret.404, tmp923
+ 1496      F5
+ 1497              	.LBE882:
+ 1498              	.LBE904:
+ 1499              	.LBE932:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1500              		.loc 8 76 0 discriminator 2
+ 1501 0aa7 C57D591D 		vmulpd	ymm11, ymm0, YMMWORD PTR .LC17[rip]	# vect_var_.370, vect_v.287,
+ 1501      00000000 
+ 1502              	.LBB933:
+ 1503              	.LBB905:
+ 1504              	.LBB883:
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1505              		.loc 8 68 0 discriminator 2
+ 1506 0aaf C4410D5E 		vdivpd	ymm12, ymm14, ymm13	# vect_var_.421, vect_var_.405, tmp923
+ 1506      E5
+ 1507              	.LBE883:
+ 1508              	.LBE905:
+ 1509              	.LBE933:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1510              		.loc 8 76 0 discriminator 2
+ 1511 0ab4 C462A59A 		vfmsub132pd	ymm15, ymm11, ymm0	# vect_var_.372, vect_var_.370, vect_v.287
+ 1511      F8
+ 1512 0ab9 C4628598 		vfmadd132pd	ymm12, ymm15, YMMWORD PTR .LC19[rip]	# vect_var_.421, vect_var_.372,
+ 1512      25000000 
+ 1512      00
+  77:saya.cpp      **** 	U_other[x][y][z] = U[x][y][z] + dt*du_dt;
+ 1513              		.loc 8 77 0 discriminator 2
+ 1514 0ac2 C4C17D29 		vmovapd	YMMWORD PTR [r15+rax], ymm4	# MEM[base: _521, index: ivtmp.486_586, offset: 0B], vect_var_
+ 1514      2407
+ 1515              		.loc 8 78 0 discriminator 2
+ 1516 0ac8 488BB424 		mov	rsi, QWORD PTR [rsp+200]	# D.36894, %sfp
+ 1516      C8000000 
+ 1517 0ad0 C4E2F598 		vfmadd132pd	ymm5, ymm1, YMMWORD PTR .LC20[rip]	# vect_var_.421, vect_v.286,
+ 1517      2D000000 
+ 1517      00
+ 1518 0ad9 C462FD98 		vfmadd132pd	ymm12, ymm0, YMMWORD PTR .LC20[rip]	# vect_var_.421, vect_v.287,
+ 1518      25000000 
+ 1518      00
+  77:saya.cpp      **** 	U_other[x][y][z] = U[x][y][z] + dt*du_dt;
+ 1519              		.loc 8 77 0 discriminator 2
+ 1520 0ae2 C4C17D28 		vmovapd	ymm4, YMMWORD PTR [r14+32+rax]	# tmp1158, MEM[base: vect_pU.279_413, index: ivtmp.486_586,
+ 1520      640620
+ 1521 0ae9 C4E2DD98 		vfmadd132pd	ymm2, ymm4, YMMWORD PTR .LC20[rip]	# vect_var_.414, tmp1158,
+ 1521      15000000 
+ 1521      00
+ 1522 0af2 C4C17D29 		vmovapd	YMMWORD PTR [r15+32+rax], ymm2	# MEM[base: _521, index: ivtmp.486_586, offset: 32B], vect_
+ 1522      540720
+ 1523              		.loc 8 78 0 discriminator 2
+ 1524 0af9 C5FD292C 		vmovapd	YMMWORD PTR [rsi+rax], ymm5	# MEM[base: _516, index: ivtmp.486_586, offset: 0B], vect_var_
+ 1524      06
+ 1525 0afe C57D2964 		vmovapd	YMMWORD PTR [rsi+32+rax], ymm12	# MEM[base: _516, index: ivtmp.486_586, offset: 32B], vect
+ 1525      0620
+ 1526 0b04 4883C040 		add	rax, 64	# ivtmp.486,
+ 1527 0b08 483D0003 		cmp	rax, 768	# ivtmp.486,
+ 1527      0000
+ 1528 0b0e 0F851CFB 		jne	.L62	#,
+ 1528      FFFF
+ 1529 0b14 4C8B7C24 		mov	r15, QWORD PTR [rsp+40]	# ivtmp.514, %sfp
+ 1529      28
+ 1530 0b19 4C89AC24 		mov	QWORD PTR [rsp+272], r13	# %sfp, ivtmp.519
+ 1530      10010000 
+ 1531              		.loc 8 78 0 is_stmt 0
+ 1532 0b21 31C9     		xor	ecx, ecx	# ivtmp.461
+ 1533              	.LBB934:
+ 1534              	.LBB906:
+ 1535              	.LBB884:
+ 1536              	.LBB852:
+ 1537              	.LBB803:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1538              		.loc 8 53 0 is_stmt 1
+ 1539 0b23 4C8B6424 		mov	r12, QWORD PTR [rsp+64]	# D.36884, %sfp
+ 1539      40
+ 1540 0b28 4C89B424 		mov	QWORD PTR [rsp+288], r14	# %sfp, ivtmp.518
+ 1540      20010000 
+ 1541              	.LBE803:
+ 1542              	.LBE852:
+ 1543              	.LBB853:
+ 1544              	.LBB790:
+ 1545 0b30 4C8B5424 		mov	r10, QWORD PTR [rsp+56]	# D.36884, %sfp
+ 1545      38
+ 1546              	.LBE790:
+ 1547              	.LBE853:
+ 1548              	.LBB854:
+ 1549              	.LBB822:
+ 1550 0b35 4C8B4424 		mov	r8, QWORD PTR [rsp+48]	# D.36884, %sfp
+ 1550      30
+ 1551 0b3a 488B7424 		mov	rsi, QWORD PTR [rsp+24]	# D.36886, %sfp
+ 1551      18
+ 1552 0b3f 488B5424 		mov	rdx, QWORD PTR [rsp+32]	# D.36886, %sfp
+ 1552      20
+ 1553              	.LBE822:
+ 1554              	.LBE854:
+ 1555              	.LBB855:
+ 1556              	.LBB804:
+ 1557 0b44 4B8D1CA4 		lea	rbx, [r12+r12*4]	# tmp942,
+ 1558              	.LBE804:
+ 1559              	.LBE855:
+ 1560              	.LBB856:
+ 1561              	.LBB791:
+ 1562 0b48 4F8D0C92 		lea	r9, [r10+r10*4]	# tmp947,
+ 1563 0b4c 4C8B6C24 		mov	r13, QWORD PTR [rsp+80]	# D.36887, %sfp
+ 1563      50
+ 1564              	.LBE791:
+ 1565              	.LBE856:
+ 1566              	.LBB857:
+ 1567              	.LBB823:
+ 1568 0b51 4B8D0480 		lea	rax, [r8+r8*4]	# tmp952,
+ 1569 0b55 4C8B6424 		mov	r12, QWORD PTR [rsp+96]	# D.36887, %sfp
+ 1569      60
+ 1570 0b5a 4E8D143E 		lea	r10, [rsi+r15]	# D.36886,
+ 1571 0b5e 4C8B4424 		mov	r8, QWORD PTR [rsp+72]	# D.36887, %sfp
+ 1571      48
+ 1572 0b63 488B7424 		mov	rsi, QWORD PTR [rsp+88]	# D.36887, %sfp
+ 1572      58
+ 1573 0b68 4E8D1C3A 		lea	r11, [rdx+r15]	# D.36886,
+ 1574 0b6c 4C899424 		mov	QWORD PTR [rsp+320], r10	# %sfp, D.36886
+ 1574      40010000 
+ 1575 0b74 488D1480 		lea	rdx, [rax+rax*4]	# tmp954,
+ 1576 0b78 4C899C24 		mov	QWORD PTR [rsp+384], r11	# %sfp, D.36886
+ 1576      80010000 
+ 1577              	.LBE823:
+ 1578              	.LBE857:
+ 1579              	.LBB858:
+ 1580              	.LBB805:
+ 1581 0b80 488D3C9B 		lea	rdi, [rbx+rbx*4]	# tmp944,
+ 1582              	.LBE805:
+ 1583              	.LBE858:
+ 1584              	.LBB859:
+ 1585              	.LBB824:
+ 1586 0b84 48C1E202 		sal	rdx, 2	# tmp955,
+ 1587              	.LBE824:
+ 1588              	.LBE859:
+ 1589              	.LBB860:
+ 1590              	.LBB792:
+ 1591 0b88 4B8D1C89 		lea	rbx, [r9+r9*4]	# tmp949,
+ 1592              	.LBE792:
+ 1593              	.LBE860:
+ 1594              	.LBB861:
+ 1595              	.LBB806:
+ 1596 0b8c 48C1E702 		sal	rdi, 2	# tmp945,
+ 1597 0b90 48899424 		mov	QWORD PTR [rsp+352], rdx	# %sfp, tmp955
+ 1597      60010000 
+ 1598              	.LBE806:
+ 1599              	.LBE861:
+ 1600              	.LBB862:
+ 1601              	.LBB793:
+ 1602 0b98 48C1E302 		sal	rbx, 2	# tmp950,
+ 1603 0b9c 0F1F4000 		.p2align 4,,10
+ 1604              		.p2align 3
+ 1605              	.L65:
+ 1606              	.LVL69:
+ 1607 0ba0 448DB1C4 		lea	r14d, [rcx+196]	# D.36885,
+ 1607      000000
+ 1608              	.LBE793:
+ 1609              	.LBE862:
+ 1610              	.LBE884:
+ 1611              	.LBE906:
+ 1612              	.LBE934:
+ 1613              	.LBB935:
+ 1614              	.LBB753:
+ 1615              	.LBB723:
+ 1616              	.LBB692:
+ 1617              	.LBB632:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1618              		.loc 8 52 0
+ 1619 0ba7 B81F85EB 		mov	eax, 1374389535	# tmp1083,
+ 1619      51
+ 1620 0bac 41B96400 		mov	r9d, 100	#,
+ 1620      0000
+ 1621 0bb2 41F7EE   		imul	r14d	# D.36885
+ 1622 0bb5 4589F3   		mov	r11d, r14d	# tmp638, D.36885
+ 1623              	.LBE632:
+ 1624              	.LBE692:
+ 1625              	.LBB693:
+ 1626              	.LBB666:
+ 1627 0bb8 B81F85EB 		mov	eax, 1374389535	# tmp1084,
+ 1627      51
+ 1628              	.LBE666:
+ 1629              	.LBE693:
+ 1630              	.LBB694:
+ 1631              	.LBB633:
+ 1632 0bbd 41C1FB1F 		sar	r11d, 31	# tmp638,
+ 1633              	.LBE633:
+ 1634              	.LBE694:
+ 1635              	.LBE723:
+ 1636              	.LBE753:
+ 1637              	.LBE935:
+ 1638              	.LBB936:
+ 1639              	.LBB907:
+ 1640              	.LBB885:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1641              		.loc 8 67 0
+ 1642 0bc1 C57B101D 		vmovsd	xmm11, QWORD PTR .LC21[rip]	# tmp1169,
  1642      00000000 
- 1643              	.LBE1091:
- 1644              	.LBE1119:
- 1645              	.LBB1120:
- 1646              	.LBB1110:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1647              		.loc 10 14 0
- 1648 072c C4420592 		vgatherdps	ymm12, DWORD PTR [r10+ymm0*4], ymm15	# vect_var_.374,, tmp1683
- 1648      2482
- 1649 0732 C4C12D73 		vpsrlq	ymm10, ymm11, 32	# tmp677, vect_var_.377,
- 1649      D320
- 1650              	.LBE1110:
- 1651              	.LBE1120:
- 1652              	.LBB1121:
- 1653              	.LBB1114:
- 1654 0738 C4620D92 		vgatherdps	ymm13, DWORD PTR [rbx+ymm0*4], ymm14	# vect_var_.371,, tmp1682
- 1654      2C83
- 1655              	.LVL99:
- 1656 073e C4622528 		vpmuldq	ymm14, ymm11, YMMWORD PTR .LC7[rip]	# tmp673, vect_var_.377,
- 1656      35000000 
- 1656      00
- 1657 0747 C4422D28 		vpmuldq	ymm15, ymm10, ymm8	# tmp675, tmp677, tmp1524
- 1657      F8
- 1658 074c C4620D00 		vpshufb	ymm14, ymm14, YMMWORD PTR .LC8[rip]	# tmp681, tmp673,
- 1658      35000000 
- 1658      00
- 1659 0755 C4620500 		vpshufb	ymm10, ymm15, YMMWORD PTR .LC9[rip]	# tmp683, tmp675,
- 1659      15000000 
- 1659      00
- 1660 075e C4410DEB 		vpor	ymm15, ymm14, ymm10	# vect_patt.379, tmp681, tmp683
- 1660      FA
- 1661 0763 C4C12D72 		vpsrad	ymm10, ymm11, 31	# vect_patt.382, vect_var_.377,
- 1661      E31F
- 1662 0769 C4C10D72 		vpsrad	ymm14, ymm15, 5	# vect_patt.381, vect_patt.379,
- 1662      E705
- 1663 076f C4410DFA 		vpsubd	ymm15, ymm14, ymm10	# vect_patt.383, vect_patt.381, vect_patt.382
- 1663      FA
- 1664 0774 C4620540 		vpmulld	ymm14, ymm15, YMMWORD PTR .LC6[rip]	# vect_patt.384, vect_patt.383,
- 1664      35000000 
- 1664      00
- 1665 077d C44125FA 		vpsubd	ymm10, ymm11, ymm14	# vect_patt.386, vect_var_.377, vect_patt.384
- 1665      D6
- 1666 0782 C58D73D4 		vpsrlq	ymm14, ymm4, 32	# tmp696, vect_var_.390,
- 1666      20
- 1667 0787 C4420D28 		vpmuldq	ymm14, ymm14, ymm8	# tmp694, tmp696, tmp1524
- 1667      F0
- 1668              	.LBE1114:
- 1669              	.LBE1121:
- 1670              	.LBB1122:
- 1671              	.LBB1075:
- 1672 078c C57C283D 		vmovaps	ymm15, YMMWORD PTR .LC10[rip]	# tmp1684,
- 1672      00000000 
- 1673 0794 C4220592 		vgatherdps	ymm11, DWORD PTR [rsi+ymm10*4], ymm15	# vect_var_.387,, tmp1684
- 1673      1C96
- 1674              	.LVL100:
- 1675 079a C4625D28 		vpmuldq	ymm15, ymm4, YMMWORD PTR .LC7[rip]	# tmp692, vect_var_.390,
- 1675      3D000000 
- 1675      00
- 1676 07a3 C4620500 		vpshufb	ymm15, ymm15, YMMWORD PTR .LC8[rip]	# tmp700, tmp692,
- 1676      3D000000 
- 1676      00
- 1677 07ac C4620D00 		vpshufb	ymm14, ymm14, YMMWORD PTR .LC9[rip]	# tmp702, tmp694,
- 1677      35000000 
- 1677      00
- 1678 07b5 C44105EB 		vpor	ymm15, ymm15, ymm14	# vect_patt.392, tmp700, tmp702
- 1678      FE
- 1679 07ba C58D72E4 		vpsrad	ymm14, ymm4, 31	# vect_patt.395, vect_var_.390,
- 1679      1F
- 1680 07bf C4C10572 		vpsrad	ymm15, ymm15, 5	# vect_patt.394, vect_patt.392,
- 1680      E705
- 1681 07c5 C44105FA 		vpsubd	ymm15, ymm15, ymm14	# vect_patt.396, vect_patt.394, vect_patt.395
- 1681      FE
- 1682 07ca C4620540 		vpmulld	ymm14, ymm15, YMMWORD PTR .LC6[rip]	# vect_patt.397, vect_patt.396,
- 1682      35000000 
- 1682      00
- 1683 07d3 C4C15DFA 		vpsubd	ymm4, ymm4, ymm14	# vect_patt.399, vect_var_.390, vect_patt.397
- 1683      E6
- 1684              	.LBE1075:
- 1685              	.LBE1122:
- 1686              	.LBB1123:
- 1687              	.LBB1092:
- 1688 07d8 C57C283D 		vmovaps	ymm15, YMMWORD PTR .LC10[rip]	# tmp1685,
- 1688      00000000 
- 1689 07e0 C4620592 		vgatherdps	ymm14, DWORD PTR [rsi+ymm4*4], ymm15	# vect_var_.400,, tmp1685
- 1689      34A6
- 1690              	.LBE1092:
- 1691              	.LBE1123:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1692              		.loc 10 20 0
- 1693 07e6 C57C28BC 		vmovaps	ymm15, YMMWORD PTR [rsp+256]	# vect_var_.368, %sfp
- 1693      24000100 
- 1693      00
- 1694 07ef C50458BC 		vaddps	ymm15, ymm15, YMMWORD PTR [rsp+224]	# vect_var_.370, vect_var_.368, %sfp
- 1694      24E00000 
- 1694      00
- 1695 07f8 C4410458 		vaddps	ymm13, ymm15, ymm13	# vect_var_.373, vect_var_.370, vect_var_.371
- 1695      ED
- 1696              	.LBE1150:
- 1697              	.LBE1179:
- 1698              	.LBE1216:
- 1699              	.LBB1217:
- 1700              	.LBB1026:
- 1701              	.LBB998:
- 1702              	.LBB962:
- 1703              	.LBB931:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1704              		.loc 10 14 0
- 1705 07fd C57C283D 		vmovaps	ymm15, YMMWORD PTR .LC10[rip]	# tmp1686,
- 1705      00000000 
- 1706              	.LBE931:
- 1707              	.LBE962:
- 1708              	.LBE998:
- 1709              	.LBE1026:
- 1710              	.LBE1217:
- 1711              	.LBB1218:
- 1712              	.LBB1180:
- 1713              	.LBB1151:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1714              		.loc 10 20 0
- 1715 0805 C4411458 		vaddps	ymm12, ymm13, ymm12	# vect_var_.376, vect_var_.373, vect_var_.374
- 1715      E4
- 1716 080a C4411C58 		vaddps	ymm11, ymm12, ymm11	# vect_var_.389, vect_var_.376, vect_var_.387
- 1716      DB
- 1717              	.LBE1151:
- 1718              	.LBE1180:
- 1719              	.LBE1218:
- 1720              	.LBB1219:
- 1721              	.LBB1027:
- 1722              	.LBB999:
- 1723              	.LBB963:
- 1724              	.LBB964:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1725              		.loc 10 14 0
- 1726 080f C57C2825 		vmovaps	ymm12, YMMWORD PTR .LC10[rip]	# tmp1687,
- 1726      00000000 
- 1727 0817 C4421D92 		vgatherdps	ymm13, DWORD PTR [r8+ymm0*4], ymm12	# vect_var_.423,, tmp1687
- 1727      2C80
- 1728              	.LBE964:
- 1729              	.LBE963:
- 1730              	.LBE999:
- 1731              	.LBE1027:
- 1732              	.LBE1219:
- 1733              	.LBB1220:
- 1734              	.LBB1181:
- 1735              	.LBB1152:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1736              		.loc 10 20 0
- 1737 081d C4412458 		vaddps	ymm14, ymm11, ymm14	# vect_var_.402, vect_var_.389, vect_var_.400
- 1737      F6
- 1738              	.LBE1152:
- 1739              	.LBE1181:
- 1740              	.LBE1220:
- 1741              	.LBB1221:
- 1742              	.LBB1028:
- 1743              	.LBB1000:
- 1744              	.LBB965:
- 1745              	.LBB908:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1746              		.loc 10 14 0
- 1747 0822 C57C281D 		vmovaps	ymm11, YMMWORD PTR .LC10[rip]	# tmp1688,
- 1747      00000000 
- 1748 082a C4622592 		vgatherdps	ymm12, DWORD PTR [rdi+ymm0*4], ymm11	# vect_var_.426,, tmp1688
- 1748      2487
- 1749              	.LBE908:
- 1750              	.LBE965:
- 1751              	.LBE1000:
- 1752              	.LBE1028:
- 1753              	.LBE1221:
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 1754              		.loc 10 31 0
- 1755 0830 488BBC24 		mov	rdi, QWORD PTR [rsp+176]	# vect_pU_other.456, %sfp
- 1755      B0000000 
- 1756              	.LBB1222:
- 1757              	.LBB1182:
- 1758              	.LBB1153:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1759              		.loc 10 20 0
- 1760 0838 C4E20D9C 		vfnmadd132ps	ymm3, ymm14, YMMWORD PTR .LC13[rip]	# vect_ret.405, vect_var_.402,
- 1760      1D000000 
- 1760      00
- 1761              	.LVL101:
- 1762              	.LBE1153:
- 1763              	.LBE1182:
- 1764              	.LBE1222:
- 1765              	.LBB1223:
- 1766              	.LBB1029:
- 1767              	.LBB1001:
- 1768              	.LBB966:
- 1769              	.LBB932:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1770              		.loc 10 14 0
- 1771 0841 C4420592 		vgatherdps	ymm14, DWORD PTR [r9+ymm0*4], ymm15	# vect_var_.421,, tmp1686
- 1771      3481
- 1772              	.LVL102:
- 1773              	.LBE932:
- 1774              	.LBE966:
- 1775              	.LBB967:
- 1776              	.LBB920:
- 1777 0847 C57C283D 		vmovaps	ymm15, YMMWORD PTR .LC10[rip]	# tmp1689,
- 1777      00000000 
- 1778 084f C4420592 		vgatherdps	ymm11, DWORD PTR [r11+ymm0*4], ymm15	# vect_var_.429,, tmp1689
- 1778      1C83
- 1779              	.LVL103:
- 1780              	.LBE920:
- 1781              	.LBE967:
- 1782              	.LBB968:
- 1783              	.LBB947:
- 1784 0855 C5FC2805 		vmovaps	ymm0, YMMWORD PTR .LC10[rip]	# tmp1690,
- 1784      00000000 
- 1785 085d C4227D92 		vgatherdps	ymm15, DWORD PTR [rcx+ymm10*4], ymm0	# vect_var_.432,, tmp1690
- 1785      3C91
- 1786              	.LVL104:
- 1787              	.LBE947:
- 1788              	.LBE968:
- 1789              	.LBB969:
- 1790              	.LBB955:
- 1791 0863 C5FC2805 		vmovaps	ymm0, YMMWORD PTR .LC10[rip]	# tmp1691,
- 1791      00000000 
- 1792 086b C4627D92 		vgatherdps	ymm10, DWORD PTR [rcx+ymm4*4], ymm0	# vect_var_.435,, tmp1691
- 1792      14A1
- 1793              	.LBE955:
- 1794              	.LBE969:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1795              		.loc 10 20 0
- 1796 0871 C4C10C58 		vaddps	ymm4, ymm14, ymm13	# vect_var_.425, vect_var_.421, vect_var_.423
- 1796      E5
- 1797 0876 C4415C58 		vaddps	ymm14, ymm4, ymm12	# vect_var_.428, vect_var_.425, vect_var_.426
- 1797      F4
- 1798 087b C4410C58 		vaddps	ymm13, ymm14, ymm11	# vect_var_.431, vect_var_.428, vect_var_.429
- 1798      EB
- 1799 0880 C4411458 		vaddps	ymm12, ymm13, ymm15	# vect_var_.434, vect_var_.431, vect_var_.432
- 1799      E7
- 1800              	.LBE1001:
- 1801              	.LBE1029:
- 1802              	.LBE1223:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1803              		.loc 10 29 0
- 1804 0885 C54D592D 		vmulpd	ymm13, ymm6, YMMWORD PTR .LC16[rip]	# vect_var_.345, vect_var_.344,
- 1804      00000000 
- 1805              	.LBB1224:
- 1806              	.LBB1183:
- 1807              	.LBB1154:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1808              		.loc 10 21 0
- 1809 088d C57C5AFB 		vcvtps2pd	ymm15, xmm3	# vect_var_.406, vect_ret.405
- 1810 0891 C4E37D19 		vextractf128	xmm3, ymm3, 0x1	# tmp751, vect_ret.405
- 1810      DB01
- 1811 0897 C5855E05 		vdivpd	ymm0, ymm15, YMMWORD PTR .LC14[rip]	# vect_var_.407, vect_var_.406,
- 1811      00000000 
- 1812 089f C5FD5E25 		vdivpd	ymm4, ymm0, YMMWORD PTR .LC14[rip]	# vect_var_.451, vect_var_.407,
- 1812      00000000 
- 1813              	.LBE1154:
- 1814              	.LBE1183:
- 1815              	.LBE1224:
- 1816              	.LBB1225:
- 1817              	.LBB1030:
- 1818              	.LBB1002:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1819              		.loc 10 20 0
- 1820 08a7 C4411C58 		vaddps	ymm11, ymm12, ymm10	# vect_var_.437, vect_var_.434, vect_var_.435
- 1820      DA
- 1821              	.LBE1002:
- 1822              	.LBE1030:
- 1823              	.LBE1225:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1824              		.loc 10 29 0
- 1825 08ac C4417C5A 		vcvtps2pd	ymm10, xmm9	# vect_var_.352, vect_var_.350
- 1825      D1
- 1826 08b1 C51559E2 		vmulpd	ymm12, ymm13, ymm2	# vect_var_.355, vect_var_.345, vect_var_.347
- 1827 08b5 C52D5935 		vmulpd	ymm14, ymm10, YMMWORD PTR .LC15[rip]	# vect_var_.353, vect_var_.352,
- 1827      00000000 
- 1828 08bd C555592D 		vmulpd	ymm13, ymm5, YMMWORD PTR .LC16[rip]	# vect_var_.345, vect_var_.344,
- 1828      00000000 
- 1829 08c5 C4628D98 		vfmadd132pd	ymm12, ymm14, ymm2	# vect_var_.355, vect_var_.353, vect_var_.347
- 1829      E2
- 1830 08ca C4E29D98 		vfmadd132pd	ymm4, ymm12, YMMWORD PTR .LC17[rip]	# vect_var_.451, vect_var_.355,
- 1830      25000000 
- 1830      00
- 1831 08d3 C4437D19 		vextractf128	xmm9, ymm9, 0x1	# tmp757, vect_var_.350
- 1831      C901
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 1832              		.loc 10 31 0
- 1833 08d9 C4E2CD98 		vfmadd132pd	ymm4, ymm6, YMMWORD PTR .LC18[rip]	# vect_var_.451, vect_var_.344,
- 1833      25000000 
- 1833      00
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1834              		.loc 10 29 0
- 1835 08e2 C4417C5A 		vcvtps2pd	ymm10, xmm9	# vect_var_.352, tmp757
- 1835      D1
- 1836 08e7 C51559E1 		vmulpd	ymm12, ymm13, ymm1	# vect_var_.355, vect_var_.345, vect_var_.347
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 1837              		.loc 10 31 0
- 1838 08eb C5FD5AE4 		vcvtpd2ps	xmm4, ymm4	# tmp769, vect_var_.451
- 1839              	.LBB1226:
- 1840              	.LBB1031:
- 1841              	.LBB1003:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 1842              		.loc 10 20 0
- 1843 08ef C4E2259C 		vfnmadd132ps	ymm7, ymm11, YMMWORD PTR .LC13[rip]	# vect_ret.440, vect_var_.437,
- 1843      3D000000 
- 1843      00
- 1844              	.LBE1003:
- 1845              	.LBE1031:
- 1846              	.LBE1226:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1847              		.loc 10 29 0
- 1848 08f8 C52D5935 		vmulpd	ymm14, ymm10, YMMWORD PTR .LC15[rip]	# vect_var_.353, vect_var_.352,
- 1848      00000000 
- 1849              	.LBB1227:
- 1850              	.LBB1184:
- 1851              	.LBB1155:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1852              		.loc 10 21 0
- 1853 0900 C57C5ADB 		vcvtps2pd	ymm11, xmm3	# vect_var_.406, tmp751
- 1854              	.LBE1155:
- 1855              	.LBE1184:
- 1856              	.LBE1227:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1857              		.loc 10 29 0
- 1858 0904 C4628D98 		vfmadd132pd	ymm12, ymm14, ymm1	# vect_var_.355, vect_var_.353, vect_var_.347
- 1858      E1
- 1859              	.LBB1228:
- 1860              	.LBB1185:
- 1861              	.LBB1156:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1862              		.loc 10 21 0
- 1863 0909 C5255E3D 		vdivpd	ymm15, ymm11, YMMWORD PTR .LC14[rip]	# vect_var_.407, vect_var_.406,
- 1863      00000000 
- 1864 0911 C5855E05 		vdivpd	ymm0, ymm15, YMMWORD PTR .LC14[rip]	# vect_var_.451, vect_var_.407,
- 1864      00000000 
- 1865              	.LBE1156:
- 1866              	.LBE1185:
- 1867              	.LBE1228:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 1868              		.loc 10 29 0
- 1869 0919 C4E29D98 		vfmadd132pd	ymm0, ymm12, YMMWORD PTR .LC17[rip]	# vect_var_.451, vect_var_.355,
- 1869      05000000 
- 1869      00
- 1870              	.LBB1229:
- 1871              	.LBB1032:
- 1872              	.LBB1004:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1873              		.loc 10 21 0
- 1874 0922 C57C5AFF 		vcvtps2pd	ymm15, xmm7	# vect_var_.441, vect_ret.440
- 1875              	.LBE1004:
- 1876              	.LBE1032:
- 1877              	.LBE1229:
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 1878              		.loc 10 31 0
- 1879 0926 C4E2D598 		vfmadd132pd	ymm0, ymm5, YMMWORD PTR .LC18[rip]	# vect_var_.451, vect_var_.344,
- 1879      05000000 
- 1879      00
- 1880 092f C5FD5AD8 		vcvtpd2ps	xmm3, ymm0	# tmp770, vect_var_.451
- 1881 0933 C4635D18 		vinsertf128	ymm11, ymm4, xmm3, 0x1	# vect_var_.452, tmp769, tmp770
- 1881      DB01
- 1882 0939 C57C111C 		vmovups	YMMWORD PTR [rdi+rax], ymm11	# MEM[base: vect_pU_other.456_548, index: ivtmp.529_127, offs
- 1882      07
- 1883              		.loc 10 32 0
- 1884 093e 488BBC24 		mov	rdi, QWORD PTR [rsp+184]	# vect_pV_other.464, %sfp
- 1884      B8000000 
- 1885              	.LBB1230:
- 1886              	.LBB1033:
- 1887              	.LBB1005:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1888              		.loc 10 21 0
- 1889 0946 C5855E05 		vdivpd	ymm0, ymm15, YMMWORD PTR .LC14[rip]	# vect_var_.442, vect_var_.441,
- 1889      00000000 
- 1890              	.LBE1005:
- 1891              	.LBE1033:
- 1892              	.LBE1230:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1893              		.loc 10 30 0
- 1894 094e C56D5915 		vmulpd	ymm10, ymm2, YMMWORD PTR .LC19[rip]	# vect_var_.418, vect_var_.347,
- 1894      00000000 
- 1895 0956 C5F55925 		vmulpd	ymm4, ymm1, YMMWORD PTR .LC19[rip]	# vect_var_.418, vect_var_.347,
- 1895      00000000 
- 1896              	.LBB1231:
- 1897              	.LBB1034:
- 1898              	.LBB1006:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1899              		.loc 10 21 0
- 1900 095e C57D5E0D 		vdivpd	ymm9, ymm0, YMMWORD PTR .LC14[rip]	# vect_var_.459, vect_var_.442,
- 1900      00000000 
- 1901              	.LBE1006:
- 1902              	.LBE1034:
- 1903              	.LBE1231:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1904              		.loc 10 30 0
- 1905 0966 C5CD5935 		vmulpd	ymm6, ymm6, YMMWORD PTR .LC20[rip]	# vect_var_.414, vect_var_.344,
- 1905      00000000 
- 1906              	.LBB1232:
- 1907              	.LBB1035:
- 1908              	.LBB1007:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1909              		.loc 10 21 0
- 1910 096e C4E37D19 		vextractf128	xmm7, ymm7, 0x1	# tmp787, vect_ret.440
- 1910      FF01
- 1911              	.LBE1007:
- 1912              	.LBE1035:
- 1913              	.LBE1232:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1914              		.loc 10 30 0
- 1915 0974 C56D59F6 		vmulpd	ymm14, ymm2, ymm6	# vect_var_.420, vect_var_.347, vect_var_.414
- 1916 0978 C5D5592D 		vmulpd	ymm5, ymm5, YMMWORD PTR .LC20[rip]	# vect_var_.414, vect_var_.344,
- 1916      00000000 
- 1917 0980 C462AD9A 		vfmsub132pd	ymm14, ymm10, ymm2	# vect_var_.420, vect_var_.418, vect_var_.347
- 1917      F2
- 1918 0985 C5F559DD 		vmulpd	ymm3, ymm1, ymm5	# vect_var_.420, vect_var_.347, vect_var_.414
- 1919 0989 C4E2DD9A 		vfmsub132pd	ymm3, ymm4, ymm1	# vect_var_.420, vect_var_.418, vect_var_.347
- 1919      D9
- 1920 098e C4628D98 		vfmadd132pd	ymm9, ymm14, YMMWORD PTR .LC21[rip]	# vect_var_.459, vect_var_.420,
- 1920      0D000000 
- 1920      00
- 1921              		.loc 10 32 0
- 1922 0997 C462ED98 		vfmadd132pd	ymm9, ymm2, YMMWORD PTR .LC18[rip]	# vect_var_.459, vect_var_.347,
- 1922      0D000000 
- 1922      00
- 1923              	.LBB1233:
- 1924              	.LBB1036:
- 1925              	.LBB1008:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 1926              		.loc 10 21 0
- 1927 09a0 C5FC5AD7 		vcvtps2pd	ymm2, xmm7	# vect_var_.441, tmp787
- 1928 09a4 C56D5E2D 		vdivpd	ymm13, ymm2, YMMWORD PTR .LC14[rip]	# vect_var_.442, vect_var_.441,
- 1928      00000000 
- 1929 09ac C5155E25 		vdivpd	ymm12, ymm13, YMMWORD PTR .LC14[rip]	# vect_var_.459, vect_var_.442,
- 1929      00000000 
- 1930              	.LBE1008:
- 1931              	.LBE1036:
- 1932              	.LBE1233:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 1933              		.loc 10 30 0
- 1934 09b4 C462E598 		vfmadd132pd	ymm12, ymm3, YMMWORD PTR .LC21[rip]	# vect_var_.459, vect_var_.420,
- 1934      25000000 
- 1934      00
- 1935              		.loc 10 32 0
- 1936 09bd C462F598 		vfmadd132pd	ymm12, ymm1, YMMWORD PTR .LC18[rip]	# vect_var_.459, vect_var_.347,
- 1936      25000000 
- 1936      00
- 1937 09c6 C4C17D5A 		vcvtpd2ps	xmm1, ymm9	# tmp803, vect_var_.459
- 1937      C9
- 1938 09cb C4417D5A 		vcvtpd2ps	xmm11, ymm12	# tmp804, vect_var_.459
- 1938      DC
- 1939 09d0 C4437518 		vinsertf128	ymm15, ymm1, xmm11, 0x1	# vect_var_.460, tmp803, tmp804
- 1939      FB01
- 1940 09d6 C57C113C 		vmovups	YMMWORD PTR [rdi+rax], ymm15	# MEM[base: vect_pV_other.464_532, index: ivtmp.529_127, offs
- 1940      07
- 1941 09db 4883C020 		add	rax, 32	# ivtmp.529,
- 1942 09df 3B9424AC 		cmp	edx, DWORD PTR [rsp+172]	# ivtmp.525, %sfp
- 1942      000000
- 1943 09e6 0F8244FC 		jb	.L69	#,
- 1943      FFFF
- 1944 09ec 448B7C24 		mov	r15d, DWORD PTR [rsp+72]	# ratio_mult_vf.327, %sfp
- 1944      48
- 1945 09f1 8B8C2480 		mov	ecx, DWORD PTR [rsp+128]	# z, %sfp
- 1945      000000
- 1946 09f8 448B6C24 		mov	r13d, DWORD PTR [rsp+76]	# tmp.329, %sfp
- 1946      4C
- 1947 09fd 448BA424 		mov	r12d, DWORD PTR [rsp+132]	# niters.325, %sfp
- 1947      84000000 
- 1948 0a05 4C8B5C24 		mov	r11, QWORD PTR [rsp+24]	# D.73741, %sfp
- 1948      18
- 1949 0a0a 4401F9   		add	ecx, r15d	# z, ratio_mult_vf.327
- 1950 0a0d 4C8B7424 		mov	r14, QWORD PTR [rsp+16]	# D.73741, %sfp
- 1950      10
- 1951 0a12 4529FD   		sub	r13d, r15d	# tmp.329, ratio_mult_vf.327
- 1952 0a15 4539E7   		cmp	r15d, r12d	# ratio_mult_vf.327, niters.325
- 1953 0a18 0F84A802 		je	.L71	#,
- 1953      0000
- 1954              	.LBB1234:
- 1955              	.LBB1037:
- 1956              	.LBB1009:
- 1957              	.LBB970:
- 1958              	.LBB933:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1959              		.loc 10 14 0
- 1960 0a1e 4C8B4C24 		mov	r9, QWORD PTR [rsp+112]	# D.73750, %sfp
- 1960      70
- 1961 0a23 4101CD   		add	r13d, ecx	# D.73734, z
- 1962              	.LBE933:
- 1963              	.LBE970:
- 1964              	.LBE1009:
- 1965              	.LBE1037:
- 1966              	.LBE1234:
- 1967              	.LBB1235:
- 1968              	.LBB1186:
- 1969              	.LBB1157:
- 1970              	.LBB1124:
- 1971              	.LBB1060:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 1972              		.loc 10 13 0
- 1973 0a26 41B81F85 		mov	r8d, 1374389535	# tmp1463,
- 1973      EB51
- 1974 0a2c 48639C24 		movsx	rbx, DWORD PTR [rsp+168]	# y, %sfp
- 1974      A8000000 
- 1975 0a34 4489AC24 		mov	DWORD PTR [rsp+256], r13d	# %sfp, D.73734
- 1975      00010000 
- 1976              	.LBE1060:
- 1977              	.LBE1124:
- 1978              	.LBE1157:
- 1979              	.LBE1186:
- 1980              	.LBE1235:
- 1981              	.LBB1236:
- 1982              	.LBB1038:
- 1983              	.LBB1010:
- 1984              	.LBB971:
- 1985              	.LBB909:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 1986              		.loc 10 14 0
- 1987 0a3c 488B5424 		mov	rdx, QWORD PTR [rsp+104]	# D.73750, %sfp
- 1987      68
- 1988              	.LBE909:
- 1989              	.LBE971:
- 1990              	.LBB972:
- 1991              	.LBB921:
- 1992 0a41 4C8B6424 		mov	r12, QWORD PTR [rsp+96]	# D.73750, %sfp
- 1992      60
- 1993              	.LBE921:
- 1994              	.LBE972:
- 1995              	.LBB973:
- 1996              	.LBB934:
- 1997 0a46 4B8D0489 		lea	rax, [r9+r9*4]	# tmp1465,
- 1998              	.LBE934:
- 1999              	.LBE973:
- 2000              	.LBE1010:
- 2001              	.LBE1038:
- 2002              	.LBE1236:
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 2003              		.loc 10 31 0
- 2004 0a4a 4C8B4C24 		mov	r9, QWORD PTR [rsp+8]	# tmp1512, %sfp
- 2004      08
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 2005              		.loc 10 28 0
- 2006 0a4f 4C8D149B 		lea	r10, [rbx+rbx*4]	# tmp1459,
- 2007 0a53 C5FA103D 		vmovss	xmm7, DWORD PTR .LC22[rip]	# tmp1420,
- 2007      00000000 
- 2008 0a5b 4B8D3492 		lea	rsi, [r10+r10*4]	# tmp1461,
- 2009 0a5f C5FB101D 		vmovsd	xmm3, QWORD PTR .LC23[rip]	# tmp1421,
- 2009      00000000 
- 2010              	.LBB1237:
- 2011              	.LBB1039:
- 2012              	.LBB1011:
- 2013              	.LBB974:
- 2014              	.LBB910:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2015              		.loc 10 14 0
- 2016 0a67 4C8D3C92 		lea	r15, [rdx+rdx*4]	# tmp1470,
- 2017              	.LBE910:
- 2018              	.LBE974:
- 2019              	.LBE1011:
- 2020              	.LBE1039:
- 2021              	.LBE1237:
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 2022              		.loc 10 28 0
- 2023 0a6b 48C1E602 		sal	rsi, 2	# tmp1462,
- 2024 0a6f C57B102D 		vmovsd	xmm13, QWORD PTR .LC24[rip]	# tmp1422,
- 2024      00000000 
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 2025              		.loc 10 31 0
- 2026 0a77 498D1431 		lea	rdx, [r9+rsi]	# tmp1480,
- 2027 0a7b 4889B424 		mov	QWORD PTR [rsp+184], rsi	# %sfp, tmp1462
- 2027      B8000000 
- 2028 0a83 488BB424 		mov	rsi, QWORD PTR [rsp+152]	# D.73741, %sfp
- 2028      98000000 
- 2029              	.LBB1238:
- 2030              	.LBB1040:
- 2031              	.LBB1012:
- 2032              	.LBB975:
- 2033              	.LBB922:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2034              		.loc 10 14 0
- 2035 0a8b 4B8D1CA4 		lea	rbx, [r12+r12*4]	# tmp1475,
- 2036 0a8f 4C8B6424 		mov	r12, QWORD PTR [rsp+88]	# D.73741, %sfp
- 2036      58
- 2037 0a94 48899424 		mov	QWORD PTR [rsp+176], rdx	# %sfp, tmp1480
- 2037      B0000000 
- 2038 0a9c 4C8D149B 		lea	r10, [rbx+rbx*4]	# tmp1477,
- 2039 0aa0 C57B1025 		vmovsd	xmm12, QWORD PTR .LC25[rip]	# tmp1423,
- 2039      00000000 
- 2040              	.LBE922:
- 2041              	.LBE975:
- 2042              	.LBB976:
- 2043              	.LBB935:
- 2044 0aa8 488D3C80 		lea	rdi, [rax+rax*4]	# tmp1467,
- 2045              	.LBE935:
- 2046              	.LBE976:
- 2047              	.LBB977:
- 2048              	.LBB923:
- 2049 0aac 49C1E202 		sal	r10, 2	# tmp1478,
- 2050 0ab0 C57B101D 		vmovsd	xmm11, QWORD PTR .LC26[rip]	# tmp1424,
- 2050      00000000 
- 2051              	.LBE923:
- 2052              	.LBE977:
- 2053              	.LBB978:
- 2054              	.LBB911:
- 2055 0ab8 4F8D2CBF 		lea	r13, [r15+r15*4]	# tmp1472,
- 2056 0abc C57A1015 		vmovss	xmm10, DWORD PTR .LC0[rip]	# tmp1428,
- 2056      00000000 
- 2057              	.LBE911:
- 2058              	.LBE978:
- 2059              	.LBB979:
- 2060              	.LBB936:
- 2061 0ac4 48C1E702 		sal	rdi, 2	# tmp1468,
- 2062 0ac8 C57B100D 		vmovsd	xmm9, QWORD PTR .LC27[rip]	# tmp1425,
- 2062      00000000 
- 2063              	.LBE936:
- 2064              	.LBE979:
- 2065              	.LBB980:
- 2066              	.LBB912:
- 2067 0ad0 49C1E502 		sal	r13, 2	# tmp1473,
- 2068              	.LBE912:
- 2069              	.LBE980:
- 2070              	.LBB981:
- 2071              	.LBB924:
- 2072 0ad4 4C899424 		mov	QWORD PTR [rsp+224], r10	# %sfp, tmp1478
- 2072      E0000000 
- 2073 0adc C57B1005 		vmovsd	xmm8, QWORD PTR .LC28[rip]	# tmp1426,
- 2073      00000000 
- 2074 0ae4 4889B424 		mov	QWORD PTR [rsp+192], rsi	# %sfp, D.73741
- 2074      C0000000 
- 2075 0aec C57B103D 		vmovsd	xmm15, QWORD PTR .LC29[rip]	# tmp1427,
- 2075      00000000 
- 2076 0af4 C5FB1035 		vmovsd	xmm6, QWORD PTR .LC30[rip]	# tmp1435,
- 2076      00000000 
- 2077              	.LVL105:
- 2078 0afc 0F1F4000 		.p2align 4,,10
- 2079              		.p2align 3
- 2080              	.L72:
- 2081              	.LBE924:
- 2082              	.LBE981:
- 2083              	.LBE1012:
- 2084              	.LBE1040:
- 2085              	.LBE1238:
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 2086              		.loc 10 28 0
- 2087 0b00 488B8424 		mov	rax, QWORD PTR [rsp+184]	# tmp1462, %sfp
- 2087      B8000000 
- 2088 0b08 4C63C9   		movsx	r9, ecx	# z, z
- 2089              	.LBB1239:
- 2090              	.LBB1187:
- 2091              	.LBB1158:
- 2092              	.LBB1125:
- 2093              	.LBB1061:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 2094              		.loc 10 13 0
- 2095 0b0b BE640000 		mov	esi, 100	#,
- 2095      00
- 2096              	.LBE1061:
- 2097              	.LBE1125:
- 2098              	.LBE1158:
- 2099              	.LBE1187:
- 2100              	.LBE1239:
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 2101              		.loc 10 28 0
- 2102 0b10 4C8BBC24 		mov	r15, QWORD PTR [rsp+136]	# ivtmp.579, %sfp
- 2102      88000000 
- 2103 0b18 488B9C24 		mov	rbx, QWORD PTR [rsp+144]	# ivtmp.581, %sfp
- 2103      90000000 
- 2104 0b20 4C01C8   		add	rax, r9	# tmp813, z
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 2105              		.loc 10 31 0
- 2106 0b23 4C038C24 		add	r9, QWORD PTR [rsp+176]	# tmp926, %sfp
- 2106      B0000000 
-  28:naive-integrator.hpp ****             auto u = U[x][y][z],  v = V[x][y][z];
- 2107              		.loc 10 28 0
- 2108 0b2b C4C17A10 		vmovss	xmm0, DWORD PTR [r15+rax*4]	# u, MEM[(float[40][100] *)_940]
- 2108      0487
- 2109              	.LVL106:
- 2110 0b31 448D7964 		lea	r15d, [rcx+100]	# D.73740,
- 2111 0b35 C57A1034 		vmovss	xmm14, DWORD PTR [rbx+rax*4]	# v, MEM[(float[40][100] *)_941]
- 2111      83
- 2112              	.LVL107:
- 2113 0b3a 8D5963   		lea	ebx, [rcx+99]	# D.73740,
- 2114              	.LBB1240:
- 2115              	.LBB1188:
- 2116              	.LBB1159:
- 2117              	.LBB1126:
- 2118              	.LBB1062:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 2119              		.loc 10 13 0
- 2120 0b3d 4489F8   		mov	eax, r15d	# tmp1692, D.73740
- 2121 0b40 4589FA   		mov	r10d, r15d	# tmp827, D.73740
- 2122 0b43 41F7E8   		imul	r8d	# tmp1463
- 2123 0b46 41C1FA1F 		sar	r10d, 31	# tmp827,
- 2124              	.LBE1062:
- 2125              	.LBE1126:
- 2126              	.LBB1127:
- 2127              	.LBB1076:
- 2128 0b4a 89D8     		mov	eax, ebx	# tmp1693, D.73740
- 2129              	.LBE1076:
- 2130              	.LBE1127:
- 2131              	.LBE1159:
- 2132              	.LBE1188:
- 2133              	.LBE1240:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 2134              		.loc 10 29 0
- 2135 0b4c C4C10814 		vunpcklps	xmm1, xmm14, xmm14	# v, v, v
- 2135      CE
- 2136 0b51 C5F814E8 		vunpcklps	xmm5, xmm0, xmm0	# u, u, u
- 2137 0b55 C5F85AC1 		vcvtps2pd	xmm0, xmm1	# D.73757, v
- 2138              	.LVL108:
- 2139 0b59 C5F85AE5 		vcvtps2pd	xmm4, xmm5	# D.73757, u
- 2140              	.LBB1241:
- 2141              	.LBB1189:
- 2142              	.LBB1160:
- 2143              	.LBB1128:
- 2144              	.LBB1063:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 2145              		.loc 10 13 0
- 2146 0b5d C1FA05   		sar	edx, 5	# z,
- 2147 0b60 4429D2   		sub	edx, r10d	# z, tmp827
- 2148              	.LBE1063:
- 2149              	.LBE1128:
- 2150              	.LBB1129:
- 2151              	.LBB1077:
- 2152 0b63 4189DA   		mov	r10d, ebx	# tmp833, D.73740
- 2153              	.LBE1077:
- 2154              	.LBE1129:
- 2155              	.LBB1130:
- 2156              	.LBB1064:
- 2157 0b66 0FAFD6   		imul	edx, esi	# tmp828,
- 2158              	.LBE1064:
- 2159              	.LBE1130:
- 2160              	.LBB1131:
- 2161              	.LBB1078:
- 2162 0b69 41C1FA1F 		sar	r10d, 31	# tmp833,
- 2163 0b6d BE640000 		mov	esi, 100	#,
- 2163      00
- 2164              	.LBE1078:
- 2165              	.LBE1131:
- 2166              	.LBB1132:
- 2167              	.LBB1065:
- 2168 0b72 4129D7   		sub	r15d, edx	# z, tmp828
- 2169              	.LVL109:
- 2170              	.LBE1065:
- 2171              	.LBE1132:
- 2172              	.LBB1133:
- 2173              	.LBB1079:
- 2174 0b75 41F7E8   		imul	r8d	# tmp1463
- 2175 0b78 C1FA05   		sar	edx, 5	# z,
- 2176 0b7b 4429D2   		sub	edx, r10d	# z, tmp833
- 2177 0b7e 0FAFD6   		imul	edx, esi	# tmp834,
- 2178 0b81 8D7165   		lea	esi, [rcx+101]	# D.73740,
- 2179              	.LBE1079:
- 2180              	.LBE1133:
- 2181              	.LBE1160:
- 2182              	.LBE1189:
- 2183              	.LBE1241:
- 2184              	.LBE898:
-  27:naive-integrator.hpp ****           for (int z=0;z<NZ;++z) {
- 2185              		.loc 10 27 0
- 2186 0b84 83C101   		add	ecx, 1	# z,
- 2187              	.LVL110:
- 2188              	.LBB1254:
- 2189              	.LBB1242:
- 2190              	.LBB1190:
- 2191              	.LBB1161:
- 2192              	.LBB1134:
- 2193              	.LBB1093:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 2194              		.loc 10 13 0
- 2195 0b87 89F0     		mov	eax, esi	# tmp1694, D.73740
- 2196 0b89 4189F2   		mov	r10d, esi	# tmp839, D.73740
- 2197 0b8c 41C1FA1F 		sar	r10d, 31	# tmp839,
- 2198              	.LBE1093:
- 2199              	.LBE1134:
- 2200              	.LBB1135:
- 2201              	.LBB1080:
- 2202 0b90 29D3     		sub	ebx, edx	# z, tmp834
- 2203              	.LVL111:
- 2204              	.LBE1080:
- 2205              	.LBE1135:
- 2206              	.LBB1136:
- 2207              	.LBB1094:
- 2208 0b92 41F7E8   		imul	r8d	# tmp1463
- 2209 0b95 B8640000 		mov	eax, 100	#,
- 2209      00
- 2210 0b9a C1FA05   		sar	edx, 5	# z,
- 2211 0b9d 4429D2   		sub	edx, r10d	# z, tmp839
- 2212              	.LBE1094:
- 2213              	.LBE1136:
- 2214              	.LBE1161:
- 2215              	.LBE1190:
- 2216              	.LBE1242:
- 2217              	.LBB1243:
- 2218              	.LBB1041:
- 2219              	.LBB1013:
- 2220              	.LBB982:
- 2221              	.LBB948:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2222              		.loc 10 14 0
- 2223 0ba0 4C63D3   		movsx	r10, ebx	# z, z
- 2224              	.LBE948:
- 2225              	.LBE982:
- 2226              	.LBE1013:
- 2227              	.LBE1041:
- 2228              	.LBE1243:
- 2229              	.LBB1244:
- 2230              	.LBB1191:
- 2231              	.LBB1162:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2232              		.loc 10 20 0
- 2233 0ba3 488B9C24 		mov	rbx, QWORD PTR [rsp+192]	# D.73741, %sfp
- 2233      C0000000 
- 2234              	.LBB1137:
- 2235              	.LBB1095:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 2236              		.loc 10 13 0
- 2237 0bab 0FAFD0   		imul	edx, eax	# tmp840,
- 2238              	.LBE1095:
- 2239              	.LBE1137:
- 2240              	.LBE1162:
- 2241              	.LBE1191:
- 2242              	.LBE1244:
- 2243              	.LBB1245:
- 2244              	.LBB1042:
- 2245              	.LBB1014:
- 2246              	.LBB983:
- 2247              	.LBB937:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2248              		.loc 10 14 0
- 2249 0bae 4963C7   		movsx	rax, r15d	# z, z
- 2250              	.LBE937:
- 2251              	.LBE983:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2252              		.loc 10 20 0
- 2253 0bb1 4C8BBC24 		mov	r15, QWORD PTR [rsp+288]	# D.73741, %sfp
- 2253      20010000 
- 2254              	.LBB984:
- 2255              	.LBB949:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2256              		.loc 10 14 0
- 2257 0bb9 4901FA   		add	r10, rdi	# tmp889, tmp1468
- 2258              	.LBE949:
- 2259              	.LBE984:
- 2260              	.LBE1014:
- 2261              	.LBE1042:
- 2262              	.LBE1245:
- 2263              	.LBB1246:
- 2264              	.LBB1192:
- 2265              	.LBB1163:
- 2266              	.LBB1138:
- 2267              	.LBB1096:
-  13:naive-integrator.hpp ****       z = (z+NZ)%NZ;
- 2268              		.loc 10 13 0
- 2269 0bbc 29D6     		sub	esi, edx	# z, tmp840
- 2270              	.LVL112:
- 2271              	.LBE1096:
- 2272              	.LBE1138:
- 2273              	.LBE1163:
- 2274              	.LBE1192:
- 2275              	.LBE1246:
- 2276              	.LBB1247:
- 2277              	.LBB1043:
- 2278              	.LBB1015:
- 2279              	.LBB985:
- 2280              	.LBB938:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2281              		.loc 10 14 0
- 2282 0bbe 488D1407 		lea	rdx, [rdi+rax]	# tmp849,
- 2283              	.LBE938:
- 2284              	.LBE985:
- 2285              	.LBB986:
- 2286              	.LBB956:
- 2287 0bc2 4863F6   		movsx	rsi, esi	# z, z
- 2288              	.LBE956:
- 2289              	.LBE986:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2290              		.loc 10 20 0
- 2291 0bc5 C4C17A10 		vmovss	xmm2, DWORD PTR [r12+rdx*4]	# tmp860, MEM[(float[40][100] *)_964]
- 2291      1494
- 2292              	.LBB987:
- 2293              	.LBB957:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2294              		.loc 10 14 0
- 2295 0bcb 4801FE   		add	rsi, rdi	# tmp899, tmp1468
- 2296              	.LBE957:
- 2297              	.LBE987:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2298              		.loc 10 20 0
- 2299 0bce C4416A58 		vaddss	xmm14, xmm2, DWORD PTR [r15+rdx*4]	# D.73733, tmp860, MEM[(float[40][100] *)_965]
- 2299      3497
- 2300              	.LVL113:
- 2301              	.LBB988:
- 2302              	.LBB913:
-  14:naive-integrator.hpp ****       return ar[x][y][z];
- 2303              		.loc 10 14 0
- 2304 0bd4 4D8D7C05 		lea	r15, [r13+0+rax]	# tmp869,
- 2304      00
- 2305              	.LVL114:
- 2306              	.LBE913:
- 2307              	.LBE988:
- 2308              	.LBB989:
- 2309              	.LBB925:
- 2310 0bd9 48038424 		add	rax, QWORD PTR [rsp+224]	# tmp879, %sfp
- 2310      E0000000 
- 2311              	.LBE925:
- 2312              	.LBE989:
- 2313              	.LBE1015:
- 2314              	.LBE1043:
- 2315              	.LBE1247:
- 2316              	.LBE1254:
-  27:naive-integrator.hpp ****           for (int z=0;z<NZ;++z) {
- 2317              		.loc 10 27 0
- 2318 0be1 3B8C2400 		cmp	ecx, DWORD PTR [rsp+256]	# z, %sfp
- 2318      010000
- 2319              	.LBB1255:
- 2320              	.LBB1248:
- 2321              	.LBB1044:
- 2322              	.LBB1016:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2323              		.loc 10 20 0
- 2324 0be8 C4810A58 		vaddss	xmm2, xmm14, DWORD PTR [r14+r15*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 2324      14BE
- 2325 0bee C4416A58 		vaddss	xmm14, xmm2, DWORD PTR [r14+rax*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 2325      3486
- 2326 0bf4 C4810A58 		vaddss	xmm2, xmm14, DWORD PTR [r14+r10*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 2326      1496
- 2327 0bfa C4416A58 		vaddss	xmm14, xmm2, DWORD PTR [r14+rsi*4]	# D.73733, D.73733, MEM[(float[40][100] *)_966]
- 2327      34B6
- 2328 0c00 C4E2099D 		vfnmadd132ss	xmm1, xmm14, xmm7	# ret, D.73733, tmp1420
- 2328      CF
- 2329              	.LVL115:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 2330              		.loc 10 21 0
- 2331 0c05 C5F014C9 		vunpcklps	xmm1, xmm1, xmm1	# ret, ret, ret
- 2332 0c09 C5F85AD1 		vcvtps2pd	xmm2, xmm1	# D.73757, ret
- 2333 0c0d C56B5EF3 		vdivsd	xmm14, xmm2, xmm3	# D.73757, D.73757, tmp1421
- 2334              	.LBE1016:
- 2335              	.LBE1044:
- 2336              	.LBE1248:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 2337              		.loc 10 30 0
- 2338 0c11 C4C15B59 		vmulsd	xmm2, xmm4, xmm12	# D.73757, D.73757, tmp1423
- 2338      D4
- 2339 0c16 C5FB59D2 		vmulsd	xmm2, xmm0, xmm2	# D.73757, D.73757, D.73757
- 2340              	.LBB1249:
- 2341              	.LBB1045:
- 2342              	.LBB1017:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 2343              		.loc 10 21 0
- 2344 0c1a C58B5ECB 		vdivsd	xmm1, xmm14, xmm3	# D.73757, D.73757, tmp1421
- 2345              	.LBE1017:
- 2346              	.LBE1045:
- 2347              	.LBE1249:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 2348              		.loc 10 30 0
- 2349 0c1e C4417B59 		vmulsd	xmm14, xmm0, xmm13	# D.73757, D.73757, tmp1422
- 2349      F5
- 2350 0c23 C4E2899B 		vfmsub132sd	xmm2, xmm14, xmm0	# D.73757, D.73757, D.73757
- 2350      D0
- 2351              	.LBB1250:
- 2352              	.LBB1193:
- 2353              	.LBB1164:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2354              		.loc 10 20 0
- 2355 0c28 C57A1034 		vmovss	xmm14, DWORD PTR [rbx+rdx*4]	# tmp947, MEM[(float[40][100] *)_949]
- 2355      93
- 2356 0c2d 488B9C24 		mov	rbx, QWORD PTR [rsp+296]	# D.73741, %sfp
- 2356      28010000 
- 2357              	.LVL116:
- 2358              	.LBE1164:
- 2359              	.LBE1193:
- 2360              	.LBE1250:
-  30:naive-integrator.hpp ****             auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
- 2361              		.loc 10 30 0
- 2362 0c35 C4C2E999 		vfmadd132sd	xmm1, xmm2, xmm11	# D.73757, D.73757, tmp1424
- 2362      CB
- 2363              	.LVL117:
- 2364              	.LBB1251:
- 2365              	.LBB1194:
- 2366              	.LBB1165:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2367              		.loc 10 20 0
- 2368 0c3a C58A5814 		vaddss	xmm2, xmm14, DWORD PTR [rbx+rdx*4]	# D.73733, tmp947, MEM[(float[40][100] *)_954]
- 2368      93
- 2369              	.LBE1165:
- 2370              	.LBE1194:
- 2371              	.LBE1251:
- 2372              		.loc 10 32 0
- 2373 0c3f C4E2F999 		vfmadd132sd	xmm1, xmm0, xmm6	# D.73757, D.73757, tmp1435
- 2373      CE
- 2374              	.LVL118:
- 2375              	.LBB1252:
- 2376              	.LBB1195:
- 2377              	.LBB1166:
-  20:naive-integrator.hpp ****       - 6*ar[x][y][z];
- 2378              		.loc 10 20 0
- 2379 0c44 C4016A58 		vaddss	xmm14, xmm2, DWORD PTR [r11+r15*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 2379      34BB
- 2380 0c4a C4C10A58 		vaddss	xmm2, xmm14, DWORD PTR [r11+rax*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 2380      1483
- 2381 0c50 C4016A58 		vaddss	xmm14, xmm2, DWORD PTR [r11+r10*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 2381      3493
- 2382 0c56 C4C10A58 		vaddss	xmm2, xmm14, DWORD PTR [r11+rsi*4]	# D.73733, D.73733, MEM[(float[40][100] *)_961]
- 2382      14B3
- 2383 0c5c C4E251BD 		vfnmadd231ss	xmm2, xmm5, xmm7	# ret, u, tmp1420
- 2383      D7
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 2384              		.loc 10 21 0
- 2385 0c61 C56814F2 		vunpcklps	xmm14, xmm2, xmm2	# ret, ret, ret
- 2386 0c65 C4C1785A 		vcvtps2pd	xmm2, xmm14	# D.73757, ret
- 2386      D6
- 2387 0c6a C56B5EF3 		vdivsd	xmm14, xmm2, xmm3	# D.73757, D.73757, tmp1421
- 2388              	.LBE1166:
- 2389              	.LBE1195:
- 2390              	.LBE1252:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 2391              		.loc 10 29 0
- 2392 0c6e C5AA5CED 		vsubss	xmm5, xmm10, xmm5	# D.73733, tmp1428, u
- 2393              	.LVL119:
- 2394              	.LBB1253:
- 2395              	.LBB1196:
- 2396              	.LBB1167:
-  21:naive-integrator.hpp ****       return ret / dx / dx;
- 2397              		.loc 10 21 0
- 2398 0c72 C58B5ED3 		vdivsd	xmm2, xmm14, xmm3	# D.73757, D.73757, tmp1421
- 2399              	.LBE1167:
- 2400              	.LBE1196:
- 2401              	.LBE1253:
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 2402              		.loc 10 29 0
- 2403 0c76 C55014F5 		vunpcklps	xmm14, xmm5, xmm5	# D.73733, D.73733, D.73733
- 2404 0c7a C4C1785A 		vcvtps2pd	xmm5, xmm14	# D.73757, D.73733
- 2404      EE
- 2405 0c7f C4415359 		vmulsd	xmm14, xmm5, xmm9	# D.73757, D.73757, tmp1425
- 2405      F1
- 2406 0c84 C4C15B59 		vmulsd	xmm5, xmm4, xmm8	# D.73757, D.73757, tmp1426
- 2406      E8
- 2407 0c89 C5D359E8 		vmulsd	xmm5, xmm5, xmm0	# D.73757, D.73757, D.73757
- 2408 0c8d C4E28999 		vfmadd132sd	xmm5, xmm14, xmm0	# D.73757, D.73757, D.73757
- 2408      E8
- 2409              		.loc 10 32 0
- 2410 0c92 C5FB12C1 		vmovddup	xmm0, xmm1	# tmp1737, D.73757
- 2411 0c96 C5F95AC8 		vcvtpd2ps	xmm1, xmm0	# tmp1737, tmp1737
- 2412 0c9a C4A17A11 		vmovss	DWORD PTR _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7V_other[0+r9*4
- 2412      0C8D0000 
- 2412      0000
-  29:naive-integrator.hpp ****             auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
- 2413              		.loc 10 29 0
- 2414 0ca4 C4C2D199 		vfmadd132sd	xmm2, xmm5, xmm15	# D.73757, D.73757, tmp1427
- 2414      D7
-  31:naive-integrator.hpp ****             U_other[x][y][z] = U[x][y][z] + dt*du_dt;
- 2415              		.loc 10 31 0
- 2416 0ca9 C4E2D999 		vfmadd132sd	xmm2, xmm4, xmm6	# D.73757, D.73757, tmp1435
- 2416      D6
- 2417 0cae C5FB12E2 		vmovddup	xmm4, xmm2	# tmp1736, D.73757
- 2418 0cb2 C5F95AD4 		vcvtpd2ps	xmm2, xmm4	# tmp1736, tmp1736
- 2419 0cb6 C4A17A11 		vmovss	DWORD PTR _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7U_other[0+r9*4
- 2419      148D0000 
- 2419      0000
- 2420              	.LBE1255:
-  27:naive-integrator.hpp ****           for (int z=0;z<NZ;++z) {
- 2421              		.loc 10 27 0
- 2422 0cc0 0F853AFE 		jne	.L72	#,
- 2422      FFFF
- 2423              	.LVL120:
- 2424              	.L71:
- 2425              	.LBE897:
-  26:naive-integrator.hpp ****         for (int y=0;y<NY;++y) {
- 2426              		.loc 10 26 0
- 2427 0cc6 838424A8 		add	DWORD PTR [rsp+168], 1	# %sfp,
- 2427      00000001 
- 2428              	.LVL121:
- 2429 0cce 48814424 		add	QWORD PTR [rsp+120], 400	# %sfp,
- 2429      78900100 
- 2429      00
- 2430 0cd7 48834424 		add	QWORD PTR [rsp+80], 100	# %sfp,
- 2430      5064
- 2431 0cdd 83BC24A8 		cmp	DWORD PTR [rsp+168], 40	# %sfp,
- 2431      00000028 
- 2432 0ce5 0F8585F4 		jne	.L79	#,
- 2432      FFFF
- 2433              	.LBE896:
-  25:naive-integrator.hpp ****       for (int x=0;x<NX;++x) {
- 2434              		.loc 10 25 0
- 2435 0ceb 83442404 		add	DWORD PTR [rsp+4], 1	# %sfp,
- 2435      01
- 2436              	.LVL122:
- 2437 0cf0 48818424 		add	QWORD PTR [rsp+136], 16000	# %sfp,
- 2437      88000000 
- 2437      803E0000 
- 2438 0cfc 48814424 		add	QWORD PTR [rsp+64], 16000	# %sfp,
- 2438      40803E00 
- 2438      00
- 2439 0d05 48818424 		add	QWORD PTR [rsp+144], 16000	# %sfp,
- 2439      90000000 
- 2439      803E0000 
- 2440 0d11 837C2404 		cmp	DWORD PTR [rsp+4], 50	# %sfp,
- 2440      32
- 2441 0d16 0F854EF3 		jne	.L68	#,
- 2441      FFFF
- 2442 0d1c 4531F6   		xor	r14d, r14d	# ivtmp.514
- 2443 0d1f C5F877   		vzeroupper
- 2444              	.L78:
- 2445              	.LVL123:
- 2446 0d22 4D8DAE00 		lea	r13, U[r14]	# D.73735,
- 2446      000000
- 2447              	.LBB1260:
- 2448              	.LBB1258:
- 2449              	.LBB1256:
- 2450              		.loc 10 32 0
- 2451 0d29 4531FF   		xor	r15d, r15d	# ivtmp.506
- 2452 0d2c 4D8DA600 		lea	r12, _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7U_other[r14]	# D.73735
- 2452      000000
- 2453              	.LVL124:
- 2454              		.p2align 4,,10
- 2455 0d33 0F1F4400 		.p2align 3
- 2455      00
- 2456              	.L83:
- 2457 0d38 4B8D7C3D 		lea	rdi, [r13+0+r15]	# D.73735,
- 2457      00
- 2458 0d3d BA900100 		mov	edx, 400	#,
- 2458      00
- 2459 0d42 4B8D343C 		lea	rsi, [r12+r15]	# D.73735,
- 2460 0d46 E8000000 		call	memcpy	#
- 2460      00
- 2461              	.LVL125:
- 2462 0d4b 4D8D9F90 		lea	r11, [r15+400]	# tmp1532,
- 2462      010000
- 2463 0d52 BA900100 		mov	edx, 400	#,
- 2463      00
- 2464 0d57 4B8D7C1D 		lea	rdi, [r13+0+r11]	# D.73735,
- 2464      00
- 2465 0d5c 4B8D341C 		lea	rsi, [r12+r11]	# D.73735,
- 2466 0d60 E8000000 		call	memcpy	#
- 2466      00
- 2467              	.LVL126:
- 2468 0d65 498D8F20 		lea	rcx, [r15+800]	# ivtmp.506,
- 2468      030000
- 2469 0d6c BA900100 		mov	edx, 400	#,
- 2469      00
- 2470 0d71 498D7C0D 		lea	rdi, [r13+0+rcx]	# D.73735,
- 2470      00
- 2471 0d76 498D340C 		lea	rsi, [r12+rcx]	# D.73735,
- 2472 0d7a E8000000 		call	memcpy	#
- 2472      00
- 2473              	.LVL127:
- 2474 0d7f 4D8D87B0 		lea	r8, [r15+1200]	# ivtmp.506,
- 2474      040000
- 2475 0d86 BA900100 		mov	edx, 400	#,
- 2475      00
- 2476 0d8b 4B8D7C05 		lea	rdi, [r13+0+r8]	# D.73735,
- 2476      00
- 2477 0d90 4B8D3404 		lea	rsi, [r12+r8]	# D.73735,
- 2478 0d94 E8000000 		call	memcpy	#
- 2478      00
- 2479              	.LVL128:
- 2480 0d99 4D8D8F40 		lea	r9, [r15+1600]	# ivtmp.506,
- 2480      060000
- 2481 0da0 BA900100 		mov	edx, 400	#,
- 2481      00
- 2482 0da5 4B8D7C0D 		lea	rdi, [r13+0+r9]	# D.73735,
- 2482      00
- 2483 0daa 4B8D340C 		lea	rsi, [r12+r9]	# D.73735,
- 2484 0dae E8000000 		call	memcpy	#
- 2484      00
- 2485              	.LVL129:
- 2486 0db3 498D87D0 		lea	rax, [r15+2000]	# ivtmp.506,
- 2486      070000
- 2487 0dba BA900100 		mov	edx, 400	#,
- 2487      00
- 2488 0dbf 498D7C05 		lea	rdi, [r13+0+rax]	# D.73735,
- 2488      00
- 2489 0dc4 498D3404 		lea	rsi, [r12+rax]	# D.73735,
- 2490 0dc8 E8000000 		call	memcpy	#
- 2490      00
- 2491              	.LVL130:
- 2492 0dcd 498D9760 		lea	rdx, [r15+2400]	# ivtmp.506,
- 2492      090000
- 2493 0dd4 498D7C15 		lea	rdi, [r13+0+rdx]	# D.73735,
- 2493      00
- 2494 0dd9 498D3414 		lea	rsi, [r12+rdx]	# D.73735,
- 2495 0ddd BA900100 		mov	edx, 400	#,
- 2495      00
- 2496 0de2 E8000000 		call	memcpy	#
- 2496      00
- 2497              	.LVL131:
- 2498 0de7 4D8D97F0 		lea	r10, [r15+2800]	# ivtmp.506,
- 2498      0A0000
- 2499 0dee BA900100 		mov	edx, 400	#,
- 2499      00
- 2500 0df3 4B8D7C15 		lea	rdi, [r13+0+r10]	# D.73735,
- 2500      00
- 2501 0df8 4981C780 		add	r15, 3200	# ivtmp.506,
- 2501      0C0000
- 2502 0dff 4B8D3414 		lea	rsi, [r12+r10]	# D.73735,
- 2503 0e03 E8000000 		call	memcpy	#
- 2503      00
- 2504              	.LVL132:
- 2505              	.LBE1256:
- 2506              	.LBE1258:
- 2507              	.LBE1260:
- 2508              	.LBE895:
- 2509              	.LBB1262:
- 2510              	.LBB1263:
-  33:naive-integrator.hpp ****           }
-  34:naive-integrator.hpp ****         }
-  35:naive-integrator.hpp ****       }
-  36:naive-integrator.hpp ****       for (int x=0;x<NX;++x) {
-  37:naive-integrator.hpp ****         for (int y=0;y<NY;++y) {
- 2511              		.loc 10 37 0
- 2512 0e08 4981FF80 		cmp	r15, 16000	# ivtmp.506,
- 2512      3E0000
- 2513 0e0f 0F8523FF 		jne	.L83	#,
- 2513      FFFF
- 2514              	.LVL133:
- 2515 0e15 4981C680 		add	r14, 16000	# ivtmp.514,
- 2515      3E0000
- 2516              	.LBE1263:
-  36:naive-integrator.hpp ****       for (int x=0;x<NX;++x) {
- 2517              		.loc 10 36 0
- 2518 0e1c 4981FE00 		cmp	r14, 800000	# ivtmp.514,
- 2518      350C00
- 2519 0e23 0F85F9FE 		jne	.L78	#,
- 2519      FFFF
- 2520 0e29 4531E4   		xor	r12d, r12d	# ivtmp.498
- 2521              	.L82:
- 2522              	.LVL134:
- 2523 0e2c 4D8DBC24 		lea	r15, V[r12]	# D.73735,
- 2523      00000000 
- 2524              	.LBE1262:
- 2525              	.LBB1264:
-  25:naive-integrator.hpp ****       for (int x=0;x<NX;++x) {
- 2526              		.loc 10 25 0
- 2527 0e34 31DB     		xor	ebx, ebx	# ivtmp.490
- 2528 0e36 4D8DAC24 		lea	r13, _ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7V_other[r12]	# D.73735
- 2528      00000000 
- 2529              	.LVL135:
- 2530 0e3e 6690     		.p2align 4,,10
- 2531              		.p2align 3
- 2532              	.L86:
- 2533 0e40 498D3C1F 		lea	rdi, [r15+rbx]	# D.73735,
- 2534 0e44 BA900100 		mov	edx, 400	#,
- 2534      00
- 2535 0e49 498D741D 		lea	rsi, [r13+0+rbx]	# D.73735,
- 2535      00
- 2536 0e4e E8000000 		call	memcpy	#
- 2536      00
- 2537              	.LVL136:
- 2538 0e53 488DB390 		lea	rsi, [rbx+400]	# tmp1531,
- 2538      010000
- 2539 0e5a BA900100 		mov	edx, 400	#,
- 2539      00
- 2540 0e5f 498D3C37 		lea	rdi, [r15+rsi]	# D.73735,
- 2541 0e63 4C8DB320 		lea	r14, [rbx+800]	# ivtmp.490,
- 2541      030000
- 2542 0e6a 498D7435 		lea	rsi, [r13+0+rsi]	# D.73735,
- 2542      00
- 2543 0e6f E8000000 		call	memcpy	#
- 2543      00
- 2544              	.LVL137:
- 2545 0e74 4B8D3C37 		lea	rdi, [r15+r14]	# D.73735,
- 2546 0e78 BA900100 		mov	edx, 400	#,
- 2546      00
- 2547 0e7d 4B8D7435 		lea	rsi, [r13+0+r14]	# D.73735,
- 2547      00
- 2548 0e82 E8000000 		call	memcpy	#
- 2548      00
- 2549              	.LVL138:
- 2550 0e87 4C8D9BB0 		lea	r11, [rbx+1200]	# ivtmp.490,
- 2550      040000
- 2551 0e8e BA900100 		mov	edx, 400	#,
- 2551      00
- 2552 0e93 4B8D3C1F 		lea	rdi, [r15+r11]	# D.73735,
- 2553 0e97 4B8D741D 		lea	rsi, [r13+0+r11]	# D.73735,
- 2553      00
- 2554 0e9c E8000000 		call	memcpy	#
- 2554      00
- 2555              	.LVL139:
- 2556 0ea1 488D8B40 		lea	rcx, [rbx+1600]	# ivtmp.490,
- 2556      060000
- 2557 0ea8 BA900100 		mov	edx, 400	#,
- 2557      00
- 2558 0ead 498D3C0F 		lea	rdi, [r15+rcx]	# D.73735,
- 2559 0eb1 498D740D 		lea	rsi, [r13+0+rcx]	# D.73735,
- 2559      00
- 2560 0eb6 E8000000 		call	memcpy	#
- 2560      00
- 2561              	.LVL140:
- 2562 0ebb 4C8D83D0 		lea	r8, [rbx+2000]	# ivtmp.490,
- 2562      070000
- 2563 0ec2 BA900100 		mov	edx, 400	#,
- 2563      00
- 2564 0ec7 4B8D3C07 		lea	rdi, [r15+r8]	# D.73735,
- 2565 0ecb 4B8D7405 		lea	rsi, [r13+0+r8]	# D.73735,
- 2565      00
- 2566 0ed0 E8000000 		call	memcpy	#
- 2566      00
- 2567              	.LVL141:
- 2568 0ed5 4C8D8B60 		lea	r9, [rbx+2400]	# ivtmp.490,
- 2568      090000
- 2569 0edc BA900100 		mov	edx, 400	#,
- 2569      00
- 2570 0ee1 4B8D3C0F 		lea	rdi, [r15+r9]	# D.73735,
- 2571 0ee5 4B8D740D 		lea	rsi, [r13+0+r9]	# D.73735,
- 2571      00
- 2572 0eea E8000000 		call	memcpy	#
- 2572      00
- 2573              	.LVL142:
- 2574 0eef 488D83F0 		lea	rax, [rbx+2800]	# ivtmp.490,
- 2574      0A0000
- 2575 0ef6 BA900100 		mov	edx, 400	#,
- 2575      00
- 2576 0efb 498D3C07 		lea	rdi, [r15+rax]	# D.73735,
- 2577 0eff 4881C380 		add	rbx, 3200	# ivtmp.490,
- 2577      0C0000
- 2578 0f06 498D7405 		lea	rsi, [r13+0+rax]	# D.73735,
- 2578      00
- 2579 0f0b E8000000 		call	memcpy	#
- 2579      00
- 2580              	.LVL143:
- 2581              	.LBE1264:
- 2582              	.LBB1265:
- 2583              	.LBB1266:
-  38:naive-integrator.hpp ****           for (int z=0;z<NZ;++z) {
-  39:naive-integrator.hpp ****             U[x][y][z]=U_other[x][y][z];
-  40:naive-integrator.hpp ****           }
-  41:naive-integrator.hpp ****         }
-  42:naive-integrator.hpp ****       }
-  43:naive-integrator.hpp ****       for (int x=0;x<NX;++x) {
-  44:naive-integrator.hpp ****         for (int y=0;y<NY;++y) {
- 2584              		.loc 10 44 0
- 2585 0f10 4881FB80 		cmp	rbx, 16000	# ivtmp.490,
- 2585      3E0000
- 2586 0f17 0F8523FF 		jne	.L86	#,
- 2586      FFFF
- 2587              	.LVL144:
- 2588 0f1d 4981C480 		add	r12, 16000	# ivtmp.498,
- 2588      3E0000
- 2589              	.LBE1266:
-  43:naive-integrator.hpp ****       for (int x=0;x<NX;++x) {
- 2590              		.loc 10 43 0
- 2591 0f24 4981FC00 		cmp	r12, 800000	# ivtmp.498,
- 2591      350C00
- 2592 0f2b 0F85FBFE 		jne	.L82	#,
- 2592      FFFF
- 2593              	.LVL145:
- 2594              	.LBE1265:
- 2595              	.LBE894:
- 2596              	.LBE893:
- 2597              	.LBE892:
- 2598              	.LBB1270:
- 2599              	.LBB1271:
- 2600              	.LBB1272:
- 2601              	.LBB1273:
+ 1643              	.LBE885:
+ 1644              	.LBE907:
+ 1645              	.LBE936:
+  74:saya.cpp      **** 	auto u = U[x][y][z],  v = V[x][y][z];
+ 1646              		.loc 8 74 0
+ 1647 0bc9 C4417B10 		vmovsd	xmm14, QWORD PTR U[r15+768+rcx*8]	# u, MEM[symbol: U, base: ivtmp.514_401, index: ivtmp.461
+ 1647      B4CF0000 
+ 1647      0000
+ 1648              	.LVL70:
+ 1649 0bd3 C4C17B10 		vmovsd	xmm0, QWORD PTR V[r15+768+rcx*8]	# v, MEM[symbol: V, base: ivtmp.514_401, index: ivtmp.461_
+ 1649      84CF0000 
+ 1649      0000
+ 1650              	.LVL71:
+ 1651              	.LBB937:
+ 1652              	.LBB754:
+ 1653              	.LBB724:
+ 1654              	.LBB695:
+ 1655              	.LBB634:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1656              		.loc 8 52 0
+ 1657 0bdd C1FA05   		sar	edx, 5	# z,
+ 1658              	.LBE634:
+ 1659              	.LBE695:
+ 1660              	.LBE724:
+ 1661              	.LBE754:
+ 1662              	.LBE937:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1663              		.loc 8 76 0
+ 1664 0be0 C50B5905 		vmulsd	xmm8, xmm14, QWORD PTR .LC24[rip]	# D.36891, u,
+ 1664      00000000 
+ 1665              	.LBB938:
+ 1666              	.LBB755:
+ 1667              	.LBB725:
+ 1668              	.LBB696:
+ 1669              	.LBB635:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1670              		.loc 8 52 0
+ 1671 0be8 4429DA   		sub	edx, r11d	# z, tmp638
+ 1672 0beb 410FAFD1 		imul	edx, r9d	# tmp639,
+ 1673 0bef 448D99C3 		lea	r11d, [rcx+195]	# D.36885,
+ 1673      000000
+ 1674              	.LBE635:
+ 1675              	.LBE696:
+ 1676              	.LBB697:
+ 1677              	.LBB667:
+ 1678 0bf6 41B96400 		mov	r9d, 100	#,
+ 1678      0000
+ 1679              	.LBE667:
+ 1680              	.LBE697:
+ 1681              	.LBE725:
+ 1682              	.LBE755:
+ 1683              	.LBE938:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1684              		.loc 8 76 0
+ 1685 0bfc C57B593D 		vmulsd	xmm15, xmm0, QWORD PTR .LC23[rip]	# D.36891, v,
+ 1685      00000000 
+ 1686              	.LBB939:
+ 1687              	.LBB756:
+ 1688              	.LBB726:
+ 1689              	.LBB698:
+ 1690              	.LBB668:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1691              		.loc 8 52 0
+ 1692 0c04 4589DA   		mov	r10d, r11d	# tmp644, D.36885
+ 1693 0c07 41C1FA1F 		sar	r10d, 31	# tmp644,
+ 1694              	.LBE668:
+ 1695              	.LBE698:
+ 1696              	.LBB699:
+ 1697              	.LBB636:
+ 1698 0c0b 4129D6   		sub	r14d, edx	# z, tmp639
+ 1699              	.LVL72:
+ 1700              	.LBE636:
+ 1701              	.LBE699:
+ 1702              	.LBB700:
+ 1703              	.LBB669:
+ 1704 0c0e 41F7EB   		imul	r11d	# D.36885
+ 1705              	.LVL73:
+ 1706              	.LBE669:
+ 1707              	.LBE700:
+ 1708              	.LBB701:
+ 1709              	.LBB679:
+ 1710 0c11 B81F85EB 		mov	eax, 1374389535	# tmp1085,
+ 1710      51
+ 1711              	.LVL74:
+ 1712              	.LBE679:
+ 1713              	.LBE701:
+ 1714              	.LBE726:
+ 1715              	.LBE756:
+ 1716              	.LBE939:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1717              		.loc 8 76 0
+ 1718 0c16 C5BB59E0 		vmulsd	xmm4, xmm8, xmm0	# D.36891, D.36891, v
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1719              		.loc 8 75 0
+ 1720 0c1a C50B5905 		vmulsd	xmm8, xmm14, QWORD PTR .LC26[rip]	# D.36891, u,
+ 1720      00000000 
+ 1721              	.LBB940:
+ 1722              	.LBB757:
+ 1723              	.LBB727:
+ 1724              	.LBB702:
+ 1725              	.LBB670:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1726              		.loc 8 52 0
+ 1727 0c22 C1FA05   		sar	edx, 5	# z,
+ 1728 0c25 4429D2   		sub	edx, r10d	# z, tmp644
+ 1729 0c28 410FAFD1 		imul	edx, r9d	# tmp645,
+ 1730 0c2c 448D91C5 		lea	r10d, [rcx+197]	# D.36885,
+ 1730      000000
+ 1731              	.LBE670:
+ 1732              	.LBE702:
+ 1733              	.LBB703:
+ 1734              	.LBB680:
+ 1735 0c33 4589D1   		mov	r9d, r10d	# tmp650, D.36885
+ 1736              	.LBE680:
+ 1737              	.LBE703:
+ 1738              	.LBE727:
+ 1739              	.LBE757:
+ 1740              	.LBE940:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1741              		.loc 8 76 0
+ 1742 0c36 C4E2819B 		vfmsub132sd	xmm4, xmm15, xmm0	# D.36891, D.36891, v
+ 1742      E0
+ 1743              	.LBB941:
+ 1744              	.LBB758:
+ 1745              	.LBB728:
+ 1746              	.LBB704:
+ 1747              	.LBB681:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1748              		.loc 8 52 0
+ 1749 0c3b 41C1F91F 		sar	r9d, 31	# tmp650,
+ 1750              	.LBE681:
+ 1751              	.LBE704:
+ 1752              	.LBB705:
+ 1753              	.LBB671:
+ 1754 0c3f 4129D3   		sub	r11d, edx	# z, tmp645
+ 1755              	.LVL75:
+ 1756              	.LBE671:
+ 1757              	.LBE705:
+ 1758              	.LBB706:
+ 1759              	.LBB682:
+ 1760 0c42 41F7EA   		imul	r10d	# D.36885
+ 1761              	.LVL76:
+ 1762 0c45 B8640000 		mov	eax, 100	#,
+ 1762      00
+ 1763              	.LBE682:
+ 1764              	.LBE706:
+ 1765              	.LBE728:
+ 1766              	.LBE758:
+ 1767              	.LBE941:
+ 1768              	.LBB942:
+ 1769              	.LBB908:
+ 1770              	.LBB886:
+ 1771              	.LBB863:
+ 1772              	.LBB834:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1773              		.loc 8 53 0
+ 1774 0c4a 4D63DB   		movsx	r11, r11d	# z, z
+ 1775 0c4d 4901FB   		add	r11, rdi	# tmp702, tmp945
+ 1776              	.LBE834:
+ 1777              	.LBE863:
+ 1778              	.LBE886:
+ 1779              	.LBE908:
+ 1780              	.LBE942:
+ 1781              	.LBB943:
+ 1782              	.LBB759:
+ 1783              	.LBB729:
+ 1784              	.LBB707:
+ 1785              	.LBB683:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1786              		.loc 8 52 0
+ 1787 0c50 C1FA05   		sar	edx, 5	# z,
+ 1788 0c53 4429CA   		sub	edx, r9d	# z, tmp650
+ 1789              	.LBE683:
+ 1790              	.LBE707:
+ 1791              	.LBE729:
+ 1792              	.LBE759:
+ 1793              	.LBE943:
+ 1794              	.LBB944:
+ 1795              	.LBB909:
+ 1796              	.LBB887:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1797              		.loc 8 67 0
+ 1798 0c56 4C8B8C24 		mov	r9, QWORD PTR [rsp+384]	# D.36886, %sfp
+ 1798      80010000 
+ 1799              	.LBE887:
+ 1800              	.LBE909:
+ 1801              	.LBE944:
+ 1802              	.LBB945:
+ 1803              	.LBB760:
+ 1804              	.LBB730:
+ 1805              	.LBB708:
+ 1806              	.LBB684:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1807              		.loc 8 52 0
+ 1808 0c5e 0FAFD0   		imul	edx, eax	# tmp651,
+ 1809              	.LBE684:
+ 1810              	.LBE708:
+ 1811              	.LBE730:
+ 1812              	.LBE760:
+ 1813              	.LBE945:
+ 1814              	.LBB946:
+ 1815              	.LBB910:
+ 1816              	.LBB888:
+ 1817              	.LBB864:
+ 1818              	.LBB807:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1819              		.loc 8 53 0
+ 1820 0c61 4963C6   		movsx	rax, r14d	# z, z
+ 1821              	.LBE807:
+ 1822              	.LBE864:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1823              		.loc 8 64 0
+ 1824 0c64 4C8B7424 		mov	r14, QWORD PTR [rsp+112]	# D.36887, %sfp
+ 1824      70
+ 1825              	.LBE888:
+ 1826              	.LBE910:
+ 1827              	.LBE946:
+ 1828              	.LBB947:
+ 1829              	.LBB761:
+ 1830              	.LBB731:
+ 1831              	.LBB709:
+ 1832              	.LBB685:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 1833              		.loc 8 52 0
+ 1834 0c69 4129D2   		sub	r10d, edx	# z, tmp651
+ 1835              	.LVL77:
+ 1836              	.LBE685:
+ 1837              	.LBE709:
+ 1838              	.LBE731:
+ 1839              	.LBE761:
+ 1840              	.LBE947:
+ 1841              	.LBB948:
+ 1842              	.LBB911:
+ 1843              	.LBB889:
+ 1844              	.LBB865:
+ 1845              	.LBB808:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1846              		.loc 8 53 0
+ 1847 0c6c 488D1407 		lea	rdx, [rdi+rax]	# tmp662,
+ 1848              	.LBE808:
+ 1849              	.LBE865:
+ 1850              	.LBB866:
+ 1851              	.LBB845:
+ 1852 0c70 4D63D2   		movsx	r10, r10d	# z, z
+ 1853              	.LBE845:
+ 1854              	.LBE866:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1855              		.loc 8 64 0
+ 1856 0c73 C4C17B10 		vmovsd	xmm1, QWORD PTR [r13+0+rdx*8]	# tmp673, MEM[(Real[40][100] *)_512]
+ 1856      4CD500
+ 1857              	.LBB867:
+ 1858              	.LBB846:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1859              		.loc 8 53 0
+ 1860 0c7a 4901FA   		add	r10, rdi	# tmp712, tmp945
+ 1861              	.LBE846:
+ 1862              	.LBE867:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1863              		.loc 8 64 0
+ 1864 0c7d C4C17358 		vaddsd	xmm2, xmm1, QWORD PTR [r14+rdx*8]	# D.36891, tmp673, MEM[(Real[40][100] *)_513]
+ 1864      14D6
+ 1865              	.LBB868:
+ 1866              	.LBB794:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 1867              		.loc 8 53 0
+ 1868 0c83 4C8D3403 		lea	r14, [rbx+rax]	# tmp682,
+ 1869              	.LBE794:
+ 1870              	.LBE868:
+ 1871              	.LBB869:
+ 1872              	.LBB825:
+ 1873 0c87 48038424 		add	rax, QWORD PTR [rsp+352]	# tmp692, %sfp
+ 1873      60010000 
+ 1874              	.LBE825:
+ 1875              	.LBE869:
+ 1876              	.LBE889:
+ 1877              	.LBE911:
+ 1878              	.LBE948:
+ 1879              	.LBB949:
+ 1880              	.LBB762:
+ 1881              	.LBB732:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1882              		.loc 8 64 0
+ 1883 0c8f C4C17B10 		vmovsd	xmm1, QWORD PTR [r12+rdx*8]	# tmp749, MEM[(Real[40][100] *)_494]
+ 1883      0CD4
+ 1884              	.LBE732:
+ 1885              	.LBE762:
+ 1886              	.LBE949:
+ 1887              	.LBB950:
+ 1888              	.LBB912:
+ 1889              	.LBB890:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1890              		.loc 8 65 0
+ 1891 0c95 C4816B58 		vaddsd	xmm5, xmm2, QWORD PTR [r8+r14*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_514]
+ 1891      2CF0
+ 1892 0c9b C4C15358 		vaddsd	xmm7, xmm5, QWORD PTR [r8+rax*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_514]
+ 1892      3CC0
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1893              		.loc 8 66 0
+ 1894 0ca1 C4814358 		vaddsd	xmm6, xmm7, QWORD PTR [r8+r11*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_514]
+ 1894      34D8
+ 1895 0ca7 C4014B58 		vaddsd	xmm12, xmm6, QWORD PTR [r8+r10*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_514]
+ 1895      24D0
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1896              		.loc 8 67 0
+ 1897 0cad C442A1BD 		vfnmadd231sd	xmm12, xmm11, QWORD PTR [r9+768+rcx*8]	# ret, tmp1169, MEM[base: _524, index: ivtmp.4
+ 1897      A4C90003 
+ 1897      0000
+ 1898              	.LBE890:
+ 1899              	.LBE912:
+ 1900              	.LBE950:
+ 1901              	.LBB951:
+ 1902              	.LBB763:
+ 1903              	.LBB733:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1904              		.loc 8 64 0
+ 1905 0cb7 4C8B4C24 		mov	r9, QWORD PTR [rsp+120]	# D.36887, %sfp
+ 1905      78
+ 1906              	.LBE733:
+ 1907              	.LBE763:
+ 1908              	.LBE951:
+ 1909              	.LBB952:
+ 1910              	.LBB913:
+ 1911              	.LBB891:
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1912              		.loc 8 68 0
+ 1913 0cbc C51B5E15 		vdivsd	xmm10, xmm12, QWORD PTR .LC22[rip]	# D.36891, ret,
+ 1913      00000000 
+ 1914 0cc4 C52B5E0D 		vdivsd	xmm9, xmm10, QWORD PTR .LC22[rip]	# D.36891, D.36891,
+ 1914      00000000 
+ 1915              	.LBE891:
+ 1916              	.LBE913:
+ 1917              	.LBE952:
+ 1918              	.LBB953:
+ 1919              	.LBB764:
+ 1920              	.LBB734:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1921              		.loc 8 67 0
+ 1922 0ccc C57B101D 		vmovsd	xmm11, QWORD PTR .LC21[rip]	# tmp1171,
+ 1922      00000000 
+ 1923              	.LBE734:
+ 1924              	.LBE764:
+ 1925              	.LBE953:
+  76:saya.cpp      **** 	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+ 1926              		.loc 8 76 0
+ 1927 0cd4 C462D999 		vfmadd132sd	xmm9, xmm4, QWORD PTR .LC25[rip]	# D.36891, D.36891,
+ 1927      0D000000 
+ 1927      00
+ 1928              	.LVL78:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1929              		.loc 8 75 0
+ 1930 0cdd C5BB59E0 		vmulsd	xmm4, xmm8, xmm0	# D.36891, D.36891, v
+ 1931              	.LBB954:
+ 1932              	.LBB765:
+ 1933              	.LBB735:
+  64:saya.cpp      ****     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+ 1934              		.loc 8 64 0
+ 1935 0ce1 C4C17358 		vaddsd	xmm2, xmm1, QWORD PTR [r9+rdx*8]	# D.36891, tmp749, MEM[(Real[40][100] *)_499]
+ 1935      14D1
+ 1936              	.LBE735:
+ 1937              	.LBE765:
+ 1938              	.LBE954:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1939              		.loc 8 75 0
+ 1940 0ce7 C5FB100D 		vmovsd	xmm1, QWORD PTR .LC27[rip]	# tmp1172,
+ 1940      00000000 
+ 1941              	.LBB955:
+ 1942              	.LBB766:
+ 1943              	.LBB736:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1944              		.loc 8 65 0
+ 1945 0cef C4A16B58 		vaddsd	xmm5, xmm2, QWORD PTR [rsi+r14*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_506]
+ 1945      2CF6
+ 1946              	.LBE736:
+ 1947              	.LBE766:
+ 1948              	.LBE955:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1949              		.loc 8 75 0
+ 1950 0cf5 C4C1735C 		vsubsd	xmm2, xmm1, xmm14	# D.36891, tmp1172, u
+ 1950      D6
+ 1951              	.LBB956:
+ 1952              	.LBB767:
+ 1953              	.LBB737:
+  65:saya.cpp      ****     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+ 1954              		.loc 8 65 0
+ 1955 0cfa C5D3583C 		vaddsd	xmm7, xmm5, QWORD PTR [rsi+rax*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_506]
+ 1955      C6
+ 1956              	.LBE737:
+ 1957              	.LBE767:
+ 1958              	.LBE956:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1959              		.loc 8 75 0
+ 1960 0cff C5EB592D 		vmulsd	xmm5, xmm2, QWORD PTR .LC28[rip]	# D.36891, D.36891,
+ 1960      00000000 
+ 1961              	.LBB957:
+ 1962              	.LBB768:
+ 1963              	.LBB738:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1964              		.loc 8 67 0
+ 1965 0d07 488B8424 		mov	rax, QWORD PTR [rsp+320]	# D.36886, %sfp
+ 1965      40010000 
+  66:saya.cpp      ****     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+ 1966              		.loc 8 66 0
+ 1967 0d0f C4A14358 		vaddsd	xmm6, xmm7, QWORD PTR [rsi+r11*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_506]
+ 1967      34DE
+ 1968 0d15 C4214B58 		vaddsd	xmm12, xmm6, QWORD PTR [rsi+r10*8]	# D.36891, D.36891, MEM[(Real[40][100] *)_506]
+ 1968      24D6
+ 1969              	.LBE738:
+ 1970              	.LBE768:
+ 1971              	.LBE957:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1972              		.loc 8 75 0
+ 1973 0d1b C4E2D199 		vfmadd132sd	xmm4, xmm5, xmm0	# D.36891, D.36891, v
+ 1973      E0
+ 1974              	.LBB958:
+ 1975              	.LBB769:
+ 1976              	.LBB739:
+  67:saya.cpp      ****     - 6*ar[x][y][z];
+ 1977              		.loc 8 67 0
+ 1978 0d20 C462A1BD 		vfnmadd231sd	xmm12, xmm11, QWORD PTR [rax+768+rcx*8]	# ret, tmp1171, MEM[base: _435, index: ivtmp.
+ 1978      A4C80003 
+ 1978      0000
+  68:saya.cpp      ****     return ret / dx / dx;
+ 1979              		.loc 8 68 0
+ 1980 0d2a C51B5E15 		vdivsd	xmm10, xmm12, QWORD PTR .LC22[rip]	# D.36891, ret,
+ 1980      00000000 
+ 1981 0d32 C52B5E3D 		vdivsd	xmm15, xmm10, QWORD PTR .LC22[rip]	# D.36891, D.36891,
+ 1981      00000000 
+ 1982              	.LBE739:
+ 1983              	.LBE769:
+ 1984              	.LBE958:
+  75:saya.cpp      **** 	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+ 1985              		.loc 8 75 0
+ 1986 0d3a C462D999 		vfmadd132sd	xmm15, xmm4, QWORD PTR .LC29[rip]	# D.36891, D.36891,
+ 1986      3D000000 
+ 1986      00
+  77:saya.cpp      **** 	U_other[x][y][z] = U[x][y][z] + dt*du_dt;
+ 1987              		.loc 8 77 0
+ 1988 0d43 C4628999 		vfmadd132sd	xmm15, xmm14, QWORD PTR .LC30[rip]	# D.36891, u,
+ 1988      3D000000 
+ 1988      00
+ 1989 0d4c C4417B11 		vmovsd	QWORD PTR U_other[r15+768+rcx*8], xmm15	# MEM[symbol: U_other, base: ivtmp.514_401, index: 
+ 1989      BCCF0000 
+ 1989      0000
+ 1990              		.loc 8 78 0
+ 1991 0d56 C462F999 		vfmadd132sd	xmm9, xmm0, QWORD PTR .LC30[rip]	# D.36891, v,
+ 1991      0D000000 
+ 1991      00
+ 1992              	.LVL79:
+ 1993 0d5f C4417B11 		vmovsd	QWORD PTR V_other[r15+768+rcx*8], xmm9	# MEM[symbol: V_other, base: ivtmp.514_401, index: i
+ 1993      8CCF0000 
+ 1993      0000
+ 1994              	.LVL80:
+ 1995 0d69 4883C101 		add	rcx, 1	# ivtmp.461,
+ 1996              	.LVL81:
+ 1997              	.LBE622:
+  73:saya.cpp      ****       for (int z=0;z<NZ;++z) {
+ 1998              		.loc 8 73 0
+ 1999 0d6d 4883F904 		cmp	rcx, 4	# ivtmp.461,
+ 2000 0d71 0F8529FE 		jne	.L65	#,
+ 2000      FFFF
+ 2001 0d77 4C8BB424 		mov	r14, QWORD PTR [rsp+288]	# ivtmp.518, %sfp
+ 2001      20010000 
+ 2002 0d7f 4981C720 		add	r15, 800	# ivtmp.514,
+ 2002      030000
+ 2003 0d86 4C8BAC24 		mov	r13, QWORD PTR [rsp+272]	# ivtmp.519, %sfp
+ 2003      10010000 
+ 2004              	.LVL82:
+ 2005              	.LBE621:
+  72:saya.cpp      ****     for (int y=0;y<NY;++y) {
+ 2006              		.loc 8 72 0
+ 2007 0d8e 8B7C246C 		mov	edi, DWORD PTR [rsp+108]	# D.36885, %sfp
+ 2008 0d92 4981C620 		add	r14, 800	# ivtmp.518,
+ 2008      030000
+ 2009 0d99 4981C520 		add	r13, 800	# ivtmp.519,
+ 2009      030000
+ 2010 0da0 83FF50   		cmp	edi, 80	# D.36885,
+ 2011 0da3 0F855FF7 		jne	.L70	#,
+ 2011      FFFF
+ 2012 0da9 48810424 		add	QWORD PTR [rsp], 32000	# %sfp,
+ 2012      007D0000 
+ 2013 0db1 48814424 		add	QWORD PTR [rsp+8], 32000	# %sfp,
+ 2013      08007D00 
+ 2013      00
+ 2014 0dba 48814424 		add	QWORD PTR [rsp+16], 32000	# %sfp,
+ 2014      10007D00 
+ 2014      00
+ 2015              	.LBE620:
+  71:saya.cpp      ****   for (int x=0;x<NX;++x) {
+ 2016              		.loc 8 71 0
+ 2017 0dc3 837C2468 		cmp	DWORD PTR [rsp+104], 99	# %sfp,
+ 2017      63
+ 2018 0dc8 7409     		je	.L96	#,
+ 2019              	.LVL83:
+ 2020 0dca 8B4C2468 		mov	ecx, DWORD PTR [rsp+104]	# ivtmp.528, %sfp
+ 2021 0dce E931F6FF 		jmp	.L61	#
+ 2021      FF
+ 2022              	.LVL84:
+ 2023              	.L96:
+ 2024 0dd3 4531E4   		xor	r12d, r12d	# ivtmp.459
+ 2025 0dd6 C5F877   		vzeroupper
+ 2026              	.LVL85:
+ 2027              	.L69:
+ 2028 0dd9 498D9C24 		lea	rbx, U[r12]	# D.36886,
+ 2028      00000000 
+ 2029              	.LBE619:
+  58:saya.cpp      ****   ++global_clock;
+ 2030              		.loc 8 58 0 discriminator 1
+ 2031 0de1 4531FF   		xor	r15d, r15d	# ivtmp.451
+ 2032 0de4 4D8DAC24 		lea	r13, U_other[r12]	# D.36886,
+ 2032      00000000 
+ 2033              	.LVL86:
+ 2034 0dec 0F1F4000 		.p2align 4,,10
+ 2035              		.p2align 3
+ 2036              	.L74:
+ 2037 0df0 4A8D3C3B 		lea	rdi, [rbx+r15]	# D.36886,
+ 2038 0df4 BA200300 		mov	edx, 800	#,
+ 2038      00
+ 2039 0df9 4B8D743D 		lea	rsi, [r13+0+r15]	# D.36886,
+ 2039      00
+ 2040 0dfe E8000000 		call	memcpy	#
+ 2040      00
+ 2041              	.LVL87:
+ 2042 0e03 498D8F20 		lea	rcx, [r15+800]	# tmp974,
+ 2042      030000
+ 2043 0e0a BA200300 		mov	edx, 800	#,
+ 2043      00
+ 2044 0e0f 488D3C0B 		lea	rdi, [rbx+rcx]	# D.36886,
+ 2045 0e13 498D740D 		lea	rsi, [r13+0+rcx]	# D.36886,
+ 2045      00
+ 2046 0e18 E8000000 		call	memcpy	#
+ 2046      00
+ 2047              	.LVL88:
+ 2048 0e1d 498DB740 		lea	rsi, [r15+1600]	# ivtmp.451,
+ 2048      060000
+ 2049 0e24 BA200300 		mov	edx, 800	#,
+ 2049      00
+ 2050 0e29 488D3C33 		lea	rdi, [rbx+rsi]	# D.36886,
+ 2051 0e2d 498D7435 		lea	rsi, [r13+0+rsi]	# D.36886,
+ 2051      00
+ 2052 0e32 E8000000 		call	memcpy	#
+ 2052      00
+ 2053              	.LVL89:
+ 2054 0e37 4D8D8760 		lea	r8, [r15+2400]	# ivtmp.451,
+ 2054      090000
+ 2055 0e3e BA200300 		mov	edx, 800	#,
+ 2055      00
+ 2056 0e43 4A8D3C03 		lea	rdi, [rbx+r8]	# D.36886,
+ 2057 0e47 4B8D7405 		lea	rsi, [r13+0+r8]	# D.36886,
+ 2057      00
+ 2058 0e4c E8000000 		call	memcpy	#
+ 2058      00
+ 2059              	.LVL90:
+ 2060 0e51 498D9780 		lea	rdx, [r15+3200]	# ivtmp.451,
+ 2060      0C0000
+ 2061 0e58 488D3C13 		lea	rdi, [rbx+rdx]	# D.36886,
+ 2062 0e5c 498D7415 		lea	rsi, [r13+0+rdx]	# D.36886,
+ 2062      00
+ 2063 0e61 BA200300 		mov	edx, 800	#,
+ 2063      00
+ 2064 0e66 E8000000 		call	memcpy	#
+ 2064      00
+ 2065              	.LVL91:
+ 2066 0e6b 4D8DB7A0 		lea	r14, [r15+4000]	# ivtmp.451,
+ 2066      0F0000
+ 2067 0e72 BA200300 		mov	edx, 800	#,
+ 2067      00
+ 2068 0e77 4A8D3C33 		lea	rdi, [rbx+r14]	# D.36886,
+ 2069 0e7b 4B8D7435 		lea	rsi, [r13+0+r14]	# D.36886,
+ 2069      00
+ 2070 0e80 E8000000 		call	memcpy	#
+ 2070      00
+ 2071              	.LVL92:
+ 2072 0e85 4D8D9FC0 		lea	r11, [r15+4800]	# ivtmp.451,
+ 2072      120000
+ 2073 0e8c BA200300 		mov	edx, 800	#,
+ 2073      00
+ 2074 0e91 4A8D3C1B 		lea	rdi, [rbx+r11]	# D.36886,
+ 2075 0e95 4B8D741D 		lea	rsi, [r13+0+r11]	# D.36886,
+ 2075      00
+ 2076 0e9a E8000000 		call	memcpy	#
+ 2076      00
+ 2077              	.LVL93:
+ 2078 0e9f 4D8D97E0 		lea	r10, [r15+5600]	# ivtmp.451,
+ 2078      150000
+ 2079 0ea6 BA200300 		mov	edx, 800	#,
+ 2079      00
+ 2080 0eab 4A8D3C13 		lea	rdi, [rbx+r10]	# D.36886,
+ 2081 0eaf 4981C700 		add	r15, 6400	# ivtmp.451,
+ 2081      190000
+ 2082 0eb6 4B8D7415 		lea	rsi, [r13+0+r10]	# D.36886,
+ 2082      00
+ 2083 0ebb E8000000 		call	memcpy	#
+ 2083      00
+ 2084              	.LVL94:
+ 2085              	.LBB959:
+ 2086              	.LBB960:
+  79:saya.cpp      ****       }
+  80:saya.cpp      ****     }
+  81:saya.cpp      ****   }
+  82:saya.cpp      ****   for (int x=0;x<NX;++x) {
+  83:saya.cpp      ****     for (int y=0;y<NY;++y) {
+ 2087              		.loc 8 83 0 discriminator 1
+ 2088 0ec0 4981FF00 		cmp	r15, 32000	# ivtmp.451,
+ 2088      7D0000
+ 2089 0ec7 0F8523FF 		jne	.L74	#,
+ 2089      FFFF
+ 2090              	.LVL95:
+ 2091 0ecd 4981C400 		add	r12, 32000	# ivtmp.459,
+ 2091      7D0000
+ 2092              	.LBE960:
+  82:saya.cpp      ****   for (int x=0;x<NX;++x) {
+ 2093              		.loc 8 82 0
+ 2094 0ed4 4981FC00 		cmp	r12, 1600000	# ivtmp.459,
+ 2094      6A1800
+ 2095 0edb 0F85F8FE 		jne	.L69	#,
+ 2095      FFFF
+ 2096 0ee1 4531E4   		xor	r12d, r12d	# ivtmp.443
+ 2097              	.L73:
+ 2098              	.LVL96:
+ 2099 0ee4 498D9C24 		lea	rbx, V[r12]	# D.36886,
+ 2099      00000000 
+ 2100              	.LBE959:
+ 2101              	.LBB961:
+  71:saya.cpp      ****   for (int x=0;x<NX;++x) {
+ 2102              		.loc 8 71 0 discriminator 1
+ 2103 0eec 4531FF   		xor	r15d, r15d	# ivtmp.435
+ 2104 0eef 4D8DAC24 		lea	r13, V_other[r12]	# D.36886,
+ 2104      00000000 
+ 2105              	.LVL97:
+ 2106 0ef7 660F1F84 		.p2align 4,,10
+ 2106      00000000 
+ 2106      00
+ 2107              		.p2align 3
+ 2108              	.L77:
+ 2109 0f00 4A8D3C3B 		lea	rdi, [rbx+r15]	# D.36886,
+ 2110 0f04 BA200300 		mov	edx, 800	#,
+ 2110      00
+ 2111 0f09 4B8D743D 		lea	rsi, [r13+0+r15]	# D.36886,
+ 2111      00
+ 2112 0f0e E8000000 		call	memcpy	#
+ 2112      00
+ 2113              	.LVL98:
+ 2114 0f13 4D8D8F20 		lea	r9, [r15+800]	# tmp973,
+ 2114      030000
+ 2115 0f1a BA200300 		mov	edx, 800	#,
+ 2115      00
+ 2116 0f1f 4A8D3C0B 		lea	rdi, [rbx+r9]	# D.36886,
+ 2117 0f23 4B8D740D 		lea	rsi, [r13+0+r9]	# D.36886,
+ 2117      00
+ 2118 0f28 E8000000 		call	memcpy	#
+ 2118      00
+ 2119              	.LVL99:
+ 2120 0f2d 498D8740 		lea	rax, [r15+1600]	# ivtmp.435,
+ 2120      060000
+ 2121 0f34 BA200300 		mov	edx, 800	#,
+ 2121      00
+ 2122 0f39 488D3C03 		lea	rdi, [rbx+rax]	# D.36886,
+ 2123 0f3d 498D7405 		lea	rsi, [r13+0+rax]	# D.36886,
+ 2123      00
+ 2124 0f42 E8000000 		call	memcpy	#
+ 2124      00
+ 2125              	.LVL100:
+ 2126 0f47 498D8F60 		lea	rcx, [r15+2400]	# ivtmp.435,
+ 2126      090000
+ 2127 0f4e BA200300 		mov	edx, 800	#,
+ 2127      00
+ 2128 0f53 488D3C0B 		lea	rdi, [rbx+rcx]	# D.36886,
+ 2129 0f57 498D740D 		lea	rsi, [r13+0+rcx]	# D.36886,
+ 2129      00
+ 2130 0f5c E8000000 		call	memcpy	#
+ 2130      00
+ 2131              	.LVL101:
+ 2132 0f61 498DB780 		lea	rsi, [r15+3200]	# ivtmp.435,
+ 2132      0C0000
+ 2133 0f68 BA200300 		mov	edx, 800	#,
+ 2133      00
+ 2134 0f6d 488D3C33 		lea	rdi, [rbx+rsi]	# D.36886,
+ 2135 0f71 498D7435 		lea	rsi, [r13+0+rsi]	# D.36886,
+ 2135      00
+ 2136 0f76 E8000000 		call	memcpy	#
+ 2136      00
+ 2137              	.LVL102:
+ 2138 0f7b 4D8D87A0 		lea	r8, [r15+4000]	# ivtmp.435,
+ 2138      0F0000
+ 2139 0f82 BA200300 		mov	edx, 800	#,
+ 2139      00
+ 2140 0f87 4A8D3C03 		lea	rdi, [rbx+r8]	# D.36886,
+ 2141 0f8b 4B8D7405 		lea	rsi, [r13+0+r8]	# D.36886,
+ 2141      00
+ 2142 0f90 E8000000 		call	memcpy	#
+ 2142      00
+ 2143              	.LVL103:
+ 2144 0f95 498D97C0 		lea	rdx, [r15+4800]	# ivtmp.435,
+ 2144      120000
+ 2145 0f9c 488D3C13 		lea	rdi, [rbx+rdx]	# D.36886,
+ 2146 0fa0 498D7415 		lea	rsi, [r13+0+rdx]	# D.36886,
+ 2146      00
+ 2147 0fa5 BA200300 		mov	edx, 800	#,
+ 2147      00
+ 2148 0faa E8000000 		call	memcpy	#
+ 2148      00
+ 2149              	.LVL104:
+ 2150 0faf 4D8DB7E0 		lea	r14, [r15+5600]	# ivtmp.435,
+ 2150      150000
+ 2151 0fb6 BA200300 		mov	edx, 800	#,
+ 2151      00
+ 2152 0fbb 4A8D3C33 		lea	rdi, [rbx+r14]	# D.36886,
+ 2153 0fbf 4981C700 		add	r15, 6400	# ivtmp.435,
+ 2153      190000
+ 2154 0fc6 4B8D7435 		lea	rsi, [r13+0+r14]	# D.36886,
+ 2154      00
+ 2155 0fcb E8000000 		call	memcpy	#
+ 2155      00
+ 2156              	.LVL105:
+ 2157              	.LBE961:
+ 2158              	.LBB962:
+ 2159              	.LBB963:
+  84:saya.cpp      ****       for (int z=0;z<NZ;++z) {
+  85:saya.cpp      **** 	U[x][y][z]=U_other[x][y][z];
+  86:saya.cpp      ****       }
+  87:saya.cpp      ****     }
+  88:saya.cpp      ****   }
+  89:saya.cpp      ****   for (int x=0;x<NX;++x) {
+  90:saya.cpp      ****     for (int y=0;y<NY;++y) {
+ 2160              		.loc 8 90 0 discriminator 1
+ 2161 0fd0 4981FF00 		cmp	r15, 32000	# ivtmp.435,
+ 2161      7D0000
+ 2162 0fd7 0F8523FF 		jne	.L77	#,
+ 2162      FFFF
+ 2163              	.LVL106:
+ 2164 0fdd 4981C400 		add	r12, 32000	# ivtmp.443,
+ 2164      7D0000
+ 2165              	.LBE963:
+  89:saya.cpp      ****   for (int x=0;x<NX;++x) {
+ 2166              		.loc 8 89 0
+ 2167 0fe4 4981FC00 		cmp	r12, 1600000	# ivtmp.443,
+ 2167      6A1800
+ 2168 0feb 0F85F3FE 		jne	.L73	#,
+ 2168      FFFF
+ 2169              	.LBE962:
+ 2170              	.LBE964:
+  91:saya.cpp      ****       for (int z=0;z<NZ;++z) {
+  92:saya.cpp      **** 	V[x][y][z]=V_other[x][y][z];
+  93:saya.cpp      ****       }
+  94:saya.cpp      ****     }
+  95:saya.cpp      ****   }
+  96:saya.cpp      **** }
+ 2171              		.loc 8 96 0
+ 2172 0ff1 488D65D8 		lea	rsp, [rbp-40]	#,
+ 2173              	.LVL107:
+ 2174 0ff5 5B       		pop	rbx	#
+ 2175 0ff6 415C     		pop	r12	#
+ 2176 0ff8 415D     		pop	r13	#
+ 2177 0ffa 415E     		pop	r14	#
+ 2178 0ffc 415F     		pop	r15	#
+ 2179 0ffe 5D       		pop	rbp	#
+ 2180              		.cfi_def_cfa 7, 8
+ 2181              	.LVL108:
+ 2182 0fff C3       		ret
+ 2183              		.cfi_endproc
+ 2184              	.LFE1476:
+ 2186              		.p2align 4,,15
+ 2187              		.globl	_Z15get_solution_atiiiiRdS_
+ 2189              	_Z15get_solution_atiiiiRdS_:
+ 2190              	.LFB1478:
+  97:saya.cpp      **** 
+  98:saya.cpp      **** void get_solution_at(int t, int x, int y, int z, Real &u, Real &v) {
+ 2191              		.loc 8 98 0
+ 2192              		.cfi_startproc
+ 2193              	.LVL109:
+ 2194 1000 4157     		push	r15	#
+ 2195              		.cfi_def_cfa_offset 16
+ 2196              		.cfi_offset 15, -16
+ 2197 1002 4189D7   		mov	r15d, edx	# y, y
+ 2198 1005 4156     		push	r14	#
+ 2199              		.cfi_def_cfa_offset 24
+ 2200              		.cfi_offset 14, -24
+ 2201 1007 4189CE   		mov	r14d, ecx	# z, z
+ 2202 100a 4155     		push	r13	#
+ 2203              		.cfi_def_cfa_offset 32
+ 2204              		.cfi_offset 13, -32
+ 2205 100c 4189F5   		mov	r13d, esi	# x, x
+ 2206 100f 4154     		push	r12	#
+ 2207              		.cfi_def_cfa_offset 40
+ 2208              		.cfi_offset 12, -40
+ 2209 1011 4D89CC   		mov	r12, r9	# v, v
+ 2210 1014 55       		push	rbp	#
+ 2211              		.cfi_def_cfa_offset 48
+ 2212              		.cfi_offset 6, -48
+ 2213 1015 4C89C5   		mov	rbp, r8	# u, u
+ 2214 1018 53       		push	rbx	#
+ 2215              		.cfi_def_cfa_offset 56
+ 2216              		.cfi_offset 3, -56
+ 2217 1019 89FB     		mov	ebx, edi	# t, t
+ 2218 101b 4883EC08 		sub	rsp, 8	#,
+ 2219              		.cfi_def_cfa_offset 64
+  99:saya.cpp      ****   if(global_clock > t) fill_initial_condition();
+ 2220              		.loc 8 99 0
+ 2221 101f 8B050000 		mov	eax, DWORD PTR global_clock[rip]	# D.36904, global_clock
+ 2221      0000
+ 2222 1025 39F8     		cmp	eax, edi	# D.36904, t
+ 2223 1027 0F8FDB00 		jg	.L107	#,
+ 2223      0000
+ 2224              	.LVL110:
+ 2225              	.L98:
+ 100:saya.cpp      ****   while(global_clock < t) naive_proceed();
+ 2226              		.loc 8 100 0 discriminator 1
+ 2227 102d 39C3     		cmp	ebx, eax	# t, D.36904
+ 2228 102f 7E14     		jle	.L100	#,
+ 2229              		.p2align 4,,10
+ 2230 1031 0F1F8000 		.p2align 3
+ 2230      000000
+ 2231              	.L103:
+ 2232              		.loc 8 100 0 is_stmt 0 discriminator 2
+ 2233 1038 E8000000 		call	_Z13naive_proceedv	#
+ 2233      00
+ 2234              	.LVL111:
+ 2235 103d 3B1D0000 		cmp	ebx, DWORD PTR global_clock[rip]	# t, global_clock
+ 2235      0000
+ 2236 1043 7FF3     		jg	.L103	#,
+ 2237              	.L100:
+ 2238              	.LVL112:
+ 2239              	.LBB965:
+ 2240              	.LBB966:
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2241              		.loc 8 51 0 is_stmt 1
+ 2242 1045 418D4F28 		lea	ecx, [r15+40]	# D.36904,
+ 2243 1049 BA676666 		mov	edx, 1717986919	# tmp118,
+ 2243      66
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2244              		.loc 8 52 0
+ 2245 104e 41BA1F85 		mov	r10d, 1374389535	# tmp127,
+ 2245      EB51
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2246              		.loc 8 51 0
+ 2247 1054 89C8     		mov	eax, ecx	# tmp168, D.36904
+ 2248 1056 89CE     		mov	esi, ecx	# tmp120, D.36904
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2249              		.loc 8 52 0
+ 2250 1058 BB640000 		mov	ebx, 100	#,
+ 2250      00
+ 2251              	.LVL113:
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2252              		.loc 8 51 0
+ 2253 105d F7EA     		imul	edx	# tmp118
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2254              		.loc 8 52 0
+ 2255 105f 458D4E64 		lea	r9d, [r14+100]	# D.36904,
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2256              		.loc 8 51 0
+ 2257 1063 C1FE1F   		sar	esi, 31	# tmp120,
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2258              		.loc 8 52 0
+ 2259 1066 4489C8   		mov	eax, r9d	# tmp169, D.36904
+ 2260 1069 4589CB   		mov	r11d, r9d	# tmp129, D.36904
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2261              		.loc 8 50 0
+ 2262 106c 41BE3200 		mov	r14d, 50	#,
+ 2262      0000
+ 2263              	.LVL114:
+ 2264 1072 458D6D32 		lea	r13d, [r13+50]	# D.36904,
+ 2265              	.LVL115:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2266              		.loc 8 52 0
+ 2267 1076 41C1FB1F 		sar	r11d, 31	# tmp129,
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2268              		.loc 8 51 0
+ 2269 107a C1FA04   		sar	edx, 4	# y,
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2270              		.loc 8 50 0
+ 2271 107d 4589EF   		mov	r15d, r13d	# tmp136, D.36904
+ 2272              	.LVL116:
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2273              		.loc 8 51 0
+ 2274 1080 29F2     		sub	edx, esi	# y, tmp120
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2275              		.loc 8 50 0
+ 2276 1082 41C1FF1F 		sar	r15d, 31	# tmp136,
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2277              		.loc 8 51 0
+ 2278 1086 8D3C92   		lea	edi, [rdx+rdx*4]	# tmp123,
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2279              		.loc 8 52 0
+ 2280 1089 41F7EA   		imul	r10d	# tmp127
+ 2281              	.LVL117:
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2282              		.loc 8 50 0
+ 2283 108c 4489E8   		mov	eax, r13d	# tmp170, D.36904
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2284              		.loc 8 51 0
+ 2285 108f C1E703   		sal	edi, 3	# tmp124,
+ 2286 1092 29F9     		sub	ecx, edi	# y, tmp124
+ 2287              	.LVL118:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2288              		.loc 8 52 0
+ 2289 1094 C1FA05   		sar	edx, 5	# z,
+  51:saya.cpp      ****   y = (y+NY)%NY;
+ 2290              		.loc 8 51 0
+ 2291 1097 4189C8   		mov	r8d, ecx	# y, y
+ 2292              	.LVL119:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2293              		.loc 8 52 0
+ 2294 109a 4429DA   		sub	edx, r11d	# z, tmp129
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2295              		.loc 8 53 0
+ 2296 109d 4D63C0   		movsx	r8, r8d	# y, y
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2297              		.loc 8 52 0
+ 2298 10a0 0FAFD3   		imul	edx, ebx	# tmp130,
+ 2299 10a3 4129D1   		sub	r9d, edx	# z, tmp130
+ 2300              	.LVL120:
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2301              		.loc 8 50 0
+ 2302 10a6 41F7EA   		imul	r10d	# tmp127
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2303              		.loc 8 53 0
+ 2304 10a9 4963F9   		movsx	rdi, r9d	# z, z
+ 2305 10ac 4F8D0C80 		lea	r9, [r8+r8*4]	# tmp145,
+ 2306 10b0 4F8D1489 		lea	r10, [r9+r9*4]	# tmp147,
+ 2307              	.LVL121:
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2308              		.loc 8 50 0
+ 2309 10b4 C1FA04   		sar	edx, 4	# tmp132,
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2310              		.loc 8 53 0
+ 2311 10b7 4E8D1C97 		lea	r11, [rdi+r10*4]	# tmp149,
+ 2312              	.LVL122:
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2313              		.loc 8 50 0
+ 2314 10bb 4429FA   		sub	edx, r15d	# tmp132, tmp136
+ 2315 10be 410FAFD6 		imul	edx, r14d	# tmp137,
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2316              		.loc 8 53 0
+ 2317 10c2 49C1E303 		sal	r11, 3	# tmp151,
+  50:saya.cpp      ****   x = (x+NX)%NX;
+ 2318              		.loc 8 50 0
+ 2319 10c6 4129D5   		sub	r13d, edx	# x, tmp137
+ 2320              	.LVL123:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2321              		.loc 8 53 0
+ 2322 10c9 4963CD   		movsx	rcx, r13d	# D.36905, x
+ 2323 10cc 4869F100 		imul	rsi, rcx, 32000	# D.36905, D.36905,
+ 2323      7D0000
+ 2324              	.LVL124:
+ 2325 10d3 C4A17B10 		vmovsd	xmm0, QWORD PTR U[rsi+r11]	# D.36907, *_23
+ 2325      841E0000 
+ 2325      0000
+ 2326              	.LBE966:
+ 2327              	.LBE965:
+ 101:saya.cpp      ****   u = periodic(U,x,y,z);
+ 2328              		.loc 8 101 0
+ 2329 10dd C5FB1145 		vmovsd	QWORD PTR [rbp+0], xmm0	# *u_11(D), D.36907
+ 2329      00
+ 2330              	.LVL125:
+ 2331              	.LBB967:
+ 2332              	.LBB968:
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2333              		.loc 8 53 0
+ 2334 10e2 C4A17B10 		vmovsd	xmm1, QWORD PTR V[rsi+r11]	# D.36907, *_25
+ 2334      8C1E0000 
+ 2334      0000
+ 2335              	.LBE968:
+ 2336              	.LBE967:
+ 102:saya.cpp      ****   v = periodic(V,x,y,z);
+ 2337              		.loc 8 102 0
+ 2338 10ec C4C17B11 		vmovsd	QWORD PTR [r12], xmm1	# *v_13(D), D.36907
+ 2338      0C24
+ 103:saya.cpp      **** }
+ 2339              		.loc 8 103 0
+ 2340 10f2 4883C408 		add	rsp, 8	#,
+ 2341              		.cfi_remember_state
+ 2342              		.cfi_def_cfa_offset 56
+ 2343 10f6 5B       		pop	rbx	#
+ 2344              		.cfi_def_cfa_offset 48
+ 2345 10f7 5D       		pop	rbp	#
+ 2346              		.cfi_def_cfa_offset 40
+ 2347              	.LVL126:
+ 2348 10f8 415C     		pop	r12	#
+ 2349              		.cfi_def_cfa_offset 32
+ 2350              	.LVL127:
+ 2351 10fa 415D     		pop	r13	#
+ 2352              		.cfi_def_cfa_offset 24
+ 2353 10fc 415E     		pop	r14	#
+ 2354              		.cfi_def_cfa_offset 16
+ 2355 10fe 415F     		pop	r15	#
+ 2356              		.cfi_def_cfa_offset 8
+ 2357 1100 C3       		ret
+ 2358              	.LVL128:
+ 2359              		.p2align 4,,10
+ 2360 1101 0F1F8000 		.p2align 3
+ 2360      000000
+ 2361              	.L107:
+ 2362              		.cfi_restore_state
+  99:saya.cpp      ****   if(global_clock > t) fill_initial_condition();
+ 2363              		.loc 8 99 0 discriminator 1
+ 2364 1108 E8000000 		call	_Z22fill_initial_conditionv	#
+ 2364      00
+ 2365              	.LVL129:
+ 2366 110d 8B050000 		mov	eax, DWORD PTR global_clock[rip]	# D.36904, global_clock
+ 2366      0000
+ 2367 1113 E915FFFF 		jmp	.L98	#
+ 2367      FF
+ 2368              		.cfi_endproc
+ 2369              	.LFE1478:
+ 2371              		.section	.rodata.str1.1,"aMS",@progbits,1
+ 2372              	.LC32:
+ 2373 0000 0A00     		.string	"\n"
+ 2374              		.section	.rodata.str1.8,"aMS",@progbits,1
+ 2375              		.align 8
+ 2376              	.LC34:
+ 2377 0000 62617369 		.string	"basic_string::_S_construct null not valid"
+ 2377      635F7374 
+ 2377      72696E67 
+ 2377      3A3A5F53 
+ 2377      5F636F6E 
+ 2378              		.section	.text.startup,"ax",@progbits
+ 2379              		.p2align 4,,15
+ 2380              		.globl	main
+ 2382              	main:
+ 2383              	.LFB1479:
+ 104:saya.cpp      **** 
+ 105:saya.cpp      **** int main () {
+ 2384              		.loc 8 105 0
+ 2385              		.cfi_startproc
+ 2386              		.cfi_personality 0x3,__gxx_personality_v0
+ 2387              		.cfi_lsda 0x3,.LLSDA1479
+ 2388 0000 55       		push	rbp	#
+ 2389              		.cfi_def_cfa_offset 16
+ 2390              		.cfi_offset 6, -16
+ 2391 0001 4889E5   		mov	rbp, rsp	#,
+ 2392              		.cfi_def_cfa_register 6
+ 2393 0004 4157     		push	r15	#
+ 2394 0006 4156     		push	r14	#
+ 2395 0008 4155     		push	r13	#
+ 2396 000a 4154     		push	r12	#
+ 2397 000c 53       		push	rbx	#
+ 2398              		.cfi_offset 15, -24
+ 2399              		.cfi_offset 14, -32
+ 2400              		.cfi_offset 13, -40
+ 2401              		.cfi_offset 12, -48
+ 2402              		.cfi_offset 3, -56
+ 2403              	.LBB1217:
+ 2404              	.LBB1218:
+ 106:saya.cpp      ****   fill_initial_condition();
+ 107:saya.cpp      **** 
+ 108:saya.cpp      ****   for(int t = 0;;++t){
+ 2405              		.loc 8 108 0
+ 2406 000d 31DB     		xor	ebx, ebx	# t
+ 2407              	.LBE1218:
+ 2408              	.LBE1217:
+ 105:saya.cpp      **** int main () {
+ 2409              		.loc 8 105 0
+ 2410 000f 4883E4E0 		and	rsp, -32	#,
+ 2411 0013 4881ECC0 		sub	rsp, 448	#,
+ 2411      010000
+ 2412              	.LBB1585:
+ 106:saya.cpp      ****   fill_initial_condition();
+ 2413              		.loc 8 106 0
+ 2414 001a E8000000 		call	_Z22fill_initial_conditionv	#
+ 2414      00
+ 2415              	.LVL130:
+ 2416 001f 4C8B3D00 		mov	r15, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+8]	# D.37206, MEM[(co
+ 2416      000000
+ 2417              	.LVL131:
+ 2418              	.L161:
+ 2419              	.LBB1579:
+ 2420              	.LBB1219:
+ 109:saya.cpp      ****     naive_proceed();
+ 2421              		.loc 8 109 0
+ 2422 0026 E8000000 		call	_Z13naive_proceedv	#
+ 2422      00
+ 2423              	.LVL132:
+ 2424              	.LBB1220:
+ 2425              	.LBB1221:
+ 2426              	.LBB1222:
+ 2427              	.LBB1223:
  153:/usr/include/c++/4.8.2/bits/basic_ios.h **** 
  154:/usr/include/c++/4.8.2/bits/basic_ios.h ****       // Flip the internal state on for the proper state bits, then re
  155:/usr/include/c++/4.8.2/bits/basic_ios.h ****       // throws the propagated exception if bit also set in
@@ -5658,97 +5385,84 @@
  454:/usr/include/c++/4.8.2/bits/basic_ios.h ****       basic_ios()
  455:/usr/include/c++/4.8.2/bits/basic_ios.h ****       : ios_base(), _M_tie(0), _M_fill(char_type()), _M_fill_init(false), 
  456:/usr/include/c++/4.8.2/bits/basic_ios.h **** 	_M_streambuf(0), _M_ctype(0), _M_num_put(0), _M_num_get(0)
- 2602              		.loc 3 456 0
- 2603 0f31 488DBC24 		lea	rdi, [rsp+472]	# tmp1319,
- 2603      D8010000 
- 2604              	.LVL146:
- 2605 0f39 E8000000 		call	_ZNSt8ios_baseC2Ev	#
- 2605      00
- 2606              	.LVL147:
- 2607              	.LBE1273:
- 2608              	.LBE1272:
- 2609              	.LBB1277:
- 2610              	.LBB1278:
+ 2428              		.loc 3 456 0
+ 2429 002b 488DBC24 		lea	rdi, [rsp+184]	# tmp181,
+ 2429      B8000000 
+ 2430              	.LVL133:
+ 2431 0033 E8000000 		call	_ZNSt8ios_baseC2Ev	#
+ 2431      00
+ 2432              	.LVL134:
+ 2433 0038 C6842498 		mov	BYTE PTR [rsp+408], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_fill,
+ 2433      01000000 
+ 2434              	.LBE1223:
+ 2435              	.LBE1222:
+ 2436              	.LBB1226:
+ 2437              	.LBB1227:
  385:/usr/include/c++/4.8.2/ostream ****       { this->init(0); }
- 2611              		.loc 1 385 0
- 2612 0f3e 488B1500 		mov	rdx, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+8]	# tmp1829, MEM[(co
- 2612      000000
- 2613 0f45 31F6     		xor	esi, esi	#
- 2614              	.LBE1278:
- 2615              	.LBE1277:
- 2616              	.LBB1282:
- 2617              	.LBB1274:
- 2618              		.loc 3 456 0
- 2619 0f47 C68424B8 		mov	BYTE PTR [rsp+696], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_fill,
- 2619      02000000 
- 2620              	.LBE1274:
- 2621              	.LBE1282:
- 2622              	.LBB1283:
- 2623              	.LBB1279:
+ 2438              		.loc 1 385 0
+ 2439 0040 31F6     		xor	esi, esi	#
+ 2440 0042 488D7C24 		lea	rdi, [rsp+96]	# D.37205,
+ 2440      60
+ 2441 0047 488B0500 		mov	rax, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+16]	# tmp324, MEM[(co
+ 2441      000000
+ 2442              	.LBE1227:
+ 2443              	.LBE1226:
+ 2444              	.LBB1230:
+ 2445              	.LBB1224:
+ 2446              		.loc 3 456 0
+ 2447 004e 48C78424 		mov	QWORD PTR [rsp+184], OFFSET FLAT:_ZTVSt9basic_iosIcSt11char_traitsIcEE+16	# MEM[(struct basic_
+ 2447      B8000000 
+ 2447      00000000 
+ 2448              	.LBE1224:
+ 2449              	.LBE1230:
+ 2450              	.LBB1231:
+ 2451              	.LBB1228:
  385:/usr/include/c++/4.8.2/ostream ****       { this->init(0); }
- 2624              		.loc 1 385 0
- 2625 0f4f 488DBC24 		lea	rdi, [rsp+384]	# D.73742,
- 2625      80010000 
- 2626 0f57 4C8B1500 		mov	r10, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+16]	# tmp1832, MEM[(c
- 2626      000000
- 2627              	.LBE1279:
- 2628              	.LBE1283:
- 2629              	.LBB1284:
- 2630              	.LBB1275:
- 2631              		.loc 3 456 0
- 2632 0f5e 48C78424 		mov	QWORD PTR [rsp+472], OFFSET FLAT:_ZTVSt9basic_iosIcSt11char_traitsIcEE+16	# MEM[(struct basic_
- 2632      D8010000 
- 2632      00000000 
- 2633 0f6a 48C78424 		mov	QWORD PTR [rsp+688], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_tie,
- 2633      B0020000 
- 2633      00000000 
- 2634              	.LBE1275:
- 2635              	.LBE1284:
- 2636              	.LBB1285:
- 2637              	.LBB1280:
+ 2452              		.loc 1 385 0
+ 2453 005a 49037FE8 		add	rdi, QWORD PTR [r15-24]	# D.37205, MEM[(long int *)_87 + -24B]
+ 2454              	.LBE1228:
+ 2455              	.LBE1231:
+ 2456              	.LBB1232:
+ 2457              	.LBB1225:
+ 2458              		.loc 3 456 0
+ 2459 005e C6842499 		mov	BYTE PTR [rsp+409], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_fill_init,
+ 2459      01000000 
+ 2460 0066 48C78424 		mov	QWORD PTR [rsp+400], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_tie,
+ 2460      90010000 
+ 2460      00000000 
+ 2461 0072 48C78424 		mov	QWORD PTR [rsp+416], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_streambuf,
+ 2461      A0010000 
+ 2461      00000000 
+ 2462 007e 48C78424 		mov	QWORD PTR [rsp+424], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_ctype,
+ 2462      A8010000 
+ 2462      00000000 
+ 2463 008a 48C78424 		mov	QWORD PTR [rsp+432], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_num_put,
+ 2463      B0010000 
+ 2463      00000000 
+ 2464 0096 48C78424 		mov	QWORD PTR [rsp+440], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_num_get,
+ 2464      B8010000 
+ 2464      00000000 
+ 2465              	.LVL135:
+ 2466              	.LBE1225:
+ 2467              	.LBE1232:
+ 2468              	.LBB1233:
+ 2469              	.LBB1229:
  385:/usr/include/c++/4.8.2/ostream ****       { this->init(0); }
- 2638              		.loc 1 385 0
- 2639 0f76 48037AE8 		add	rdi, QWORD PTR [rdx-24]	# D.73742, MEM[(long int *)_915 + -24B]
- 2640              	.LBE1280:
- 2641              	.LBE1285:
- 2642              	.LBB1286:
- 2643              	.LBB1276:
- 2644              		.loc 3 456 0
- 2645 0f7a C68424B9 		mov	BYTE PTR [rsp+697], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_fill_init,
- 2645      02000000 
- 2646 0f82 48C78424 		mov	QWORD PTR [rsp+704], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_streambuf,
- 2646      C0020000 
- 2646      00000000 
- 2647 0f8e 48C78424 		mov	QWORD PTR [rsp+712], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_ctype,
- 2647      C8020000 
- 2647      00000000 
- 2648 0f9a 48C78424 		mov	QWORD PTR [rsp+720], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_num_put,
- 2648      D0020000 
- 2648      00000000 
- 2649 0fa6 48C78424 		mov	QWORD PTR [rsp+728], 0	# MEM[(struct basic_ios *)&ostr + 88B]._M_num_get,
- 2649      D8020000 
- 2649      00000000 
- 2650              	.LVL148:
- 2651              	.LBE1276:
- 2652              	.LBE1286:
- 2653              	.LBB1287:
- 2654              	.LBB1281:
- 385:/usr/include/c++/4.8.2/ostream ****       { this->init(0); }
- 2655              		.loc 1 385 0
- 2656 0fb2 48899424 		mov	QWORD PTR [rsp+384], rdx	# MEM[(struct basic_ostream *)&ostr]._vptr.basic_ostream, tmp1829
- 2656      80010000 
- 2657 0fba 4C8917   		mov	QWORD PTR [rdi], r10	# _227->D.29168._vptr.ios_base, tmp1832
- 2658              	.LEHB0:
- 2659 0fbd E8000000 		call	_ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E	#
- 2659      00
- 2660              	.LEHE0:
- 2661              	.LVL149:
- 2662              	.LBE1281:
- 2663              	.LBE1287:
- 2664              	.LBB1288:
- 2665              	.LBB1289:
- 2666              	.LBB1290:
- 2667              	.LBB1291:
+ 2470              		.loc 1 385 0
+ 2471 00a2 4C897C24 		mov	QWORD PTR [rsp+96], r15	# MEM[(struct basic_ostream *)&ostr]._vptr.basic_ostream, D.37206
+ 2471      60
+ 2472 00a7 488907   		mov	QWORD PTR [rdi], rax	# _64->D.29168._vptr.ios_base, tmp324
+ 2473              	.LEHB0:
+ 2474 00aa E8000000 		call	_ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E	#
+ 2474      00
+ 2475              	.LEHE0:
+ 2476              	.LVL136:
+ 2477              	.LBE1229:
+ 2478              	.LBE1233:
+ 2479              	.LBB1234:
+ 2480              	.LBB1235:
+ 2481              	.LBB1236:
+ 2482              	.LBB1237:
  199:/usr/include/c++/4.8.2/streambuf **** 
  200:/usr/include/c++/4.8.2/streambuf ****       // [27.5.2.2.1] locales
  201:/usr/include/c++/4.8.2/streambuf ****       /**
@@ -6017,13 +5731,13 @@
  464:/usr/include/c++/4.8.2/streambuf ****       : _M_in_beg(0), _M_in_cur(0), _M_in_end(0), 
  465:/usr/include/c++/4.8.2/streambuf ****       _M_out_beg(0), _M_out_cur(0), _M_out_end(0),
  466:/usr/include/c++/4.8.2/streambuf ****       _M_buf_locale(locale()) 
- 2668              		.loc 6 466 0
- 2669 0fc2 488DBC24 		lea	rdi, [rsp+448]	# tmp1323,
- 2669      C0010000 
- 2670              	.LBE1291:
- 2671              	.LBE1290:
- 2672              	.LBE1289:
- 2673              	.LBE1288:
+ 2483              		.loc 6 466 0
+ 2484 00af 488DBC24 		lea	rdi, [rsp+160]	# tmp185,
+ 2484      A0000000 
+ 2485              	.LBE1237:
+ 2486              	.LBE1236:
+ 2487              	.LBE1235:
+ 2488              	.LBE1234:
   65:/usr/include/c++/4.8.2/sstream ****     {
   66:/usr/include/c++/4.8.2/sstream ****     public:
   67:/usr/include/c++/4.8.2/sstream ****       // Types:
@@ -6384,692 +6098,341 @@
  422:/usr/include/c++/4.8.2/sstream ****       explicit
  423:/usr/include/c++/4.8.2/sstream ****       basic_ostringstream(ios_base::openmode __mode = ios_base::out)
  424:/usr/include/c++/4.8.2/sstream ****       : __ostream_type(), _M_stringbuf(__mode | ios_base::out)
- 2674              		.loc 4 424 0
- 2675 0fca 48C78424 		mov	QWORD PTR [rsp+384], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+24	# os
- 2675      80010000 
- 2675      00000000 
- 2676 0fd6 48C78424 		mov	QWORD PTR [rsp+472], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+64	# ME
- 2676      D8010000 
- 2676      00000000 
- 2677              	.LVL150:
- 2678              	.LBB1300:
- 2679              	.LBB1297:
- 2680              	.LBB1293:
- 2681              	.LBB1292:
- 2682              		.loc 6 466 0
- 2683 0fe2 48C78424 		mov	QWORD PTR [rsp+392], OFFSET FLAT:_ZTVSt15basic_streambufIcSt11char_traitsIcEE+16	# MEM[(struct
- 2683      88010000 
- 2683      00000000 
- 2684 0fee 48C78424 		mov	QWORD PTR [rsp+400], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_in_beg,
- 2684      90010000 
- 2684      00000000 
- 2685 0ffa 48C78424 		mov	QWORD PTR [rsp+408], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_in_cur,
- 2685      98010000 
- 2685      00000000 
- 2686 1006 48C78424 		mov	QWORD PTR [rsp+416], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_in_end,
- 2686      A0010000 
- 2686      00000000 
- 2687 1012 48C78424 		mov	QWORD PTR [rsp+424], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_out_beg,
- 2687      A8010000 
- 2687      00000000 
- 2688 101e 48C78424 		mov	QWORD PTR [rsp+432], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_out_cur,
- 2688      B0010000 
- 2688      00000000 
- 2689 102a 48C78424 		mov	QWORD PTR [rsp+440], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_out_end,
- 2689      B8010000 
- 2689      00000000 
- 2690 1036 E8000000 		call	_ZNSt6localeC1Ev	#
- 2690      00
- 2691              	.LVL151:
- 2692              	.LBE1292:
- 2693              	.LBE1293:
- 2694              	.LBE1297:
- 2695              	.LBE1300:
+ 2489              		.loc 4 424 0
+ 2490 00b7 48C74424 		mov	QWORD PTR [rsp+96], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+24	# ost
+ 2490      60000000 
+ 2490      00
+ 2491 00c0 48C78424 		mov	QWORD PTR [rsp+184], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+64	# ME
+ 2491      B8000000 
+ 2491      00000000 
+ 2492              	.LVL137:
+ 2493              	.LBB1246:
+ 2494              	.LBB1243:
+ 2495              	.LBB1239:
+ 2496              	.LBB1238:
+ 2497              		.loc 6 466 0
+ 2498 00cc 48C74424 		mov	QWORD PTR [rsp+104], OFFSET FLAT:_ZTVSt15basic_streambufIcSt11char_traitsIcEE+16	# MEM[(struct
+ 2498      68000000 
+ 2498      00
+ 2499 00d5 48C74424 		mov	QWORD PTR [rsp+112], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_in_beg,
+ 2499      70000000 
+ 2499      00
+ 2500 00de 48C74424 		mov	QWORD PTR [rsp+120], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_in_cur,
+ 2500      78000000 
+ 2500      00
+ 2501 00e7 48C78424 		mov	QWORD PTR [rsp+128], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_in_end,
+ 2501      80000000 
+ 2501      00000000 
+ 2502 00f3 48C78424 		mov	QWORD PTR [rsp+136], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_out_beg,
+ 2502      88000000 
+ 2502      00000000 
+ 2503 00ff 48C78424 		mov	QWORD PTR [rsp+144], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_out_cur,
+ 2503      90000000 
+ 2503      00000000 
+ 2504 010b 48C78424 		mov	QWORD PTR [rsp+152], 0	# MEM[(struct basic_streambuf *)&ostr + 8B]._M_out_end,
+ 2504      98000000 
+ 2504      00000000 
+ 2505 0117 E8000000 		call	_ZNSt6localeC1Ev	#
+ 2505      00
+ 2506              	.LVL138:
+ 2507              	.LBE1238:
+ 2508              	.LBE1239:
+ 2509              	.LBE1243:
+ 2510              	.LBE1246:
  425:/usr/include/c++/4.8.2/sstream ****       { this->init(&_M_stringbuf); }
- 2696              		.loc 4 425 0
- 2697 103b 488DBC24 		lea	rdi, [rsp+384]	# tmp1834,
- 2697      80010000 
- 2698              	.LBB1301:
- 2699              	.LBB1298:
+ 2511              		.loc 4 425 0
+ 2512 011c 488D5424 		lea	rdx, [rsp+96]	# tmp326,
+ 2512      60
+ 2513              	.LBB1247:
+ 2514              	.LBB1244:
   99:/usr/include/c++/4.8.2/sstream ****       : __streambuf_type(), _M_mode(__mode), _M_string()
- 2700              		.loc 4 99 0
- 2701 1043 48C78424 		mov	QWORD PTR [rsp+392], OFFSET FLAT:_ZTVSt15basic_stringbufIcSt11char_traitsIcESaIcEE+16	# MEM[(s
- 2701      88010000 
- 2701      00000000 
- 2702 104f C78424C8 		mov	DWORD PTR [rsp+456], 16	# MEM[(struct basic_stringbuf *)&ostr + 8B]._M_mode,
- 2702      01000010 
- 2702      000000
- 2703              	.LVL152:
- 2704              	.LBE1298:
- 2705              	.LBE1301:
- 2706              		.loc 4 425 0
- 2707 105a 488D7708 		lea	rsi, [rdi+8]	# tmp1325,
- 2708              	.LBB1302:
- 2709              	.LBB1299:
- 2710              	.LBB1294:
- 2711              	.LBB1295:
- 2712              	.LBB1296:
+ 2515              		.loc 4 99 0
+ 2516 0121 48C74424 		mov	QWORD PTR [rsp+104], OFFSET FLAT:_ZTVSt15basic_stringbufIcSt11char_traitsIcESaIcEE+16	# MEM[(s
+ 2516      68000000 
+ 2516      00
+ 2517 012a C78424A8 		mov	DWORD PTR [rsp+168], 16	# MEM[(struct basic_stringbuf *)&ostr + 8B]._M_mode,
+ 2517      00000010 
+ 2517      000000
+ 2518              	.LVL139:
+ 2519              	.LBE1244:
+ 2520              	.LBE1247:
+ 2521              		.loc 4 425 0
+ 2522 0135 488D7208 		lea	rsi, [rdx+8]	# tmp187,
+ 2523              	.LBB1248:
+ 2524              	.LBB1245:
+ 2525              	.LBB1240:
+ 2526              	.LBB1241:
+ 2527              	.LBB1242:
  275:/usr/include/c++/4.8.2/bits/basic_string.h **** 	: _Alloc(__a), _M_p(__dat) { }
- 2713              		.loc 5 275 0
- 2714 105e 48C78424 		mov	QWORD PTR [rsp+464], OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# MEM[(struct _Alloc_hid
- 2714      D0010000 
- 2714      00000000 
- 2715              	.LVL153:
- 2716              	.LBE1296:
- 2717              	.LBE1295:
- 2718              	.LBE1294:
- 2719              	.LBE1299:
- 2720              	.LBE1302:
- 2721              		.loc 4 425 0
- 2722 106a 488D7F58 		lea	rdi, [rdi+88]	# tmp1327,
- 2723              	.LEHB1:
- 2724 106e E8000000 		call	_ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E	#
- 2724      00
- 2725              	.LEHE1:
- 2726              	.LVL154:
- 2727              	.LBE1271:
- 2728              	.LBE1270:
-  21:main.cpp      ****     integrator.proceed(1, U,V);
-  22:main.cpp      **** 
-  23:main.cpp      ****     std::ostringstream ostr;
-  24:main.cpp      ****     ostr << t << "\n";
- 2729              		.loc 9 24 0
- 2730 1073 8B3424   		mov	esi, DWORD PTR [rsp]	#, %sfp
- 2731 1076 488DBC24 		lea	rdi, [rsp+384]	# tmp1841,
- 2731      80010000 
- 2732              	.LEHB2:
- 2733 107e E8000000 		call	_ZNSolsEi	#
- 2733      00
- 2734              	.LVL155:
- 2735              	.LBB1309:
- 2736              	.LBB1310:
+ 2528              		.loc 5 275 0
+ 2529 0139 48C78424 		mov	QWORD PTR [rsp+176], OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# MEM[(struct _Alloc_hid
+ 2529      B0000000 
+ 2529      00000000 
+ 2530              	.LVL140:
+ 2531              	.LBE1242:
+ 2532              	.LBE1241:
+ 2533              	.LBE1240:
+ 2534              	.LBE1245:
+ 2535              	.LBE1248:
+ 2536              		.loc 4 425 0
+ 2537 0145 488D7A58 		lea	rdi, [rdx+88]	# tmp189,
+ 2538              	.LEHB1:
+ 2539 0149 E8000000 		call	_ZNSt9basic_iosIcSt11char_traitsIcEE4initEPSt15basic_streambufIcS1_E	#
+ 2539      00
+ 2540              	.LEHE1:
+ 2541              	.LVL141:
+ 2542              	.LBE1221:
+ 2543              	.LBE1220:
+ 110:saya.cpp      **** 
+ 111:saya.cpp      ****     std::ostringstream ostr;
+ 112:saya.cpp      ****     ostr << global_clock << "\n";
+ 2544              		.loc 8 112 0
+ 2545 014e 8B350000 		mov	esi, DWORD PTR global_clock[rip]	#, global_clock
+ 2545      0000
+ 2546 0154 488D7C24 		lea	rdi, [rsp+96]	# tmp331,
+ 2546      60
+ 2547              	.LEHB2:
+ 2548 0159 E8000000 		call	_ZNSolsEi	#
+ 2548      00
+ 2549              	.LVL142:
+ 2550              	.LBB1254:
+ 2551              	.LBB1255:
  535:/usr/include/c++/4.8.2/ostream **** 	__ostream_insert(__out, __s,
- 2737              		.loc 1 535 0
- 2738 1083 BA010000 		mov	edx, 1	#,
- 2738      00
- 2739 1088 BE000000 		mov	esi, OFFSET FLAT:.LC32	#,
- 2739      00
- 2740 108d 4889C7   		mov	rdi, rax	#, D.73732
- 2741 1090 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l	#
- 2741      00
- 2742              	.LVL156:
- 2743 1095 4531ED   		xor	r13d, r13d	# ivtmp.482
- 2744              	.L90:
- 2745              	.LVL157:
- 2746              	.LBE1310:
- 2747              	.LBE1309:
- 2748              	.LBB1311:
- 2749              	.LBB1312:
- 2750              	.LBB1313:
-  25:main.cpp      ****     for (int y=0;y<NY;++y) {
-  26:main.cpp      ****       for (int z=0;z<NZ;++z) {
-  27:main.cpp      ****         ostr<<int(std::floor(10*U[NX/2][y][z]));
- 2751              		.loc 9 27 0 discriminator 1
- 2752 1098 C5FA103D 		vmovss	xmm7, DWORD PTR .LC33[rip]	# tmp1847,
- 2752      00000000 
- 2753 10a0 C4C14259 		vmulss	xmm0, xmm7, DWORD PTR U[r13+400000]	# D.73733, tmp1847, MEM[symbol: U, base: ivtmp.482_109,
- 2753      85000000 
- 2753      00
- 2754              	.LBB1314:
- 2755              	.LBB1315:
- 2756              		.file 11 "/usr/include/c++/4.8.2/cmath"
-   1:/usr/include/c++/4.8.2/cmath **** // -*- C++ -*- C forwarding header.
-   2:/usr/include/c++/4.8.2/cmath **** 
-   3:/usr/include/c++/4.8.2/cmath **** // Copyright (C) 1997-2013 Free Software Foundation, Inc.
-   4:/usr/include/c++/4.8.2/cmath **** //
-   5:/usr/include/c++/4.8.2/cmath **** // This file is part of the GNU ISO C++ Library.  This library is free
-   6:/usr/include/c++/4.8.2/cmath **** // software; you can redistribute it and/or modify it under the
-   7:/usr/include/c++/4.8.2/cmath **** // terms of the GNU General Public License as published by the
-   8:/usr/include/c++/4.8.2/cmath **** // Free Software Foundation; either version 3, or (at your option)
-   9:/usr/include/c++/4.8.2/cmath **** // any later version.
-  10:/usr/include/c++/4.8.2/cmath **** 
-  11:/usr/include/c++/4.8.2/cmath **** // This library is distributed in the hope that it will be useful,
-  12:/usr/include/c++/4.8.2/cmath **** // but WITHOUT ANY WARRANTY; without even the implied warranty of
-  13:/usr/include/c++/4.8.2/cmath **** // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  14:/usr/include/c++/4.8.2/cmath **** // GNU General Public License for more details.
-  15:/usr/include/c++/4.8.2/cmath **** 
-  16:/usr/include/c++/4.8.2/cmath **** // Under Section 7 of GPL version 3, you are granted additional
-  17:/usr/include/c++/4.8.2/cmath **** // permissions described in the GCC Runtime Library Exception, version
-  18:/usr/include/c++/4.8.2/cmath **** // 3.1, as published by the Free Software Foundation.
-  19:/usr/include/c++/4.8.2/cmath **** 
-  20:/usr/include/c++/4.8.2/cmath **** // You should have received a copy of the GNU General Public License and
-  21:/usr/include/c++/4.8.2/cmath **** // a copy of the GCC Runtime Library Exception along with this program;
-  22:/usr/include/c++/4.8.2/cmath **** // see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
-  23:/usr/include/c++/4.8.2/cmath **** // <http://www.gnu.org/licenses/>.
-  24:/usr/include/c++/4.8.2/cmath **** 
-  25:/usr/include/c++/4.8.2/cmath **** /** @file include/cmath
-  26:/usr/include/c++/4.8.2/cmath ****  *  This is a Standard C++ Library file.  You should @c \#include this file
-  27:/usr/include/c++/4.8.2/cmath ****  *  in your programs, rather than any of the @a *.h implementation files.
-  28:/usr/include/c++/4.8.2/cmath ****  *
-  29:/usr/include/c++/4.8.2/cmath ****  *  This is the C++ version of the Standard C Library header @c math.h,
-  30:/usr/include/c++/4.8.2/cmath ****  *  and its contents are (mostly) the same as that header, but are all
-  31:/usr/include/c++/4.8.2/cmath ****  *  contained in the namespace @c std (except for names which are defined
-  32:/usr/include/c++/4.8.2/cmath ****  *  as macros in C).
-  33:/usr/include/c++/4.8.2/cmath ****  */
-  34:/usr/include/c++/4.8.2/cmath **** 
-  35:/usr/include/c++/4.8.2/cmath **** //
-  36:/usr/include/c++/4.8.2/cmath **** // ISO C++ 14882: 26.5  C library
-  37:/usr/include/c++/4.8.2/cmath **** //
-  38:/usr/include/c++/4.8.2/cmath **** 
-  39:/usr/include/c++/4.8.2/cmath **** #pragma GCC system_header
-  40:/usr/include/c++/4.8.2/cmath **** 
-  41:/usr/include/c++/4.8.2/cmath **** #include <bits/c++config.h>
-  42:/usr/include/c++/4.8.2/cmath **** #include <bits/cpp_type_traits.h>
-  43:/usr/include/c++/4.8.2/cmath **** #include <ext/type_traits.h>
-  44:/usr/include/c++/4.8.2/cmath **** #include <math.h>
-  45:/usr/include/c++/4.8.2/cmath **** 
-  46:/usr/include/c++/4.8.2/cmath **** #ifndef _GLIBCXX_CMATH
-  47:/usr/include/c++/4.8.2/cmath **** #define _GLIBCXX_CMATH 1
-  48:/usr/include/c++/4.8.2/cmath **** 
-  49:/usr/include/c++/4.8.2/cmath **** // Get rid of those macros defined in <math.h> in lieu of real functions.
-  50:/usr/include/c++/4.8.2/cmath **** #undef abs
-  51:/usr/include/c++/4.8.2/cmath **** #undef div
-  52:/usr/include/c++/4.8.2/cmath **** #undef acos
-  53:/usr/include/c++/4.8.2/cmath **** #undef asin
-  54:/usr/include/c++/4.8.2/cmath **** #undef atan
-  55:/usr/include/c++/4.8.2/cmath **** #undef atan2
-  56:/usr/include/c++/4.8.2/cmath **** #undef ceil
-  57:/usr/include/c++/4.8.2/cmath **** #undef cos
-  58:/usr/include/c++/4.8.2/cmath **** #undef cosh
-  59:/usr/include/c++/4.8.2/cmath **** #undef exp
-  60:/usr/include/c++/4.8.2/cmath **** #undef fabs
-  61:/usr/include/c++/4.8.2/cmath **** #undef floor
-  62:/usr/include/c++/4.8.2/cmath **** #undef fmod
-  63:/usr/include/c++/4.8.2/cmath **** #undef frexp
-  64:/usr/include/c++/4.8.2/cmath **** #undef ldexp
-  65:/usr/include/c++/4.8.2/cmath **** #undef log
-  66:/usr/include/c++/4.8.2/cmath **** #undef log10
-  67:/usr/include/c++/4.8.2/cmath **** #undef modf
-  68:/usr/include/c++/4.8.2/cmath **** #undef pow
-  69:/usr/include/c++/4.8.2/cmath **** #undef sin
-  70:/usr/include/c++/4.8.2/cmath **** #undef sinh
-  71:/usr/include/c++/4.8.2/cmath **** #undef sqrt
-  72:/usr/include/c++/4.8.2/cmath **** #undef tan
-  73:/usr/include/c++/4.8.2/cmath **** #undef tanh
-  74:/usr/include/c++/4.8.2/cmath **** 
-  75:/usr/include/c++/4.8.2/cmath **** namespace std _GLIBCXX_VISIBILITY(default)
-  76:/usr/include/c++/4.8.2/cmath **** {
-  77:/usr/include/c++/4.8.2/cmath **** _GLIBCXX_BEGIN_NAMESPACE_VERSION
-  78:/usr/include/c++/4.8.2/cmath **** 
-  79:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
-  80:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR double
-  81:/usr/include/c++/4.8.2/cmath ****   abs(double __x)
-  82:/usr/include/c++/4.8.2/cmath ****   { return __builtin_fabs(__x); }
-  83:/usr/include/c++/4.8.2/cmath **** #endif
-  84:/usr/include/c++/4.8.2/cmath **** 
-  85:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
-  86:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
-  87:/usr/include/c++/4.8.2/cmath ****   abs(float __x)
-  88:/usr/include/c++/4.8.2/cmath ****   { return __builtin_fabsf(__x); }
-  89:/usr/include/c++/4.8.2/cmath **** 
-  90:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
-  91:/usr/include/c++/4.8.2/cmath ****   abs(long double __x)
-  92:/usr/include/c++/4.8.2/cmath ****   { return __builtin_fabsl(__x); }
-  93:/usr/include/c++/4.8.2/cmath **** #endif
-  94:/usr/include/c++/4.8.2/cmath **** 
-  95:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
-  96:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
-  97:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
-  98:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
-  99:/usr/include/c++/4.8.2/cmath ****     abs(_Tp __x)
- 100:/usr/include/c++/4.8.2/cmath ****     { return __builtin_fabs(__x); }
- 101:/usr/include/c++/4.8.2/cmath **** 
- 102:/usr/include/c++/4.8.2/cmath ****   using ::acos;
- 103:/usr/include/c++/4.8.2/cmath **** 
- 104:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 105:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 106:/usr/include/c++/4.8.2/cmath ****   acos(float __x)
- 107:/usr/include/c++/4.8.2/cmath ****   { return __builtin_acosf(__x); }
- 108:/usr/include/c++/4.8.2/cmath **** 
- 109:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 110:/usr/include/c++/4.8.2/cmath ****   acos(long double __x)
- 111:/usr/include/c++/4.8.2/cmath ****   { return __builtin_acosl(__x); }
- 112:/usr/include/c++/4.8.2/cmath **** #endif
- 113:/usr/include/c++/4.8.2/cmath **** 
- 114:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 115:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 116:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value, 
- 117:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 118:/usr/include/c++/4.8.2/cmath ****     acos(_Tp __x)
- 119:/usr/include/c++/4.8.2/cmath ****     { return __builtin_acos(__x); }
- 120:/usr/include/c++/4.8.2/cmath **** 
- 121:/usr/include/c++/4.8.2/cmath ****   using ::asin;
- 122:/usr/include/c++/4.8.2/cmath **** 
- 123:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 124:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 125:/usr/include/c++/4.8.2/cmath ****   asin(float __x)
- 126:/usr/include/c++/4.8.2/cmath ****   { return __builtin_asinf(__x); }
- 127:/usr/include/c++/4.8.2/cmath **** 
- 128:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 129:/usr/include/c++/4.8.2/cmath ****   asin(long double __x)
- 130:/usr/include/c++/4.8.2/cmath ****   { return __builtin_asinl(__x); }
- 131:/usr/include/c++/4.8.2/cmath **** #endif
- 132:/usr/include/c++/4.8.2/cmath **** 
- 133:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 134:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 135:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
- 136:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 137:/usr/include/c++/4.8.2/cmath ****     asin(_Tp __x)
- 138:/usr/include/c++/4.8.2/cmath ****     { return __builtin_asin(__x); }
- 139:/usr/include/c++/4.8.2/cmath **** 
- 140:/usr/include/c++/4.8.2/cmath ****   using ::atan;
- 141:/usr/include/c++/4.8.2/cmath **** 
- 142:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 143:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 144:/usr/include/c++/4.8.2/cmath ****   atan(float __x)
- 145:/usr/include/c++/4.8.2/cmath ****   { return __builtin_atanf(__x); }
- 146:/usr/include/c++/4.8.2/cmath **** 
- 147:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 148:/usr/include/c++/4.8.2/cmath ****   atan(long double __x)
- 149:/usr/include/c++/4.8.2/cmath ****   { return __builtin_atanl(__x); }
- 150:/usr/include/c++/4.8.2/cmath **** #endif
- 151:/usr/include/c++/4.8.2/cmath **** 
- 152:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 153:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 154:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
- 155:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 156:/usr/include/c++/4.8.2/cmath ****     atan(_Tp __x)
- 157:/usr/include/c++/4.8.2/cmath ****     { return __builtin_atan(__x); }
- 158:/usr/include/c++/4.8.2/cmath **** 
- 159:/usr/include/c++/4.8.2/cmath ****   using ::atan2;
- 160:/usr/include/c++/4.8.2/cmath **** 
- 161:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 162:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 163:/usr/include/c++/4.8.2/cmath ****   atan2(float __y, float __x)
- 164:/usr/include/c++/4.8.2/cmath ****   { return __builtin_atan2f(__y, __x); }
- 165:/usr/include/c++/4.8.2/cmath **** 
- 166:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 167:/usr/include/c++/4.8.2/cmath ****   atan2(long double __y, long double __x)
- 168:/usr/include/c++/4.8.2/cmath ****   { return __builtin_atan2l(__y, __x); }
- 169:/usr/include/c++/4.8.2/cmath **** #endif
- 170:/usr/include/c++/4.8.2/cmath **** 
- 171:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp, typename _Up>
- 172:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 173:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__promote_2<_Tp, _Up>::__type
- 174:/usr/include/c++/4.8.2/cmath ****     atan2(_Tp __y, _Up __x)
- 175:/usr/include/c++/4.8.2/cmath ****     {
- 176:/usr/include/c++/4.8.2/cmath ****       typedef typename __gnu_cxx::__promote_2<_Tp, _Up>::__type __type;
- 177:/usr/include/c++/4.8.2/cmath ****       return atan2(__type(__y), __type(__x));
- 178:/usr/include/c++/4.8.2/cmath ****     }
- 179:/usr/include/c++/4.8.2/cmath **** 
- 180:/usr/include/c++/4.8.2/cmath ****   using ::ceil;
- 181:/usr/include/c++/4.8.2/cmath **** 
- 182:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 183:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 184:/usr/include/c++/4.8.2/cmath ****   ceil(float __x)
- 185:/usr/include/c++/4.8.2/cmath ****   { return __builtin_ceilf(__x); }
- 186:/usr/include/c++/4.8.2/cmath **** 
- 187:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 188:/usr/include/c++/4.8.2/cmath ****   ceil(long double __x)
- 189:/usr/include/c++/4.8.2/cmath ****   { return __builtin_ceill(__x); }
- 190:/usr/include/c++/4.8.2/cmath **** #endif
- 191:/usr/include/c++/4.8.2/cmath **** 
- 192:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 193:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 194:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value, 
- 195:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 196:/usr/include/c++/4.8.2/cmath ****     ceil(_Tp __x)
- 197:/usr/include/c++/4.8.2/cmath ****     { return __builtin_ceil(__x); }
- 198:/usr/include/c++/4.8.2/cmath **** 
- 199:/usr/include/c++/4.8.2/cmath ****   using ::cos;
- 200:/usr/include/c++/4.8.2/cmath **** 
- 201:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 202:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 203:/usr/include/c++/4.8.2/cmath ****   cos(float __x)
- 204:/usr/include/c++/4.8.2/cmath ****   { return __builtin_cosf(__x); }
- 205:/usr/include/c++/4.8.2/cmath **** 
- 206:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 207:/usr/include/c++/4.8.2/cmath ****   cos(long double __x)
- 208:/usr/include/c++/4.8.2/cmath ****   { return __builtin_cosl(__x); }
- 209:/usr/include/c++/4.8.2/cmath **** #endif
- 210:/usr/include/c++/4.8.2/cmath **** 
- 211:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 212:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 213:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
- 214:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 215:/usr/include/c++/4.8.2/cmath ****     cos(_Tp __x)
- 216:/usr/include/c++/4.8.2/cmath ****     { return __builtin_cos(__x); }
- 217:/usr/include/c++/4.8.2/cmath **** 
- 218:/usr/include/c++/4.8.2/cmath ****   using ::cosh;
- 219:/usr/include/c++/4.8.2/cmath **** 
- 220:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 221:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 222:/usr/include/c++/4.8.2/cmath ****   cosh(float __x)
- 223:/usr/include/c++/4.8.2/cmath ****   { return __builtin_coshf(__x); }
- 224:/usr/include/c++/4.8.2/cmath **** 
- 225:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 226:/usr/include/c++/4.8.2/cmath ****   cosh(long double __x)
- 227:/usr/include/c++/4.8.2/cmath ****   { return __builtin_coshl(__x); }
- 228:/usr/include/c++/4.8.2/cmath **** #endif
- 229:/usr/include/c++/4.8.2/cmath **** 
- 230:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 231:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 232:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
- 233:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 234:/usr/include/c++/4.8.2/cmath ****     cosh(_Tp __x)
- 235:/usr/include/c++/4.8.2/cmath ****     { return __builtin_cosh(__x); }
- 236:/usr/include/c++/4.8.2/cmath **** 
- 237:/usr/include/c++/4.8.2/cmath ****   using ::exp;
- 238:/usr/include/c++/4.8.2/cmath **** 
- 239:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 240:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 241:/usr/include/c++/4.8.2/cmath ****   exp(float __x)
- 242:/usr/include/c++/4.8.2/cmath ****   { return __builtin_expf(__x); }
- 243:/usr/include/c++/4.8.2/cmath **** 
- 244:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 245:/usr/include/c++/4.8.2/cmath ****   exp(long double __x)
- 246:/usr/include/c++/4.8.2/cmath ****   { return __builtin_expl(__x); }
- 247:/usr/include/c++/4.8.2/cmath **** #endif
- 248:/usr/include/c++/4.8.2/cmath **** 
- 249:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 250:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 251:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
- 252:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 253:/usr/include/c++/4.8.2/cmath ****     exp(_Tp __x)
- 254:/usr/include/c++/4.8.2/cmath ****     { return __builtin_exp(__x); }
- 255:/usr/include/c++/4.8.2/cmath **** 
- 256:/usr/include/c++/4.8.2/cmath ****   using ::fabs;
- 257:/usr/include/c++/4.8.2/cmath **** 
- 258:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 259:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 260:/usr/include/c++/4.8.2/cmath ****   fabs(float __x)
- 261:/usr/include/c++/4.8.2/cmath ****   { return __builtin_fabsf(__x); }
- 262:/usr/include/c++/4.8.2/cmath **** 
- 263:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR long double
- 264:/usr/include/c++/4.8.2/cmath ****   fabs(long double __x)
- 265:/usr/include/c++/4.8.2/cmath ****   { return __builtin_fabsl(__x); }
- 266:/usr/include/c++/4.8.2/cmath **** #endif
- 267:/usr/include/c++/4.8.2/cmath **** 
- 268:/usr/include/c++/4.8.2/cmath ****   template<typename _Tp>
- 269:/usr/include/c++/4.8.2/cmath ****     inline _GLIBCXX_CONSTEXPR
- 270:/usr/include/c++/4.8.2/cmath ****     typename __gnu_cxx::__enable_if<__is_integer<_Tp>::__value,
- 271:/usr/include/c++/4.8.2/cmath ****                                     double>::__type
- 272:/usr/include/c++/4.8.2/cmath ****     fabs(_Tp __x)
- 273:/usr/include/c++/4.8.2/cmath ****     { return __builtin_fabs(__x); }
- 274:/usr/include/c++/4.8.2/cmath **** 
- 275:/usr/include/c++/4.8.2/cmath ****   using ::floor;
- 276:/usr/include/c++/4.8.2/cmath **** 
- 277:/usr/include/c++/4.8.2/cmath **** #ifndef __CORRECT_ISO_CPP_MATH_H_PROTO
- 278:/usr/include/c++/4.8.2/cmath ****   inline _GLIBCXX_CONSTEXPR float
- 279:/usr/include/c++/4.8.2/cmath ****   floor(float __x)
- 280:/usr/include/c++/4.8.2/cmath ****   { return __builtin_floorf(__x); }
- 2757              		.loc 11 280 0 discriminator 1
- 2758 10a9 E8000000 		call	floorf	#
- 2758      00
- 2759              	.LVL158:
- 2760              	.LBE1315:
- 2761              	.LBE1314:
- 2762              		.loc 9 27 0 discriminator 1
- 2763 10ae 488DBC24 		lea	rdi, [rsp+384]	# tmp1848,
- 2763      80010000 
- 2764 10b6 C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2765 10ba E8000000 		call	_ZNSolsEi	#
- 2765      00
- 2766              	.LVL159:
- 2767              		.loc 9 27 0 is_stmt 0
- 2768 10bf C5FA101D 		vmovss	xmm3, DWORD PTR .LC33[rip]	# tmp1877,
- 2768      00000000 
- 2769 10c7 C4C16259 		vmulss	xmm0, xmm3, DWORD PTR U[r13+400004]	# D.73733, tmp1877, MEM[symbol: U, base: ivtmp.482_109,
- 2769      85000000 
- 2769      00
- 2770              	.LBB1324:
- 2771              	.LBB1316:
- 2772              		.loc 11 280 0 is_stmt 1
- 2773 10d0 E8000000 		call	floorf	#
- 2773      00
- 2774              	.LVL160:
- 2775              	.LBE1316:
- 2776              	.LBE1324:
- 2777              		.loc 9 27 0
- 2778 10d5 488DBC24 		lea	rdi, [rsp+384]	# tmp1878,
- 2778      80010000 
- 2779 10dd C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2780 10e1 E8000000 		call	_ZNSolsEi	#
- 2780      00
- 2781              	.LVL161:
- 2782 10e6 41BF0800 		mov	r15d, 8	# ivtmp.474,
- 2782      0000
- 2783              	.L93:
- 2784 10ec C57A102D 		vmovss	xmm13, DWORD PTR .LC33[rip]	# tmp1842,
- 2784      00000000 
- 2785 10f4 C4811259 		vmulss	xmm0, xmm13, DWORD PTR U[r15+400000+r13]	# D.73733, tmp1842, MEM[symbol: U, base: ivtmp.482
- 2785      842F0000 
- 2785      0000
- 2786              	.LBB1325:
- 2787              	.LBB1317:
- 2788              		.loc 11 280 0
- 2789 10fe E8000000 		call	floorf	#
- 2789      00
- 2790              	.LVL162:
- 2791              	.LBE1317:
- 2792              	.LBE1325:
- 2793              		.loc 9 27 0
- 2794 1103 488DBC24 		lea	rdi, [rsp+384]	# tmp1843,
- 2794      80010000 
- 2795 110b C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2796 110f E8000000 		call	_ZNSolsEi	#
- 2796      00
- 2797              	.LVL163:
- 2798 1114 C57A1025 		vmovss	xmm12, DWORD PTR .LC33[rip]	# tmp1844,
- 2798      00000000 
- 2799 111c 4983C704 		add	r15, 4	# tmp1530,
- 2800 1120 C4811A59 		vmulss	xmm0, xmm12, DWORD PTR U[r13+400000+r15]	# D.73733, tmp1844, MEM[symbol: U, base: ivtmp.482
- 2800      843D0000 
- 2800      0000
- 2801              	.LBB1326:
- 2802              	.LBB1318:
- 2803              		.loc 11 280 0
- 2804 112a E8000000 		call	floorf	#
- 2804      00
- 2805              	.LVL164:
- 2806              	.LBE1318:
- 2807              	.LBE1326:
- 2808              		.loc 9 27 0
- 2809 112f 488DBC24 		lea	rdi, [rsp+384]	# tmp1845,
- 2809      80010000 
- 2810 1137 C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2811 113b E8000000 		call	_ZNSolsEi	#
- 2811      00
- 2812              	.LVL165:
- 2813 1140 C57A101D 		vmovss	xmm11, DWORD PTR .LC33[rip]	# tmp1879,
- 2813      00000000 
- 2814 1148 C4812259 		vmulss	xmm0, xmm11, DWORD PTR U[r13+400004+r15]	# D.73733, tmp1879, MEM[symbol: U, base: ivtmp.482
- 2814      843D0000 
- 2814      0000
- 2815              	.LBB1327:
- 2816              	.LBB1319:
- 2817              		.loc 11 280 0
- 2818 1152 E8000000 		call	floorf	#
- 2818      00
- 2819              	.LVL166:
- 2820              	.LBE1319:
- 2821              	.LBE1327:
- 2822              		.loc 9 27 0
- 2823 1157 488DBC24 		lea	rdi, [rsp+384]	# tmp1880,
- 2823      80010000 
- 2824 115f C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2825 1163 E8000000 		call	_ZNSolsEi	#
- 2825      00
- 2826              	.LVL167:
- 2827 1168 C57A1015 		vmovss	xmm10, DWORD PTR .LC33[rip]	# tmp1881,
- 2827      00000000 
- 2828 1170 C4812A59 		vmulss	xmm0, xmm10, DWORD PTR U[r13+400008+r15]	# D.73733, tmp1881, MEM[symbol: U, base: ivtmp.482
- 2828      843D0000 
- 2828      0000
- 2829              	.LBB1328:
- 2830              	.LBB1320:
- 2831              		.loc 11 280 0
- 2832 117a E8000000 		call	floorf	#
- 2832      00
- 2833              	.LVL168:
- 2834              	.LBE1320:
- 2835              	.LBE1328:
- 2836              		.loc 9 27 0
- 2837 117f 488DBC24 		lea	rdi, [rsp+384]	# tmp1882,
- 2837      80010000 
- 2838 1187 C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2839 118b E8000000 		call	_ZNSolsEi	#
- 2839      00
- 2840              	.LVL169:
- 2841 1190 C57A100D 		vmovss	xmm9, DWORD PTR .LC33[rip]	# tmp1883,
- 2841      00000000 
- 2842 1198 C4813259 		vmulss	xmm0, xmm9, DWORD PTR U[r13+400012+r15]	# D.73733, tmp1883, MEM[symbol: U, base: ivtmp.482_
- 2842      843D0000 
- 2842      0000
- 2843              	.LBB1329:
- 2844              	.LBB1321:
- 2845              		.loc 11 280 0
- 2846 11a2 E8000000 		call	floorf	#
- 2846      00
- 2847              	.LVL170:
- 2848              	.LBE1321:
- 2849              	.LBE1329:
- 2850              		.loc 9 27 0
- 2851 11a7 488DBC24 		lea	rdi, [rsp+384]	# tmp1884,
- 2851      80010000 
- 2852 11af C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2853 11b3 E8000000 		call	_ZNSolsEi	#
- 2853      00
- 2854              	.LVL171:
- 2855 11b8 C57A1005 		vmovss	xmm8, DWORD PTR .LC33[rip]	# tmp1885,
- 2855      00000000 
- 2856 11c0 C4813A59 		vmulss	xmm0, xmm8, DWORD PTR U[r13+400016+r15]	# D.73733, tmp1885, MEM[symbol: U, base: ivtmp.482_
- 2856      843D0000 
- 2856      0000
- 2857              	.LBB1330:
- 2858              	.LBB1322:
- 2859              		.loc 11 280 0
- 2860 11ca E8000000 		call	floorf	#
- 2860      00
- 2861              	.LVL172:
- 2862              	.LBE1322:
- 2863              	.LBE1330:
- 2864              		.loc 9 27 0
- 2865 11cf 488DBC24 		lea	rdi, [rsp+384]	# tmp1886,
- 2865      80010000 
- 2866 11d7 C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2867 11db E8000000 		call	_ZNSolsEi	#
- 2867      00
- 2868              	.LVL173:
- 2869 11e0 C57A103D 		vmovss	xmm15, DWORD PTR .LC33[rip]	# tmp1887,
- 2869      00000000 
- 2870 11e8 C4810259 		vmulss	xmm0, xmm15, DWORD PTR U[r13+400020+r15]	# D.73733, tmp1887, MEM[symbol: U, base: ivtmp.482
- 2870      843D0000 
- 2870      0000
- 2871              	.LBB1331:
- 2872              	.LBB1323:
- 2873              		.loc 11 280 0
- 2874 11f2 E8000000 		call	floorf	#
- 2874      00
- 2875              	.LVL174:
- 2876              	.LBE1323:
- 2877              	.LBE1331:
- 2878              		.loc 9 27 0
- 2879 11f7 488DBC24 		lea	rdi, [rsp+384]	# tmp1888,
- 2879      80010000 
- 2880 11ff C5FA2CF0 		vcvttss2si	esi, xmm0	# D.73734, D.73733
- 2881 1203 E8000000 		call	_ZNSolsEi	#
- 2881      00
- 2882              	.LVL175:
- 2883 1208 4983C718 		add	r15, 24	# ivtmp.474,
-  26:main.cpp      ****       for (int z=0;z<NZ;++z) {
- 2884              		.loc 9 26 0
- 2885 120c 4981FF90 		cmp	r15, 400	# ivtmp.474,
- 2885      010000
- 2886 1213 0F85D3FE 		jne	.L93	#,
- 2886      FFFF
- 2887              	.LVL176:
- 2888              	.LBE1313:
- 2889              	.LBB1332:
- 2890              	.LBB1333:
+ 2552              		.loc 1 535 0
+ 2553 015e BA010000 		mov	edx, 1	#,
+ 2553      00
+ 2554 0163 BE000000 		mov	esi, OFFSET FLAT:.LC32	#,
+ 2554      00
+ 2555 0168 4889C7   		mov	rdi, rax	#, D.37199
+ 2556 016b E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l	#
+ 2556      00
+ 2557              	.LVL143:
+ 2558 0170 C744240C 		mov	DWORD PTR [rsp+12], 40	# %sfp,
+ 2558      28000000 
+ 2559              	.L112:
+ 2560              	.LVL144:
+ 2561 0178 8B4C240C 		mov	ecx, DWORD PTR [rsp+12]	# ivtmp.551, %sfp
+ 2562 017c B8676666 		mov	eax, 1717986919	# tmp321,
+ 2562      66
+ 2563              	.LBE1255:
+ 2564              	.LBE1254:
+ 2565              	.LBE1219:
+ 108:saya.cpp      ****   for(int t = 0;;++t){
+ 2566              		.loc 8 108 0 discriminator 1
+ 2567 0181 41BC6400 		mov	r12d, 100	# ivtmp.544,
+ 2567      0000
+ 2568              	.LBB1571:
+ 2569              	.LBB1256:
+ 2570              	.LBB1257:
+ 2571              	.LBB1258:
+ 2572              	.LBB1259:
+ 2573              	.LBB1260:
+ 2574              	.LBB1261:
+ 2575              	.LBB1262:
+ 2576              	.LBB1263:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2577              		.loc 8 52 0 discriminator 1
+ 2578 0187 41BE1F85 		mov	r14d, 1374389535	# tmp306,
+ 2578      EB51
+ 2579 018d F7E9     		imul	ecx	# ivtmp.551
+ 2580 018f 89CE     		mov	esi, ecx	# tmp228, ivtmp.551
+ 2581 0191 C1FE1F   		sar	esi, 31	# tmp228,
+ 2582 0194 C1FA04   		sar	edx, 4	# D.37198,
+ 2583 0197 29F2     		sub	edx, esi	# D.37198, tmp228
+ 2584 0199 8D3C92   		lea	edi, [rdx+rdx*4]	# tmp231,
+ 2585 019c C1E703   		sal	edi, 3	# tmp232,
+ 2586 019f 29F9     		sub	ecx, edi	# D.37198, tmp232
+ 2587 01a1 4C63C1   		movsx	r8, ecx	#, D.37198
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2588              		.loc 8 53 0 discriminator 1
+ 2589 01a4 4F8D0C80 		lea	r9, [r8+r8*4]	# tmp308,
+ 2590 01a8 4F8D2C89 		lea	r13, [r9+r9*4]	# tmp310,
+ 2591 01ac 49C1E502 		sal	r13, 2	# tmp311,
+ 2592              	.LVL145:
+ 2593              		.p2align 4,,10
+ 2594              		.p2align 3
+ 2595              	.L120:
+ 2596              	.LBE1263:
+ 2597              	.LBE1262:
+  99:saya.cpp      ****   if(global_clock > t) fill_initial_condition();
+ 2598              		.loc 8 99 0
+ 2599 01b0 448B1500 		mov	r10d, DWORD PTR global_clock[rip]	# D.37198, global_clock
+ 2599      000000
+ 2600 01b7 4439D3   		cmp	ebx, r10d	# t, D.37198
+ 2601 01ba 0F8C4002 		jl	.L199	#,
+ 2601      0000
+ 2602              	.L113:
+ 100:saya.cpp      ****   while(global_clock < t) naive_proceed();
+ 2603              		.loc 8 100 0
+ 2604 01c0 4439D3   		cmp	ebx, r10d	# t, D.37198
+ 2605 01c3 7E10     		jle	.L116	#,
+ 2606              		.p2align 4,,10
+ 2607 01c5 0F1F00   		.p2align 3
+ 2608              	.L181:
+ 2609 01c8 E8000000 		call	_Z13naive_proceedv	#
+ 2609      00
+ 2610              	.LVL146:
+ 2611 01cd 3B1D0000 		cmp	ebx, DWORD PTR global_clock[rip]	# t, global_clock
+ 2611      0000
+ 2612 01d3 7FF3     		jg	.L181	#,
+ 2613              	.L116:
+ 2614              	.LVL147:
+ 2615              	.LBB1266:
+ 2616              	.LBB1264:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2617              		.loc 8 52 0
+ 2618 01d5 4489E0   		mov	eax, r12d	# tmp320, ivtmp.544
+ 2619 01d8 4589E3   		mov	r11d, r12d	# tmp206, ivtmp.544
+ 2620 01db B9640000 		mov	ecx, 100	#,
+ 2620      00
+ 2621 01e0 41F7EE   		imul	r14d	# tmp306
+ 2622 01e3 41C1FB1F 		sar	r11d, 31	# tmp206,
+ 2623 01e7 4489E0   		mov	eax, r12d	# z, ivtmp.544
+ 2624              	.LBE1264:
+ 2625              	.LBE1266:
+ 2626              	.LBE1261:
+ 2627              	.LBE1260:
+ 113:saya.cpp      ****     for (int y=0;y<NY;++y) {
+ 114:saya.cpp      ****       for (int z=0;z<NZ;++z) {
+ 115:saya.cpp      **** 	Real u,v;
+ 116:saya.cpp      **** 	get_solution_at(t,NX/2,y,z, u,v);
+ 117:saya.cpp      ****         ostr<<int(std::floor(9.999*u));
+ 2628              		.loc 8 117 0
+ 2629 01ea C5FB100D 		vmovsd	xmm1, QWORD PTR .LC33[rip]	# tmp335,
+ 2629      00000000 
+ 2630              	.LBB1270:
+ 2631              	.LBB1268:
+ 2632              	.LBB1267:
+ 2633              	.LBB1265:
+  52:saya.cpp      ****   z = (z+NZ)%NZ;
+ 2634              		.loc 8 52 0
+ 2635 01f2 C1FA05   		sar	edx, 5	# tmp202,
+ 2636 01f5 4429DA   		sub	edx, r11d	# tmp202, tmp206
+ 2637 01f8 0FAFD1   		imul	edx, ecx	# tmp207,
+ 2638 01fb 29D0     		sub	eax, edx	# z, tmp207
+  53:saya.cpp      ****   return ar[x][y][z];
+ 2639              		.loc 8 53 0
+ 2640 01fd 4898     		cdqe
+ 2641 01ff 4C01E8   		add	rax, r13	# tmp217, tmp311
+ 2642              	.LBE1265:
+ 2643              	.LBE1267:
+ 2644              	.LBE1268:
+ 2645              	.LBE1270:
+ 2646              		.loc 8 117 0
+ 2647 0202 C5F35904 		vmulsd	xmm0, xmm1, QWORD PTR U[800000+rax*8]	# D.37200, tmp335, U
+ 2647      C5000000 
+ 2647      00
+ 2648 020b E8000000 		call	floor	#
+ 2648      00
+ 2649              	.LVL148:
+ 2650 0210 488D7C24 		lea	rdi, [rsp+96]	# tmp336,
+ 2650      60
+ 2651 0215 C5FB2CF0 		vcvttsd2si	esi, xmm0	# D.37198, D.37200
+ 2652 0219 E8000000 		call	_ZNSolsEi	#
+ 2652      00
+ 2653              	.LVL149:
+ 2654 021e 4183C401 		add	r12d, 1	# ivtmp.544,
+ 2655              	.LVL150:
+ 2656              	.LBE1259:
+ 114:saya.cpp      ****       for (int z=0;z<NZ;++z) {
+ 2657              		.loc 8 114 0
+ 2658 0222 4181FCC8 		cmp	r12d, 200	# ivtmp.544,
+ 2658      000000
+ 2659 0229 7585     		jne	.L120	#,
+ 2660              	.LVL151:
+ 2661              	.LBE1258:
+ 2662              	.LBB1273:
+ 2663              	.LBB1274:
  535:/usr/include/c++/4.8.2/ostream **** 	__ostream_insert(__out, __s,
- 2891              		.loc 1 535 0
- 2892 1219 BA010000 		mov	edx, 1	#,
- 2892      00
- 2893 121e BE000000 		mov	esi, OFFSET FLAT:.LC32	#,
- 2893      00
- 2894 1223 488DBC24 		lea	rdi, [rsp+384]	# tmp1846,
- 2894      80010000 
- 2895              	.LVL177:
- 2896 122b E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l	#
- 2896      00
- 2897              	.LEHE2:
- 2898              	.LVL178:
- 2899 1230 4981C590 		add	r13, 400	# ivtmp.482,
- 2899      010000
- 2900              	.LBE1333:
- 2901              	.LBE1332:
- 2902              	.LBE1312:
-  25:main.cpp      ****     for (int y=0;y<NY;++y) {
- 2903              		.loc 9 25 0
- 2904 1237 4981FD80 		cmp	r13, 16000	# ivtmp.482,
- 2904      3E0000
- 2905 123e 0F8554FE 		jne	.L90	#,
- 2905      FFFF
- 2906              	.LVL179:
- 2907              	.LBE1311:
- 2908              	.LBE891:
- 2909              	.LBE890:
- 2910              	.LBE1638:
+ 2664              		.loc 1 535 0
+ 2665 022b 488D7C24 		lea	rdi, [rsp+96]	# tmp337,
+ 2665      60
+ 2666              	.LVL152:
+ 2667 0230 BA010000 		mov	edx, 1	#,
+ 2667      00
+ 2668 0235 BE000000 		mov	esi, OFFSET FLAT:.LC32	#,
+ 2668      00
+ 2669 023a E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l	#
+ 2669      00
+ 2670              	.LEHE2:
+ 2671              	.LVL153:
+ 2672 023f 8344240C 		add	DWORD PTR [rsp+12], 1	# %sfp,
+ 2672      01
+ 2673              	.LVL154:
+ 2674              	.LBE1274:
+ 2675              	.LBE1273:
+ 2676              	.LBE1257:
+ 113:saya.cpp      ****     for (int y=0;y<NY;++y) {
+ 2677              		.loc 8 113 0
+ 2678 0244 837C240C 		cmp	DWORD PTR [rsp+12], 80	# %sfp,
+ 2678      50
+ 2679 0249 0F8529FF 		jne	.L112	#,
+ 2679      FFFF
+ 2680              	.LVL155:
+ 2681              	.LBE1256:
+ 2682              	.LBE1571:
+ 2683              	.LBE1579:
+ 2684              	.LBE1585:
  129:/usr/include/c++/4.8.2/sstream **** 	if (this->pptr())
- 2911              		.loc 4 129 0
- 2912 1244 4C8BA424 		mov	r12, QWORD PTR [rsp+432]	# D.73743, MEM[(const struct basic_streambuf *)&ostr + 48B]
- 2912      B0010000 
- 2913              	.LBB1639:
- 2914              	.LBB1633:
- 2915              	.LBB1627:
- 2916              	.LBB1334:
- 2917              	.LBB1335:
- 2918              	.LBB1336:
- 2919              	.LBB1337:
- 2920              	.LBB1338:
- 2921              	.LBB1339:
+ 2685              		.loc 4 129 0
+ 2686 024f 4C8BAC24 		mov	r13, QWORD PTR [rsp+144]	# D.37207, MEM[(const struct basic_streambuf *)&ostr + 48B]
+ 2686      90000000 
+ 2687              	.LBB1586:
+ 2688              	.LBB1580:
+ 2689              	.LBB1572:
+ 2690              	.LBB1277:
+ 2691              	.LBB1278:
+ 2692              	.LBB1279:
+ 2693              	.LBB1280:
+ 2694              	.LBB1281:
+ 2695              	.LBB1282:
  275:/usr/include/c++/4.8.2/bits/basic_string.h **** 	: _Alloc(__a), _M_p(__dat) { }
- 2922              		.loc 5 275 0
- 2923 124c 48C78424 		mov	QWORD PTR [rsp+320], OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# MEM[(struct _Alloc_hid
- 2923      40010000 
- 2923      00000000 
- 2924              	.LVL180:
- 2925              	.LBE1339:
- 2926              	.LBE1338:
- 2927              	.LBE1337:
+ 2696              		.loc 5 275 0
+ 2697 0257 48C74424 		mov	QWORD PTR [rsp+32], OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# MEM[(struct _Alloc_hide
+ 2697      20000000 
+ 2697      00
+ 2698              	.LVL156:
+ 2699              	.LBE1282:
+ 2700              	.LBE1281:
+ 2701              	.LBE1280:
  129:/usr/include/c++/4.8.2/sstream **** 	if (this->pptr())
- 2928              		.loc 4 129 0
- 2929 1258 4D85E4   		test	r12, r12	# D.73743
- 2930 125b 0F849504 		je	.L94	#,
- 2930      0000
- 2931              	.LVL181:
- 2932              	.LBE1336:
- 2933              	.LBE1335:
- 2934              	.LBE1334:
- 2935              	.LBE1627:
- 2936              	.LBE1633:
- 2937              	.LBE1639:
- 2938 1261 4C8BB424 		mov	r14, QWORD PTR [rsp+416]	# D.73743, MEM[(const struct basic_streambuf *)&ostr + 32B]
- 2938      A0010000 
- 2939              	.LVL182:
- 2940 1269 488B9C24 		mov	rbx, QWORD PTR [rsp+424]	# D.73743, MEM[(const struct basic_streambuf *)&ostr + 40B]
- 2940      A8010000 
- 2941              	.LBB1640:
- 2942              	.LBB1634:
- 2943              	.LBB1628:
- 2944              	.LBB1505:
- 2945              	.LBB1500:
- 2946              	.LBB1495:
+ 2702              		.loc 4 129 0
+ 2703 0260 4D85ED   		test	r13, r13	# D.37207
+ 2704 0263 0F840B04 		je	.L121	#,
+ 2704      0000
+ 2705              	.LVL157:
+ 2706              	.LBE1279:
+ 2707              	.LBE1278:
+ 2708              	.LBE1277:
+ 2709              	.LBE1572:
+ 2710              	.LBE1580:
+ 2711              	.LBE1586:
+ 2712 0269 488BBC24 		mov	rdi, QWORD PTR [rsp+128]	# D.37207, MEM[(const struct basic_streambuf *)&ostr + 32B]
+ 2712      80000000 
+ 2713              	.LVL158:
+ 2714 0271 4C8BA424 		mov	r12, QWORD PTR [rsp+136]	# D.37207, MEM[(const struct basic_streambuf *)&ostr + 40B]
+ 2714      88000000 
+ 2715              	.LVL159:
+ 2716              	.LBB1587:
+ 2717              	.LBB1581:
+ 2718              	.LBB1573:
+ 2719              	.LBB1448:
+ 2720              	.LBB1443:
+ 2721              	.LBB1438:
  132:/usr/include/c++/4.8.2/sstream **** 	    if (this->pptr() > this->egptr())
- 2947              		.loc 4 132 0
- 2948 1271 4D39F4   		cmp	r12, r14	# D.73743, D.73743
- 2949 1274 0F86E303 		jbe	.L95	#,
- 2949      0000
- 2950              	.LVL183:
- 2951              	.LBB1340:
- 2952              	.LBB1341:
- 2953              	.LBB1342:
- 2954              	.LBB1343:
- 2955              	.LBB1344:
- 2956              	.LBB1345:
- 2957              	.LBB1346:
- 2958              		.file 12 "/usr/include/c++/4.8.2/bits/basic_string.tcc"
+ 2722              		.loc 4 132 0
+ 2723 0279 4939FD   		cmp	r13, rdi	# D.37207, D.37207
+ 2724 027c 0F866B03 		jbe	.L122	#,
+ 2724      0000
+ 2725              	.LVL160:
+ 2726              	.LBB1283:
+ 2727              	.LBB1284:
+ 2728              	.LBB1285:
+ 2729              	.LBB1286:
+ 2730              	.LBB1287:
+ 2731              	.LBB1288:
+ 2732              	.LBB1289:
+ 2733              		.file 9 "/usr/include/c++/4.8.2/bits/basic_string.tcc"
    1:/usr/include/c++/4.8.2/bits/basic_string.tcc **** // Components for manipulating sequences of characters -*- C++ -*-
    2:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 
    3:/usr/include/c++/4.8.2/bits/basic_string.tcc **** // Copyright (C) 1997-2013 Free Software Foundation, Inc.
@@ -7198,34 +6561,34 @@
  126:/usr/include/c++/4.8.2/bits/basic_string.tcc ****       {
  127:/usr/include/c++/4.8.2/bits/basic_string.tcc **** #if _GLIBCXX_FULLY_DYNAMIC_STRING == 0
  128:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	if (__beg == __end && __a == _Alloc())
- 2959              		.loc 12 128 0
- 2960 127a 4939DC   		cmp	r12, rbx	# D.73743, D.73743
- 2961 127d 0F84CF03 		je	.L197	#,
- 2961      0000
- 2962              	.LVL184:
+ 2734              		.loc 9 128 0
+ 2735 0282 4D39E5   		cmp	r13, r12	# D.37207, D.37207
+ 2736 0285 0F845703 		je	.L200	#,
+ 2736      0000
+ 2737              	.LVL161:
  129:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	  return _S_empty_rep()._M_refdata();
  130:/usr/include/c++/4.8.2/bits/basic_string.tcc **** #endif
  131:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	// NB: Not required, but considered best practice.
  132:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	if (__gnu_cxx::__is_null_pointer(__beg) && __beg != __end)
- 2963              		.loc 12 132 0
- 2964 1283 4885DB   		test	rbx, rbx	# D.73743
- 2965 1286 0F84BC03 		je	.L198	#,
- 2965      0000
- 2966              	.LVL185:
+ 2738              		.loc 9 132 0
+ 2739 028b 4D85E4   		test	r12, r12	# D.37207
+ 2740 028e 0F844403 		je	.L201	#,
+ 2740      0000
+ 2741              	.LVL162:
  133:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	  __throw_logic_error(__N("basic_string::_S_construct null not valid"));
  134:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 
  135:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	const size_type __dnew = static_cast<size_type>(std::distance(__beg,
  136:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 								      __end));
  137:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	// Check for out_of_range and length_error exceptions.
  138:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	_Rep* __r = _Rep::_S_create(__dnew, size_type(0), __a);
- 2967              		.loc 12 138 0
- 2968 128c 488D9424 		lea	rdx, [rsp+319]	# tmp1874,
- 2968      3F010000 
- 2969              	.LVL186:
- 2970              	.LBB1347:
- 2971              	.LBB1348:
- 2972              	.LBB1349:
- 2973              		.file 13 "/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h"
+ 2742              		.loc 9 138 0
+ 2743 0294 488D5424 		lea	rdx, [rsp+31]	# tmp368,
+ 2743      1F
+ 2744              	.LVL163:
+ 2745              	.LBB1290:
+ 2746              	.LBB1291:
+ 2747              	.LBB1292:
+ 2748              		.file 10 "/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h"
    1:/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h **** // Functions used by iterators -*- C++ -*-
    2:/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h **** 
    3:/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h **** // Copyright (C) 2001-2013 Free Software Foundation, Inc.
@@ -7322,83 +6685,84 @@
   94:/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h ****       __glibcxx_function_requires(_RandomAccessIteratorConcept<
   95:/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h **** 				  _RandomAccessIterator>)
   96:/usr/include/c++/4.8.2/bits/stl_iterator_base_funcs.h ****       return __last - __first;
- 2974              		.loc 13 96 0
- 2975 1294 4929DC   		sub	r12, rbx	# __dnew, D.73743
- 2976              	.LVL187:
- 2977              	.LBE1349:
- 2978              	.LBE1348:
- 2979              	.LBE1347:
- 2980              		.loc 12 138 0
- 2981 1297 31F6     		xor	esi, esi	#
- 2982 1299 4C89E7   		mov	rdi, r12	#, __dnew
- 2983              	.LEHB3:
- 2984 129c E8000000 		call	_ZNSs4_Rep9_S_createEmmRKSaIcE	#
- 2984      00
- 2985              	.LEHE3:
- 2986              	.LVL188:
+ 2749              		.loc 10 96 0
+ 2750 0299 4D29E5   		sub	r13, r12	# __dnew, D.37207
+ 2751              	.LVL164:
+ 2752              	.LBE1292:
+ 2753              	.LBE1291:
+ 2754              	.LBE1290:
+ 2755              		.loc 9 138 0
+ 2756 029c 31F6     		xor	esi, esi	#
+ 2757 029e 4C89EF   		mov	rdi, r13	#, __dnew
+ 2758              	.LEHB3:
+ 2759 02a1 E8000000 		call	_ZNSs4_Rep9_S_createEmmRKSaIcE	#
+ 2759      00
+ 2760              	.LEHE3:
+ 2761              	.LVL165:
  139:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	__try
  140:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	  { _S_copy_chars(__r->_M_refdata(), __beg, __end); }
- 2987              		.loc 12 140 0
- 2988 12a1 4C8D4018 		lea	r8, [rax+24]	# D.73736,
- 2989              	.LBB1350:
- 2990              	.LBB1351:
- 2991              	.LBB1352:
+ 2762              		.loc 9 140 0
+ 2763 02a6 4C8D5018 		lea	r10, [rax+24]	# D.37201,
+ 2764              	.LBB1293:
+ 2765              	.LBB1294:
+ 2766              	.LBB1295:
  356:/usr/include/c++/4.8.2/bits/basic_string.h **** 	if (__n == 1)
- 2992              		.loc 5 356 0
- 2993 12a5 4983FC01 		cmp	r12, 1	# __dnew,
- 2994              	.LBE1352:
- 2995              	.LBE1351:
- 2996              	.LBE1350:
+ 2767              		.loc 5 356 0
+ 2768 02aa 4983FD01 		cmp	r13, 1	# __dnew,
+ 2769              	.LBE1295:
+ 2770              	.LBE1294:
+ 2771              	.LBE1293:
  138:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	_Rep* __r = _Rep::_S_create(__dnew, size_type(0), __a);
- 2997              		.loc 12 138 0
- 2998 12a9 4989C6   		mov	r14, rax	# __r,
- 2999              	.LVL189:
- 3000              	.LBB1363:
- 3001              	.LBB1360:
- 3002              	.LBB1357:
+ 2772              		.loc 9 138 0
+ 2773 02ae 4989C6   		mov	r14, rax	# __r,
+ 2774              	.LVL166:
+ 2775              	.LBB1306:
+ 2776              	.LBB1303:
+ 2777              	.LBB1300:
  356:/usr/include/c++/4.8.2/bits/basic_string.h **** 	if (__n == 1)
- 3003              		.loc 5 356 0
- 3004 12ac 0F851B02 		jne	.L98	#,
- 3004      0000
- 3005              	.LBE1357:
- 3006              	.LBE1360:
- 3007              	.LBE1363:
- 3008              	.LBE1346:
- 3009              	.LBE1345:
- 3010              	.LBE1344:
- 3011              	.LBE1343:
- 3012              	.LBE1342:
- 3013              	.LBE1341:
- 3014              	.LBE1340:
- 3015              	.LBE1495:
- 3016              	.LBE1500:
- 3017              	.LBE1505:
- 3018              	.LBE1628:
- 3019              	.LBE1634:
- 3020              	.LBE1640:
+ 2778              		.loc 5 356 0
+ 2779 02b1 0F85C001 		jne	.L125	#,
+ 2779      0000
+ 2780              	.LBE1300:
+ 2781              	.LBE1303:
+ 2782              	.LBE1306:
+ 2783              	.LBE1289:
+ 2784              	.LBE1288:
+ 2785              	.LBE1287:
+ 2786              	.LBE1286:
+ 2787              	.LBE1285:
+ 2788              	.LBE1284:
+ 2789              	.LBE1283:
+ 2790              	.LBE1438:
+ 2791              	.LBE1443:
+ 2792              	.LBE1448:
+ 2793              	.LBE1573:
+ 2794              	.LBE1581:
+ 2795              	.LBE1587:
  354:/usr/include/c++/4.8.2/bits/basic_string.h ****       _M_copy(_CharT* __d, const _CharT* __s, size_type __n)
- 3021              		.loc 5 354 0
- 3022 12b2 440FB60B 		movzx	r9d, BYTE PTR [rbx]	# D.73745, MEM[(const char_type &)_245]
- 3023              	.LVL190:
- 3024              	.LBB1641:
- 3025              	.LBB1635:
- 3026              	.LBB1629:
- 3027              	.LBB1506:
- 3028              	.LBB1501:
- 3029              	.LBB1496:
- 3030              	.LBB1392:
- 3031              	.LBB1387:
- 3032              	.LBB1384:
- 3033              	.LBB1381:
- 3034              	.LBB1378:
- 3035              	.LBB1375:
- 3036              	.LBB1372:
- 3037              	.LBB1364:
- 3038              	.LBB1361:
- 3039              	.LBB1358:
- 3040              	.LBB1353:
- 3041              	.LBB1354:
- 3042              		.file 14 "/usr/include/c++/4.8.2/bits/char_traits.h"
+ 2796              		.loc 5 354 0
+ 2797 02b7 410FB614 		movzx	edx, BYTE PTR [r12]	# D.37209, MEM[(const char_type &)_96]
+ 2797      24
+ 2798              	.LVL167:
+ 2799              	.LBB1588:
+ 2800              	.LBB1582:
+ 2801              	.LBB1574:
+ 2802              	.LBB1449:
+ 2803              	.LBB1444:
+ 2804              	.LBB1439:
+ 2805              	.LBB1335:
+ 2806              	.LBB1330:
+ 2807              	.LBB1327:
+ 2808              	.LBB1324:
+ 2809              	.LBB1321:
+ 2810              	.LBB1318:
+ 2811              	.LBB1315:
+ 2812              	.LBB1307:
+ 2813              	.LBB1304:
+ 2814              	.LBB1301:
+ 2815              	.LBB1296:
+ 2816              	.LBB1297:
+ 2817              		.file 11 "/usr/include/c++/4.8.2/bits/char_traits.h"
    1:/usr/include/c++/4.8.2/bits/char_traits.h **** // Character Traits for use by standard string and iostream -*- C++ -*-
    2:/usr/include/c++/4.8.2/bits/char_traits.h **** 
    3:/usr/include/c++/4.8.2/bits/char_traits.h **** // Copyright (C) 1997-2013 Free Software Foundation, Inc.
@@ -7642,55 +7006,55 @@
  241:/usr/include/c++/4.8.2/bits/char_traits.h ****       static void
  242:/usr/include/c++/4.8.2/bits/char_traits.h ****       assign(char_type& __c1, const char_type& __c2) _GLIBCXX_NOEXCEPT
  243:/usr/include/c++/4.8.2/bits/char_traits.h ****       { __c1 = __c2; }
- 3043              		.loc 14 243 0
- 3044 12b6 45884E18 		mov	BYTE PTR [r14+24], r9b	# MEM[(char_type &)__r_266 + 24], D.73745
- 3045              	.LVL191:
- 3046              	.L99:
- 3047              	.LBE1354:
- 3048              	.LBE1353:
- 3049              	.LBE1358:
- 3050              	.LBE1361:
- 3051              	.LBE1364:
- 3052              	.LBB1365:
- 3053              	.LBB1366:
+ 2818              		.loc 11 243 0
+ 2819 02bc 41885618 		mov	BYTE PTR [r14+24], dl	# MEM[(char_type &)__r_117 + 24], D.37209
+ 2820              	.LVL168:
+ 2821              	.L126:
+ 2822              	.LBE1297:
+ 2823              	.LBE1296:
+ 2824              	.LBE1301:
+ 2825              	.LBE1304:
+ 2826              	.LBE1307:
+ 2827              	.LBB1308:
+ 2828              	.LBB1309:
  210:/usr/include/c++/4.8.2/bits/basic_string.h **** 	  if (__builtin_expect(this != &_S_empty_rep(), false))
- 3054              		.loc 5 210 0
- 3055 12ba 4981FE00 		cmp	r14, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# __r,
- 3055      000000
- 3056 12c1 7411     		je	.L96	#,
- 3057              	.LVL192:
- 3058              	.LBB1367:
- 3059              	.LBB1368:
+ 2829              		.loc 5 210 0
+ 2830 02c0 4981FE00 		cmp	r14, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# __r,
+ 2830      000000
+ 2831 02c7 7411     		je	.L123	#,
+ 2832              	.LVL169:
+ 2833              	.LBB1310:
+ 2834              	.LBB1311:
  204:/usr/include/c++/4.8.2/bits/basic_string.h ****         { this->_M_refcount = 0; }
- 3060              		.loc 5 204 0
- 3061 12c3 41C74610 		mov	DWORD PTR [r14+16], 0	# MEM[(_Atomic_word *)__r_266 + 16B],
- 3061      00000000 
- 3062              	.LBE1368:
- 3063              	.LBE1367:
+ 2835              		.loc 5 204 0
+ 2836 02c9 41C74610 		mov	DWORD PTR [r14+16], 0	# MEM[(_Atomic_word *)__r_117 + 16B],
+ 2836      00000000 
+ 2837              	.LBE1311:
+ 2838              	.LBE1310:
  214:/usr/include/c++/4.8.2/bits/basic_string.h **** 	      this->_M_length = __n;
- 3064              		.loc 5 214 0
- 3065 12cb 4D8926   		mov	QWORD PTR [r14], r12	# __r_266->D.22725._M_length, __dnew
- 3066              	.LVL193:
- 3067              	.LBB1369:
- 3068              	.LBB1370:
- 3069              		.loc 14 243 0
- 3070 12ce 43C64426 		mov	BYTE PTR [r14+24+r12], 0	# MEM[(char_type &)_272],
- 3070      1800
- 3071              	.LVL194:
- 3072              	.L96:
- 3073              	.LBE1370:
- 3074              	.LBE1369:
- 3075              	.LBE1366:
- 3076              	.LBE1365:
- 3077              	.LBE1372:
- 3078              	.LBE1375:
- 3079              	.LBE1378:
- 3080              	.LBE1381:
- 3081              	.LBE1384:
- 3082              	.LBE1387:
- 3083              	.LBE1392:
- 3084              	.LBB1393:
- 3085              	.LBB1394:
+ 2839              		.loc 5 214 0
+ 2840 02d1 4D892E   		mov	QWORD PTR [r14], r13	# __r_117->D.22725._M_length, __dnew
+ 2841              	.LVL170:
+ 2842              	.LBB1312:
+ 2843              	.LBB1313:
+ 2844              		.loc 11 243 0
+ 2845 02d4 43C6442E 		mov	BYTE PTR [r14+24+r13], 0	# MEM[(char_type &)_123],
+ 2845      1800
+ 2846              	.LVL171:
+ 2847              	.L123:
+ 2848              	.LBE1313:
+ 2849              	.LBE1312:
+ 2850              	.LBE1309:
+ 2851              	.LBE1308:
+ 2852              	.LBE1315:
+ 2853              	.LBE1318:
+ 2854              	.LBE1321:
+ 2855              	.LBE1324:
+ 2856              	.LBE1327:
+ 2857              	.LBE1330:
+ 2858              	.LBE1335:
+ 2859              	.LBB1336:
+ 2860              	.LBB1337:
  540:/usr/include/c++/4.8.2/bits/basic_string.h **** 
  541:/usr/include/c++/4.8.2/bits/basic_string.h ****       /**
  542:/usr/include/c++/4.8.2/bits/basic_string.h ****        *  @brief  Assign the value of @a str to this string.
@@ -7735,90 +7099,90 @@
  581:/usr/include/c++/4.8.2/bits/basic_string.h ****       {
  582:/usr/include/c++/4.8.2/bits/basic_string.h **** 	// NB: DR 1204.
  583:/usr/include/c++/4.8.2/bits/basic_string.h **** 	this->swap(__str);
- 3086              		.loc 5 583 0
- 3087 12d4 488D9C24 		lea	rbx, [rsp+352]	# tmp1446,
- 3087      60010000 
- 3088              	.LVL195:
- 3089              	.LBE1394:
- 3090              	.LBE1393:
- 3091              	.LBB1396:
- 3092              	.LBB1388:
- 3093              	.LBB1389:
+ 2861              		.loc 5 583 0
+ 2862 02da 4C8D6424 		lea	r12, [rsp+64]	# tmp341,
+ 2862      40
+ 2863              	.LVL172:
+ 2864              	.LBE1337:
+ 2865              	.LBE1336:
+ 2866              	.LBB1339:
+ 2867              	.LBB1331:
+ 2868              	.LBB1332:
  275:/usr/include/c++/4.8.2/bits/basic_string.h **** 	: _Alloc(__a), _M_p(__dat) { }
- 3094              		.loc 5 275 0
- 3095 12dc 4C898424 		mov	QWORD PTR [rsp+352], r8	# MEM[(struct _Alloc_hider *)&D.73311]._M_p, D.73736
- 3095      60010000 
- 3096              	.LVL196:
- 3097              	.LBE1389:
- 3098              	.LBE1388:
- 3099              	.LBE1396:
- 3100              	.LBB1397:
- 3101              	.LBB1395:
- 3102              		.loc 5 583 0
- 3103 12e4 488DBC24 		lea	rdi, [rsp+320]	# tmp1849,
- 3103      40010000 
- 3104              	.LVL197:
- 3105 12ec 4889DE   		mov	rsi, rbx	#, tmp1446
- 3106              	.LEHB4:
- 3107 12ef E8000000 		call	_ZNSs4swapERSs	#
- 3107      00
- 3108              	.LEHE4:
- 3109              	.LVL198:
- 3110              	.L196:
- 3111              	.LBE1395:
- 3112              	.LBE1397:
- 3113              	.LBB1398:
- 3114              	.LBB1399:
- 3115              	.LBB1400:
- 3116              	.LBB1401:
- 3117              	.LBB1402:
- 3118              	.LBB1403:
+ 2869              		.loc 5 275 0
+ 2870 02df 4C895424 		mov	QWORD PTR [rsp+64], r10	# MEM[(struct _Alloc_hider *)&D.37026]._M_p, D.37201
+ 2870      40
+ 2871              	.LVL173:
+ 2872              	.LBE1332:
+ 2873              	.LBE1331:
+ 2874              	.LBE1339:
+ 2875              	.LBB1340:
+ 2876              	.LBB1338:
+ 2877              		.loc 5 583 0
+ 2878 02e4 488D7C24 		lea	rdi, [rsp+32]	# tmp343,
+ 2878      20
+ 2879              	.LVL174:
+ 2880 02e9 4C89E6   		mov	rsi, r12	# tmp342, tmp303
+ 2881              	.LEHB4:
+ 2882 02ec E8000000 		call	_ZNSs4swapERSs	#
+ 2882      00
+ 2883              	.LEHE4:
+ 2884              	.LVL175:
+ 2885              	.L198:
+ 2886              	.LBE1338:
+ 2887              	.LBE1340:
+ 2888              	.LBB1341:
+ 2889              	.LBB1342:
+ 2890              	.LBB1343:
+ 2891              	.LBB1344:
+ 2892              	.LBB1345:
+ 2893              	.LBB1346:
  293:/usr/include/c++/4.8.2/bits/basic_string.h ****       { return  _M_dataplus._M_p; }
- 3119              		.loc 5 293 0
- 3120 12f4 4C8B9424 		mov	r10, QWORD PTR [rsp+352]	# D.73736,
- 3120      60010000 
- 3121              	.LBE1403:
- 3122              	.LBE1402:
- 3123              	.LBE1401:
- 3124              	.LBE1400:
+ 2894              		.loc 5 293 0
+ 2895 02f1 488B4424 		mov	rax, QWORD PTR [rsp+64]	# D.37201,
+ 2895      40
+ 2896              	.LBE1346:
+ 2897              	.LBE1345:
+ 2898              	.LBE1344:
+ 2899              	.LBE1343:
  539:/usr/include/c++/4.8.2/bits/basic_string.h ****       { _M_rep()->_M_dispose(this->get_allocator()); }
- 3125              		.loc 5 539 0
- 3126 12fc 498D7AE8 		lea	rdi, [r10-24]	# D.73739,
- 3127              	.LVL199:
- 3128              	.LBB1404:
- 3129              	.LBB1405:
+ 2900              		.loc 5 539 0
+ 2901 02f6 488D78E8 		lea	rdi, [rax-24]	# D.37204,
+ 2902              	.LVL176:
+ 2903              	.LBB1347:
+ 2904              	.LBB1348:
  240:/usr/include/c++/4.8.2/bits/basic_string.h **** 	  if (__builtin_expect(this != &_S_empty_rep(), false))
- 3130              		.loc 5 240 0
- 3131 1300 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.73739,
- 3131      000000
- 3132 1307 0F85D102 		jne	.L199	#,
- 3132      0000
- 3133              	.LVL200:
- 3134              	.L105:
- 3135              	.LBE1405:
- 3136              	.LBE1404:
- 3137              	.LBE1399:
- 3138              	.LBE1398:
- 3139              	.LBE1496:
- 3140              	.LBE1501:
- 3141              	.LBE1506:
- 3142              	.LBB1507:
- 3143              	.LBB1508:
- 3144              	.LBB1509:
- 3145              	.LBB1510:
- 3146              	.LBB1511:
- 3147              	.LBB1512:
- 3148              	.LBB1513:
+ 2905              		.loc 5 240 0
+ 2906 02fa 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.37204,
+ 2906      000000
+ 2907 0301 0F857002 		jne	.L202	#,
+ 2907      0000
+ 2908              	.LVL177:
+ 2909              	.L132:
+ 2910              	.LBE1348:
+ 2911              	.LBE1347:
+ 2912              	.LBE1342:
+ 2913              	.LBE1341:
+ 2914              	.LBE1439:
+ 2915              	.LBE1444:
+ 2916              	.LBE1449:
+ 2917              	.LBB1450:
+ 2918              	.LBB1451:
+ 2919              	.LBB1452:
+ 2920              	.LBB1453:
+ 2921              	.LBB1454:
+ 2922              	.LBB1455:
+ 2923              	.LBB1456:
  293:/usr/include/c++/4.8.2/bits/basic_string.h ****       { return  _M_dataplus._M_p; }
- 3149              		.loc 5 293 0
- 3150 130d 488BB424 		mov	rsi, QWORD PTR [rsp+320]	# D.73736, D.62922._M_dataplus._M_p
- 3150      40010000 
- 3151              	.LVL201:
- 3152              	.LBE1513:
- 3153              	.LBE1512:
- 3154              	.LBE1511:
- 3155              	.LBE1510:
- 3156              	.LBE1509:
+ 2924              		.loc 5 293 0
+ 2925 0307 488B7424 		mov	rsi, QWORD PTR [rsp+32]	# D.37201, D.33253._M_dataplus._M_p
+ 2925      20
+ 2926              	.LVL178:
+ 2927              	.LBE1456:
+ 2928              	.LBE1455:
+ 2929              	.LBE1454:
+ 2930              	.LBE1453:
+ 2931              	.LBE1452:
  584:/usr/include/c++/4.8.2/bits/basic_string.h **** 	return *this;
  585:/usr/include/c++/4.8.2/bits/basic_string.h ****       }
  586:/usr/include/c++/4.8.2/bits/basic_string.h **** 
@@ -9994,19 +9358,19 @@
 2756:/usr/include/c++/4.8.2/bits/basic_string.h ****       // _GLIBCXX_RESOLVE_LIB_DEFECTS
 2757:/usr/include/c++/4.8.2/bits/basic_string.h ****       // 586. string inserter not a formatted function
 2758:/usr/include/c++/4.8.2/bits/basic_string.h ****       return __ostream_insert(__os, __str.data(), __str.size());
- 3157              		.loc 5 2758 0
- 3158 1315 BF000000 		mov	edi, OFFSET FLAT:_ZSt4cout	#,
- 3158      00
- 3159 131a 488B56E8 		mov	rdx, QWORD PTR [rsi-24]	# MEM[(struct _Rep *)_37 + -24B].D.22725._M_length, MEM[(struct _Rep *
- 3160              	.LEHB5:
- 3161 131e E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l	#
- 3161      00
- 3162              	.LVL202:
- 3163              	.LBE1508:
- 3164              	.LBE1507:
- 3165              	.LBB1515:
- 3166              	.LBB1516:
- 3167              	.LBB1517:
+ 2932              		.loc 5 2758 0
+ 2933 030c BF000000 		mov	edi, OFFSET FLAT:_ZSt4cout	#,
+ 2933      00
+ 2934 0311 488B56E8 		mov	rdx, QWORD PTR [rsi-24]	# MEM[(struct _Rep *)_43 + -24B].D.22725._M_length, MEM[(struct _Rep *
+ 2935              	.LEHB5:
+ 2936 0315 E8000000 		call	_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l	#
+ 2936      00
+ 2937              	.LVL179:
+ 2938              	.LBE1451:
+ 2939              	.LBE1450:
+ 2940              	.LBB1458:
+ 2941              	.LBB1459:
+ 2942              	.LBB1460:
  539:/usr/include/c++/4.8.2/ostream **** 
  540:/usr/include/c++/4.8.2/ostream ****   // Signed and unsigned
  541:/usr/include/c++/4.8.2/ostream ****   template<class _Traits>
@@ -10034,46 +9398,46 @@
  563:/usr/include/c++/4.8.2/ostream ****     inline basic_ostream<_CharT, _Traits>&
  564:/usr/include/c++/4.8.2/ostream ****     endl(basic_ostream<_CharT, _Traits>& __os)
  565:/usr/include/c++/4.8.2/ostream ****     { return flush(__os.put(__os.widen('\n'))); }
- 3168              		.loc 1 565 0
- 3169 1323 488B38   		mov	rdi, QWORD PTR [rax]	# _40->_vptr.basic_ostream, _40->_vptr.basic_ostream
- 3170              	.LBE1517:
- 3171              	.LBE1516:
- 3172              	.LBE1515:
- 3173              	.LBB1537:
- 3174              	.LBB1514:
- 3175              		.loc 5 2758 0
- 3176 1326 4989C6   		mov	r14, rax	# D.73732,
- 3177              	.LVL203:
- 3178              	.LBE1514:
- 3179              	.LBE1537:
- 3180              	.LBE1629:
- 3181              	.LBE1635:
- 3182              	.LBE1641:
- 3183              		.loc 1 565 0
- 3184 1329 4C8B5FE8 		mov	r11, QWORD PTR [rdi-24]	# MEM[(long int *)_306 + -24B], MEM[(long int *)_306 + -24B]
- 3185 132d 4E8BA418 		mov	r12, QWORD PTR [rax+240+r11]	# D.73751, MEM[(const struct basic_ios *)_309 + 240B]
- 3185      F0000000 
- 3186              	.LVL204:
- 3187              	.LBB1642:
- 3188              	.LBB1636:
- 3189              	.LBB1630:
- 3190              	.LBB1538:
- 3191              	.LBB1534:
- 3192              	.LBB1531:
- 3193              	.LBB1518:
- 3194              	.LBB1519:
- 3195              	.LBB1520:
+ 2943              		.loc 1 565 0
+ 2944 031a 488B38   		mov	rdi, QWORD PTR [rax]	# _46->_vptr.basic_ostream, _46->_vptr.basic_ostream
+ 2945              	.LBE1460:
+ 2946              	.LBE1459:
+ 2947              	.LBE1458:
+ 2948              	.LBB1480:
+ 2949              	.LBB1457:
+ 2950              		.loc 5 2758 0
+ 2951 031d 4989C6   		mov	r14, rax	# D.37199,
+ 2952              	.LVL180:
+ 2953              	.LBE1457:
+ 2954              	.LBE1480:
+ 2955              	.LBE1574:
+ 2956              	.LBE1582:
+ 2957              	.LBE1588:
+ 2958              		.loc 1 565 0
+ 2959 0320 4C8B4FE8 		mov	r9, QWORD PTR [rdi-24]	# MEM[(long int *)_157 + -24B], MEM[(long int *)_157 + -24B]
+ 2960 0324 4E8BA408 		mov	r12, QWORD PTR [rax+240+r9]	# D.37215, MEM[(const struct basic_ios *)_160 + 240B]
+ 2960      F0000000 
+ 2961              	.LVL181:
+ 2962              	.LBB1589:
+ 2963              	.LBB1583:
+ 2964              	.LBB1575:
+ 2965              	.LBB1481:
+ 2966              	.LBB1477:
+ 2967              	.LBB1474:
+ 2968              	.LBB1461:
+ 2969              	.LBB1462:
+ 2970              	.LBB1463:
   48:/usr/include/c++/4.8.2/bits/basic_ios.h ****       if (!__f)
- 3196              		.loc 3 48 0
- 3197 1335 4D85E4   		test	r12, r12	# D.73751
- 3198 1338 0F847702 		je	.L200	#,
- 3198      0000
- 3199              	.LVL205:
- 3200              	.LBE1520:
- 3201              	.LBE1519:
- 3202              	.LBB1522:
- 3203              	.LBB1523:
- 3204              		.file 15 "/usr/include/c++/4.8.2/bits/locale_facets.h"
+ 2971              		.loc 3 48 0
+ 2972 032c 4D85E4   		test	r12, r12	# D.37215
+ 2973 032f 0F841F02 		je	.L203	#,
+ 2973      0000
+ 2974              	.LVL182:
+ 2975              	.LBE1463:
+ 2976              	.LBE1462:
+ 2977              	.LBB1465:
+ 2978              	.LBB1466:
+ 2979              		.file 12 "/usr/include/c++/4.8.2/bits/locale_facets.h"
    1:/usr/include/c++/4.8.2/bits/locale_facets.h **** // Locale support -*- C++ -*-
    2:/usr/include/c++/4.8.2/bits/locale_facets.h **** 
    3:/usr/include/c++/4.8.2/bits/locale_facets.h **** // Copyright (C) 1997-2013 Free Software Foundation, Inc.
@@ -10941,28 +10305,28 @@
  865:/usr/include/c++/4.8.2/bits/locale_facets.h ****       widen(char __c) const
  866:/usr/include/c++/4.8.2/bits/locale_facets.h ****       {
  867:/usr/include/c++/4.8.2/bits/locale_facets.h **** 	if (_M_widen_ok)
- 3205              		.loc 15 867 0
- 3206 133e 41807C24 		cmp	BYTE PTR [r12+56], 0	# MEM[(const struct ctype *)_310]._M_widen_ok,
- 3206      3800
- 3207 1344 0F842B02 		je	.L122	#,
- 3207      0000
+ 2980              		.loc 12 867 0
+ 2981 0335 41807C24 		cmp	BYTE PTR [r12+56], 0	# MEM[(const struct ctype *)_161]._M_widen_ok,
+ 2981      3800
+ 2982 033b 0F84D201 		je	.L149	#,
+ 2982      0000
  868:/usr/include/c++/4.8.2/bits/locale_facets.h **** 	  return _M_widen[static_cast<unsigned char>(__c)];
- 3208              		.loc 15 868 0
- 3209 134a 410FB644 		movzx	eax, BYTE PTR [r12+67]	# D.73753, MEM[(const struct ctype *)_310]._M_widen
- 3209      2443
- 3210              	.LVL206:
- 3211              	.L123:
- 3212              	.LBE1523:
- 3213              	.LBE1522:
- 3214              	.LBE1518:
- 3215              		.loc 1 565 0
- 3216 1350 0FBEF0   		movsx	esi, al	# D.73734, D.73753
- 3217 1353 4C89F7   		mov	rdi, r14	#, D.73732
- 3218 1356 E8000000 		call	_ZNSo3putEc	#
- 3218      00
- 3219              	.LVL207:
- 3220              	.LBB1527:
- 3221              	.LBB1528:
+ 2983              		.loc 12 868 0
+ 2984 0341 410FB644 		movzx	eax, BYTE PTR [r12+67]	# D.37217, MEM[(const struct ctype *)_161]._M_widen
+ 2984      2443
+ 2985              	.LVL183:
+ 2986              	.L150:
+ 2987              	.LBE1466:
+ 2988              	.LBE1465:
+ 2989              	.LBE1461:
+ 2990              		.loc 1 565 0
+ 2991 0347 0FBEF0   		movsx	esi, al	# D.37198, D.37217
+ 2992 034a 4C89F7   		mov	rdi, r14	#, D.37199
+ 2993 034d E8000000 		call	_ZNSo3putEc	#
+ 2993      00
+ 2994              	.LVL184:
+ 2995              	.LBB1470:
+ 2996              	.LBB1471:
  566:/usr/include/c++/4.8.2/ostream **** 
  567:/usr/include/c++/4.8.2/ostream ****   /**
  568:/usr/include/c++/4.8.2/ostream ****    *  @brief  Write a null character into the output sequence.
@@ -10985,84 +10349,84 @@
  585:/usr/include/c++/4.8.2/ostream ****     inline basic_ostream<_CharT, _Traits>&
  586:/usr/include/c++/4.8.2/ostream ****     flush(basic_ostream<_CharT, _Traits>& __os)
  587:/usr/include/c++/4.8.2/ostream ****     { return __os.flush(); }
- 3222              		.loc 1 587 0
- 3223 135b 4889C7   		mov	rdi, rax	#, D.73732
- 3224 135e E8000000 		call	_ZNSo5flushEv	#
- 3224      00
- 3225              	.LEHE5:
- 3226              	.LVL208:
- 3227              	.LBE1528:
- 3228              	.LBE1527:
- 3229              	.LBE1531:
- 3230              	.LBE1534:
- 3231              	.LBE1538:
- 3232              	.LBB1539:
- 3233              	.LBB1540:
- 3234              	.LBB1541:
- 3235              	.LBB1542:
- 3236              	.LBB1543:
- 3237              	.LBB1544:
+ 2997              		.loc 1 587 0
+ 2998 0352 4889C7   		mov	rdi, rax	#, D.37199
+ 2999 0355 E8000000 		call	_ZNSo5flushEv	#
+ 2999      00
+ 3000              	.LEHE5:
+ 3001              	.LVL185:
+ 3002              	.LBE1471:
+ 3003              	.LBE1470:
+ 3004              	.LBE1474:
+ 3005              	.LBE1477:
+ 3006              	.LBE1481:
+ 3007              	.LBB1482:
+ 3008              	.LBB1483:
+ 3009              	.LBB1484:
+ 3010              	.LBB1485:
+ 3011              	.LBB1486:
+ 3012              	.LBB1487:
  293:/usr/include/c++/4.8.2/bits/basic_string.h ****       { return  _M_dataplus._M_p; }
- 3238              		.loc 5 293 0
- 3239 1363 4C8B8424 		mov	r8, QWORD PTR [rsp+320]	# D.73736, D.62922._M_dataplus._M_p
- 3239      40010000 
- 3240              	.LBE1544:
- 3241              	.LBE1543:
- 3242              	.LBE1542:
- 3243              	.LBE1541:
+ 3013              		.loc 5 293 0
+ 3014 035a 4C8B5424 		mov	r10, QWORD PTR [rsp+32]	# D.37201, D.33253._M_dataplus._M_p
+ 3014      20
+ 3015              	.LBE1487:
+ 3016              	.LBE1486:
+ 3017              	.LBE1485:
+ 3018              	.LBE1484:
  539:/usr/include/c++/4.8.2/bits/basic_string.h ****       { _M_rep()->_M_dispose(this->get_allocator()); }
- 3244              		.loc 5 539 0
- 3245 136b 498D78E8 		lea	rdi, [r8-24]	# D.73739,
- 3246              	.LVL209:
- 3247              	.LBB1545:
- 3248              	.LBB1546:
+ 3019              		.loc 5 539 0
+ 3020 035f 498D7AE8 		lea	rdi, [r10-24]	# D.37204,
+ 3021              	.LVL186:
+ 3022              	.LBB1488:
+ 3023              	.LBB1489:
  240:/usr/include/c++/4.8.2/bits/basic_string.h **** 	  if (__builtin_expect(this != &_S_empty_rep(), false))
- 3249              		.loc 5 240 0
- 3250 136f 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.73739,
- 3250      000000
- 3251 1376 0F85C701 		jne	.L201	#,
- 3251      0000
- 3252              	.LVL210:
- 3253              	.L125:
- 3254              	.LBE1546:
- 3255              	.LBE1545:
- 3256              	.LBE1540:
- 3257              	.LBE1539:
-  28:main.cpp      ****       }
-  29:main.cpp      ****       ostr << "\n";
-  30:main.cpp      ****     }
-  31:main.cpp      ****     std::cout << ostr.str()<<std::endl;
-  32:main.cpp      ****     usleep(10000);
- 3258              		.loc 9 32 0
- 3259 137c BF102700 		mov	edi, 10000	#,
- 3259      00
- 3260              	.LEHB6:
- 3261 1381 E8000000 		call	usleep	#
- 3261      00
- 3262              	.LEHE6:
- 3263              	.LVL211:
- 3264              	.LBB1563:
- 3265              	.LBB1564:
- 3266              	.LBB1565:
- 3267              	.LBB1566:
- 3268              	.LBB1567:
- 3269              	.LBB1568:
- 3270              	.LBB1569:
- 3271              	.LBB1570:
- 3272              	.LBB1571:
- 3273              	.LBB1572:
+ 3024              		.loc 5 240 0
+ 3025 0363 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.37204,
+ 3025      000000
+ 3026 036a 0F857101 		jne	.L204	#,
+ 3026      0000
+ 3027              	.LVL187:
+ 3028              	.L152:
+ 3029              	.LBE1489:
+ 3030              	.LBE1488:
+ 3031              	.LBE1483:
+ 3032              	.LBE1482:
+ 118:saya.cpp      ****       }
+ 119:saya.cpp      ****       ostr << "\n";
+ 120:saya.cpp      ****     }
+ 121:saya.cpp      ****     std::cout << ostr.str()<<std::endl;
+ 122:saya.cpp      ****     usleep(10000);
+ 3033              		.loc 8 122 0
+ 3034 0370 BF102700 		mov	edi, 10000	#,
+ 3034      00
+ 3035              	.LEHB6:
+ 3036 0375 E8000000 		call	usleep	#
+ 3036      00
+ 3037              	.LEHE6:
+ 3038              	.LVL188:
+ 3039              	.LBB1506:
+ 3040              	.LBB1507:
+ 3041              	.LBB1508:
+ 3042              	.LBB1509:
+ 3043              	.LBB1510:
+ 3044              	.LBB1511:
+ 3045              	.LBB1512:
+ 3046              	.LBB1513:
+ 3047              	.LBB1514:
+ 3048              	.LBB1515:
  293:/usr/include/c++/4.8.2/bits/basic_string.h ****       { return  _M_dataplus._M_p; }
- 3274              		.loc 5 293 0
- 3275 1386 488B9C24 		mov	rbx, QWORD PTR [rsp+464]	# D.73736, MEM[(const struct basic_string *)&ostr + 80B]._M_dataplus.
- 3275      D0010000 
- 3276              	.LBE1572:
- 3277              	.LBE1571:
- 3278              	.LBE1570:
- 3279              	.LBE1569:
- 3280              	.LBE1568:
- 3281              	.LBE1567:
- 3282              	.LBE1566:
- 3283              	.LBE1565:
+ 3049              		.loc 5 293 0
+ 3050 037a 4C8B8424 		mov	r8, QWORD PTR [rsp+176]	# D.37201, MEM[(const struct basic_string *)&ostr + 80B]._M_dataplus._
+ 3050      B0000000 
+ 3051              	.LBE1515:
+ 3052              	.LBE1514:
+ 3053              	.LBE1513:
+ 3054              	.LBE1512:
+ 3055              	.LBE1511:
+ 3056              	.LBE1510:
+ 3057              	.LBE1509:
+ 3058              	.LBE1508:
  426:/usr/include/c++/4.8.2/sstream **** 
  427:/usr/include/c++/4.8.2/sstream ****       /**
  428:/usr/include/c++/4.8.2/sstream ****        *  @brief  Starts with an existing string buffer.
@@ -11091,241 +10455,229 @@
  451:/usr/include/c++/4.8.2/sstream ****       */
  452:/usr/include/c++/4.8.2/sstream ****       ~basic_ostringstream()
  453:/usr/include/c++/4.8.2/sstream ****       { }
- 3284              		.loc 4 453 0
- 3285 138e 48C78424 		mov	QWORD PTR [rsp+384], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+24	# os
- 3285      80010000 
- 3285      00000000 
- 3286 139a 48C78424 		mov	QWORD PTR [rsp+472], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+64	# ME
- 3286      D8010000 
- 3286      00000000 
- 3287              	.LVL212:
- 3288              	.LBB1600:
- 3289              	.LBB1597:
+ 3059              		.loc 4 453 0
+ 3060 0382 48C74424 		mov	QWORD PTR [rsp+96], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+24	# ost
+ 3060      60000000 
+ 3060      00
+ 3061 038b 48C78424 		mov	QWORD PTR [rsp+184], OFFSET FLAT:_ZTVSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE+64	# ME
+ 3061      B8000000 
+ 3061      00000000 
+ 3062              	.LVL189:
+ 3063              	.LBB1546:
+ 3064              	.LBB1542:
   64:/usr/include/c++/4.8.2/sstream ****     class basic_stringbuf : public basic_streambuf<_CharT, _Traits>
- 3290              		.loc 4 64 0
- 3291 13a6 48C78424 		mov	QWORD PTR [rsp+392], OFFSET FLAT:_ZTVSt15basic_stringbufIcSt11char_traitsIcESaIcEE+16	# MEM[(s
- 3291      88010000 
- 3291      00000000 
- 3292              	.LVL213:
- 3293              	.LBB1592:
- 3294              	.LBB1589:
+ 3065              		.loc 4 64 0
+ 3066 0397 48C74424 		mov	QWORD PTR [rsp+104], OFFSET FLAT:_ZTVSt15basic_stringbufIcSt11char_traitsIcESaIcEE+16	# MEM[(s
+ 3066      68000000 
+ 3066      00
+ 3067              	.LVL190:
+ 3068              	.LBB1535:
+ 3069              	.LBB1532:
  539:/usr/include/c++/4.8.2/bits/basic_string.h ****       { _M_rep()->_M_dispose(this->get_allocator()); }
- 3295              		.loc 5 539 0
- 3296 13b2 488D7BE8 		lea	rdi, [rbx-24]	# D.73739,
- 3297              	.LVL214:
- 3298              	.LBB1573:
- 3299              	.LBB1574:
+ 3070              		.loc 5 539 0
+ 3071 03a0 498D78E8 		lea	rdi, [r8-24]	# D.37204,
+ 3072              	.LVL191:
+ 3073              	.LBB1516:
+ 3074              	.LBB1517:
  240:/usr/include/c++/4.8.2/bits/basic_string.h **** 	  if (__builtin_expect(this != &_S_empty_rep(), false))
- 3300              		.loc 5 240 0
- 3301 13b6 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.73739,
- 3301      000000
- 3302 13bd 0F854701 		jne	.L202	#,
- 3302      0000
- 3303              	.LVL215:
- 3304              	.L130:
- 3305              	.LBE1574:
- 3306              	.LBE1573:
- 3307              	.LBE1589:
- 3308              	.LBE1592:
- 3309              	.LBB1593:
- 3310              	.LBB1594:
+ 3075              		.loc 5 240 0
+ 3076 03a4 4881FF00 		cmp	rdi, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# D.37204,
+ 3076      000000
+ 3077 03ab 0F85FA00 		jne	.L205	#,
+ 3077      0000
+ 3078              	.LVL192:
+ 3079              	.L157:
+ 3080              	.LBE1517:
+ 3081              	.LBE1516:
+ 3082              	.LBE1532:
+ 3083              	.LBE1535:
+ 3084              	.LBB1536:
+ 3085              	.LBB1537:
  198:/usr/include/c++/4.8.2/streambuf ****       { }
- 3311              		.loc 6 198 0
- 3312 13c3 488DBC24 		lea	rdi, [rsp+448]	# tmp1404,
- 3312      C0010000 
- 3313 13cb 48C78424 		mov	QWORD PTR [rsp+392], OFFSET FLAT:_ZTVSt15basic_streambufIcSt11char_traitsIcEE+16	# MEM[(struct
- 3313      88010000 
- 3313      00000000 
- 3314 13d7 E8000000 		call	_ZNSt6localeD1Ev	#
- 3314      00
- 3315              	.LVL216:
- 3316              	.LBE1594:
- 3317              	.LBE1593:
- 3318              	.LBE1597:
- 3319              	.LBE1600:
- 3320              	.LBB1601:
- 3321              	.LBB1602:
+ 3086              		.loc 6 198 0
+ 3087 03b1 488DBC24 		lea	rdi, [rsp+160]	# tmp290,
+ 3087      A0000000 
+ 3088              	.LBE1537:
+ 3089              	.LBE1536:
+ 3090              	.LBE1542:
+ 3091              	.LBE1546:
+ 3092              	.LBE1507:
+ 3093              	.LBE1506:
+ 3094              	.LBE1575:
+ 108:saya.cpp      ****   for(int t = 0;;++t){
+ 3095              		.loc 8 108 0
+ 3096 03b9 83C301   		add	ebx, 1	# t,
+ 3097              	.LVL193:
+ 3098              	.LBB1576:
+ 3099              	.LBB1557:
+ 3100              	.LBB1554:
+ 3101              	.LBB1547:
+ 3102              	.LBB1543:
+ 3103              	.LBB1539:
+ 3104              	.LBB1538:
+ 198:/usr/include/c++/4.8.2/streambuf ****       { }
+ 3105              		.loc 6 198 0
+ 3106 03bc 48C74424 		mov	QWORD PTR [rsp+104], OFFSET FLAT:_ZTVSt15basic_streambufIcSt11char_traitsIcEE+16	# MEM[(struct
+ 3106      68000000 
+ 3106      00
+ 3107 03c5 E8000000 		call	_ZNSt6localeD1Ev	#
+ 3107      00
+ 3108              	.LVL194:
+ 3109              	.LBE1538:
+ 3110              	.LBE1539:
+ 3111              	.LBE1543:
+ 3112              	.LBE1547:
+ 3113              	.LBB1548:
+ 3114              	.LBB1549:
   93:/usr/include/c++/4.8.2/ostream ****       ~basic_ostream() { }
- 3322              		.loc 1 93 0
- 3323 13dc 488B3D00 		mov	rdi, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+8]	# tmp1867, MEM[(co
- 3323      000000
- 3324 13e3 4C8B0500 		mov	r8, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+16]	# tmp1869, MEM[(co
- 3324      000000
- 3325 13ea 488B47E8 		mov	rax, QWORD PTR [rdi-24]	# MEM[(long int *)_915 + -24B], MEM[(long int *)_915 + -24B]
- 3326 13ee 4889BC24 		mov	QWORD PTR [rsp+384], rdi	# MEM[(struct basic_ostream *)&ostr]._vptr.basic_ostream, tmp1867
- 3326      80010000 
- 3327              	.LBE1602:
- 3328              	.LBE1601:
- 3329              	.LBB1604:
- 3330              	.LBB1605:
+ 3115              		.loc 1 93 0
+ 3116 03ca 498B7FE8 		mov	rdi, QWORD PTR [r15-24]	# MEM[(long int *)_87 + -24B], MEM[(long int *)_87 + -24B]
+ 3117 03ce 4C897C24 		mov	QWORD PTR [rsp+96], r15	# MEM[(struct basic_ostream *)&ostr]._vptr.basic_ostream, D.37206
+ 3117      60
+ 3118 03d3 488B1500 		mov	rdx, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+16]	# tmp363, MEM[(co
+ 3118      000000
+ 3119 03da 4889543C 		mov	QWORD PTR [rsp+96+rdi], rdx	# _189->D.29168._vptr.ios_base, tmp363
+ 3119      60
+ 3120              	.LVL195:
+ 3121              	.LBE1549:
+ 3122              	.LBE1548:
+ 3123              	.LBB1550:
+ 3124              	.LBB1551:
  276:/usr/include/c++/4.8.2/bits/basic_ios.h ****       ~basic_ios() { }
- 3331              		.loc 3 276 0
- 3332 13f6 488DBC24 		lea	rdi, [rsp+472]	# tmp1407,
- 3332      D8010000 
- 3333              	.LBE1605:
- 3334              	.LBE1604:
- 3335              	.LBB1607:
- 3336              	.LBB1603:
-  93:/usr/include/c++/4.8.2/ostream ****       ~basic_ostream() { }
- 3337              		.loc 1 93 0
- 3338 13fe 4C898404 		mov	QWORD PTR [rsp+384+rax], r8	# _338->D.29168._vptr.ios_base, tmp1869
- 3338      80010000 
- 3339              	.LVL217:
- 3340              	.LBE1603:
- 3341              	.LBE1607:
- 3342              	.LBB1608:
- 3343              	.LBB1606:
- 276:/usr/include/c++/4.8.2/bits/basic_ios.h ****       ~basic_ios() { }
- 3344              		.loc 3 276 0
- 3345 1406 48C78424 		mov	QWORD PTR [rsp+472], OFFSET FLAT:_ZTVSt9basic_iosIcSt11char_traitsIcEE+16	# MEM[(struct basic_
- 3345      D8010000 
- 3345      00000000 
- 3346 1412 E8000000 		call	_ZNSt8ios_baseD2Ev	#
- 3346      00
- 3347              	.LVL218:
- 3348              	.LBE1606:
- 3349              	.LBE1608:
- 3350              	.LBE1564:
- 3351              	.LBE1563:
- 3352              	.LBE1630:
-  20:main.cpp      ****   for(int t=0;;++t){
- 3353              		.loc 9 20 0
- 3354 1417 83042401 		add	DWORD PTR [rsp], 1	# %sfp,
- 3355              	.LVL219:
-  33:main.cpp      ****   }
- 3356              		.loc 9 33 0
- 3357 141b E921ECFF 		jmp	.L134	#
- 3357      FF
- 3358              	.LVL220:
- 3359              		.p2align 4,,10
- 3360              		.p2align 3
- 3361              	.L140:
- 3362 1420 4863FF   		movsx	rdi, edi	# D.73750, D.73734
- 3363 1423 4D63FF   		movsx	r15, r15d	# D.73750, D.73734
- 3364              	.LBB1631:
- 3365              	.LBB1613:
- 3366              	.LBB1269:
- 3367              	.LBB1268:
- 3368              	.LBB1267:
- 3369              	.LBB1261:
- 3370              	.LBB1259:
- 3371              	.LBB1257:
-  32:naive-integrator.hpp ****             V_other[x][y][z] = V[x][y][z] + dt*dv_dt;
- 3372              		.loc 10 32 0
- 3373 1426 C744244C 		mov	DWORD PTR [rsp+76], 100	# %sfp,
- 3373      64000000 
- 3374 142e C7842480 		mov	DWORD PTR [rsp+128], 0	# %sfp,
- 3374      00000000 
- 3374      000000
- 3375 1439 48897C24 		mov	QWORD PTR [rsp+112], rdi	# %sfp, D.73750
- 3375      70
- 3376 143e 8B9C2480 		mov	ebx, DWORD PTR [rsp+128]	# z, %sfp
- 3376      000000
- 3377 1445 4C897C24 		mov	QWORD PTR [rsp+104], r15	# %sfp, D.73750
- 3377      68
- 3378 144a 4C896C24 		mov	QWORD PTR [rsp+96], r13	# %sfp, D.73750
- 3378      60
- 3379 144f E958F0FF 		jmp	.L74	#
- 3379      FF
- 3380              	.LVL221:
- 3381              	.L145:
- 3382 1454 4889C3   		mov	rbx, rax	# tmp1335,
- 3383 1457 C5F877   		vzeroupper
- 3384              	.L89:
- 3385              	.LVL222:
- 3386              	.LBE1257:
- 3387              	.LBE1259:
- 3388              	.LBE1261:
- 3389              	.LBE1267:
- 3390              	.LBE1268:
- 3391              	.LBE1269:
- 3392              	.LBE1613:
- 3393              	.LBB1614:
- 3394              	.LBB1307:
- 3395              	.LBB1303:
- 3396              	.LBB1304:
- 276:/usr/include/c++/4.8.2/bits/basic_ios.h ****       ~basic_ios() { }
- 3397              		.loc 3 276 0
- 3398 145a 488DBC24 		lea	rdi, [rsp+472]	# tmp1338,
- 3398      D8010000 
- 3399              	.LVL223:
- 3400 1462 48C78424 		mov	QWORD PTR [rsp+472], OFFSET FLAT:_ZTVSt9basic_iosIcSt11char_traitsIcEE+16	# MEM[(struct basic_
- 3400      D8010000 
- 3400      00000000 
- 3401 146e E8000000 		call	_ZNSt8ios_baseD2Ev	#
- 3401      00
- 3402              	.LVL224:
- 3403 1473 4889DF   		mov	rdi, rbx	#, tmp1335
- 3404              	.LEHB7:
- 3405 1476 E8000000 		call	_Unwind_Resume	#
- 3405      00
- 3406              	.LVL225:
- 3407              	.L143:
- 3408 147b 4989C7   		mov	r15, rax	# tmp1387,
- 3409 147e C5F877   		vzeroupper
- 3410              	.L120:
- 3411              	.LBE1304:
- 3412              	.LBE1303:
- 3413              	.LBE1307:
- 3414              	.LBE1614:
- 3415              		.loc 9 33 0
- 3416 1481 488DBC24 		lea	rdi, [rsp+384]	# tmp1873,
- 3416      80010000 
- 3417 1489 E8000000 		call	_ZNSt19basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev	#
- 3417      00
- 3418              	.LVL226:
- 3419 148e 4C89FF   		mov	rdi, r15	#, tmp1387
- 3420 1491 E8000000 		call	_Unwind_Resume	#
- 3420      00
- 3421              	.LEHE7:
- 3422              	.LVL227:
- 3423              	.L146:
- 3424              	.LBB1615:
- 3425              	.LBB1308:
+ 3125              		.loc 3 276 0
+ 3126 03df 488DBC24 		lea	rdi, [rsp+184]	# tmp293,
+ 3126      B8000000 
+ 3127              	.LVL196:
+ 3128 03e7 48C78424 		mov	QWORD PTR [rsp+184], OFFSET FLAT:_ZTVSt9basic_iosIcSt11char_traitsIcEE+16	# MEM[(struct basic_
+ 3128      B8000000 
+ 3128      00000000 
+ 3129 03f3 E8000000 		call	_ZNSt8ios_baseD2Ev	#
+ 3129      00
+ 3130              	.LVL197:
+ 3131              	.LBE1551:
+ 3132              	.LBE1550:
+ 3133              	.LBE1554:
+ 3134              	.LBE1557:
+ 3135              	.LBE1576:
+ 123:saya.cpp      ****   }
+ 3136              		.loc 8 123 0
+ 3137 03f8 E929FCFF 		jmp	.L161	#
+ 3137      FF
+ 3138              	.LVL198:
+ 3139 03fd 0F1F00   		.p2align 4,,10
+ 3140              		.p2align 3
+ 3141              	.L199:
+ 3142              	.LBB1577:
+ 3143              	.LBB1558:
+ 3144              	.LBB1276:
+ 3145              	.LBB1275:
+ 3146              	.LBB1272:
+ 3147              	.LBB1271:
+ 3148              	.LBB1269:
+  99:saya.cpp      ****   if(global_clock > t) fill_initial_condition();
+ 3149              		.loc 8 99 0
+ 3150 0400 E8000000 		call	_Z22fill_initial_conditionv	#
+ 3150      00
+ 3151              	.LVL199:
+ 3152 0405 448B1500 		mov	r10d, DWORD PTR global_clock[rip]	# D.37198, global_clock
+ 3152      000000
+ 3153 040c E9AFFDFF 		jmp	.L113	#
+ 3153      FF
+ 3154              	.LVL200:
+ 3155              	.L173:
+ 3156              	.LBE1269:
+ 3157              	.LBE1271:
+ 3158              	.LBE1272:
+ 3159              	.LBE1275:
+ 3160              	.LBE1276:
+ 3161              	.LBE1558:
+ 3162              	.LBB1559:
+ 3163              	.LBB1253:
  424:/usr/include/c++/4.8.2/sstream ****       : __ostream_type(), _M_stringbuf(__mode | ios_base::out)
- 3426              		.loc 4 424 0
- 3427 1496 488DBC24 		lea	rdi, [rsp+392]	# tmp1329,
- 3427      88010000 
- 3428 149e 4889C3   		mov	rbx, rax	# tmp1331,
- 3429 14a1 C5F877   		vzeroupper
- 3430 14a4 E8000000 		call	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED1Ev	#
- 3430      00
- 3431              	.LVL228:
- 3432              	.LBB1305:
- 3433              	.LBB1306:
+ 3164              		.loc 4 424 0
+ 3165 0411 488D7C24 		lea	rdi, [rsp+104]	# tmp191,
+ 3165      68
+ 3166 0416 4889C3   		mov	rbx, rax	# tmp193,
+ 3167              	.LVL201:
+ 3168 0419 C5F877   		vzeroupper
+ 3169 041c E8000000 		call	_ZNSt15basic_stringbufIcSt11char_traitsIcESaIcEED1Ev	#
+ 3169      00
+ 3170              	.LVL202:
+ 3171              	.LBB1249:
+ 3172              	.LBB1250:
   93:/usr/include/c++/4.8.2/ostream ****       ~basic_ostream() { }
- 3434              		.loc 1 93 0
- 3435 14a9 488B0D00 		mov	rcx, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+8]	# tmp1837, MEM[(co
- 3435      000000
- 3436 14b0 488B3500 		mov	rsi, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+16]	# tmp1839, MEM[(c
- 3436      000000
- 3437 14b7 4C8B51E8 		mov	r10, QWORD PTR [rcx-24]	# MEM[(long int *)_915 + -24B], MEM[(long int *)_915 + -24B]
- 3438 14bb 48898C24 		mov	QWORD PTR [rsp+384], rcx	# MEM[(struct basic_ostream *)&ostr]._vptr.basic_ostream, tmp1837
- 3438      80010000 
- 3439 14c3 4A89B414 		mov	QWORD PTR [rsp+384+r10], rsi	# _238->D.29168._vptr.ios_base, tmp1839
- 3439      80010000 
- 3440 14cb EB8D     		jmp	.L89	#
- 3441              	.LVL229:
- 3442              	.L98:
- 3443              	.LBE1306:
- 3444              	.LBE1305:
- 3445              	.LBE1308:
- 3446              	.LBE1615:
- 3447              	.LBB1616:
- 3448              	.LBB1502:
- 3449              	.LBB1497:
- 3450              	.LBB1422:
- 3451              	.LBB1390:
- 3452              	.LBB1385:
- 3453              	.LBB1382:
- 3454              	.LBB1379:
- 3455              	.LBB1376:
- 3456              	.LBB1373:
- 3457              	.LBB1371:
- 3458              	.LBB1362:
- 3459              	.LBB1359:
- 3460              	.LBB1355:
- 3461              	.LBB1356:
+ 3173              		.loc 1 93 0
+ 3174 0421 4D8B5FE8 		mov	r11, QWORD PTR [r15-24]	# MEM[(long int *)_87 + -24B], MEM[(long int *)_87 + -24B]
+ 3175 0425 488B3500 		mov	rsi, QWORD PTR _ZTTSt19basic_ostringstreamIcSt11char_traitsIcESaIcEE[rip+16]	# tmp329, MEM[(co
+ 3175      000000
+ 3176 042c 4C897C24 		mov	QWORD PTR [rsp+96], r15	# MEM[(struct basic_ostream *)&ostr]._vptr.basic_ostream, D.37206
+ 3176      60
+ 3177 0431 4A89741C 		mov	QWORD PTR [rsp+96+r11], rsi	# _75->D.29168._vptr.ios_base, tmp329
+ 3177      60
+ 3178              	.LVL203:
+ 3179              	.L111:
+ 3180              	.LBE1250:
+ 3181              	.LBE1249:
+ 3182              	.LBB1251:
+ 3183              	.LBB1252:
+ 276:/usr/include/c++/4.8.2/bits/basic_ios.h ****       ~basic_ios() { }
+ 3184              		.loc 3 276 0
+ 3185 0436 488DBC24 		lea	rdi, [rsp+184]	# tmp200,
+ 3185      B8000000 
+ 3186              	.LVL204:
+ 3187 043e 48C78424 		mov	QWORD PTR [rsp+184], OFFSET FLAT:_ZTVSt9basic_iosIcSt11char_traitsIcEE+16	# MEM[(struct basic_
+ 3187      B8000000 
+ 3187      00000000 
+ 3188 044a E8000000 		call	_ZNSt8ios_baseD2Ev	#
+ 3188      00
+ 3189              	.LVL205:
+ 3190 044f 4889DF   		mov	rdi, rbx	#, tmp197
+ 3191              	.LEHB7:
+ 3192 0452 E8000000 		call	_Unwind_Resume	#
+ 3192      00
+ 3193              	.LVL206:
+ 3194              	.L172:
+ 3195 0457 4889C3   		mov	rbx, rax	# tmp197,
+ 3196              	.LVL207:
+ 3197 045a C5F877   		vzeroupper
+ 3198 045d EBD7     		jmp	.L111	#
+ 3199              	.LVL208:
+ 3200              	.L170:
+ 3201 045f 4889C3   		mov	rbx, rax	# tmp273,
+ 3202              	.LVL209:
+ 3203 0462 C5F877   		vzeroupper
+ 3204              	.L147:
+ 3205              	.LBE1252:
+ 3206              	.LBE1251:
+ 3207              	.LBE1253:
+ 3208              	.LBE1559:
+ 3209              		.loc 8 123 0
+ 3210 0465 488D7C24 		lea	rdi, [rsp+96]	# tmp367,
+ 3210      60
+ 3211 046a E8000000 		call	_ZNSt19basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev	#
+ 3211      00
+ 3212              	.LVL210:
+ 3213 046f 4889DF   		mov	rdi, rbx	#, tmp273
+ 3214 0472 E8000000 		call	_Unwind_Resume	#
+ 3214      00
+ 3215              	.LEHE7:
+ 3216              	.LVL211:
+ 3217              	.L125:
+ 3218              	.LBB1560:
+ 3219              	.LBB1445:
+ 3220              	.LBB1440:
+ 3221              	.LBB1365:
+ 3222              	.LBB1333:
+ 3223              	.LBB1328:
+ 3224              	.LBB1325:
+ 3225              	.LBB1322:
+ 3226              	.LBB1319:
+ 3227              	.LBB1316:
+ 3228              	.LBB1314:
+ 3229              	.LBB1305:
+ 3230              	.LBB1302:
+ 3231              	.LBB1298:
+ 3232              	.LBB1299:
  244:/usr/include/c++/4.8.2/bits/char_traits.h **** 
  245:/usr/include/c++/4.8.2/bits/char_traits.h ****       static _GLIBCXX_CONSTEXPR bool
  246:/usr/include/c++/4.8.2/bits/char_traits.h ****       eq(const char_type& __c1, const char_type& __c2) _GLIBCXX_NOEXCEPT
@@ -11354,831 +10706,834 @@
  269:/usr/include/c++/4.8.2/bits/char_traits.h ****       static char_type*
  270:/usr/include/c++/4.8.2/bits/char_traits.h ****       copy(char_type* __s1, const char_type* __s2, size_t __n)
  271:/usr/include/c++/4.8.2/bits/char_traits.h ****       { return static_cast<char_type*>(__builtin_memcpy(__s1, __s2, __n)); }
- 3462              		.loc 14 271 0
- 3463 14cd 4C89C7   		mov	rdi, r8	#, D.73736
- 3464 14d0 4C89E2   		mov	rdx, r12	#, __dnew
- 3465 14d3 4889DE   		mov	rsi, rbx	#, D.73743
- 3466 14d6 E8000000 		call	memcpy	#
- 3466      00
- 3467              	.LVL230:
- 3468 14db 4989C0   		mov	r8, rax	# D.73736,
- 3469 14de E9D7FDFF 		jmp	.L99	#
- 3469      FF
- 3470              	.LVL231:
- 3471              	.L147:
- 3472 14e3 488D9C24 		lea	rbx, [rsp+352]	# tmp1446,
- 3472      60010000 
- 3473 14eb 4989C7   		mov	r15, rax	# tmp1375,
- 3474 14ee C5F877   		vzeroupper
- 3475              	.L118:
- 3476              	.LVL232:
- 3477              	.LBE1356:
- 3478              	.LBE1355:
- 3479              	.LBE1359:
- 3480              	.LBE1362:
- 3481              	.LBE1371:
- 3482              	.LBE1373:
- 3483              	.LBE1376:
- 3484              	.LBE1379:
- 3485              	.LBE1382:
- 3486              	.LBE1385:
- 3487              	.LBE1390:
- 3488              	.LBE1422:
- 3489              	.LBB1423:
- 3490              	.LBB1424:
+ 3233              		.loc 11 271 0
+ 3234 0477 4C89D7   		mov	rdi, r10	#, D.37201
+ 3235 047a 4C89EA   		mov	rdx, r13	#, __dnew
+ 3236 047d 4C89E6   		mov	rsi, r12	#, D.37207
+ 3237 0480 E8000000 		call	memcpy	#
+ 3237      00
+ 3238              	.LVL212:
+ 3239 0485 4989C2   		mov	r10, rax	# D.37201,
+ 3240 0488 E933FEFF 		jmp	.L126	#
+ 3240      FF
+ 3241              	.LVL213:
+ 3242              	.L174:
+ 3243 048d 4C8D6424 		lea	r12, [rsp+64]	# tmp303,
+ 3243      40
+ 3244 0492 4889C3   		mov	rbx, rax	# tmp261,
+ 3245              	.LVL214:
+ 3246 0495 C5F877   		vzeroupper
+ 3247              	.L145:
+ 3248              	.LVL215:
+ 3249              	.LBE1299:
+ 3250              	.LBE1298:
+ 3251              	.LBE1302:
+ 3252              	.LBE1305:
+ 3253              	.LBE1314:
+ 3254              	.LBE1316:
+ 3255              	.LBE1319:
+ 3256              	.LBE1322:
+ 3257              	.LBE1325:
+ 3258              	.LBE1328:
+ 3259              	.LBE1333:
+ 3260              	.LBE1365:
+ 3261              	.LBB1366:
+ 3262              	.LBB1367:
  539:/usr/include/c++/4.8.2/bits/basic_string.h ****       { _M_rep()->_M_dispose(this->get_allocator()); }
- 3491              		.loc 5 539 0
- 3492 14f1 488B9424 		mov	rdx, QWORD PTR [rsp+320]	# tmp1861, D.62922._M_dataplus._M_p
- 3492      40010000 
- 3493 14f9 4889DE   		mov	rsi, rbx	#, tmp1446
- 3494 14fc 488D7AE8 		lea	rdi, [rdx-24]	# D.73739,
- 3495 1500 E8000000 		call	_ZNSs4_Rep10_M_disposeERKSaIcE	#
- 3495      00
- 3496              	.LVL233:
- 3497 1505 E977FFFF 		jmp	.L120	#
- 3497      FF
- 3498              	.LVL234:
- 3499              	.L202:
- 3500              	.LBE1424:
- 3501              	.LBE1423:
- 3502              	.LBE1497:
- 3503              	.LBE1502:
- 3504              	.LBE1616:
- 3505              	.LBB1617:
- 3506              	.LBB1611:
- 3507              	.LBB1609:
- 3508              	.LBB1598:
- 3509              	.LBB1595:
- 3510              	.LBB1590:
- 3511              	.LBB1587:
- 3512              	.LBB1585:
+ 3263              		.loc 5 539 0
+ 3264 0498 4C8B5C24 		mov	r11, QWORD PTR [rsp+32]	# tmp357, D.33253._M_dataplus._M_p
+ 3264      20
+ 3265 049d 4C89E6   		mov	rsi, r12	#, tmp303
+ 3266 04a0 498D7BE8 		lea	rdi, [r11-24]	# D.37204,
+ 3267 04a4 E8000000 		call	_ZNSs4_Rep10_M_disposeERKSaIcE	#
+ 3267      00
+ 3268              	.LVL216:
+ 3269 04a9 EBBA     		jmp	.L147	#
+ 3270              	.LVL217:
+ 3271              	.L205:
+ 3272              	.LBE1367:
+ 3273              	.LBE1366:
+ 3274              	.LBE1440:
+ 3275              	.LBE1445:
+ 3276              	.LBE1560:
+ 3277              	.LBB1561:
+ 3278              	.LBB1555:
+ 3279              	.LBB1552:
+ 3280              	.LBB1544:
+ 3281              	.LBB1540:
+ 3282              	.LBB1533:
+ 3283              	.LBB1530:
+ 3284              	.LBB1528:
  246:/usr/include/c++/4.8.2/bits/basic_string.h **** 							 -1) <= 0)
- 3513              		.loc 5 246 0
- 3514 150a 4C8D7F10 		lea	r15, [rdi+16]	# D.73746,
- 3515              	.LVL235:
- 3516              	.LBB1575:
- 3517              	.LBB1576:
+ 3285              		.loc 5 246 0
+ 3286 04ab 4C8D7710 		lea	r14, [rdi+16]	# D.37210,
+ 3287              	.LVL218:
+ 3288              	.LBB1518:
+ 3289              	.LBB1519:
   81:/usr/include/c++/4.8.2/ext/atomicity.h ****     if (__gthread_active_p())
- 3518              		.loc 7 81 0
- 3519 150e 41BD0000 		mov	r13d, OFFSET FLAT:_ZL28__gthrw___pthread_key_createPjPFvPvE	# tmp1400,
- 3519      0000
- 3520 1514 4D85ED   		test	r13, r13	# tmp1400
- 3521 1517 0F848400 		je	.L131	#,
- 3521      0000
- 3522              	.LVL236:
- 3523              	.LBB1577:
- 3524              	.LBB1578:
+ 3290              		.loc 7 81 0
+ 3291 04af 41B90000 		mov	r9d, OFFSET FLAT:_ZL28__gthrw___pthread_key_createPjPFvPvE	# tmp286,
+ 3291      0000
+ 3292 04b5 4D85C9   		test	r9, r9	# tmp286
+ 3293 04b8 0F848100 		je	.L158	#,
+ 3293      0000
+ 3294              	.LVL219:
+ 3295              	.LBB1520:
+ 3296              	.LBB1521:
   49:/usr/include/c++/4.8.2/ext/atomicity.h ****   { return __atomic_fetch_add(__mem, __val, __ATOMIC_ACQ_REL); }
- 3525              		.loc 7 49 0
- 3526 151d 41BCFFFF 		mov	r12d, -1	# D.73747,
- 3526      FFFF
- 3527              	.LVL237:
- 3528 1523 F0450FC1 		lock xadd	DWORD PTR [r15], r12d	#,* D.73746, D.73747
- 3528      27
- 3529              	.LVL238:
- 3530              	.L132:
- 3531              	.LBE1578:
- 3532              	.LBE1577:
- 3533              	.LBE1576:
- 3534              	.LBE1575:
+ 3297              		.loc 7 49 0
+ 3298 04be 41BAFFFF 		mov	r10d, -1	# D.37211,
+ 3298      FFFF
+ 3299 04c4 F0450FC1 		lock xadd	DWORD PTR [r14], r10d	#,* D.37210, D.37211
+ 3299      16
+ 3300              	.LVL220:
+ 3301              	.L159:
+ 3302              	.LBE1521:
+ 3303              	.LBE1520:
+ 3304              	.LBE1519:
+ 3305              	.LBE1518:
  245:/usr/include/c++/4.8.2/bits/basic_string.h **** 	      if (__gnu_cxx::__exchange_and_add_dispatch(&this->_M_refcount,
- 3535              		.loc 5 245 0
- 3536 1528 4585E4   		test	r12d, r12d	# D.73748
- 3537 152b 0F8F92FE 		jg	.L130	#,
- 3537      FFFF
+ 3306              		.loc 5 245 0
+ 3307 04c9 4585D2   		test	r10d, r10d	# D.37212
+ 3308 04cc 0F8FDFFE 		jg	.L157	#,
+ 3308      FFFF
  249:/usr/include/c++/4.8.2/bits/basic_string.h **** 		  _M_destroy(__a);
- 3538              		.loc 5 249 0
- 3539 1531 488DB424 		lea	rsi, [rsp+352]	# tmp1865,
- 3539      60010000 
- 3540 1539 E8000000 		call	_ZNSs4_Rep10_M_destroyERKSaIcE	#
- 3540      00
- 3541              	.LVL239:
- 3542 153e E980FEFF 		jmp	.L130	#
- 3542      FF
- 3543              	.LVL240:
- 3544              	.L201:
- 3545              	.LBE1585:
- 3546              	.LBE1587:
- 3547              	.LBE1590:
- 3548              	.LBE1595:
- 3549              	.LBE1598:
- 3550              	.LBE1609:
- 3551              	.LBE1611:
- 3552              	.LBE1617:
- 3553              	.LBB1618:
- 3554              	.LBB1561:
- 3555              	.LBB1559:
- 3556              	.LBB1557:
+ 3309              		.loc 5 249 0
+ 3310 04d2 488D7424 		lea	rsi, [rsp+64]	# tmp361,
+ 3310      40
+ 3311 04d7 E8000000 		call	_ZNSs4_Rep10_M_destroyERKSaIcE	#
+ 3311      00
+ 3312              	.LVL221:
+ 3313 04dc E9D0FEFF 		jmp	.L157	#
+ 3313      FF
+ 3314              	.LVL222:
+ 3315              	.L204:
+ 3316              	.LBE1528:
+ 3317              	.LBE1530:
+ 3318              	.LBE1533:
+ 3319              	.LBE1540:
+ 3320              	.LBE1544:
+ 3321              	.LBE1552:
+ 3322              	.LBE1555:
+ 3323              	.LBE1561:
+ 3324              	.LBB1562:
+ 3325              	.LBB1504:
+ 3326              	.LBB1502:
+ 3327              	.LBB1500:
  246:/usr/include/c++/4.8.2/bits/basic_string.h **** 							 -1) <= 0)
- 3557              		.loc 5 246 0
- 3558 1543 4C8D4F10 		lea	r9, [rdi+16]	# D.73746,
- 3559              	.LVL241:
- 3560              	.LBB1547:
- 3561              	.LBB1548:
+ 3328              		.loc 5 246 0
+ 3329 04e1 488D5710 		lea	rdx, [rdi+16]	# D.37210,
+ 3330              	.LVL223:
+ 3331              	.LBB1490:
+ 3332              	.LBB1491:
   81:/usr/include/c++/4.8.2/ext/atomicity.h ****     if (__gthread_active_p())
- 3562              		.loc 7 81 0
- 3563 1547 B9000000 		mov	ecx, OFFSET FLAT:_ZL28__gthrw___pthread_key_createPjPFvPvE	# tmp1396,
- 3563      00
- 3564 154c 4885C9   		test	rcx, rcx	# tmp1396
- 3565 154f 7440     		je	.L126	#,
- 3566              	.LVL242:
- 3567              	.LBB1549:
- 3568              	.LBB1550:
+ 3333              		.loc 7 81 0
+ 3334 04e5 41BB0000 		mov	r11d, OFFSET FLAT:_ZL28__gthrw___pthread_key_createPjPFvPvE	# tmp282,
+ 3334      0000
+ 3335 04eb 4D85DB   		test	r11, r11	# tmp282
+ 3336 04ee 743F     		je	.L153	#,
+ 3337              	.LVL224:
+ 3338              	.LBB1492:
+ 3339              	.LBB1493:
   49:/usr/include/c++/4.8.2/ext/atomicity.h ****   { return __atomic_fetch_add(__mem, __val, __ATOMIC_ACQ_REL); }
- 3569              		.loc 7 49 0
- 3570 1551 BEFFFFFF 		mov	esi, -1	# D.73747,
- 3570      FF
- 3571 1556 F0410FC1 		lock xadd	DWORD PTR [r9], esi	#,* D.73746, D.73747
- 3571      31
- 3572              	.LVL243:
- 3573              	.L127:
- 3574              	.LBE1550:
- 3575              	.LBE1549:
- 3576              	.LBE1548:
- 3577              	.LBE1547:
+ 3340              		.loc 7 49 0
+ 3341 04f0 41BDFFFF 		mov	r13d, -1	# D.37211,
+ 3341      FFFF
+ 3342 04f6 F0440FC1 		lock xadd	DWORD PTR [rdx], r13d	#,* D.37210, D.37211
+ 3342      2A
+ 3343              	.LVL225:
+ 3344              	.L154:
+ 3345              	.LBE1493:
+ 3346              	.LBE1492:
+ 3347              	.LBE1491:
+ 3348              	.LBE1490:
  245:/usr/include/c++/4.8.2/bits/basic_string.h **** 	      if (__gnu_cxx::__exchange_and_add_dispatch(&this->_M_refcount,
- 3578              		.loc 5 245 0
- 3579 155b 85F6     		test	esi, esi	# D.73748
- 3580 155d 0F8F19FE 		jg	.L125	#,
- 3580      FFFF
+ 3349              		.loc 5 245 0
+ 3350 04fb 4585ED   		test	r13d, r13d	# D.37212
+ 3351 04fe 0F8F6CFE 		jg	.L152	#,
+ 3351      FFFF
  249:/usr/include/c++/4.8.2/bits/basic_string.h **** 		  _M_destroy(__a);
- 3581              		.loc 5 249 0
- 3582 1563 488DB424 		lea	rsi, [rsp+352]	# tmp1863,
- 3582      60010000 
- 3583 156b E8000000 		call	_ZNSs4_Rep10_M_destroyERKSaIcE	#
- 3583      00
- 3584              	.LVL244:
- 3585 1570 E907FEFF 		jmp	.L125	#
- 3585      FF
- 3586              	.LVL245:
- 3587              	.L122:
- 3588              	.LBE1557:
- 3589              	.LBE1559:
- 3590              	.LBE1561:
- 3591              	.LBE1618:
- 3592              	.LBB1619:
- 3593              	.LBB1535:
- 3594              	.LBB1532:
- 3595              	.LBB1529:
- 3596              	.LBB1525:
- 3597              	.LBB1524:
+ 3352              		.loc 5 249 0
+ 3353 0504 488D7424 		lea	rsi, [rsp+64]	# tmp359,
+ 3353      40
+ 3354 0509 E8000000 		call	_ZNSs4_Rep10_M_destroyERKSaIcE	#
+ 3354      00
+ 3355              	.LVL226:
+ 3356 050e E95DFEFF 		jmp	.L152	#
+ 3356      FF
+ 3357              	.LVL227:
+ 3358              	.L149:
+ 3359              	.LBE1500:
+ 3360              	.LBE1502:
+ 3361              	.LBE1504:
+ 3362              	.LBE1562:
+ 3363              	.LBB1563:
+ 3364              	.LBB1478:
+ 3365              	.LBB1475:
+ 3366              	.LBB1472:
+ 3367              	.LBB1468:
+ 3368              	.LBB1467:
  869:/usr/include/c++/4.8.2/bits/locale_facets.h **** 	this->_M_widen_init();
- 3598              		.loc 15 869 0
- 3599 1575 4C89E7   		mov	rdi, r12	#, D.73751
- 3600              	.LEHB8:
- 3601 1578 E8000000 		call	_ZNKSt5ctypeIcE13_M_widen_initEv	#
- 3601      00
- 3602              	.LVL246:
+ 3369              		.loc 12 869 0
+ 3370 0513 4C89E7   		mov	rdi, r12	#, D.37215
+ 3371              	.LEHB8:
+ 3372 0516 E8000000 		call	_ZNKSt5ctypeIcE13_M_widen_initEv	#
+ 3372      00
+ 3373              	.LVL228:
  870:/usr/include/c++/4.8.2/bits/locale_facets.h **** 	return this->do_widen(__c);
- 3603              		.loc 15 870 0
- 3604 157d 498B0424 		mov	rax, QWORD PTR [r12]	# MEM[(const struct ctype *)_310].D.26081._vptr.facet, MEM[(const struct 
- 3605 1581 BE0A0000 		mov	esi, 10	#,
- 3605      00
- 3606 1586 4C89E7   		mov	rdi, r12	#, D.73751
- 3607 1589 FF5030   		call	[QWORD PTR [rax+48]]	# MEM[(int (*__vtbl_ptr_type) () *)_319 + 48B]
- 3608              	.LVL247:
- 3609 158c E9BFFDFF 		jmp	.L123	#
- 3609      FF
- 3610              	.LVL248:
- 3611              	.L126:
- 3612              	.LBE1524:
- 3613              	.LBE1525:
- 3614              	.LBE1529:
- 3615              	.LBE1532:
- 3616              	.LBE1535:
- 3617              	.LBE1619:
- 3618              	.LBB1620:
- 3619              	.LBB1562:
- 3620              	.LBB1560:
- 3621              	.LBB1558:
- 3622              	.LBB1556:
- 3623              	.LBB1555:
- 3624              	.LBB1551:
- 3625              	.LBB1552:
+ 3374              		.loc 12 870 0
+ 3375 051b 498B0424 		mov	rax, QWORD PTR [r12]	# MEM[(const struct ctype *)_161].D.26081._vptr.facet, MEM[(const struct 
+ 3376 051f BE0A0000 		mov	esi, 10	#,
+ 3376      00
+ 3377 0524 4C89E7   		mov	rdi, r12	#, D.37215
+ 3378 0527 FF5030   		call	[QWORD PTR [rax+48]]	# MEM[(int (*__vtbl_ptr_type) () *)_170 + 48B]
+ 3379              	.LVL229:
+ 3380 052a E918FEFF 		jmp	.L150	#
+ 3380      FF
+ 3381              	.LVL230:
+ 3382              	.L153:
+ 3383              	.LBE1467:
+ 3384              	.LBE1468:
+ 3385              	.LBE1472:
+ 3386              	.LBE1475:
+ 3387              	.LBE1478:
+ 3388              	.LBE1563:
+ 3389              	.LBB1564:
+ 3390              	.LBB1505:
+ 3391              	.LBB1503:
+ 3392              	.LBB1501:
+ 3393              	.LBB1499:
+ 3394              	.LBB1498:
+ 3395              	.LBB1494:
+ 3396              	.LBB1495:
   67:/usr/include/c++/4.8.2/ext/atomicity.h ****     _Atomic_word __result = *__mem;
- 3626              		.loc 7 67 0
- 3627 1591 418B50F8 		mov	edx, DWORD PTR [r8-8]	# __result, MEM[(_Atomic_word *)_41 + -8B]
- 3628              	.LVL249:
+ 3397              		.loc 7 67 0
+ 3398 052f 418B72F8 		mov	esi, DWORD PTR [r10-8]	# __result, MEM[(_Atomic_word *)_47 + -8B]
+ 3399              	.LVL231:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
- 3629              		.loc 7 68 0
- 3630 1595 448D52FF 		lea	r10d, [rdx-1]	# tmp1397,
- 3631              	.LBE1552:
- 3632              	.LBE1551:
- 3633              		.loc 7 84 0
- 3634 1599 89D6     		mov	esi, edx	# D.73748, __result
- 3635              	.LBB1554:
- 3636              	.LBB1553:
+ 3400              		.loc 7 68 0
+ 3401 0533 8D4EFF   		lea	ecx, [rsi-1]	# tmp283,
+ 3402              	.LBE1495:
+ 3403              	.LBE1494:
+ 3404              		.loc 7 84 0
+ 3405 0536 4189F5   		mov	r13d, esi	# D.37212, __result
+ 3406              	.LBB1497:
+ 3407              	.LBB1496:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
- 3637              		.loc 7 68 0
- 3638 159b 458950F8 		mov	DWORD PTR [r8-8], r10d	# MEM[(_Atomic_word *)_41 + -8B], tmp1397
- 3639 159f EBBA     		jmp	.L127	#
- 3640              	.LVL250:
- 3641              	.L131:
- 3642              	.LBE1553:
- 3643              	.LBE1554:
- 3644              	.LBE1555:
- 3645              	.LBE1556:
- 3646              	.LBE1558:
- 3647              	.LBE1560:
- 3648              	.LBE1562:
- 3649              	.LBE1620:
- 3650              	.LBB1621:
- 3651              	.LBB1612:
- 3652              	.LBB1610:
- 3653              	.LBB1599:
- 3654              	.LBB1596:
- 3655              	.LBB1591:
- 3656              	.LBB1588:
- 3657              	.LBB1586:
- 3658              	.LBB1584:
- 3659              	.LBB1583:
- 3660              	.LBB1579:
- 3661              	.LBB1580:
+ 3408              		.loc 7 68 0
+ 3409 0539 41894AF8 		mov	DWORD PTR [r10-8], ecx	# MEM[(_Atomic_word *)_47 + -8B], tmp283
+ 3410 053d EBBC     		jmp	.L154	#
+ 3411              	.LVL232:
+ 3412              	.L158:
+ 3413              	.LBE1496:
+ 3414              	.LBE1497:
+ 3415              	.LBE1498:
+ 3416              	.LBE1499:
+ 3417              	.LBE1501:
+ 3418              	.LBE1503:
+ 3419              	.LBE1505:
+ 3420              	.LBE1564:
+ 3421              	.LBB1565:
+ 3422              	.LBB1556:
+ 3423              	.LBB1553:
+ 3424              	.LBB1545:
+ 3425              	.LBB1541:
+ 3426              	.LBB1534:
+ 3427              	.LBB1531:
+ 3428              	.LBB1529:
+ 3429              	.LBB1527:
+ 3430              	.LBB1526:
+ 3431              	.LBB1522:
+ 3432              	.LBB1523:
   67:/usr/include/c++/4.8.2/ext/atomicity.h ****     _Atomic_word __result = *__mem;
- 3662              		.loc 7 67 0
- 3663 15a1 448B73F8 		mov	r14d, DWORD PTR [rbx-8]	# __result, MEM[(_Atomic_word *)_341 + -8B]
- 3664              	.LVL251:
+ 3433              		.loc 7 67 0
+ 3434 053f 458B60F8 		mov	r12d, DWORD PTR [r8-8]	# __result, MEM[(_Atomic_word *)_192 + -8B]
+ 3435              	.LVL233:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
- 3665              		.loc 7 68 0
- 3666 15a5 458D5EFF 		lea	r11d, [r14-1]	# tmp1401,
- 3667              	.LBE1580:
- 3668              	.LBE1579:
- 3669              		.loc 7 84 0
- 3670 15a9 4589F4   		mov	r12d, r14d	# D.73748, __result
- 3671              	.LVL252:
- 3672              	.LBB1582:
- 3673              	.LBB1581:
+ 3436              		.loc 7 68 0
+ 3437 0543 418D4424 		lea	eax, [r12-1]	# tmp287,
+ 3437      FF
+ 3438              	.LBE1523:
+ 3439              	.LBE1522:
+ 3440              		.loc 7 84 0
+ 3441 0548 4589E2   		mov	r10d, r12d	# D.37212, __result
+ 3442              	.LBB1525:
+ 3443              	.LBB1524:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
- 3674              		.loc 7 68 0
- 3675 15ac 44895BF8 		mov	DWORD PTR [rbx-8], r11d	# MEM[(_Atomic_word *)_341 + -8B], tmp1401
- 3676 15b0 E973FFFF 		jmp	.L132	#
- 3676      FF
- 3677              	.LVL253:
- 3678              	.L200:
- 3679              	.LBE1581:
- 3680              	.LBE1582:
- 3681              	.LBE1583:
- 3682              	.LBE1584:
- 3683              	.LBE1586:
- 3684              	.LBE1588:
- 3685              	.LBE1591:
- 3686              	.LBE1596:
- 3687              	.LBE1599:
- 3688              	.LBE1610:
- 3689              	.LBE1612:
- 3690              	.LBE1621:
- 3691              	.LBB1622:
- 3692              	.LBB1536:
- 3693              	.LBB1533:
- 3694              	.LBB1530:
- 3695              	.LBB1526:
- 3696              	.LBB1521:
+ 3444              		.loc 7 68 0
+ 3445 054b 418940F8 		mov	DWORD PTR [r8-8], eax	# MEM[(_Atomic_word *)_192 + -8B], tmp287
+ 3446 054f E975FFFF 		jmp	.L159	#
+ 3446      FF
+ 3447              	.LVL234:
+ 3448              	.L203:
+ 3449              	.LBE1524:
+ 3450              	.LBE1525:
+ 3451              	.LBE1526:
+ 3452              	.LBE1527:
+ 3453              	.LBE1529:
+ 3454              	.LBE1531:
+ 3455              	.LBE1534:
+ 3456              	.LBE1541:
+ 3457              	.LBE1545:
+ 3458              	.LBE1553:
+ 3459              	.LBE1556:
+ 3460              	.LBE1565:
+ 3461              	.LBB1566:
+ 3462              	.LBB1479:
+ 3463              	.LBB1476:
+ 3464              	.LBB1473:
+ 3465              	.LBB1469:
+ 3466              	.LBB1464:
   49:/usr/include/c++/4.8.2/bits/basic_ios.h **** 	__throw_bad_cast();
- 3697              		.loc 3 49 0
- 3698 15b5 E8000000 		call	_ZSt16__throw_bad_castv	#
- 3698      00
- 3699              	.LEHE8:
- 3700              	.LVL254:
- 3701              	.L144:
- 3702              	.LBE1521:
- 3703              	.LBE1526:
- 3704              	.LBE1530:
- 3705              	.LBE1533:
- 3706              	.LBE1536:
- 3707              	.LBE1622:
- 3708              	.LBB1623:
- 3709              	.LBB1624:
+ 3467              		.loc 3 49 0
+ 3468 0554 E8000000 		call	_ZSt16__throw_bad_castv	#
+ 3468      00
+ 3469              	.LEHE8:
+ 3470              	.LVL235:
+ 3471              	.L171:
+ 3472              	.LBE1464:
+ 3473              	.LBE1469:
+ 3474              	.LBE1473:
+ 3475              	.LBE1476:
+ 3476              	.LBE1479:
+ 3477              	.LBE1566:
+ 3478              	.LBB1567:
+ 3479              	.LBB1568:
  539:/usr/include/c++/4.8.2/bits/basic_string.h ****       { _M_rep()->_M_dispose(this->get_allocator()); }
- 3710              		.loc 5 539 0
- 3711 15ba 4C8B8C24 		mov	r9, QWORD PTR [rsp+320]	# tmp1871, D.62922._M_dataplus._M_p
- 3711      40010000 
- 3712 15c2 4989C7   		mov	r15, rax	# tmp1411,
- 3713              	.LVL255:
- 3714 15c5 488DB424 		lea	rsi, [rsp+352]	# tmp1872,
- 3714      60010000 
- 3715 15cd 498D79E8 		lea	rdi, [r9-24]	# D.73739,
- 3716 15d1 C5F877   		vzeroupper
- 3717 15d4 E8000000 		call	_ZNSs4_Rep10_M_disposeERKSaIcE	#
- 3717      00
- 3718              	.LVL256:
- 3719 15d9 E9A3FEFF 		jmp	.L120	#
- 3719      FF
- 3720              	.LVL257:
- 3721              	.L199:
- 3722              	.LBE1624:
- 3723              	.LBE1623:
- 3724              	.LBB1625:
- 3725              	.LBB1503:
- 3726              	.LBB1498:
- 3727              	.LBB1425:
- 3728              	.LBB1420:
- 3729              	.LBB1418:
- 3730              	.LBB1416:
+ 3480              		.loc 5 539 0
+ 3481 0559 4C8B7C24 		mov	r15, QWORD PTR [rsp+32]	# tmp365, D.33253._M_dataplus._M_p
+ 3481      20
+ 3482 055e 488D7424 		lea	rsi, [rsp+64]	# tmp366,
+ 3482      40
+ 3483 0563 4889C3   		mov	rbx, rax	# tmp297,
+ 3484              	.LVL236:
+ 3485 0566 498D7FE8 		lea	rdi, [r15-24]	# D.37204,
+ 3486 056a C5F877   		vzeroupper
+ 3487 056d E8000000 		call	_ZNSs4_Rep10_M_disposeERKSaIcE	#
+ 3487      00
+ 3488              	.LVL237:
+ 3489 0572 E9EEFEFF 		jmp	.L147	#
+ 3489      FF
+ 3490              	.LVL238:
+ 3491              	.L202:
+ 3492              	.LBE1568:
+ 3493              	.LBE1567:
+ 3494              	.LBB1569:
+ 3495              	.LBB1446:
+ 3496              	.LBB1441:
+ 3497              	.LBB1368:
+ 3498              	.LBB1363:
+ 3499              	.LBB1361:
+ 3500              	.LBB1359:
  246:/usr/include/c++/4.8.2/bits/basic_string.h **** 							 -1) <= 0)
- 3731              		.loc 5 246 0
- 3732 15de 4C8D6710 		lea	r12, [rdi+16]	# D.73746,
- 3733              	.LVL258:
- 3734              	.LBB1406:
- 3735              	.LBB1407:
+ 3501              		.loc 5 246 0
+ 3502 0577 488D7710 		lea	rsi, [rdi+16]	# D.37210,
+ 3503              	.LVL239:
+ 3504              	.LBB1349:
+ 3505              	.LBB1350:
   81:/usr/include/c++/4.8.2/ext/atomicity.h ****     if (__gthread_active_p())
- 3736              		.loc 7 81 0
- 3737 15e2 BE000000 		mov	esi, OFFSET FLAT:_ZL28__gthrw___pthread_key_createPjPFvPvE	# tmp1366,
- 3737      00
- 3738 15e7 4885F6   		test	rsi, rsi	# tmp1366
- 3739 15ea 744B     		je	.L114	#,
- 3740              	.LVL259:
- 3741              	.LBB1408:
- 3742              	.LBB1409:
+ 3506              		.loc 7 81 0
+ 3507 057b B9000000 		mov	ecx, OFFSET FLAT:_ZL28__gthrw___pthread_key_createPjPFvPvE	# tmp252,
+ 3507      00
+ 3508 0580 4885C9   		test	rcx, rcx	# tmp252
+ 3509 0583 7441     		je	.L141	#,
+ 3510              	.LVL240:
+ 3511              	.LBB1351:
+ 3512              	.LBB1352:
   49:/usr/include/c++/4.8.2/ext/atomicity.h ****   { return __atomic_fetch_add(__mem, __val, __ATOMIC_ACQ_REL); }
- 3743              		.loc 7 49 0
- 3744 15ec 41BDFFFF 		mov	r13d, -1	# D.73747,
- 3744      FFFF
- 3745 15f2 F0450FC1 		lock xadd	DWORD PTR [r12], r13d	#,* D.73746, D.73747
- 3745      2C24
- 3746              	.LVL260:
- 3747              	.L115:
- 3748              	.LBE1409:
- 3749              	.LBE1408:
- 3750              	.LBE1407:
- 3751              	.LBE1406:
+ 3513              		.loc 7 49 0
+ 3514 0585 41B8FFFF 		mov	r8d, -1	# D.37211,
+ 3514      FFFF
+ 3515 058b F0440FC1 		lock xadd	DWORD PTR [rsi], r8d	#,* D.37210, D.37211
+ 3515      06
+ 3516              	.LVL241:
+ 3517              	.L142:
+ 3518              	.LBE1352:
+ 3519              	.LBE1351:
+ 3520              	.LBE1350:
+ 3521              	.LBE1349:
  245:/usr/include/c++/4.8.2/bits/basic_string.h **** 	      if (__gnu_cxx::__exchange_and_add_dispatch(&this->_M_refcount,
- 3752              		.loc 5 245 0
- 3753 15f8 4585ED   		test	r13d, r13d	# D.73748
- 3754 15fb 0F8F0CFD 		jg	.L105	#,
- 3754      FFFF
+ 3522              		.loc 5 245 0
+ 3523 0590 4585C0   		test	r8d, r8d	# D.37212
+ 3524 0593 0F8F6EFD 		jg	.L132	#,
+ 3524      FFFF
  249:/usr/include/c++/4.8.2/bits/basic_string.h **** 		  _M_destroy(__a);
- 3755              		.loc 5 249 0
- 3756 1601 488DB424 		lea	rsi, [rsp+318]	# tmp1854,
- 3756      3E010000 
- 3757 1609 E8000000 		call	_ZNSs4_Rep10_M_destroyERKSaIcE	#
- 3757      00
- 3758              	.LVL261:
- 3759 160e E9FAFCFF 		jmp	.L105	#
- 3759      FF
- 3760              	.LVL262:
- 3761              	.L149:
- 3762              	.L189:
- 3763              	.LBE1416:
- 3764              	.LBE1418:
- 3765              	.LBE1420:
- 3766              	.LBE1425:
- 3767              	.LBB1426:
- 3768              	.LBB1427:
+ 3525              		.loc 5 249 0
+ 3526 0599 488D7424 		lea	rsi, [rsp+30]	# tmp350,
+ 3526      1E
+ 3527              	.LVL242:
+ 3528 059e E8000000 		call	_ZNSs4_Rep10_M_destroyERKSaIcE	#
+ 3528      00
+ 3529              	.LVL243:
+ 3530 05a3 E95FFDFF 		jmp	.L132	#
+ 3530      FF
+ 3531              	.LVL244:
+ 3532              	.L176:
+ 3533              	.L191:
+ 3534              	.LBE1359:
+ 3535              	.LBE1361:
+ 3536              	.LBE1363:
+ 3537              	.LBE1368:
+ 3538              	.LBB1369:
+ 3539              	.LBB1370:
  539:/usr/include/c++/4.8.2/bits/basic_string.h ****       { _M_rep()->_M_dispose(this->get_allocator()); }
- 3769              		.loc 5 539 0
- 3770 1613 488DB424 		lea	rsi, [rsp+318]	# tmp1860,
- 3770      3E010000 
- 3771 161b 4989C7   		mov	r15, rax	# tmp1382,
- 3772              	.LVL263:
- 3773 161e 488B8424 		mov	rax, QWORD PTR [rsp+352]	# tmp1859,
- 3773      60010000 
- 3774 1626 488D78E8 		lea	rdi, [rax-24]	# D.73739,
- 3775 162a C5F877   		vzeroupper
- 3776 162d E8000000 		call	_ZNSs4_Rep10_M_disposeERKSaIcE	#
- 3776      00
- 3777              	.LVL264:
- 3778 1632 E9BAFEFF 		jmp	.L118	#
- 3778      FF
- 3779              	.LVL265:
- 3780              	.L114:
- 3781              	.LBE1427:
- 3782              	.LBE1426:
- 3783              	.LBB1428:
- 3784              	.LBB1421:
- 3785              	.LBB1419:
- 3786              	.LBB1417:
- 3787              	.LBB1415:
- 3788              	.LBB1414:
- 3789              	.LBB1410:
- 3790              	.LBB1411:
+ 3540              		.loc 5 539 0
+ 3541 05a8 4C8B7C24 		mov	r15, QWORD PTR [rsp+64]	# tmp355,
+ 3541      40
+ 3542 05ad 488D7424 		lea	rsi, [rsp+30]	# tmp356,
+ 3542      1E
+ 3543 05b2 4889C3   		mov	rbx, rax	# tmp268,
+ 3544              	.LVL245:
+ 3545 05b5 498D7FE8 		lea	rdi, [r15-24]	# D.37204,
+ 3546 05b9 C5F877   		vzeroupper
+ 3547 05bc E8000000 		call	_ZNSs4_Rep10_M_disposeERKSaIcE	#
+ 3547      00
+ 3548              	.LVL246:
+ 3549 05c1 E9D2FEFF 		jmp	.L145	#
+ 3549      FF
+ 3550              	.LVL247:
+ 3551              	.L141:
+ 3552              	.LBE1370:
+ 3553              	.LBE1369:
+ 3554              	.LBB1371:
+ 3555              	.LBB1364:
+ 3556              	.LBB1362:
+ 3557              	.LBB1360:
+ 3558              	.LBB1358:
+ 3559              	.LBB1357:
+ 3560              	.LBB1353:
+ 3561              	.LBB1354:
   67:/usr/include/c++/4.8.2/ext/atomicity.h ****     _Atomic_word __result = *__mem;
- 3791              		.loc 7 67 0
- 3792 1637 418B5AF8 		mov	ebx, DWORD PTR [r10-8]	# __result,
- 3793              	.LVL266:
+ 3562              		.loc 7 67 0
+ 3563 05c6 448B60F8 		mov	r12d, DWORD PTR [rax-8]	# __result,
+ 3564              	.LVL248:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
- 3794              		.loc 7 68 0
- 3795 163b 448D7BFF 		lea	r15d, [rbx-1]	# tmp1367,
- 3796              	.LBE1411:
- 3797              	.LBE1410:
- 3798              		.loc 7 84 0
- 3799 163f 4189DD   		mov	r13d, ebx	# D.73748, __result
- 3800              	.LBB1413:
- 3801              	.LBB1412:
+ 3565              		.loc 7 68 0
+ 3566 05ca 458D6C24 		lea	r13d, [r12-1]	# tmp253,
+ 3566      FF
+ 3567              	.LBE1354:
+ 3568              	.LBE1353:
+ 3569              		.loc 7 84 0
+ 3570 05cf 4589E0   		mov	r8d, r12d	# D.37212, __result
+ 3571              	.LBB1356:
+ 3572              	.LBB1355:
   68:/usr/include/c++/4.8.2/ext/atomicity.h ****     *__mem += __val;
- 3802              		.loc 7 68 0
- 3803 1642 45897AF8 		mov	DWORD PTR [r10-8], r15d	#, tmp1367
- 3804 1646 EBB0     		jmp	.L115	#
- 3805              	.LVL267:
- 3806              	.L198:
- 3807              	.LBE1412:
- 3808              	.LBE1413:
- 3809              	.LBE1414:
- 3810              	.LBE1415:
- 3811              	.LBE1417:
- 3812              	.LBE1419:
- 3813              	.LBE1421:
- 3814              	.LBE1428:
- 3815              	.LBB1429:
- 3816              	.LBB1391:
- 3817              	.LBB1386:
- 3818              	.LBB1383:
- 3819              	.LBB1380:
- 3820              	.LBB1377:
- 3821              	.LBB1374:
+ 3573              		.loc 7 68 0
+ 3574 05d2 448968F8 		mov	DWORD PTR [rax-8], r13d	#, tmp253
+ 3575 05d6 EBB8     		jmp	.L142	#
+ 3576              	.LVL249:
+ 3577              	.L201:
+ 3578              	.LBE1355:
+ 3579              	.LBE1356:
+ 3580              	.LBE1357:
+ 3581              	.LBE1358:
+ 3582              	.LBE1360:
+ 3583              	.LBE1362:
+ 3584              	.LBE1364:
+ 3585              	.LBE1371:
+ 3586              	.LBB1372:
+ 3587              	.LBB1334:
+ 3588              	.LBB1329:
+ 3589              	.LBB1326:
+ 3590              	.LBB1323:
+ 3591              	.LBB1320:
+ 3592              	.LBB1317:
  133:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	  __throw_logic_error(__N("basic_string::_S_construct null not valid"));
- 3822              		.loc 12 133 0
- 3823 1648 BF000000 		mov	edi, OFFSET FLAT:.LC34	#,
- 3823      00
- 3824              	.LEHB9:
- 3825 164d E8000000 		call	_ZSt19__throw_logic_errorPKc	#
- 3825      00
- 3826              	.LVL268:
- 3827              	.L197:
+ 3593              		.loc 9 133 0
+ 3594 05d8 BF000000 		mov	edi, OFFSET FLAT:.LC34	#,
+ 3594      00
+ 3595              	.LEHB9:
+ 3596 05dd E8000000 		call	_ZSt19__throw_logic_errorPKc	#
+ 3596      00
+ 3597              	.LVL250:
+ 3598              	.L200:
  129:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	  return _S_empty_rep()._M_refdata();
- 3828              		.loc 12 129 0
- 3829 1652 41B80000 		mov	r8d, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# D.73736,
- 3829      0000
- 3830 1658 E977FCFF 		jmp	.L96	#
- 3830      FF
- 3831              	.LVL269:
- 3832              	.L95:
- 3833              	.LBE1374:
- 3834              	.LBE1377:
- 3835              	.LBE1380:
- 3836              	.LBE1383:
- 3837              	.LBE1386:
- 3838              	.LBE1391:
- 3839              	.LBE1429:
- 3840              	.LBB1430:
- 3841              	.LBB1431:
- 3842              	.LBB1432:
- 3843              	.LBB1433:
- 3844              	.LBB1434:
- 3845              	.LBB1435:
- 3846              	.LBB1436:
+ 3599              		.loc 9 129 0
+ 3600 05e2 41BA0000 		mov	r10d, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# D.37201,
+ 3600      0000
+ 3601 05e8 E9EDFCFF 		jmp	.L123	#
+ 3601      FF
+ 3602              	.LVL251:
+ 3603              	.L122:
+ 3604              	.LBE1317:
+ 3605              	.LBE1320:
+ 3606              	.LBE1323:
+ 3607              	.LBE1326:
+ 3608              	.LBE1329:
+ 3609              	.LBE1334:
+ 3610              	.LBE1372:
+ 3611              	.LBB1373:
+ 3612              	.LBB1374:
+ 3613              	.LBB1375:
+ 3614              	.LBB1376:
+ 3615              	.LBB1377:
+ 3616              	.LBB1378:
+ 3617              	.LBB1379:
  128:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	if (__beg == __end && __a == _Alloc())
- 3847              		.loc 12 128 0
- 3848 165d 4939DE   		cmp	r14, rbx	# D.73743, D.73743
- 3849 1660 0F848800 		je	.L203	#,
- 3849      0000
- 3850              	.LVL270:
+ 3618              		.loc 9 128 0
+ 3619 05ed 4C39E7   		cmp	rdi, r12	# D.37207, D.37207
+ 3620 05f0 747A     		je	.L206	#,
+ 3621              	.LVL252:
  132:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	if (__gnu_cxx::__is_null_pointer(__beg) && __beg != __end)
- 3851              		.loc 12 132 0
- 3852 1666 4885DB   		test	rbx, rbx	# D.73743
- 3853 1669 0F84A500 		je	.L204	#,
- 3853      0000
- 3854              	.L109:
- 3855              	.LVL271:
+ 3622              		.loc 9 132 0
+ 3623 05f2 4D85E4   		test	r12, r12	# D.37207
+ 3624 05f5 0F849100 		je	.L207	#,
+ 3624      0000
+ 3625              	.L136:
+ 3626              	.LVL253:
  138:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	_Rep* __r = _Rep::_S_create(__dnew, size_type(0), __a);
- 3856              		.loc 12 138 0
- 3857 166f 488D9424 		lea	rdx, [rsp+319]	# tmp1876,
- 3857      3F010000 
- 3858              	.LBB1437:
- 3859              	.LBB1438:
- 3860              	.LBB1439:
- 3861              		.loc 13 96 0
- 3862 1677 4929DE   		sub	r14, rbx	# __dnew, D.73743
- 3863              	.LVL272:
- 3864              	.LBE1439:
- 3865              	.LBE1438:
- 3866              	.LBE1437:
+ 3627              		.loc 9 138 0
+ 3628 05fb 488D5424 		lea	rdx, [rsp+31]	# tmp370,
+ 3628      1F
+ 3629              	.LBB1380:
+ 3630              	.LBB1381:
+ 3631              	.LBB1382:
+ 3632              		.loc 10 96 0
+ 3633 0600 4C29E7   		sub	rdi, r12	# __dnew, D.37207
+ 3634              	.LVL254:
+ 3635              	.LBE1382:
+ 3636              	.LBE1381:
+ 3637              	.LBE1380:
  138:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	_Rep* __r = _Rep::_S_create(__dnew, size_type(0), __a);
- 3867              		.loc 12 138 0
- 3868 167a 31F6     		xor	esi, esi	#
- 3869 167c 4C89F7   		mov	rdi, r14	#, __dnew
- 3870              	.LBB1442:
- 3871              	.LBB1441:
- 3872              	.LBB1440:
- 3873              		.loc 13 96 0
- 3874 167f 4D89F7   		mov	r15, r14	# __dnew, __dnew
- 3875              	.LVL273:
- 3876              	.LBE1440:
- 3877              	.LBE1441:
- 3878              	.LBE1442:
+ 3638              		.loc 9 138 0
+ 3639 0603 31F6     		xor	esi, esi	#
+ 3640              	.LBB1385:
+ 3641              	.LBB1384:
+ 3642              	.LBB1383:
+ 3643              		.loc 10 96 0
+ 3644 0605 4989FD   		mov	r13, rdi	# __dnew, __dnew
+ 3645              	.LVL255:
+ 3646              	.LBE1383:
+ 3647              	.LBE1384:
+ 3648              	.LBE1385:
  138:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	_Rep* __r = _Rep::_S_create(__dnew, size_type(0), __a);
- 3879              		.loc 12 138 0
- 3880 1682 E8000000 		call	_ZNSs4_Rep9_S_createEmmRKSaIcE	#
- 3880      00
- 3881              	.LEHE9:
- 3882              	.LVL274:
- 3883              		.loc 12 140 0
- 3884 1687 4C8D5818 		lea	r11, [rax+24]	# D.73736,
- 3885              	.LBB1443:
- 3886              	.LBB1444:
- 3887              	.LBB1445:
+ 3649              		.loc 9 138 0
+ 3650 0608 E8000000 		call	_ZNSs4_Rep9_S_createEmmRKSaIcE	#
+ 3650      00
+ 3651              	.LEHE9:
+ 3652              	.LVL256:
+ 3653              		.loc 9 140 0
+ 3654 060d 4C8D4018 		lea	r8, [rax+24]	# D.37201,
+ 3655              	.LBB1386:
+ 3656              	.LBB1387:
+ 3657              	.LBB1388:
  356:/usr/include/c++/4.8.2/bits/basic_string.h **** 	if (__n == 1)
- 3888              		.loc 5 356 0
- 3889 168b 4983FE01 		cmp	r14, 1	# __dnew,
- 3890              	.LBE1445:
- 3891              	.LBE1444:
- 3892              	.LBE1443:
+ 3658              		.loc 5 356 0
+ 3659 0611 4983FD01 		cmp	r13, 1	# __dnew,
+ 3660              	.LBE1388:
+ 3661              	.LBE1387:
+ 3662              	.LBE1386:
  138:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	_Rep* __r = _Rep::_S_create(__dnew, size_type(0), __a);
- 3893              		.loc 12 138 0
- 3894 168f 4989C5   		mov	r13, rax	# __r,
- 3895              	.LVL275:
- 3896              	.LBB1456:
- 3897              	.LBB1453:
- 3898              	.LBB1450:
+ 3663              		.loc 9 138 0
+ 3664 0615 4989C6   		mov	r14, rax	# __r,
+ 3665              	.LVL257:
+ 3666              	.LBB1399:
+ 3667              	.LBB1396:
+ 3668              	.LBB1393:
  356:/usr/include/c++/4.8.2/bits/basic_string.h **** 	if (__n == 1)
- 3899              		.loc 5 356 0
- 3900 1692 7547     		jne	.L110	#,
- 3901              	.LBE1450:
- 3902              	.LBE1453:
- 3903              	.LBE1456:
- 3904              	.LBE1436:
- 3905              	.LBE1435:
- 3906              	.LBE1434:
- 3907              	.LBE1433:
- 3908              	.LBE1432:
- 3909              	.LBE1431:
- 3910              	.LBE1430:
- 3911              	.LBE1498:
- 3912              	.LBE1503:
- 3913              	.LBE1625:
- 3914              	.LBE1631:
- 3915              	.LBE1636:
- 3916              	.LBE1642:
+ 3669              		.loc 5 356 0
+ 3670 0618 753F     		jne	.L137	#,
+ 3671              	.LBE1393:
+ 3672              	.LBE1396:
+ 3673              	.LBE1399:
+ 3674              	.LBE1379:
+ 3675              	.LBE1378:
+ 3676              	.LBE1377:
+ 3677              	.LBE1376:
+ 3678              	.LBE1375:
+ 3679              	.LBE1374:
+ 3680              	.LBE1373:
+ 3681              	.LBE1441:
+ 3682              	.LBE1446:
+ 3683              	.LBE1569:
+ 3684              	.LBE1577:
+ 3685              	.LBE1583:
+ 3686              	.LBE1589:
  354:/usr/include/c++/4.8.2/bits/basic_string.h ****       _M_copy(_CharT* __d, const _CharT* __s, size_type __n)
- 3917              		.loc 5 354 0
- 3918 1694 0FB60B   		movzx	ecx, BYTE PTR [rbx]	# D.73745, MEM[(const char_type &)_249]
- 3919              	.LVL276:
- 3920              	.LBB1643:
- 3921              	.LBB1637:
- 3922              	.LBB1632:
- 3923              	.LBB1626:
- 3924              	.LBB1504:
- 3925              	.LBB1499:
- 3926              	.LBB1485:
- 3927              	.LBB1480:
- 3928              	.LBB1477:
- 3929              	.LBB1474:
- 3930              	.LBB1471:
- 3931              	.LBB1468:
- 3932              	.LBB1465:
- 3933              	.LBB1457:
- 3934              	.LBB1454:
- 3935              	.LBB1451:
- 3936              	.LBB1446:
- 3937              	.LBB1447:
+ 3687              		.loc 5 354 0
+ 3688 061a 450FB60C 		movzx	r9d, BYTE PTR [r12]	# D.37209, MEM[(const char_type &)_100]
+ 3688      24
+ 3689              	.LVL258:
+ 3690              	.LBB1590:
+ 3691              	.LBB1584:
+ 3692              	.LBB1578:
+ 3693              	.LBB1570:
+ 3694              	.LBB1447:
+ 3695              	.LBB1442:
+ 3696              	.LBB1428:
+ 3697              	.LBB1423:
+ 3698              	.LBB1420:
+ 3699              	.LBB1417:
+ 3700              	.LBB1414:
+ 3701              	.LBB1411:
+ 3702              	.LBB1408:
+ 3703              	.LBB1400:
+ 3704              	.LBB1397:
+ 3705              	.LBB1394:
+ 3706              	.LBB1389:
+ 3707              	.LBB1390:
  243:/usr/include/c++/4.8.2/bits/char_traits.h ****       { __c1 = __c2; }
- 3938              		.loc 14 243 0
- 3939 1697 41884D18 		mov	BYTE PTR [r13+24], cl	# MEM[(char_type &)__r_289 + 24], D.73745
- 3940              	.LVL277:
- 3941              	.L111:
- 3942              	.LBE1447:
- 3943              	.LBE1446:
- 3944              	.LBE1451:
- 3945              	.LBE1454:
- 3946              	.LBE1457:
- 3947              	.LBB1458:
- 3948              	.LBB1459:
+ 3708              		.loc 11 243 0
+ 3709 061f 45884E18 		mov	BYTE PTR [r14+24], r9b	# MEM[(char_type &)__r_140 + 24], D.37209
+ 3710              	.LVL259:
+ 3711              	.L138:
+ 3712              	.LBE1390:
+ 3713              	.LBE1389:
+ 3714              	.LBE1394:
+ 3715              	.LBE1397:
+ 3716              	.LBE1400:
+ 3717              	.LBB1401:
+ 3718              	.LBB1402:
  210:/usr/include/c++/4.8.2/bits/basic_string.h **** 	  if (__builtin_expect(this != &_S_empty_rep(), false))
- 3949              		.loc 5 210 0
- 3950 169b 4981FD00 		cmp	r13, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# __r,
- 3950      000000
- 3951 16a2 7412     		je	.L106	#,
- 3952              	.LVL278:
- 3953              	.LBB1460:
- 3954              	.LBB1461:
+ 3719              		.loc 5 210 0
+ 3720 0623 4981FE00 		cmp	r14, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE	# __r,
+ 3720      000000
+ 3721 062a 7411     		je	.L133	#,
+ 3722              	.LVL260:
+ 3723              	.LBB1403:
+ 3724              	.LBB1404:
  204:/usr/include/c++/4.8.2/bits/basic_string.h ****         { this->_M_refcount = 0; }
- 3955              		.loc 5 204 0
- 3956 16a4 41C74510 		mov	DWORD PTR [r13+16], 0	# MEM[(_Atomic_word *)__r_289 + 16B],
- 3956      00000000 
- 3957              	.LBE1461:
- 3958              	.LBE1460:
+ 3725              		.loc 5 204 0
+ 3726 062c 41C74610 		mov	DWORD PTR [r14+16], 0	# MEM[(_Atomic_word *)__r_140 + 16B],
+ 3726      00000000 
+ 3727              	.LBE1404:
+ 3728              	.LBE1403:
  214:/usr/include/c++/4.8.2/bits/basic_string.h **** 	      this->_M_length = __n;
- 3959              		.loc 5 214 0
- 3960 16ac 4D897D00 		mov	QWORD PTR [r13+0], r15	# __r_289->D.22725._M_length, __dnew
- 3961              	.LVL279:
- 3962              	.LBB1462:
- 3963              	.LBB1463:
+ 3729              		.loc 5 214 0
+ 3730 0634 4D892E   		mov	QWORD PTR [r14], r13	# __r_140->D.22725._M_length, __dnew
+ 3731              	.LVL261:
+ 3732              	.LBB1405:
+ 3733              	.LBB1406:
  243:/usr/include/c++/4.8.2/bits/char_traits.h ****       { __c1 = __c2; }
- 3964              		.loc 14 243 0
- 3965 16b0 43C6443D 		mov	BYTE PTR [r13+24+r15], 0	# MEM[(char_type &)_295],
- 3965      1800
- 3966              	.LVL280:
- 3967              	.L106:
- 3968              	.LBE1463:
- 3969              	.LBE1462:
- 3970              	.LBE1459:
- 3971              	.LBE1458:
- 3972              	.LBE1465:
- 3973              	.LBE1468:
- 3974              	.LBE1471:
- 3975              	.LBE1474:
- 3976              	.LBE1477:
- 3977              	.LBE1480:
- 3978              	.LBE1485:
- 3979              	.LBB1486:
- 3980              	.LBB1487:
+ 3734              		.loc 11 243 0
+ 3735 0637 43C6442E 		mov	BYTE PTR [r14+24+r13], 0	# MEM[(char_type &)_146],
+ 3735      1800
+ 3736              	.LVL262:
+ 3737              	.L133:
+ 3738              	.LBE1406:
+ 3739              	.LBE1405:
+ 3740              	.LBE1402:
+ 3741              	.LBE1401:
+ 3742              	.LBE1408:
+ 3743              	.LBE1411:
+ 3744              	.LBE1414:
+ 3745              	.LBE1417:
+ 3746              	.LBE1420:
+ 3747              	.LBE1423:
+ 3748              	.LBE1428:
+ 3749              	.LBB1429:
+ 3750              	.LBB1430:
  583:/usr/include/c++/4.8.2/bits/basic_string.h **** 	this->swap(__str);
- 3981              		.loc 5 583 0
- 3982 16b6 488D9C24 		lea	rbx, [rsp+352]	# tmp1446,
- 3982      60010000 
- 3983              	.LVL281:
- 3984              	.LBE1487:
- 3985              	.LBE1486:
- 3986              	.LBB1489:
- 3987              	.LBB1481:
- 3988              	.LBB1482:
+ 3751              		.loc 5 583 0
+ 3752 063d 4C8D6424 		lea	r12, [rsp+64]	# tmp346,
+ 3752      40
+ 3753              	.LVL263:
+ 3754              	.LBE1430:
+ 3755              	.LBE1429:
+ 3756              	.LBB1432:
+ 3757              	.LBB1424:
+ 3758              	.LBB1425:
  275:/usr/include/c++/4.8.2/bits/basic_string.h **** 	: _Alloc(__a), _M_p(__dat) { }
- 3989              		.loc 5 275 0
- 3990 16be 4C899C24 		mov	QWORD PTR [rsp+352], r11	# MEM[(struct _Alloc_hider *)&D.73309]._M_p, D.73736
- 3990      60010000 
- 3991              	.LVL282:
- 3992              	.LBE1482:
- 3993              	.LBE1481:
- 3994              	.LBE1489:
- 3995              	.LBB1490:
- 3996              	.LBB1488:
+ 3759              		.loc 5 275 0
+ 3760 0642 4C894424 		mov	QWORD PTR [rsp+64], r8	# MEM[(struct _Alloc_hider *)&D.37024]._M_p, D.37201
+ 3760      40
+ 3761              	.LVL264:
+ 3762              	.LBE1425:
+ 3763              	.LBE1424:
+ 3764              	.LBE1432:
+ 3765              	.LBB1433:
+ 3766              	.LBB1431:
  583:/usr/include/c++/4.8.2/bits/basic_string.h **** 	this->swap(__str);
- 3997              		.loc 5 583 0
- 3998 16c6 488DBC24 		lea	rdi, [rsp+320]	# tmp1852,
- 3998      40010000 
- 3999              	.LVL283:
- 4000 16ce 4889DE   		mov	rsi, rbx	#, tmp1446
- 4001              	.LEHB10:
- 4002 16d1 E8000000 		call	_ZNSs4swapERSs	#
- 4002      00
- 4003              	.LEHE10:
- 4004              	.LVL284:
- 4005 16d6 E919FCFF 		jmp	.L196	#
- 4005      FF
- 4006              	.LVL285:
- 4007              	.L110:
- 4008              	.LBE1488:
- 4009              	.LBE1490:
- 4010              	.LBB1491:
- 4011              	.LBB1483:
- 4012              	.LBB1478:
- 4013              	.LBB1475:
- 4014              	.LBB1472:
- 4015              	.LBB1469:
- 4016              	.LBB1466:
- 4017              	.LBB1464:
- 4018              	.LBB1455:
- 4019              	.LBB1452:
- 4020              	.LBB1448:
- 4021              	.LBB1449:
- 4022              		.loc 14 271 0
- 4023 16db 4C89DF   		mov	rdi, r11	#, D.73736
- 4024 16de 4C89FA   		mov	rdx, r15	#, __dnew
- 4025 16e1 4889DE   		mov	rsi, rbx	#, D.73743
- 4026 16e4 E8000000 		call	memcpy	#
- 4026      00
- 4027              	.LVL286:
- 4028 16e9 4989C3   		mov	r11, rax	# D.73736,
- 4029 16ec EBAD     		jmp	.L111	#
- 4030              	.LVL287:
- 4031              	.L203:
- 4032              	.LBE1449:
- 4033              	.LBE1448:
- 4034              	.LBE1452:
- 4035              	.LBE1455:
- 4036              	.LBE1464:
+ 3767              		.loc 5 583 0
+ 3768 0647 488D7C24 		lea	rdi, [rsp+32]	# tmp348,
+ 3768      20
+ 3769              	.LVL265:
+ 3770 064c 4C89E6   		mov	rsi, r12	# tmp347, tmp303
+ 3771              	.LEHB10:
+ 3772 064f E8000000 		call	_ZNSs4swapERSs	#
+ 3772      00
+ 3773              	.LEHE10:
+ 3774              	.LVL266:
+ 3775 0654 E998FCFF 		jmp	.L198	#
+ 3775      FF
+ 3776              	.LVL267:
+ 3777              	.L137:
+ 3778              	.LBE1431:
+ 3779              	.LBE1433:
+ 3780              	.LBB1434:
+ 3781              	.LBB1426:
+ 3782              	.LBB1421:
+ 3783              	.LBB1418:
+ 3784              	.LBB1415:
+ 3785              	.LBB1412:
+ 3786              	.LBB1409:
+ 3787              	.LBB1407:
+ 3788              	.LBB1398:
+ 3789              	.LBB1395:
+ 3790              	.LBB1391:
+ 3791              	.LBB1392:
+ 3792              		.loc 11 271 0
+ 3793 0659 4C89C7   		mov	rdi, r8	#, D.37201
+ 3794 065c 4C89EA   		mov	rdx, r13	#, __dnew
+ 3795 065f 4C89E6   		mov	rsi, r12	#, D.37207
+ 3796 0662 E8000000 		call	memcpy	#
+ 3796      00
+ 3797              	.LVL268:
+ 3798 0667 4989C0   		mov	r8, rax	# D.37201,
+ 3799 066a EBB7     		jmp	.L138	#
+ 3800              	.LVL269:
+ 3801              	.L206:
+ 3802              	.LBE1392:
+ 3803              	.LBE1391:
+ 3804              	.LBE1395:
+ 3805              	.LBE1398:
+ 3806              	.LBE1407:
  129:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	  return _S_empty_rep()._M_refdata();
- 4037              		.loc 12 129 0
- 4038 16ee 41BB0000 		mov	r11d, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# D.73736,
- 4038      0000
- 4039 16f4 EBC0     		jmp	.L106	#
- 4040              	.LVL288:
- 4041              	.L94:
- 4042              	.LBE1466:
- 4043              	.LBE1469:
- 4044              	.LBE1472:
- 4045              	.LBE1475:
- 4046              	.LBE1478:
- 4047              	.LBE1483:
- 4048              	.LBE1491:
- 4049              	.LBB1492:
- 4050              	.LBB1493:
+ 3807              		.loc 9 129 0
+ 3808 066c 41B80000 		mov	r8d, OFFSET FLAT:_ZNSs4_Rep20_S_empty_rep_storageE+24	# D.37201,
+ 3808      0000
+ 3809 0672 EBC9     		jmp	.L133	#
+ 3810              	.LVL270:
+ 3811              	.L121:
+ 3812              	.LBE1409:
+ 3813              	.LBE1412:
+ 3814              	.LBE1415:
+ 3815              	.LBE1418:
+ 3816              	.LBE1421:
+ 3817              	.LBE1426:
+ 3818              	.LBE1434:
+ 3819              	.LBB1435:
+ 3820              	.LBB1436:
  547:/usr/include/c++/4.8.2/bits/basic_string.h ****       { return this->assign(__str); }
- 4051              		.loc 5 547 0
- 4052 16f6 488DB424 		lea	rsi, [rsp+384]	# tmp1855,
- 4052      80010000 
- 4053 16fe 488D7650 		lea	rsi, [rsi+80]	# tmp1370,
- 4054 1702 488DBC24 		lea	rdi, [rsp+320]	# tmp1856,
- 4054      40010000 
- 4055              	.LVL289:
- 4056              	.LEHB11:
- 4057 170a E8000000 		call	_ZNSs6assignERKSs	#
- 4057      00
- 4058              	.LVL290:
- 4059 170f E9F9FBFF 		jmp	.L105	#
- 4059      FF
- 4060              	.LVL291:
- 4061              	.L204:
- 4062              	.LBE1493:
- 4063              	.LBE1492:
- 4064              	.LBB1494:
- 4065              	.LBB1484:
- 4066              	.LBB1479:
- 4067              	.LBB1476:
- 4068              	.LBB1473:
- 4069              	.LBB1470:
- 4070              	.LBB1467:
+ 3821              		.loc 5 547 0
+ 3822 0674 488D7424 		lea	rsi, [rsp+96]	# tmp351,
+ 3822      60
+ 3823 0679 488D7650 		lea	rsi, [rsi+80]	# tmp256,
+ 3824 067d 488D7C24 		lea	rdi, [rsp+32]	# tmp352,
+ 3824      20
+ 3825              	.LVL271:
+ 3826              	.LEHB11:
+ 3827 0682 E8000000 		call	_ZNSs6assignERKSs	#
+ 3827      00
+ 3828              	.LVL272:
+ 3829 0687 E97BFCFF 		jmp	.L132	#
+ 3829      FF
+ 3830              	.LVL273:
+ 3831              	.L207:
+ 3832              	.LBE1436:
+ 3833              	.LBE1435:
+ 3834              	.LBB1437:
+ 3835              	.LBB1427:
+ 3836              	.LBB1422:
+ 3837              	.LBB1419:
+ 3838              	.LBB1416:
+ 3839              	.LBB1413:
+ 3840              	.LBB1410:
  132:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	if (__gnu_cxx::__is_null_pointer(__beg) && __beg != __end)
- 4071              		.loc 12 132 0
- 4072 1714 4D85F6   		test	r14, r14	# D.73743
- 4073 1717 0F8452FF 		je	.L109	#,
- 4073      FFFF
+ 3841              		.loc 9 132 0
+ 3842 068c 4885FF   		test	rdi, rdi	# D.37207
+ 3843 068f 0F8466FF 		je	.L136	#,
+ 3843      FFFF
  133:/usr/include/c++/4.8.2/bits/basic_string.tcc **** 	  __throw_logic_error(__N("basic_string::_S_construct null not valid"));
- 4074              		.loc 12 133 0
- 4075 171d BF000000 		mov	edi, OFFSET FLAT:.LC34	#,
- 4075      00
- 4076 1722 E8000000 		call	_ZSt19__throw_logic_errorPKc	#
- 4076      00
- 4077              	.LEHE11:
- 4078              	.LVL292:
- 4079              	.L148:
- 4080 1727 E9E7FEFF 		jmp	.L189	#
- 4080      FF
- 4081              	.LBE1467:
- 4082              	.LBE1470:
- 4083              	.LBE1473:
- 4084              	.LBE1476:
- 4085              	.LBE1479:
- 4086              	.LBE1484:
- 4087              	.LBE1494:
- 4088              	.LBE1499:
- 4089              	.LBE1504:
- 4090              	.LBE1626:
- 4091              	.LBE1632:
- 4092              	.LBE1637:
- 4093              	.LBE1643:
- 4094              		.cfi_endproc
- 4095              	.LFE4288:
- 4096              		.globl	__gxx_personality_v0
- 4097              		.section	.gcc_except_table,"a",@progbits
- 4098              	.LLSDA4288:
- 4099 0000 FF       		.byte	0xff
- 4100 0001 FF       		.byte	0xff
- 4101 0002 01       		.byte	0x1
- 4102 0003 48       		.uleb128 .LLSDACSE4288-.LLSDACSB4288
- 4103              	.LLSDACSB4288:
- 4104 0004 BD1F     		.uleb128 .LEHB0-.LFB4288
- 4105 0006 05       		.uleb128 .LEHE0-.LEHB0
- 4106 0007 D428     		.uleb128 .L145-.LFB4288
- 4107 0009 00       		.uleb128 0
- 4108 000a EE20     		.uleb128 .LEHB1-.LFB4288
- 4109 000c 05       		.uleb128 .LEHE1-.LEHB1
- 4110 000d 9629     		.uleb128 .L146-.LFB4288
- 4111 000f 00       		.uleb128 0
- 4112 0010 FE20     		.uleb128 .LEHB2-.LFB4288
- 4113 0012 B203     		.uleb128 .LEHE2-.LEHB2
- 4114 0014 FB28     		.uleb128 .L143-.LFB4288
- 4115 0016 00       		.uleb128 0
- 4116 0017 9C25     		.uleb128 .LEHB3-.LFB4288
- 4117 0019 05       		.uleb128 .LEHE3-.LEHB3
- 4118 001a E329     		.uleb128 .L147-.LFB4288
- 4119 001c 00       		.uleb128 0
- 4120 001d EF25     		.uleb128 .LEHB4-.LFB4288
- 4121 001f 05       		.uleb128 .LEHE4-.LEHB4
- 4122 0020 932C     		.uleb128 .L149-.LFB4288
- 4123 0022 00       		.uleb128 0
- 4124 0023 9E26     		.uleb128 .LEHB5-.LFB4288
- 4125 0025 45       		.uleb128 .LEHE5-.LEHB5
- 4126 0026 BA2B     		.uleb128 .L144-.LFB4288
- 4127 0028 00       		.uleb128 0
- 4128 0029 8127     		.uleb128 .LEHB6-.LFB4288
- 4129 002b 05       		.uleb128 .LEHE6-.LEHB6
- 4130 002c FB28     		.uleb128 .L143-.LFB4288
- 4131 002e 00       		.uleb128 0
- 4132 002f F628     		.uleb128 .LEHB7-.LFB4288
- 4133 0031 20       		.uleb128 .LEHE7-.LEHB7
- 4134 0032 00       		.uleb128 0
- 4135 0033 00       		.uleb128 0
- 4136 0034 F82A     		.uleb128 .LEHB8-.LFB4288
- 4137 0036 42       		.uleb128 .LEHE8-.LEHB8
- 4138 0037 BA2B     		.uleb128 .L144-.LFB4288
- 4139 0039 00       		.uleb128 0
- 4140 003a CD2C     		.uleb128 .LEHB9-.LFB4288
- 4141 003c 3A       		.uleb128 .LEHE9-.LEHB9
- 4142 003d E329     		.uleb128 .L147-.LFB4288
- 4143 003f 00       		.uleb128 0
- 4144 0040 D12D     		.uleb128 .LEHB10-.LFB4288
- 4145 0042 05       		.uleb128 .LEHE10-.LEHB10
- 4146 0043 A72E     		.uleb128 .L148-.LFB4288
- 4147 0045 00       		.uleb128 0
- 4148 0046 8A2E     		.uleb128 .LEHB11-.LFB4288
- 4149 0048 1D       		.uleb128 .LEHE11-.LEHB11
- 4150 0049 E329     		.uleb128 .L147-.LFB4288
- 4151 004b 00       		.uleb128 0
- 4152              	.LLSDACSE4288:
- 4153              		.section	.text.startup
- 4155 172c 0F1F4000 		.p2align 4,,15
- 4157              	_GLOBAL__sub_I_U:
- 4158              	.LFB4540:
-  34:main.cpp      **** 
-  35:main.cpp      **** }
- 4159              		.loc 9 35 0
- 4160              		.cfi_startproc
- 4161              	.LVL293:
- 4162 1730 4883EC08 		sub	rsp, 8	#,
- 4163              		.cfi_def_cfa_offset 16
- 4164              	.LBB1646:
- 4165              	.LBB1647:
- 4166              		.file 16 "/usr/include/c++/4.8.2/iostream"
+ 3844              		.loc 9 133 0
+ 3845 0695 BF000000 		mov	edi, OFFSET FLAT:.LC34	#,
+ 3845      00
+ 3846              	.LVL274:
+ 3847 069a E8000000 		call	_ZSt19__throw_logic_errorPKc	#
+ 3847      00
+ 3848              	.LEHE11:
+ 3849              	.LVL275:
+ 3850              	.L175:
+ 3851 069f E904FFFF 		jmp	.L191	#
+ 3851      FF
+ 3852              	.LBE1410:
+ 3853              	.LBE1413:
+ 3854              	.LBE1416:
+ 3855              	.LBE1419:
+ 3856              	.LBE1422:
+ 3857              	.LBE1427:
+ 3858              	.LBE1437:
+ 3859              	.LBE1442:
+ 3860              	.LBE1447:
+ 3861              	.LBE1570:
+ 3862              	.LBE1578:
+ 3863              	.LBE1584:
+ 3864              	.LBE1590:
+ 3865              		.cfi_endproc
+ 3866              	.LFE1479:
+ 3867              		.globl	__gxx_personality_v0
+ 3868              		.section	.gcc_except_table,"a",@progbits
+ 3869              	.LLSDA1479:
+ 3870 0000 FF       		.byte	0xff
+ 3871 0001 FF       		.byte	0xff
+ 3872 0002 01       		.byte	0x1
+ 3873 0003 48       		.uleb128 .LLSDACSE1479-.LLSDACSB1479
+ 3874              	.LLSDACSB1479:
+ 3875 0004 AA01     		.uleb128 .LEHB0-.LFB1479
+ 3876 0006 05       		.uleb128 .LEHE0-.LEHB0
+ 3877 0007 D708     		.uleb128 .L172-.LFB1479
+ 3878 0009 00       		.uleb128 0
+ 3879 000a C902     		.uleb128 .LEHB1-.LFB1479
+ 3880 000c 05       		.uleb128 .LEHE1-.LEHB1
+ 3881 000d 9108     		.uleb128 .L173-.LFB1479
+ 3882 000f 00       		.uleb128 0
+ 3883 0010 D902     		.uleb128 .LEHB2-.LFB1479
+ 3884 0012 E601     		.uleb128 .LEHE2-.LEHB2
+ 3885 0014 DF08     		.uleb128 .L170-.LFB1479
+ 3886 0016 00       		.uleb128 0
+ 3887 0017 A105     		.uleb128 .LEHB3-.LFB1479
+ 3888 0019 05       		.uleb128 .LEHE3-.LEHB3
+ 3889 001a 8D09     		.uleb128 .L174-.LFB1479
+ 3890 001c 00       		.uleb128 0
+ 3891 001d EC05     		.uleb128 .LEHB4-.LFB1479
+ 3892 001f 05       		.uleb128 .LEHE4-.LEHB4
+ 3893 0020 A80B     		.uleb128 .L176-.LFB1479
+ 3894 0022 00       		.uleb128 0
+ 3895 0023 9506     		.uleb128 .LEHB5-.LFB1479
+ 3896 0025 45       		.uleb128 .LEHE5-.LEHB5
+ 3897 0026 D90A     		.uleb128 .L171-.LFB1479
+ 3898 0028 00       		.uleb128 0
+ 3899 0029 F506     		.uleb128 .LEHB6-.LFB1479
+ 3900 002b 05       		.uleb128 .LEHE6-.LEHB6
+ 3901 002c DF08     		.uleb128 .L170-.LFB1479
+ 3902 002e 00       		.uleb128 0
+ 3903 002f D208     		.uleb128 .LEHB7-.LFB1479
+ 3904 0031 25       		.uleb128 .LEHE7-.LEHB7
+ 3905 0032 00       		.uleb128 0
+ 3906 0033 00       		.uleb128 0
+ 3907 0034 960A     		.uleb128 .LEHB8-.LFB1479
+ 3908 0036 43       		.uleb128 .LEHE8-.LEHB8
+ 3909 0037 D90A     		.uleb128 .L171-.LFB1479
+ 3910 0039 00       		.uleb128 0
+ 3911 003a DD0B     		.uleb128 .LEHB9-.LFB1479
+ 3912 003c 30       		.uleb128 .LEHE9-.LEHB9
+ 3913 003d 8D09     		.uleb128 .L174-.LFB1479
+ 3914 003f 00       		.uleb128 0
+ 3915 0040 CF0C     		.uleb128 .LEHB10-.LFB1479
+ 3916 0042 05       		.uleb128 .LEHE10-.LEHB10
+ 3917 0043 9F0D     		.uleb128 .L175-.LFB1479
+ 3918 0045 00       		.uleb128 0
+ 3919 0046 820D     		.uleb128 .LEHB11-.LFB1479
+ 3920 0048 1D       		.uleb128 .LEHE11-.LEHB11
+ 3921 0049 8D09     		.uleb128 .L174-.LFB1479
+ 3922 004b 00       		.uleb128 0
+ 3923              	.LLSDACSE1479:
+ 3924              		.section	.text.startup
+ 3926 06a4 6666662E 		.p2align 4,,15
+ 3926      0F1F8400 
+ 3926      00000000 
+ 3928              	_GLOBAL__sub_I_U:
+ 3929              	.LFB1684:
+ 124:saya.cpp      **** 
+ 125:saya.cpp      **** }
+ 3930              		.loc 8 125 0
+ 3931              		.cfi_startproc
+ 3932              	.LVL276:
+ 3933 06b0 4883EC08 		sub	rsp, 8	#,
+ 3934              		.cfi_def_cfa_offset 16
+ 3935              	.LBB1593:
+ 3936              	.LBB1594:
+ 3937              		.file 13 "/usr/include/c++/4.8.2/iostream"
    1:/usr/include/c++/4.8.2/iostream **** // Standard iostream objects -*- C++ -*-
    2:/usr/include/c++/4.8.2/iostream **** 
    3:/usr/include/c++/4.8.2/iostream **** // Copyright (C) 1997-2013 Free Software Foundation, Inc.
@@ -12253,410 +11608,434 @@
   72:/usr/include/c++/4.8.2/iostream **** 
   73:/usr/include/c++/4.8.2/iostream ****   // For construction of filebuffers for cout, cin, cerr, clog et. al.
   74:/usr/include/c++/4.8.2/iostream ****   static ios_base::Init __ioinit;
- 4167              		.loc 16 74 0
- 4168 1734 BF000000 		mov	edi, OFFSET FLAT:_ZStL8__ioinit	#,
- 4168      00
- 4169 1739 E8000000 		call	_ZNSt8ios_base4InitC1Ev	#
- 4169      00
- 4170              	.LVL294:
- 4171 173e BA000000 		mov	edx, OFFSET FLAT:__dso_handle	#,
- 4171      00
- 4172 1743 BE000000 		mov	esi, OFFSET FLAT:_ZStL8__ioinit	#,
- 4172      00
- 4173 1748 BF000000 		mov	edi, OFFSET FLAT:_ZNSt8ios_base4InitD1Ev	#,
- 4173      00
- 4174              	.LBE1647:
- 4175              	.LBE1646:
- 4176              		.loc 9 35 0
- 4177 174d 4883C408 		add	rsp, 8	#,
- 4178              		.cfi_def_cfa_offset 8
- 4179              	.LBB1649:
- 4180              	.LBB1648:
- 4181              		.loc 16 74 0
- 4182 1751 E9000000 		jmp	__cxa_atexit	#
- 4182      00
- 4183              	.LVL295:
- 4184              	.LBE1648:
- 4185              	.LBE1649:
- 4186              		.cfi_endproc
- 4187              	.LFE4540:
- 4189              		.section	.init_array,"aw"
- 4190              		.align 8
- 4191 0000 00000000 		.quad	_GLOBAL__sub_I_U
- 4191      00000000 
- 4192              		.weak	_ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7V_other
- 4193              		.section	.bss._ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7V_other,"awG",@no
- 4194              		.align 32
- 4197              	_ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7V_other:
- 4198 0000 00000000 		.zero	800000
- 4198      00000000 
- 4198      00000000 
- 4198      00000000 
- 4198      00000000 
- 4199              		.weak	_ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7U_other
- 4200              		.section	.bss._ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7U_other,"awG",@no
- 4201              		.align 32
- 4204              	_ZZN16naive_integratorILi50ELi40ELi100EfE7proceedEiPA40_A100_fS3_E7U_other:
- 4205 0000 00000000 		.zero	800000
- 4205      00000000 
- 4205      00000000 
- 4205      00000000 
- 4205      00000000 
- 4206              		.globl	V
- 4207              		.bss
- 4208              		.align 32
- 4211              	V:
- 4212 0000 00000000 		.zero	800000
- 4212      00000000 
- 4212      00000000 
- 4212      00000000 
- 4212      00000000 
- 4213              		.globl	U
- 4214              		.align 32
- 4217              	U:
- 4218 c3500 00000000 		.zero	800000
- 4218      00000000 
- 4218      00000000 
- 4218      00000000 
- 4218      00000000 
- 4219              		.local	_ZStL8__ioinit
- 4220              		.comm	_ZStL8__ioinit,1,1
- 4221              		.weakref	_ZL28__gthrw___pthread_key_createPjPFvPvE,__pthread_key_create
- 4222              		.section	.rodata.cst4,"aM",@progbits,4
- 4223              		.align 4
- 4224              	.LC0:
- 4225 0000 0000803F 		.long	1065353216
- 4226              		.section	.rodata.cst32,"aM",@progbits,32
- 4227              		.align 32
- 4228              	.LC2:
- 4229 0000 0000803F 		.long	1065353216
- 4230 0004 0000803F 		.long	1065353216
- 4231 0008 0000803F 		.long	1065353216
- 4232 000c 0000803F 		.long	1065353216
- 4233 0010 0000803F 		.long	1065353216
- 4234 0014 0000803F 		.long	1065353216
- 4235 0018 0000803F 		.long	1065353216
- 4236 001c 0000803F 		.long	1065353216
- 4237              		.section	.rodata.cst8,"aM",@progbits,8
- 4238              		.align 8
- 4239              	.LC4:
- 4240 0000 9A999999 		.long	2576980378
- 4241 0004 9999B93F 		.long	1069128089
- 4242              		.align 8
- 4243              	.LC5:
- 4244 0008 00000000 		.long	0
- 4245 000c 0000D03F 		.long	1070596096
- 4246              		.section	.rodata.cst32
- 4247              		.align 32
- 4248              	.LC6:
- 4249 0020 64000000 		.long	100
- 4250 0024 64000000 		.long	100
- 4251 0028 64000000 		.long	100
- 4252 002c 64000000 		.long	100
- 4253 0030 64000000 		.long	100
- 4254 0034 64000000 		.long	100
- 4255 0038 64000000 		.long	100
- 4256 003c 64000000 		.long	100
- 4257              		.align 32
- 4258              	.LC7:
- 4259 0040 1F85EB51 		.long	1374389535
- 4260 0044 1F85EB51 		.long	1374389535
- 4261 0048 1F85EB51 		.long	1374389535
- 4262 004c 1F85EB51 		.long	1374389535
- 4263 0050 1F85EB51 		.long	1374389535
- 4264 0054 1F85EB51 		.long	1374389535
- 4265 0058 1F85EB51 		.long	1374389535
- 4266 005c 1F85EB51 		.long	1374389535
- 4267              		.align 32
- 4268              	.LC8:
- 4269 0060 04       		.byte	4
- 4270 0061 05       		.byte	5
- 4271 0062 06       		.byte	6
- 4272 0063 07       		.byte	7
- 4273 0064 80       		.byte	-128
- 4274 0065 80       		.byte	-128
- 4275 0066 80       		.byte	-128
- 4276 0067 80       		.byte	-128
- 4277 0068 0C       		.byte	12
- 4278 0069 0D       		.byte	13
- 4279 006a 0E       		.byte	14
- 4280 006b 0F       		.byte	15
- 4281 006c 80       		.byte	-128
- 4282 006d 80       		.byte	-128
- 4283 006e 80       		.byte	-128
- 4284 006f 80       		.byte	-128
- 4285 0070 04       		.byte	4
- 4286 0071 05       		.byte	5
- 4287 0072 06       		.byte	6
- 4288 0073 07       		.byte	7
- 4289 0074 80       		.byte	-128
- 4290 0075 80       		.byte	-128
- 4291 0076 80       		.byte	-128
- 4292 0077 80       		.byte	-128
- 4293 0078 0C       		.byte	12
- 4294 0079 0D       		.byte	13
- 4295 007a 0E       		.byte	14
- 4296 007b 0F       		.byte	15
- 4297 007c 80       		.byte	-128
- 4298 007d 80       		.byte	-128
- 4299 007e 80       		.byte	-128
- 4300 007f 80       		.byte	-128
- 4301              		.align 32
- 4302              	.LC9:
- 4303 0080 80       		.byte	-128
- 4304 0081 80       		.byte	-128
- 4305 0082 80       		.byte	-128
- 4306 0083 80       		.byte	-128
- 4307 0084 04       		.byte	4
- 4308 0085 05       		.byte	5
- 4309 0086 06       		.byte	6
- 4310 0087 07       		.byte	7
- 4311 0088 80       		.byte	-128
- 4312 0089 80       		.byte	-128
- 4313 008a 80       		.byte	-128
- 4314 008b 80       		.byte	-128
- 4315 008c 0C       		.byte	12
- 4316 008d 0D       		.byte	13
- 4317 008e 0E       		.byte	14
- 4318 008f 0F       		.byte	15
- 4319 0090 80       		.byte	-128
- 4320 0091 80       		.byte	-128
- 4321 0092 80       		.byte	-128
- 4322 0093 80       		.byte	-128
- 4323 0094 04       		.byte	4
- 4324 0095 05       		.byte	5
- 4325 0096 06       		.byte	6
- 4326 0097 07       		.byte	7
- 4327 0098 80       		.byte	-128
- 4328 0099 80       		.byte	-128
- 4329 009a 80       		.byte	-128
- 4330 009b 80       		.byte	-128
- 4331 009c 0C       		.byte	12
- 4332 009d 0D       		.byte	13
- 4333 009e 0E       		.byte	14
- 4334 009f 0F       		.byte	15
- 4335              		.align 32
- 4336              	.LC10:
- 4337 00a0 FFFFFFFF 		.long	4294967295
- 4338 00a4 FFFFFFFF 		.long	4294967295
- 4339 00a8 FFFFFFFF 		.long	4294967295
- 4340 00ac FFFFFFFF 		.long	4294967295
- 4341 00b0 FFFFFFFF 		.long	4294967295
- 4342 00b4 FFFFFFFF 		.long	4294967295
- 4343 00b8 FFFFFFFF 		.long	4294967295
- 4344 00bc FFFFFFFF 		.long	4294967295
- 4345              		.align 32
- 4346              	.LC11:
- 4347 00c0 63000000 		.long	99
- 4348 00c4 63000000 		.long	99
- 4349 00c8 63000000 		.long	99
- 4350 00cc 63000000 		.long	99
- 4351 00d0 63000000 		.long	99
- 4352 00d4 63000000 		.long	99
- 4353 00d8 63000000 		.long	99
- 4354 00dc 63000000 		.long	99
- 4355              		.align 32
- 4356              	.LC12:
- 4357 00e0 65000000 		.long	101
- 4358 00e4 65000000 		.long	101
- 4359 00e8 65000000 		.long	101
- 4360 00ec 65000000 		.long	101
- 4361 00f0 65000000 		.long	101
- 4362 00f4 65000000 		.long	101
- 4363 00f8 65000000 		.long	101
- 4364 00fc 65000000 		.long	101
- 4365              		.align 32
- 4366              	.LC13:
- 4367 0100 0000C040 		.long	1086324736
- 4368 0104 0000C040 		.long	1086324736
- 4369 0108 0000C040 		.long	1086324736
- 4370 010c 0000C040 		.long	1086324736
- 4371 0110 0000C040 		.long	1086324736
- 4372 0114 0000C040 		.long	1086324736
- 4373 0118 0000C040 		.long	1086324736
- 4374 011c 0000C040 		.long	1086324736
- 4375              		.align 32
- 4376              	.LC14:
- 4377 0120 FCA9F1D2 		.long	3539053052
- 4378 0124 4D62503F 		.long	1062232653
- 4379 0128 FCA9F1D2 		.long	3539053052
- 4380 012c 4D62503F 		.long	1062232653
- 4381 0130 FCA9F1D2 		.long	3539053052
- 4382 0134 4D62503F 		.long	1062232653
- 4383 0138 FCA9F1D2 		.long	3539053052
- 4384 013c 4D62503F 		.long	1062232653
- 4385              		.align 32
- 4386              	.LC15:
- 4387 0140 2951CEA0 		.long	2697875753
- 4388 0144 C845E83E 		.long	1055409608
- 4389 0148 2951CEA0 		.long	2697875753
- 4390 014c C845E83E 		.long	1055409608
- 4391 0150 2951CEA0 		.long	2697875753
- 4392 0154 C845E83E 		.long	1055409608
- 4393 0158 2951CEA0 		.long	2697875753
- 4394 015c C845E83E 		.long	1055409608
- 4395              		.align 32
- 4396              	.LC16:
- 4397 0160 DFBC9A78 		.long	2023406815
- 4398 0164 563452BF 		.long	-1085131690
- 4399 0168 DFBC9A78 		.long	2023406815
- 4400 016c 563452BF 		.long	-1085131690
- 4401 0170 DFBC9A78 		.long	2023406815
- 4402 0174 563452BF 		.long	-1085131690
- 4403 0178 DFBC9A78 		.long	2023406815
- 4404 017c 563452BF 		.long	-1085131690
- 4405              		.align 32
- 4406              	.LC17:
- 4407 0180 97801ED4 		.long	3558768791
- 4408 0184 679CEF3D 		.long	1039113319
- 4409 0188 97801ED4 		.long	3558768791
- 4410 018c 679CEF3D 		.long	1039113319
- 4411 0190 97801ED4 		.long	3558768791
- 4412 0194 679CEF3D 		.long	1039113319
- 4413 0198 97801ED4 		.long	3558768791
- 4414 019c 679CEF3D 		.long	1039113319
- 4415              		.align 32
- 4416              	.LC18:
- 4417 01a0 00000000 		.long	0
- 4418 01a4 00006940 		.long	1080623104
- 4419 01a8 00000000 		.long	0
- 4420 01ac 00006940 		.long	1080623104
- 4421 01b0 00000000 		.long	0
- 4422 01b4 00006940 		.long	1080623104
- 4423 01b8 00000000 		.long	0
- 4424 01bc 00006940 		.long	1080623104
- 4425              		.align 32
- 4426              	.LC19:
- 4427 01c0 DFBC9A78 		.long	2023406815
- 4428 01c4 5634123F 		.long	1058157654
- 4429 01c8 DFBC9A78 		.long	2023406815
- 4430 01cc 5634123F 		.long	1058157654
- 4431 01d0 DFBC9A78 		.long	2023406815
- 4432 01d4 5634123F 		.long	1058157654
- 4433 01d8 DFBC9A78 		.long	2023406815
- 4434 01dc 5634123F 		.long	1058157654
- 4435              		.align 32
- 4436              	.LC20:
- 4437 01e0 DFBC9A78 		.long	2023406815
- 4438 01e4 5634523F 		.long	1062351958
- 4439 01e8 DFBC9A78 		.long	2023406815
- 4440 01ec 5634523F 		.long	1062351958
- 4441 01f0 DFBC9A78 		.long	2023406815
- 4442 01f4 5634523F 		.long	1062351958
- 4443 01f8 DFBC9A78 		.long	2023406815
- 4444 01fc 5634523F 		.long	1062351958
- 4445              		.align 32
- 4446              	.LC21:
- 4447 0200 18C31F4F 		.long	1327481624
- 4448 0204 7EC4E03D 		.long	1038140542
- 4449 0208 18C31F4F 		.long	1327481624
- 4450 020c 7EC4E03D 		.long	1038140542
- 4451 0210 18C31F4F 		.long	1327481624
- 4452 0214 7EC4E03D 		.long	1038140542
- 4453 0218 18C31F4F 		.long	1327481624
- 4454 021c 7EC4E03D 		.long	1038140542
- 4455              		.section	.rodata.cst4
- 4456              		.align 4
- 4457              	.LC22:
- 4458 0004 0000C040 		.long	1086324736
- 4459              		.section	.rodata.cst8
- 4460              		.align 8
- 4461              	.LC23:
- 4462 0010 FCA9F1D2 		.long	3539053052
- 4463 0014 4D62503F 		.long	1062232653
- 4464              		.align 8
- 4465              	.LC24:
- 4466 0018 DFBC9A78 		.long	2023406815
- 4467 001c 5634123F 		.long	1058157654
- 4468              		.align 8
- 4469              	.LC25:
- 4470 0020 DFBC9A78 		.long	2023406815
- 4471 0024 5634523F 		.long	1062351958
- 4472              		.align 8
- 4473              	.LC26:
- 4474 0028 18C31F4F 		.long	1327481624
- 4475 002c 7EC4E03D 		.long	1038140542
- 4476              		.align 8
- 4477              	.LC27:
- 4478 0030 2951CEA0 		.long	2697875753
- 4479 0034 C845E83E 		.long	1055409608
- 4480              		.align 8
- 4481              	.LC28:
- 4482 0038 DFBC9A78 		.long	2023406815
- 4483 003c 563452BF 		.long	-1085131690
- 4484              		.align 8
- 4485              	.LC29:
- 4486 0040 97801ED4 		.long	3558768791
- 4487 0044 679CEF3D 		.long	1039113319
- 4488              		.align 8
- 4489              	.LC30:
- 4490 0048 00000000 		.long	0
- 4491 004c 00006940 		.long	1080623104
- 4492              		.section	.rodata.cst32
- 4493              		.align 32
- 4494              	.LC31:
- 4495 0220 08000000 		.long	8
- 4496 0224 08000000 		.long	8
- 4497 0228 08000000 		.long	8
- 4498 022c 08000000 		.long	8
- 4499 0230 08000000 		.long	8
- 4500 0234 08000000 		.long	8
- 4501 0238 08000000 		.long	8
- 4502 023c 08000000 		.long	8
- 4503              		.section	.rodata.cst4
- 4504              		.align 4
- 4505              	.LC33:
- 4506 0008 00002041 		.long	1092616192
- 4507              		.text
- 4508              	.Letext0:
- 4509              		.file 17 "/usr/include/c++/4.8.2/cwchar"
- 4510              		.file 18 "/usr/include/c++/4.8.2/bits/exception_ptr.h"
- 4511              		.file 19 "/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/c++config.h"
- 4512              		.file 20 "/usr/include/c++/4.8.2/type_traits"
- 4513              		.file 21 "/usr/include/c++/4.8.2/bits/cpp_type_traits.h"
- 4514              		.file 22 "/usr/include/c++/4.8.2/bits/stl_pair.h"
- 4515              		.file 23 "/usr/include/c++/4.8.2/bits/stl_iterator_base_types.h"
- 4516              		.file 24 "/usr/include/c++/4.8.2/cstdint"
- 4517              		.file 25 "/usr/include/c++/4.8.2/clocale"
- 4518              		.file 26 "/usr/include/c++/4.8.2/new"
- 4519              		.file 27 "/usr/include/c++/4.8.2/bits/allocator.h"
- 4520              		.file 28 "/usr/include/c++/4.8.2/cstdlib"
- 4521              		.file 29 "/usr/include/c++/4.8.2/cstdio"
- 4522              		.file 30 "/usr/include/c++/4.8.2/initializer_list"
- 4523              		.file 31 "/usr/include/c++/4.8.2/cwctype"
- 4524              		.file 32 "/usr/include/c++/4.8.2/bits/ostream.tcc"
- 4525              		.file 33 "/usr/include/c++/4.8.2/debug/debug.h"
- 4526              		.file 34 "/usr/include/c++/4.8.2/bits/random.h"
- 4527              		.file 35 "/usr/include/c++/4.8.2/bits/alloc_traits.h"
- 4528              		.file 36 "/usr/include/c++/4.8.2/bits/uses_allocator.h"
- 4529              		.file 37 "/usr/include/c++/4.8.2/tuple"
- 4530              		.file 38 "/usr/include/c++/4.8.2/bits/basic_ios.tcc"
- 4531              		.file 39 "/usr/include/c++/4.8.2/bits/stl_algobase.h"
- 4532              		.file 40 "/usr/include/c++/4.8.2/iosfwd"
- 4533              		.file 41 "/usr/include/c++/4.8.2/functional"
- 4534              		.file 42 "/usr/include/c++/4.8.2/bits/ostream_insert.h"
- 4535              		.file 43 "/usr/include/c++/4.8.2/bits/postypes.h"
- 4536              		.file 44 "/usr/include/c++/4.8.2/bits/functexcept.h"
- 4537              		.file 45 "/usr/include/c++/4.8.2/ext/new_allocator.h"
- 4538              		.file 46 "/usr/include/c++/4.8.2/ext/numeric_traits.h"
- 4539              		.file 47 "/usr/include/c++/4.8.2/bits/stl_iterator.h"
- 4540              		.file 48 "/usr/include/bits/mathdef.h"
- 4541              		.file 49 "/usr/include/bits/types.h"
- 4542              		.file 50 "/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
- 4543              		.file 51 "/usr/include/unistd.h"
- 4544              		.file 52 "/usr/include/stdio.h"
- 4545              		.file 53 "/usr/include/libio.h"
- 4546              		.file 54 "<\347\265\204\343\201\277\350\276\274\343\201\277>"
- 4547              		.file 55 "/usr/include/wchar.h"
- 4548              		.file 56 "/usr/include/time.h"
- 4549              		.file 57 "/usr/include/stdint.h"
- 4550              		.file 58 "/usr/include/locale.h"
- 4551              		.file 59 "/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/atomic_word.h"
- 4552              		.file 60 "/usr/include/stdlib.h"
- 4553              		.file 61 "/usr/include/bits/stdlib-float.h"
- 4554              		.file 62 "/usr/include/c++/4.8.2/ext/type_traits.h"
- 4555              		.file 63 "/usr/include/_G_config.h"
- 4556              		.file 64 "/usr/include/bits/stdio.h"
- 4557              		.file 65 "/usr/include/wctype.h"
- 4558              		.file 66 "/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/gthr-default.h"
- 4559              		.file 67 "/usr/include/bits/mathcalls.h"
+ 3938              		.loc 13 74 0
+ 3939 06b4 BF000000 		mov	edi, OFFSET FLAT:_ZStL8__ioinit	#,
+ 3939      00
+ 3940 06b9 E8000000 		call	_ZNSt8ios_base4InitC1Ev	#
+ 3940      00
+ 3941              	.LVL277:
+ 3942 06be BA000000 		mov	edx, OFFSET FLAT:__dso_handle	#,
+ 3942      00
+ 3943 06c3 BE000000 		mov	esi, OFFSET FLAT:_ZStL8__ioinit	#,
+ 3943      00
+ 3944 06c8 BF000000 		mov	edi, OFFSET FLAT:_ZNSt8ios_base4InitD1Ev	#,
+ 3944      00
+ 3945              	.LBE1594:
+ 3946              	.LBE1593:
+ 3947              		.loc 8 125 0
+ 3948 06cd 4883C408 		add	rsp, 8	#,
+ 3949              		.cfi_def_cfa_offset 8
+ 3950              	.LBB1596:
+ 3951              	.LBB1595:
+ 3952              		.loc 13 74 0
+ 3953 06d1 E9000000 		jmp	__cxa_atexit	#
+ 3953      00
+ 3954              	.LVL278:
+ 3955              	.LBE1595:
+ 3956              	.LBE1596:
+ 3957              		.cfi_endproc
+ 3958              	.LFE1684:
+ 3960              		.section	.init_array,"aw"
+ 3961              		.align 8
+ 3962 0000 00000000 		.quad	_GLOBAL__sub_I_U
+ 3962      00000000 
+ 3963              		.globl	Uwx
+ 3964              		.bss
+ 3965              		.align 32
+ 3968              	Uwx:
+ 3969 0000 00000000 		.zero	18496
+ 3969      00000000 
+ 3969      00000000 
+ 3969      00000000 
+ 3969      00000000 
+ 3970              		.globl	global_clock
+ 3971              		.align 32
+ 3974              	global_clock:
+ 3975 4840 00000000 		.zero	4
+ 3976              		.globl	V_other
+ 3977 4844 00000000 		.align 32
+ 3977      00000000 
+ 3977      00000000 
+ 3977      00000000 
+ 3977      00000000 
+ 3980              	V_other:
+ 3981 4860 00000000 		.zero	1600000
+ 3981      00000000 
+ 3981      00000000 
+ 3981      00000000 
+ 3981      00000000 
+ 3982              		.globl	U_other
+ 3983              		.align 32
+ 3986              	U_other:
+ 3987 18b260 00000000 		.zero	1600000
+ 3987      00000000 
+ 3987      00000000 
+ 3987      00000000 
+ 3987      00000000 
+ 3988              		.globl	V
+ 3989              		.align 32
+ 3992              	V:
+ 3993 311c60 00000000 		.zero	1600000
+ 3993      00000000 
+ 3993      00000000 
+ 3993      00000000 
+ 3993      00000000 
+ 3994              		.globl	U
+ 3995              		.align 32
+ 3998              	U:
+ 3999 498660 00000000 		.zero	1600000
+ 3999      00000000 
+ 3999      00000000 
+ 3999      00000000 
+ 3999      00000000 
+ 4000              		.local	_ZStL8__ioinit
+ 4001              		.comm	_ZStL8__ioinit,1,1
+ 4002              		.weakref	_ZL28__gthrw___pthread_key_createPjPFvPvE,__pthread_key_create
+ 4003              		.section	.rodata.cst32,"aM",@progbits,32
+ 4004              		.align 32
+ 4005              	.LC0:
+ 4006 0000 00000000 		.long	0
+ 4007 0004 0000F03F 		.long	1072693248
+ 4008 0008 00000000 		.long	0
+ 4009 000c 0000F03F 		.long	1072693248
+ 4010 0010 00000000 		.long	0
+ 4011 0014 0000F03F 		.long	1072693248
+ 4012 0018 00000000 		.long	0
+ 4013 001c 0000F03F 		.long	1072693248
+ 4014              		.section	.rodata.cst8,"aM",@progbits,8
+ 4015              		.align 8
+ 4016              	.LC1:
+ 4017 0000 00000000 		.long	0
+ 4018 0004 0000E03F 		.long	1071644672
+ 4019              		.align 8
+ 4020              	.LC2:
+ 4021 0008 9A999999 		.long	2576980378
+ 4022 000c 9999B93F 		.long	1069128089
+ 4023              		.align 8
+ 4024              	.LC3:
+ 4025 0010 00000000 		.long	0
+ 4026 0014 0000D03F 		.long	1070596096
+ 4027              		.section	.rodata.cst32
+ 4028              		.align 32
+ 4029              	.LC4:
+ 4030 0020 00000000 		.long	0
+ 4031 0024 01000000 		.long	1
+ 4032 0028 02000000 		.long	2
+ 4033 002c 03000000 		.long	3
+ 4034 0030 04000000 		.long	4
+ 4035 0034 05000000 		.long	5
+ 4036 0038 06000000 		.long	6
+ 4037 003c 07000000 		.long	7
+ 4038              		.align 32
+ 4039              	.LC5:
+ 4040 0040 64000000 		.long	100
+ 4041 0044 64000000 		.long	100
+ 4042 0048 64000000 		.long	100
+ 4043 004c 64000000 		.long	100
+ 4044 0050 64000000 		.long	100
+ 4045 0054 64000000 		.long	100
+ 4046 0058 64000000 		.long	100
+ 4047 005c 64000000 		.long	100
+ 4048              		.align 32
+ 4049              	.LC6:
+ 4050 0060 1F85EB51 		.long	1374389535
+ 4051 0064 1F85EB51 		.long	1374389535
+ 4052 0068 1F85EB51 		.long	1374389535
+ 4053 006c 1F85EB51 		.long	1374389535
+ 4054 0070 1F85EB51 		.long	1374389535
+ 4055 0074 1F85EB51 		.long	1374389535
+ 4056 0078 1F85EB51 		.long	1374389535
+ 4057 007c 1F85EB51 		.long	1374389535
+ 4058              		.align 32
+ 4059              	.LC7:
+ 4060 0080 04       		.byte	4
+ 4061 0081 05       		.byte	5
+ 4062 0082 06       		.byte	6
+ 4063 0083 07       		.byte	7
+ 4064 0084 80       		.byte	-128
+ 4065 0085 80       		.byte	-128
+ 4066 0086 80       		.byte	-128
+ 4067 0087 80       		.byte	-128
+ 4068 0088 0C       		.byte	12
+ 4069 0089 0D       		.byte	13
+ 4070 008a 0E       		.byte	14
+ 4071 008b 0F       		.byte	15
+ 4072 008c 80       		.byte	-128
+ 4073 008d 80       		.byte	-128
+ 4074 008e 80       		.byte	-128
+ 4075 008f 80       		.byte	-128
+ 4076 0090 04       		.byte	4
+ 4077 0091 05       		.byte	5
+ 4078 0092 06       		.byte	6
+ 4079 0093 07       		.byte	7
+ 4080 0094 80       		.byte	-128
+ 4081 0095 80       		.byte	-128
+ 4082 0096 80       		.byte	-128
+ 4083 0097 80       		.byte	-128
+ 4084 0098 0C       		.byte	12
+ 4085 0099 0D       		.byte	13
+ 4086 009a 0E       		.byte	14
+ 4087 009b 0F       		.byte	15
+ 4088 009c 80       		.byte	-128
+ 4089 009d 80       		.byte	-128
+ 4090 009e 80       		.byte	-128
+ 4091 009f 80       		.byte	-128
+ 4092              		.align 32
+ 4093              	.LC8:
+ 4094 00a0 80       		.byte	-128
+ 4095 00a1 80       		.byte	-128
+ 4096 00a2 80       		.byte	-128
+ 4097 00a3 80       		.byte	-128
+ 4098 00a4 04       		.byte	4
+ 4099 00a5 05       		.byte	5
+ 4100 00a6 06       		.byte	6
+ 4101 00a7 07       		.byte	7
+ 4102 00a8 80       		.byte	-128
+ 4103 00a9 80       		.byte	-128
+ 4104 00aa 80       		.byte	-128
+ 4105 00ab 80       		.byte	-128
+ 4106 00ac 0C       		.byte	12
+ 4107 00ad 0D       		.byte	13
+ 4108 00ae 0E       		.byte	14
+ 4109 00af 0F       		.byte	15
+ 4110 00b0 80       		.byte	-128
+ 4111 00b1 80       		.byte	-128
+ 4112 00b2 80       		.byte	-128
+ 4113 00b3 80       		.byte	-128
+ 4114 00b4 04       		.byte	4
+ 4115 00b5 05       		.byte	5
+ 4116 00b6 06       		.byte	6
+ 4117 00b7 07       		.byte	7
+ 4118 00b8 80       		.byte	-128
+ 4119 00b9 80       		.byte	-128
+ 4120 00ba 80       		.byte	-128
+ 4121 00bb 80       		.byte	-128
+ 4122 00bc 0C       		.byte	12
+ 4123 00bd 0D       		.byte	13
+ 4124 00be 0E       		.byte	14
+ 4125 00bf 0F       		.byte	15
+ 4126              		.align 32
+ 4127              	.LC9:
+ 4128 00c0 FFFFFFFF 		.long	4294967295
+ 4129 00c4 FFFFFFFF 		.long	-1
+ 4130 00c8 FFFFFFFF 		.long	4294967295
+ 4131 00cc FFFFFFFF 		.long	-1
+ 4132 00d0 FFFFFFFF 		.long	4294967295
+ 4133 00d4 FFFFFFFF 		.long	-1
+ 4134 00d8 FFFFFFFF 		.long	4294967295
+ 4135 00dc FFFFFFFF 		.long	-1
+ 4136              		.align 32
+ 4137              	.LC10:
+ 4138 00e0 63000000 		.long	99
+ 4139 00e4 63000000 		.long	99
+ 4140 00e8 63000000 		.long	99
+ 4141 00ec 63000000 		.long	99
+ 4142 00f0 63000000 		.long	99
+ 4143 00f4 63000000 		.long	99
+ 4144 00f8 63000000 		.long	99
+ 4145 00fc 63000000 		.long	99
+ 4146              		.align 32
+ 4147              	.LC11:
+ 4148 0100 65000000 		.long	101
+ 4149 0104 65000000 		.long	101
+ 4150 0108 65000000 		.long	101
+ 4151 010c 65000000 		.long	101
+ 4152 0110 65000000 		.long	101
+ 4153 0114 65000000 		.long	101
+ 4154 0118 65000000 		.long	101
+ 4155 011c 65000000 		.long	101
+ 4156              		.align 32
+ 4157              	.LC12:
+ 4158 0120 00000000 		.long	0
+ 4159 0124 00001840 		.long	1075314688
+ 4160 0128 00000000 		.long	0
+ 4161 012c 00001840 		.long	1075314688
+ 4162 0130 00000000 		.long	0
+ 4163 0134 00001840 		.long	1075314688
+ 4164 0138 00000000 		.long	0
+ 4165 013c 00001840 		.long	1075314688
+ 4166              		.align 32
+ 4167              	.LC13:
+ 4168 0140 FCA9F1D2 		.long	3539053052
+ 4169 0144 4D62503F 		.long	1062232653
+ 4170 0148 FCA9F1D2 		.long	3539053052
+ 4171 014c 4D62503F 		.long	1062232653
+ 4172 0150 FCA9F1D2 		.long	3539053052
+ 4173 0154 4D62503F 		.long	1062232653
+ 4174 0158 FCA9F1D2 		.long	3539053052
+ 4175 015c 4D62503F 		.long	1062232653
+ 4176              		.align 32
+ 4177              	.LC14:
+ 4178 0160 DFBC9A78 		.long	2023406815
+ 4179 0164 563452BF 		.long	-1085131690
+ 4180 0168 DFBC9A78 		.long	2023406815
+ 4181 016c 563452BF 		.long	-1085131690
+ 4182 0170 DFBC9A78 		.long	2023406815
+ 4183 0174 563452BF 		.long	-1085131690
+ 4184 0178 DFBC9A78 		.long	2023406815
+ 4185 017c 563452BF 		.long	-1085131690
+ 4186              		.align 32
+ 4187              	.LC15:
+ 4188 0180 2951CEA0 		.long	2697875753
+ 4189 0184 C845E83E 		.long	1055409608
+ 4190 0188 2951CEA0 		.long	2697875753
+ 4191 018c C845E83E 		.long	1055409608
+ 4192 0190 2951CEA0 		.long	2697875753
+ 4193 0194 C845E83E 		.long	1055409608
+ 4194 0198 2951CEA0 		.long	2697875753
+ 4195 019c C845E83E 		.long	1055409608
+ 4196              		.align 32
+ 4197              	.LC16:
+ 4198 01a0 97801ED4 		.long	3558768791
+ 4199 01a4 679CEF3D 		.long	1039113319
+ 4200 01a8 97801ED4 		.long	3558768791
+ 4201 01ac 679CEF3D 		.long	1039113319
+ 4202 01b0 97801ED4 		.long	3558768791
+ 4203 01b4 679CEF3D 		.long	1039113319
+ 4204 01b8 97801ED4 		.long	3558768791
+ 4205 01bc 679CEF3D 		.long	1039113319
+ 4206              		.align 32
+ 4207              	.LC17:
+ 4208 01c0 DFBC9A78 		.long	2023406815
+ 4209 01c4 5634123F 		.long	1058157654
+ 4210 01c8 DFBC9A78 		.long	2023406815
+ 4211 01cc 5634123F 		.long	1058157654
+ 4212 01d0 DFBC9A78 		.long	2023406815
+ 4213 01d4 5634123F 		.long	1058157654
+ 4214 01d8 DFBC9A78 		.long	2023406815
+ 4215 01dc 5634123F 		.long	1058157654
+ 4216              		.align 32
+ 4217              	.LC18:
+ 4218 01e0 DFBC9A78 		.long	2023406815
+ 4219 01e4 5634523F 		.long	1062351958
+ 4220 01e8 DFBC9A78 		.long	2023406815
+ 4221 01ec 5634523F 		.long	1062351958
+ 4222 01f0 DFBC9A78 		.long	2023406815
+ 4223 01f4 5634523F 		.long	1062351958
+ 4224 01f8 DFBC9A78 		.long	2023406815
+ 4225 01fc 5634523F 		.long	1062351958
+ 4226              		.align 32
+ 4227              	.LC19:
+ 4228 0200 18C31F4F 		.long	1327481624
+ 4229 0204 7EC4E03D 		.long	1038140542
+ 4230 0208 18C31F4F 		.long	1327481624
+ 4231 020c 7EC4E03D 		.long	1038140542
+ 4232 0210 18C31F4F 		.long	1327481624
+ 4233 0214 7EC4E03D 		.long	1038140542
+ 4234 0218 18C31F4F 		.long	1327481624
+ 4235 021c 7EC4E03D 		.long	1038140542
+ 4236              		.align 32
+ 4237              	.LC20:
+ 4238 0220 00000000 		.long	0
+ 4239 0224 00006940 		.long	1080623104
+ 4240 0228 00000000 		.long	0
+ 4241 022c 00006940 		.long	1080623104
+ 4242 0230 00000000 		.long	0
+ 4243 0234 00006940 		.long	1080623104
+ 4244 0238 00000000 		.long	0
+ 4245 023c 00006940 		.long	1080623104
+ 4246              		.section	.rodata.cst8
+ 4247              		.align 8
+ 4248              	.LC21:
+ 4249 0018 00000000 		.long	0
+ 4250 001c 00001840 		.long	1075314688
+ 4251              		.align 8
+ 4252              	.LC22:
+ 4253 0020 FCA9F1D2 		.long	3539053052
+ 4254 0024 4D62503F 		.long	1062232653
+ 4255              		.align 8
+ 4256              	.LC23:
+ 4257 0028 DFBC9A78 		.long	2023406815
+ 4258 002c 5634123F 		.long	1058157654
+ 4259              		.align 8
+ 4260              	.LC24:
+ 4261 0030 DFBC9A78 		.long	2023406815
+ 4262 0034 5634523F 		.long	1062351958
+ 4263              		.align 8
+ 4264              	.LC25:
+ 4265 0038 18C31F4F 		.long	1327481624
+ 4266 003c 7EC4E03D 		.long	1038140542
+ 4267              		.align 8
+ 4268              	.LC26:
+ 4269 0040 DFBC9A78 		.long	2023406815
+ 4270 0044 563452BF 		.long	-1085131690
+ 4271              		.align 8
+ 4272              	.LC27:
+ 4273 0048 00000000 		.long	0
+ 4274 004c 0000F03F 		.long	1072693248
+ 4275              		.align 8
+ 4276              	.LC28:
+ 4277 0050 2951CEA0 		.long	2697875753
+ 4278 0054 C845E83E 		.long	1055409608
+ 4279              		.align 8
+ 4280              	.LC29:
+ 4281 0058 97801ED4 		.long	3558768791
+ 4282 005c 679CEF3D 		.long	1039113319
+ 4283              		.align 8
+ 4284              	.LC30:
+ 4285 0060 00000000 		.long	0
+ 4286 0064 00006940 		.long	1080623104
+ 4287              		.section	.rodata.cst32
+ 4288              		.align 32
+ 4289              	.LC31:
+ 4290 0240 08000000 		.long	8
+ 4291 0244 08000000 		.long	8
+ 4292 0248 08000000 		.long	8
+ 4293 024c 08000000 		.long	8
+ 4294 0250 08000000 		.long	8
+ 4295 0254 08000000 		.long	8
+ 4296 0258 08000000 		.long	8
+ 4297 025c 08000000 		.long	8
+ 4298              		.section	.rodata.cst8
+ 4299              		.align 8
+ 4300              	.LC33:
+ 4301 0068 736891ED 		.long	3985729651
+ 4302 006c 7CFF2340 		.long	1076100988
+ 4303              		.text
+ 4304              	.Letext0:
+ 4305              		.file 14 "/usr/include/c++/4.8.2/cmath"
+ 4306              		.file 15 "/usr/include/c++/4.8.2/cwchar"
+ 4307              		.file 16 "/usr/include/c++/4.8.2/bits/exception_ptr.h"
+ 4308              		.file 17 "/usr/include/c++/4.8.2/bits/cpp_type_traits.h"
+ 4309              		.file 18 "/usr/include/c++/4.8.2/bits/stl_pair.h"
+ 4310              		.file 19 "/usr/include/c++/4.8.2/bits/stl_iterator_base_types.h"
+ 4311              		.file 20 "/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/c++config.h"
+ 4312              		.file 21 "/usr/include/c++/4.8.2/cstdint"
+ 4313              		.file 22 "/usr/include/c++/4.8.2/clocale"
+ 4314              		.file 23 "/usr/include/c++/4.8.2/bits/allocator.h"
+ 4315              		.file 24 "/usr/include/c++/4.8.2/cstdlib"
+ 4316              		.file 25 "/usr/include/c++/4.8.2/cstdio"
+ 4317              		.file 26 "/usr/include/c++/4.8.2/initializer_list"
+ 4318              		.file 27 "/usr/include/c++/4.8.2/cwctype"
+ 4319              		.file 28 "/usr/include/c++/4.8.2/bits/ostream.tcc"
+ 4320              		.file 29 "/usr/include/c++/4.8.2/bits/basic_ios.tcc"
+ 4321              		.file 30 "/usr/include/c++/4.8.2/bits/stl_algobase.h"
+ 4322              		.file 31 "/usr/include/c++/4.8.2/iosfwd"
+ 4323              		.file 32 "/usr/include/c++/4.8.2/bits/ostream_insert.h"
+ 4324              		.file 33 "/usr/include/c++/4.8.2/bits/postypes.h"
+ 4325              		.file 34 "/usr/include/c++/4.8.2/bits/functexcept.h"
+ 4326              		.file 35 "/usr/include/c++/4.8.2/ext/new_allocator.h"
+ 4327              		.file 36 "/usr/include/c++/4.8.2/ext/numeric_traits.h"
+ 4328              		.file 37 "/usr/include/c++/4.8.2/bits/stl_iterator.h"
+ 4329              		.file 38 "/usr/include/bits/mathdef.h"
+ 4330              		.file 39 "/usr/include/bits/types.h"
+ 4331              		.file 40 "/usr/lib/gcc/x86_64-redhat-linux/4.8.3/include/stddef.h"
+ 4332              		.file 41 "/usr/include/unistd.h"
+ 4333              		.file 42 "/usr/include/stdio.h"
+ 4334              		.file 43 "/usr/include/libio.h"
+ 4335              		.file 44 "<\347\265\204\343\201\277\350\276\274\343\201\277>"
+ 4336              		.file 45 "/usr/include/wchar.h"
+ 4337              		.file 46 "/usr/include/time.h"
+ 4338              		.file 47 "/usr/include/c++/4.8.2/debug/debug.h"
+ 4339              		.file 48 "/usr/include/stdint.h"
+ 4340              		.file 49 "/usr/include/locale.h"
+ 4341              		.file 50 "/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/atomic_word.h"
+ 4342              		.file 51 "/usr/include/stdlib.h"
+ 4343              		.file 52 "/usr/include/bits/stdlib-float.h"
+ 4344              		.file 53 "/usr/include/c++/4.8.2/ext/type_traits.h"
+ 4345              		.file 54 "/usr/include/_G_config.h"
+ 4346              		.file 55 "/usr/include/bits/stdio.h"
+ 4347              		.file 56 "/usr/include/wctype.h"
+ 4348              		.file 57 "/usr/include/c++/4.8.2/x86_64-redhat-linux/bits/gthr-default.h"
+ 4349              		.file 58 "/usr/include/c++/4.8.2/new"
+ 4350              		.file 59 "/usr/include/bits/mathcalls.h"

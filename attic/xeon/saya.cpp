@@ -7,12 +7,23 @@
 #define NY 40
 #define NZ 100
 
+#define SX 34
+#define SY 34
+#define SZ 34
+
+#define MAX_T 8000
+
 typedef double Real;
 
 Real U[NX][NY][NZ], V[NX][NY][NZ];
 Real U_other[NX][NY][NZ], V_other[NX][NY][NZ];
+int global_clock;
+
+
+Real Uwx[2][SY][SZ];
 
 void fill_initial_condition() {
+  global_clock=0;
   for (int x=0;x<NX;++x) {
     for (int y=0;y<NY;++y) {
       for (int z=0;z<NZ;++z) {
@@ -34,18 +45,22 @@ void fill_initial_condition() {
   }
 }
 
-void naive_proceed(int timesteps) {
+
+inline Real periodic(Real ar[NX][NY][NZ],int x, int y, int z) {
+  x = (x+NX)%NX;
+  y = (y+NY)%NY;
+  z = (z+NZ)%NZ;
+  return ar[x][y][z];
+}
+
+
+void naive_proceed() {
+  ++global_clock;
   
   const Real Fu = 1.0/86400, Fv = 6.0/86400, Fe = 1.0/900, Du = 0.1*2.3e-9, Dv = 12.2e-11;
   const Real dt = 200, dx = 0.001;
 
-  auto periodic = [](Real ar[NX][NY][NZ],int x, int y, int z) {
-    x = (x+NX)%NX;
-    y = (y+NY)%NY;
-    z = (z+NZ)%NZ;
-    return ar[x][y][z];
-  };
-  auto lap = [&periodic, &dx](Real ar[NX][NY][NZ],int x, int y, int z) {
+  auto lap = [&dx](Real ar[NX][NY][NZ],int x, int y, int z) {
     auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
     + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
     + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
@@ -53,46 +68,53 @@ void naive_proceed(int timesteps) {
     return ret / dx / dx;
   };
 
-  for (int t=0;t<timesteps;++t){
-    for (int x=0;x<NX;++x) {
-      for (int y=0;y<NY;++y) {
-	for (int z=0;z<NZ;++z) {
-	  auto u = U[x][y][z],  v = V[x][y][z];
-	  auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
-	  auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
-	  U_other[x][y][z] = U[x][y][z] + dt*du_dt;
-	  V_other[x][y][z] = V[x][y][z] + dt*dv_dt;
-	}
+  for (int x=0;x<NX;++x) {
+    for (int y=0;y<NY;++y) {
+      for (int z=0;z<NZ;++z) {
+	auto u = U[x][y][z],  v = V[x][y][z];
+	auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(U,x,y,z);
+	auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(V,x,y,z);
+	U_other[x][y][z] = U[x][y][z] + dt*du_dt;
+	V_other[x][y][z] = V[x][y][z] + dt*dv_dt;
       }
     }
-    for (int x=0;x<NX;++x) {
-      for (int y=0;y<NY;++y) {
-	for (int z=0;z<NZ;++z) {
-	  U[x][y][z]=U_other[x][y][z];
-	}
+  }
+  for (int x=0;x<NX;++x) {
+    for (int y=0;y<NY;++y) {
+      for (int z=0;z<NZ;++z) {
+	U[x][y][z]=U_other[x][y][z];
       }
     }
-    for (int x=0;x<NX;++x) {
-      for (int y=0;y<NY;++y) {
-	for (int z=0;z<NZ;++z) {
-	  V[x][y][z]=V_other[x][y][z];
-	}
+  }
+  for (int x=0;x<NX;++x) {
+    for (int y=0;y<NY;++y) {
+      for (int z=0;z<NZ;++z) {
+	V[x][y][z]=V_other[x][y][z];
       }
     }
   }
 }
 
+void get_solution_at(int t, int x, int y, int z, Real &u, Real &v) {
+  if(global_clock > t) fill_initial_condition();
+  while(global_clock < t) naive_proceed();
+  u = periodic(U,x,y,z);
+  v = periodic(V,x,y,z);
+}
+
 int main () {
   fill_initial_condition();
 
-  for(int t=0;;++t){
-    naive_proceed(1);
+  for(int t = 0;;++t){
+    naive_proceed();
 
     std::ostringstream ostr;
-    ostr << t << "\n";
+    ostr << global_clock << "\n";
     for (int y=0;y<NY;++y) {
       for (int z=0;z<NZ;++z) {
-        ostr<<int(std::floor(10*U[NX/2][y][z]));
+	Real u,v;
+	get_solution_at(t,NX/2,y,z, u,v);
+        ostr<<int(std::floor(9.999*u));
       }
       ostr << "\n";
     }
