@@ -28,9 +28,10 @@ def generate_modified_code(sx,sy,sz,t_max):
                 ret = "#define T_MAX {}\n".format(t_max)
             f_out.write(ret)
 
+#dims = [32,34,64,68,96,128,130,192,256,258,320,512,514]
 dims = [32,34,64,68,128,130,256,258,512,514]
 
-for ipow in range(17,1000):
+for ipow in range(18,1000):
     zpow = 2**ipow
     for sx in dims:
         for sz in dims:
