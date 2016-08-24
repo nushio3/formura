@@ -16,6 +16,12 @@ saya-mod.out: saya-mod.cpp Makefile
 	-Wa,-adhln=saya-mod.s -g -fverbose-asm -masm=intel \
 	saya-mod.cpp -o saya-mod.out
 
+mystream.out: mystream.cpp Makefile
+	g++ -std=c++11 \
+	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large \
+	-Wa,-adhln=mystream.s -g -fverbose-asm -masm=intel \
+	mystream.cpp -o mystream.out
+
 
 tv.out: tv.cpp
 	g++ -std=c++11 \

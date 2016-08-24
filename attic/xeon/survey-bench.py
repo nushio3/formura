@@ -28,17 +28,17 @@ def generate_modified_code(sx,sy,sz,t_max):
                 ret = "#define T_MAX {}\n".format(t_max)
             f_out.write(ret)
 
-dims = [32,34,64,68,128,130,256,258]
+dims = [32,34,64,68,128,130,256,258,512,514]
 
-for ipow in range(1000):
+for ipow in range(17,1000):
     zpow = 2**ipow
     for sx in dims:
-        for sy in dims:
-            for sz in dims:
+        for sz in dims:
+            for sy in [sx,sz]:
                 size = sx*sy*sz
                 if size < zpow or size >= 2*zpow:
                     continue
-                for t in [1000,4000,16000]:
+                for t in [1000,2000]:
                     generate_modified_code(sx,sy,sz,t)
                     subprocess.call(["make","saya-mod.out"])
                     subprocess.call("./run-saya-mod.sh",shell=True)
