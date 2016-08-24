@@ -182,7 +182,9 @@ int main () {
   }
 
   double time_begin = wctime();
+  double time_comp = 0, time_comm = 0;
   for(int t = 0; t < T_MAX; ++t){
+    double timestamp_1 = wctime();
     // load communication values
 #pragma omp parallel for collapse(3)
     for(int x=SX-2;x<SX;++x) {
@@ -214,7 +216,9 @@ int main () {
       }
     }
 
+    double timestamp_2 = wctime();
 
+    time_comm += timestamp_2 -  timestamp_1;
 
     // destructively update the state
     const auto lap = [](Real ar[SX][SY][SZ],int x, int y, int z) {
@@ -239,6 +243,10 @@ int main () {
         }
       }
     }
+    double timestamp_3 = wctime();
+
+    time_comp += timestamp_3 -  timestamp_2;
+
 #pragma omp parallel for collapse(2)
     for(int x=0;x<SX-2;++x) {
       for(int y=0;y<SY-2;++y) {
@@ -268,7 +276,7 @@ int main () {
     }
     std::ostringstream msg;
     msg << SX << " " << SY << " " << SZ << " " << T_MAX << " "
-        << " t: " << time_elapse << " GFlops: " << flop/time_elapse/1e9<< " error: " << (num/den);
+        << " t: " << time_elapse << " " << time_comm << " " << time_comp << " GFlops: " << flop/time_elapse/1e9<< " error: " << (num/den);
     std::ofstream log_file("benchmark.txt", std::ios::app);
     std::cout << msg.str() << std::endl;
     log_file << msg.str() << std::endl;
