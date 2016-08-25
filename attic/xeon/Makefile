@@ -22,6 +22,13 @@ mystream.out: mystream.cpp Makefile
 	-Wa,-adhln=mystream.s -g -fverbose-asm -masm=intel \
 	mystream.cpp -o mystream.out
 
+stencilstream.out: stencilstream.cpp Makefile
+	g++ -std=c++11 \
+	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large \
+	-Wa,-adhln=stencilstream.s -g -fverbose-asm -masm=intel \
+	stencilstream.cpp -o stencilstream.out
+
+
 
 tv.out: tv.cpp
 	g++ -std=c++11 \
