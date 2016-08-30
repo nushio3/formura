@@ -398,7 +398,7 @@ benchmark it = do
       , "export LD_LIBRARY_PATH=/opt/FJSVtclang/GM-1.2.0-20/lib64:$LD_LIBRARY_PATH"
       , "mpiexec /work/system/bin/msh \"mkdir -p ./out\""
       , ""
-      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics mpiexec -n %d  -ofout-proc out/out -oferr-proc out/err ./a.out %d %d" n mpiSize x x
+      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics mpiexec -n %d  -ofout-proc out/out -oferr-proc out/err ./a.out %d %d" n mpiSize x (x`div`32)
                 | n <- extensionNSet, let x = 8192 * 2^n::Integer]
       ,
         if not csvMode then "" else

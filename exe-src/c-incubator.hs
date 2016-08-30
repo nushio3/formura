@@ -269,7 +269,7 @@ codegen it = do
       , ""
       , "#time limit"
       , "#PJM --name \"C" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
-      , "#PJM --rsc-list \"elapse=0:30:00\""
+      , "#PJM --rsc-list \"elapse=1:00:00\""
       , "#PJM --rsc-list \"rscgrp=small\""
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -318,7 +318,7 @@ compile it = do
 extensionNSet :: [Int]
 extensionNSet = unsafePerformIO $ do
   argv <- getArgs
-  return $ if "--extend" `elem` argv then [1..8] else [3]
+  return $ if "--extend" `elem` argv then [1..8] else [5]
 
 benchmark :: WithQBConfig => IndExp -> IO IndExp
 benchmark it = do
@@ -353,7 +353,7 @@ benchmark it = do
       , "#time limit"
       , "#PJM --name \"B" ++ (it ^. xpLocalWorkDir . filename) ++ "\""
         -- for Pearson-3d benchmarks, the fastest benchmark takes only a few minutes
-      , "#PJM --rsc-list \"elapse=1:00:00\""
+      , "#PJM --rsc-list \"elapse=6:00:00\""
       , printf "#PJM --rsc-list \"rscgrp=%s\"" rscgrp
       , "#PJM --mpi \"use-rankdir\""
       , "#PJM --stg-transfiles all"
@@ -385,7 +385,7 @@ benchmark it = do
       , ". /work/system/Env_base"
       , "mpiexec /work/system/bin/msh \"mkdir ./out\""
       , ""
-      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpiexec -n %d   -ofout-proc out/out -oferr-proc out/err  ./a.out %d %d" n mpiSize x x
+      , unlines [ printf "fapp -C -d prof-X%d -Hevent=Statistics  mpiexec -n %d   -ofout-proc out/out -oferr-proc out/err  ./a.out %d %d" n mpiSize x (x`div`32)
                 | n <- extensionNSet, let x = 8192 * 2^n::Integer]
       ,
         if not csvMode then "" else
