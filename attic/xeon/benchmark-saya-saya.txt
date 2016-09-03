@@ -1,0 +1,14 @@
+4 10 34 128 8  t: 0.0237861 t_com: 0 t_comp: 0 GFlops: 0.639213 error: 0
+4 10 34 128 8  t: 0.0271459 t_com: 0 t_comp: 0 GFlops: 0.560098 error: 0
+4 10 34 128 16  t: 0.0473452 t_com: 0 t_comp: 0 GFlops: 0.642277 error: 0
+4 10 34 128 16  t: 0.0473709 t_com: 0 t_comp: 0 GFlops: 0.641928 error: 0
+4 10 34 128 32  t: 0.094063 t_com: 0 t_comp: 0 GFlops: 0.64656 error: 0
+4 10 34 128 32  t: 0.0939472 t_com: 0 t_comp: 0 GFlops: 0.647358 error: 0
+4 10 34 256 8  t: 0.0473258 t_com: 0 t_comp: 0 GFlops: 0.642539 error: 0
+4 10 34 256 8  t: 0.0472639 t_com: 0 t_comp: 0 GFlops: 0.643382 error: 0
+4 10 34 256 16  t: 0.0947881 t_com: 0 t_comp: 0 GFlops: 0.641615 error: 0
+4 10 34 256 16  t: 0.094142 t_com: 0 t_comp: 0 GFlops: 0.646018 error: 0
+4 10 34 256 32  t: 0.18895 t_com: 0 t_comp: 0 GFlops: 0.643741 error: 0
+4 10 34 256 32  t: 0.188512 t_com: 0 t_comp: 0 GFlops: 0.645237 error: 0
+4 10 34 1024 8  t: 0.189111 t_com: 0 t_comp: 0 GFlops: 0.643193 error: 0
+4 10 34 1024 8  t: 0.188881 t_com: 0 t_comp: 0 GFlops: 0.643975 error: 0

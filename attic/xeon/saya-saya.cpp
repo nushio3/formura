@@ -290,7 +290,7 @@ int main () {
       std::ostringstream msg;
       msg << SX << " " << SY << " " << SZ << " " << T_MAX << " " << HIERARCHY_ITER << " "
           << " t: " << time_elapse << " t_com: " << time_comm << " t_comp: " << time_comp << " GFlops: " << flop/time_elapse/1e9<< " error: " << (num/den);
-      std::ofstream log_file("benchmark.txt", std::ios::app);
+      std::ofstream log_file("benchmark-saya-saya.txt", std::ios::app);
       std::cout << msg.str() << std::endl;
       log_file << msg.str() << std::endl;
     }
