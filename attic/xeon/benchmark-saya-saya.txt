@@ -1647,3 +1647,15 @@
 34 34 68 64 16  t: 0.290643 t_com: 0 t_comp: 0 GFlops: 6.90529 GBps: 30.4785 error: 0
 34 34 68 64 16  t: 0.30487 t_com: 0 t_comp: 0 GFlops: 6.58305 GBps: 29.0562 error: 0
 34 34 68 64 16  t: 0.287458 t_com: 0 t_comp: 0 GFlops: 6.9818 GBps: 30.8162 error: 0
+4 34 34 68 64 16  t: 0.294506 t_com: 0 t_comp: 0 GFlops: 6.81472 GBps: 30.0788 error: 0
+4 34 34 68 64 16  t: 0.287077 t_com: 0 t_comp: 0 GFlops: 6.99107 GBps: 30.8571 error: 0
+4 34 34 68 64 16  t: 0.297513 t_com: 0 t_comp: 0 GFlops: 6.74584 GBps: 29.7747 error: 0
+4 34 34 68 64 16  t: 0.28825 t_com: 0 t_comp: 0 GFlops: 6.96262 GBps: 30.7316 error: 0
+4 34 34 68 64 16  t: 0.308782 t_com: 0 t_comp: 0 GFlops: 6.49965 GBps: 28.6881 error: 0
+4 34 34 68 64 16  t: 0.32466 t_com: 0 t_comp: 0 GFlops: 6.18178 GBps: 27.2851 error: 0
+4 34 34 68 64 16  t: 0.312813 t_com: 0 t_comp: 0 GFlops: 6.41589 GBps: 28.3184 error: 0
+4 34 34 68 64 16  t: 0.296487 t_com: 0 t_comp: 0 GFlops: 6.76918 GBps: 29.8778 error: 0
+4 34 34 68 64 16  t: 0.28844 t_com: 0 t_comp: 0 GFlops: 6.95803 GBps: 30.7113 error: 0
+4 34 34 68 64 16  t: 0.293224 t_com: 0 t_comp: 0 GFlops: 6.84451 GBps: 30.2102 error: 0
+32 34 34 68 64 16  t: 0.517473 t_com: 0 t_comp: 0 GFlops: 3.87841 GBps: 17.1185 error: 0
+32 34 34 68 64 16  t: 0.536595 t_com: 0 t_comp: 0 GFlops: 3.7402 GBps: 16.5085 error: 0

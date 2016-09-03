@@ -4,7 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <sys/time.h>
-
+#include <omp.h>
 #define NX 50
 #define NY 50
 #define NZ 50
@@ -276,7 +276,10 @@ int main () {
     double bw_gb= 8.0 * 2 * (7+1) * (SX-2)*(SY-2)*(SZ-2) *T_MAX * HIERARCHY_ITER;
     double time_elapse = time_end-time_begin;
 
+
+
     {
+      const int n_thre = omp_get_max_threads();
       const int t = T_MAX;
       double num=0,den=0;
       for(int x=0;x<SX-2;++x) {
@@ -289,7 +292,7 @@ int main () {
         }
       }
       std::ostringstream msg;
-      msg << SX << " " << SY << " " << SZ << " " << T_MAX << " " << HIERARCHY_ITER << " "
+      msg << n_thre << "  " << SX << " " << SY << " " << SZ << "  " << T_MAX << " " << HIERARCHY_ITER << " "
           << " t: " << time_elapse << " t_com: " << time_comm << " t_comp: " << time_comp << " GFlops: " << flop/time_elapse/1e9<<  " GBps: " << bw_gb/time_elapse/1e9<< " error: " << (num/den);
       std::ofstream log_file("benchmark-saya-saya.txt", std::ios::app);
       std::cout << msg.str() << std::endl;
