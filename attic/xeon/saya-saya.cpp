@@ -11,12 +11,12 @@
 
 #define SX 34
 #define SY 34
-#define SZ 34
+#define SZ 68
 
 #define HIERARCHY_ITER 16
 
 
-#define T_MAX 3000
+#define T_MAX 64
 
 typedef double Real;
 
@@ -172,7 +172,7 @@ int main () {
   }
 
 
-  for(int trial=0;trial<2;++trial) {
+  for(int trial=0;trial<10;++trial) {
     std::cerr << "Carrying out simulation..." << std::endl;
 
     double time_begin = wctime();

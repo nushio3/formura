@@ -31,9 +31,9 @@ def generate_modified_code(sx,sy,sz,t_max,hier):
 #dims = [32,34,64,68,96,128,130,192,256,258,320,512,514]
 dims = [6,10,32,34,64,66,128,130,256,258]
 
-for ipow in range(10,1000):
+for ipow in range(14,1000):
     zpow = 2**ipow
-    for sx in [4,8,10,34,66]:
+    for sx in [4,10,34,66]:
         for sz in [34,66,130,258]:
             for sy in dims:
                 size = sx*sy*sz
