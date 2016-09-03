@@ -1,3 +1,4 @@
+#include <cmath>
 #include <omp.h>
 #include <iostream>
 #include <sys/time.h>
@@ -5,9 +6,9 @@
 using namespace std;
 
 //const int NN =1073741824;
-const int NX = 96, NY = 3;
+const int NX = 960, NY = 3;
 const int NN =1048576, NZ=NN;
-const int fac = 1;
+const int fac = 10;
 
 const double Fu = 1.0/86400, Fv = 6.0/86400, Fe = 1.0/900, Du = 0.1*2.3e-9, Dv = 12.2e-11;
 const double dt = 0*200, dx = 0.001;
@@ -45,7 +46,7 @@ int main (int argc, char **argv) {
         for (int y=0;y<NY;++y) {
           for (int i=0;i<N;++i) {
             U[x][y][i]=1;
-            V[x][y][i]=0;
+            V[x][y][i]=0.1+0.1*sin(x+y+i);
           }
         }
       }
@@ -55,15 +56,15 @@ int main (int argc, char **argv) {
 	time_begin=wctime();
       }
       const auto lap = [](double ar[NX][NY][NN],int x, int y, int z) {
-    auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
-    + periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
-    + periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
-    - 6*ar[x][y][z];
-    return ret / dx / dx;
-  };
-
+	auto ret = periodic(ar, x-1, y, z) + periodic(ar, x+1, y, z)
+	+ periodic(ar, x, y-1, z) + periodic(ar, x, y+1, z)
+	+ periodic(ar, x, y, z-1) + periodic(ar, x, y, z+1)
+	- 6*ar[x][y][z];
+	return ret / dx / dx;
+      };
+      
       for (int t=0;t<NN/N*fac;++t) {
-        const int x = 1+2*omp_get_thread_num();
+        const int x = 1+30*omp_get_thread_num();
         const int y = 1;
 #pragma omp for nowait
         for (int z=0;z<N;++z) {
@@ -77,7 +78,7 @@ int main (int argc, char **argv) {
 #pragma omp master
       {
 	time_end=wctime();
-	double gb = double(fac)*NN*29/1e9;
+	double gb = double(fac)*NN*29/1e9*omp_get_num_threads();
 	double time_elapse=time_end - time_begin;
 
 	cout << N << " " << U[1][1][N/2] << " flops: " << gb/time_elapse << endl;
