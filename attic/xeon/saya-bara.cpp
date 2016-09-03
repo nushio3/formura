@@ -12,11 +12,11 @@
 
 #define SX 18
 #define SY 18
-#define SZ 34
+#define SZ 130
 
 #define BANK 8
 
-#define T_MAX 1024
+#define T_MAX 128
 
 typedef double Real;
 
@@ -185,7 +185,6 @@ int main () {
 #pragma omp parallel
     {
       const int tid=2*omp_get_thread_num();
-
       for(int x=0;x<SX;++x) {
         for(int y=0;y<SY;++y) {
           for(int z=0;z<SZ;++z) {
