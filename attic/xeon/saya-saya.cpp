@@ -176,10 +176,13 @@ int main () {
     std::cerr << "Carrying out simulation..." << std::endl;
 
     double time_begin = wctime();
-    double time_comp = 0, time_comm = 0;
+    double time_comp = 0, time_comm = 0, timestamp_1, timestamp_2, timestamp_3;
 
-    for(int hier=0; hier<HIERARCHY_ITER; ++hier){
-      // set initial condition
+#pragma omp parallel //shared(time_comp, time_comm, timestamp_1,timestamp_2, timestamp_3)
+    {
+      for(int hier=0; hier<HIERARCHY_ITER; ++hier){
+        // set initial condition
+#pragma omp for collapse(3)
       for(int x=0;x<SX;++x) {
         for(int y=0;y<SY;++y) {
           for(int z=0;z<SZ;++z) {
@@ -188,11 +191,13 @@ int main () {
           }
         }
       }
+#pragma omp barrier
 
       for(int t = 0; t < T_MAX; ++t){
-        double timestamp_1 = wctime();
+
+        //timestamp_1 = wctime();
         // load communication values
-#pragma omp parallel for collapse(3)
+#pragma omp for collapse(3)
         for(int x=SX-2;x<SX;++x) {
           for(int y=0;y<SY;++y) {
             for(int z=0;z<SZ;++z) {
@@ -202,7 +207,7 @@ int main () {
           }
         }
 
-#pragma omp parallel for collapse(3)
+#pragma omp for collapse(3)
         for(int x=0;x<SX-2;++x) {
           for(int y=SY-2;y<SY;++y) {
             for(int z=0;z<SZ;++z) {
@@ -212,7 +217,7 @@ int main () {
           }
         }
 
-#pragma omp parallel for collapse(3)
+#pragma omp for collapse(3)
         for(int x=0;x<SX-2;++x) {
           for(int y=0;y<SY-2;++y) {
             for(int z=SZ-2;z<SZ;++z) {
@@ -221,10 +226,9 @@ int main () {
             }
           }
         }
-
-        double timestamp_2 = wctime();
-
-        time_comm += timestamp_2 -  timestamp_1;
+#pragma omp barrier
+        //double timestamp_2 = wctime();
+        //        time_comm += timestamp_2 -  timestamp_1;
 
         const auto lap = [](Real ar[SX][SY][SZ],int x, int y, int z) {
           auto ret = ar[x][y+1][z+1] + ar[x+2][y+1][z+1]
@@ -235,7 +239,7 @@ int main () {
         };
 
         // non-destructively update the state
-#pragma omp parallel for collapse(2)
+#pragma omp for collapse(2)
         for(int x=0;x<SX-2;++x) {
           for(int y=0;y<SY-2;++y) {
             for(int z=0;z<SZ-2;++z) {
@@ -249,11 +253,12 @@ int main () {
             }
           }
         }
-        double timestamp_3 = wctime();
-
-        time_comp += timestamp_3 -  timestamp_2;
-
-#pragma omp parallel for collapse(2)
+        //#pragma omp single{
+        //double timestamp_3 = wctime();
+        //time_comp += timestamp_3 -  timestamp_2;
+        //}
+#pragma omp barrier
+#pragma omp for collapse(2)
         for(int x=0;x<SX-2;++x) {
           for(int y=0;y<SY-2;++y) {
             for(int z=0;z<SZ-2;++z) {
@@ -263,6 +268,7 @@ int main () {
           }
         }
       }
+    }
     }
     double time_end = wctime();
 
@@ -284,7 +290,7 @@ int main () {
       std::ostringstream msg;
       msg << SX << " " << SY << " " << SZ << " " << T_MAX << " " << HIERARCHY_ITER << " "
           << " t: " << time_elapse << " t_com: " << time_comm << " t_comp: " << time_comp << " GFlops: " << flop/time_elapse/1e9<< " error: " << (num/den);
-      std::ofstream log_file("benchmark-h2.txt", std::ios::app);
+      std::ofstream log_file("benchmark.txt", std::ios::app);
       std::cout << msg.str() << std::endl;
       log_file << msg.str() << std::endl;
     }
