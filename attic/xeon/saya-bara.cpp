@@ -14,7 +14,7 @@
 #define SY 18
 #define SZ 34
 
-#define BANK 32
+#define BANK 8
 
 #define T_MAX 128
 
@@ -28,8 +28,8 @@ Real U_other[NX][NY][NZ], V_other[NX][NY][NZ];
 int global_clock;
 
 
-Real Uwx[T_MAX][2][SY][SZ], Uwy[T_MAX][SX][2][SZ], Uwz[T_MAX][SX][SY][2];
-Real Vwx[T_MAX][2][SY][SZ], Vwy[T_MAX][SX][2][SZ], Vwz[T_MAX][SX][SY][2];
+Real Uwx[BANK][T_MAX][2][SY][SZ], Uwy[BANK][T_MAX][SX][2][SZ], Uwz[BANK][T_MAX][SX][SY][2];
+Real Vwx[BANK][T_MAX][2][SY][SZ], Vwy[BANK][T_MAX][SX][2][SZ], Vwz[BANK][T_MAX][SX][SY][2];
 
 Real sU0[BANK][SX][SY][SZ], sV0[BANK][SX][SY][SZ];
 Real sU[BANK][SX][SY][SZ], sV[BANK][SX][SY][SZ];
@@ -146,39 +146,38 @@ int main () {
 
   std::cerr << "Setting up wall values..." << std::endl;
   for(int t = 0;t<T_MAX;++t){
-#pragma omp parallel for collapse(2)
-    for(int x=SX-2;x<SX;++x) {
-      for(int y=0;y<SY;++y) {
-        for(int z=0;z<SZ;++z) {
-          double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
-          Uwx[t][x-(SX-2)][y][z] = u;
-          Vwx[t][x-(SX-2)][y][z] = v;
+#pragma omp parallel
+    {
+      int tid=2*omp_get_thread_num();
+      for(int x=SX-2;x<SX;++x) {
+        for(int y=0;y<SY;++y) {
+          for(int z=0;z<SZ;++z) {
+            double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
+            Uwx[tid][t][x-(SX-2)][y][z] = u;
+            Vwx[tid][t][x-(SX-2)][y][z] = v;
+          }
         }
       }
-    }
-
-#pragma omp parallel for collapse(2)
-    for(int x=0;x<SX;++x) {
-      for(int y=SY-2;y<SY;++y) {
-        for(int z=0;z<SZ;++z) {
-          double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
-          Uwy[t][x][y-(SY-2)][z] = u;
-          Vwy[t][x][y-(SY-2)][z] = v;
+      for(int x=0;x<SX;++x) {
+        for(int y=SY-2;y<SY;++y) {
+          for(int z=0;z<SZ;++z) {
+            double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
+            Uwy[tid][t][x][y-(SY-2)][z] = u;
+            Vwy[tid][t][x][y-(SY-2)][z] = v;
+          }
         }
       }
-    }
-#pragma omp parallel for collapse(2)
-    for(int x=0;x<SX;++x) {
-      for(int y=0;y<SY;++y) {
-        for(int z=SZ-2;z<SZ;++z) {
-          double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
-          Uwz[t][x][y][z-(SZ-2)] = u;
-          Vwz[t][x][y][z-(SZ-2)] = v;
+      for(int x=0;x<SX;++x) {
+        for(int y=0;y<SY;++y) {
+          for(int z=SZ-2;z<SZ;++z) {
+            double u,v; get_solution_at(t,x+t,y+t,z+t, u,v);
+            Uwz[tid][t][x][y][z-(SZ-2)] = u;
+            Vwz[tid][t][x][y][z-(SZ-2)] = v;
+          }
         }
       }
     }
   }
-
 
   for(int trial=0;trial<10;++trial) {
     std::cerr << "Carrying out simulation..." << std::endl;
@@ -199,81 +198,81 @@ int main () {
     double time_comp=0, time_comm=0, time_begin, time_end;
 
     for(int heating=0;heating<10;++heating) {
-     time_begin = wctime();
+      time_begin = wctime();
 #pragma omp parallel
-    {
-      const int tid=2*omp_get_thread_num();
-      for(int t = 0; t < T_MAX; ++t){
-        //double timestamp_1 = wctime();
+      {
+        const int tid=2*omp_get_thread_num();
+        for(int t = 0; t < T_MAX; ++t){
+          //double timestamp_1 = wctime();
 
 
-        // load communication values
-        for(int x=SX-2;x<SX;++x) {
-          for(int y=0;y<SY;++y) {
-            for(int z=0;z<SZ;++z) {
-              sU[tid][x][y][z] = Uwx[t][x-(SX-2)][y][z];
-              sV[tid][x][y][z] = Vwx[t][x-(SX-2)][y][z];
+          // load communication values
+          for(int x=SX-2;x<SX;++x) {
+            for(int y=0;y<SY;++y) {
+              for(int z=0;z<SZ;++z) {
+                sU[tid][x][y][z] = Uwx[tid][t][x-(SX-2)][y][z];
+                sV[tid][x][y][z] = Vwx[tid][t][x-(SX-2)][y][z];
+              }
             }
           }
-        }
 
-        for(int x=0;x<SX-2;++x) {
-          for(int y=SY-2;y<SY;++y) {
-            for(int z=0;z<SZ;++z) {
-              sU[tid][x][y][z] = Uwy[t][x][y-(SY-2)][z];
-              sV[tid][x][y][z] = Vwy[t][x][y-(SY-2)][z];
-            }
-          }
-        }
-
-        for(int x=0;x<SX-2;++x) {
-          for(int y=0;y<SY-2;++y) {
-            for(int z=SZ-2;z<SZ;++z) {
-              sU[tid][x][y][z] = Uwz[t][x][y][z-(SZ-2)];
-              sV[tid][x][y][z] = Vwz[t][x][y][z-(SZ-2)];
-            }
-          }
-        }
-
-        //double timestamp_2 = wctime();
-        //time_comm += timestamp_2 -  timestamp_1;
-
-        // destructively update the state
-        const auto lap = [](Real ar[SX][SY][SZ],int x, int y, int z) {
-          auto ret = ar[x][y+1][z+1] + ar[x+2][y+1][z+1]
-          + ar[x+1][y][z+1] + ar[x+1][y+2][z+1]
-          + ar[x+1][y+1][z] + ar[x+1][y+1][z+2]
-          - 6*ar[x+1][y+1][z+1];
-          return ret / dx / dx;
-        };
-
-        for(int x=0;x<SX-2;++x) {
-          for(int y=0;y<SY-2;++y) {
-            for(int z=0;z<SZ-2;++z) {
-              Real u=sU[tid][x+1][y+1][z+1] ;
-              Real v=sV[tid][x+1][y+1][z+1] ;
-
-              auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(sU[tid],x,y,z);
-              auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(sV[tid],x,y,z);
-              sU[tid][x][y][z] = u+dt*du_dt;
-              sV[tid][x][y][z] = v+dt*dv_dt;
-            }
-          }
-        }
-        //double timestamp_3 = wctime();
-        //time_comp += timestamp_3 -  timestamp_2;
-        /*
           for(int x=0;x<SX-2;++x) {
-          for(int y=0;y<SY-2;++y) {
-          for(int z=0;z<SZ-2;++z) {
-          sU[x][y][z] = sU_1[x][y][z];
-          sV[x][y][z] = sV_1[x][y][z];
+            for(int y=SY-2;y<SY;++y) {
+              for(int z=0;z<SZ;++z) {
+                sU[tid][x][y][z] = Uwy[tid][t][x][y-(SY-2)][z];
+                sV[tid][x][y][z] = Vwy[tid][t][x][y-(SY-2)][z];
+              }
+            }
           }
+
+          for(int x=0;x<SX-2;++x) {
+            for(int y=0;y<SY-2;++y) {
+              for(int z=SZ-2;z<SZ;++z) {
+                sU[tid][x][y][z] = Uwz[tid][t][x][y][z-(SZ-2)];
+                sV[tid][x][y][z] = Vwz[tid][t][x][y][z-(SZ-2)];
+              }
+            }
           }
-          }*/
+
+          //double timestamp_2 = wctime();
+          //time_comm += timestamp_2 -  timestamp_1;
+
+          // destructively update the state
+          const auto lap = [](Real ar[SX][SY][SZ],int x, int y, int z) {
+            auto ret = ar[x][y+1][z+1] + ar[x+2][y+1][z+1]
+            + ar[x+1][y][z+1] + ar[x+1][y+2][z+1]
+            + ar[x+1][y+1][z] + ar[x+1][y+1][z+2]
+            - 6*ar[x+1][y+1][z+1];
+            return ret / dx / dx;
+          };
+
+          for(int x=0;x<SX-2;++x) {
+            for(int y=0;y<SY-2;++y) {
+              for(int z=0;z<SZ-2;++z) {
+                Real u=sU[tid][x+1][y+1][z+1] ;
+                Real v=sV[tid][x+1][y+1][z+1] ;
+
+                auto du_dt = -Fe * u*v*v + Fu*(1-u) + Du * lap(sU[tid],x,y,z);
+                auto dv_dt =  Fe * u*v*v - Fv*v     + Dv * lap(sV[tid],x,y,z);
+                sU[tid][x][y][z] = u+dt*du_dt;
+                sV[tid][x][y][z] = v+dt*dv_dt;
+              }
+            }
+          }
+          //double timestamp_3 = wctime();
+          //time_comp += timestamp_3 -  timestamp_2;
+          /*
+            for(int x=0;x<SX-2;++x) {
+            for(int y=0;y<SY-2;++y) {
+            for(int z=0;z<SZ-2;++z) {
+            sU[x][y][z] = sU_1[x][y][z];
+            sV[x][y][z] = sV_1[x][y][z];
+            }
+            }
+            }*/
+        }
       }
-    }
-     time_end = wctime();
+      time_end = wctime();
     }
 
     double flop = 29.0 * (SX-2)*(SY-2)*(SZ-2) *T_MAX * n_thre;
