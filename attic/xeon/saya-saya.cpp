@@ -273,6 +273,7 @@ int main () {
     double time_end = wctime();
 
     double flop = 29.0 * (SX-2)*(SY-2)*(SZ-2) *T_MAX * HIERARCHY_ITER;
+    double bw_gb= 8.0 * 2 * (7+1) * (SX-2)*(SY-2)*(SZ-2) *T_MAX * HIERARCHY_ITER;
     double time_elapse = time_end-time_begin;
 
     {
@@ -289,7 +290,7 @@ int main () {
       }
       std::ostringstream msg;
       msg << SX << " " << SY << " " << SZ << " " << T_MAX << " " << HIERARCHY_ITER << " "
-          << " t: " << time_elapse << " t_com: " << time_comm << " t_comp: " << time_comp << " GFlops: " << flop/time_elapse/1e9<< " error: " << (num/den);
+          << " t: " << time_elapse << " t_com: " << time_comm << " t_comp: " << time_comp << " GFlops: " << flop/time_elapse/1e9<<  " GBps: " << bw_gb/time_elapse/1e9<< " error: " << (num/den);
       std::ofstream log_file("benchmark-saya-saya.txt", std::ios::app);
       std::cout << msg.str() << std::endl;
       log_file << msg.str() << std::endl;

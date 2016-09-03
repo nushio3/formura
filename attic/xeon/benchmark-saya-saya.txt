@@ -1637,3 +1637,13 @@
 4 32 130 1024 32  t: 0.951771 t_com: 0 t_comp: 0 GFlops: 7.6679 error: 0
 4 32 130 1024 32  t: 1.03073 t_com: 0 t_comp: 0 GFlops: 7.08049 error: 0
 4 32 130 1024 32  t: 0.956809 t_com: 0 t_comp: 0 GFlops: 7.62753 error: 0
+34 34 68 64 16  t: 0.286379 t_com: 0 t_comp: 0 GFlops: 7.0081 GBps: 30.9323 error: 0
+34 34 68 64 16  t: 0.295439 t_com: 0 t_comp: 0 GFlops: 6.79319 GBps: 29.9838 error: 0
+34 34 68 64 16  t: 0.285217 t_com: 0 t_comp: 0 GFlops: 7.03666 GBps: 31.0584 error: 0
+34 34 68 64 16  t: 0.298309 t_com: 0 t_comp: 0 GFlops: 6.72784 GBps: 29.6953 error: 0
+34 34 68 64 16  t: 0.301246 t_com: 0 t_comp: 0 GFlops: 6.66225 GBps: 29.4058 error: 0
+34 34 68 64 16  t: 0.283962 t_com: 0 t_comp: 0 GFlops: 7.06776 GBps: 31.1956 error: 0
+34 34 68 64 16  t: 0.291004 t_com: 0 t_comp: 0 GFlops: 6.89673 GBps: 30.4407 error: 0
+34 34 68 64 16  t: 0.290643 t_com: 0 t_comp: 0 GFlops: 6.90529 GBps: 30.4785 error: 0
+34 34 68 64 16  t: 0.30487 t_com: 0 t_comp: 0 GFlops: 6.58305 GBps: 29.0562 error: 0
+34 34 68 64 16  t: 0.287458 t_com: 0 t_comp: 0 GFlops: 6.9818 GBps: 30.8162 error: 0
