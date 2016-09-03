@@ -2,8 +2,6 @@
 
 import subprocess, re
 
-# p = subprocess.Popen(['curl', '--compressed', '-L', '-H', 'Expect:', '-H', 'X-API-Key: ' + userkey, 'http://2016sv.icfpcontest.org/api/blob/'+hashstr], stdout=subprocess.PIPE)
-#    con, _ = p.communicate(None)
 with open("/proc/cpuinfo","r") as fp:
     for l in fp:
         if re.match('model name', l):
