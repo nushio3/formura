@@ -16,7 +16,7 @@
 
 #define BANK 8
 
-#define T_MAX 128
+#define T_MAX 1024
 
 typedef double Real;
 
@@ -209,6 +209,7 @@ int main () {
           // load communication values
           for(int x=SX-2;x<SX;++x) {
             for(int y=0;y<SY;++y) {
+              #pragma omp simd
               for(int z=0;z<SZ;++z) {
                 sU[tid][x][y][z] = Uwx[tid][t][x-(SX-2)][y][z];
                 sV[tid][x][y][z] = Vwx[tid][t][x-(SX-2)][y][z];
@@ -218,6 +219,7 @@ int main () {
 
           for(int x=0;x<SX-2;++x) {
             for(int y=SY-2;y<SY;++y) {
+              #pragma omp simd
               for(int z=0;z<SZ;++z) {
                 sU[tid][x][y][z] = Uwy[tid][t][x][y-(SY-2)][z];
                 sV[tid][x][y][z] = Vwy[tid][t][x][y-(SY-2)][z];
@@ -227,6 +229,7 @@ int main () {
 
           for(int x=0;x<SX-2;++x) {
             for(int y=0;y<SY-2;++y) {
+              #pragma omp simd
               for(int z=SZ-2;z<SZ;++z) {
                 sU[tid][x][y][z] = Uwz[tid][t][x][y][z-(SZ-2)];
                 sV[tid][x][y][z] = Vwz[tid][t][x][y][z-(SZ-2)];
@@ -248,6 +251,7 @@ int main () {
 
           for(int x=0;x<SX-2;++x) {
             for(int y=0;y<SY-2;++y) {
+#pragma omp simd
               for(int z=0;z<SZ-2;++z) {
                 Real u=sU[tid][x+1][y+1][z+1] ;
                 Real v=sV[tid][x+1][y+1][z+1] ;

@@ -242,6 +242,7 @@ int main () {
 #pragma omp for collapse(2)
         for(int x=0;x<SX-2;++x) {
           for(int y=0;y<SY-2;++y) {
+#pragma omp simd
             for(int z=0;z<SZ-2;++z) {
               Real u=sU[x+1][y+1][z+1] ;
               Real v=sV[x+1][y+1][z+1] ;
@@ -261,6 +262,7 @@ int main () {
 #pragma omp for collapse(2)
         for(int x=0;x<SX-2;++x) {
           for(int y=0;y<SY-2;++y) {
+#pragma omp simd
             for(int z=0;z<SZ-2;++z) {
               sU[x][y][z] = sU_1[x][y][z];
               sV[x][y][z] = sV_1[x][y][z];
