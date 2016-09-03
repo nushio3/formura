@@ -7,8 +7,10 @@
 #include <sys/time.h>
 #include <time.h>
 
+#ifndef HUGE_JOB_MODE
 #include <fj_tool/fapp.h>
 #include <fjcoll.h>
+#endif
 
 using namespace std;
 
@@ -207,8 +209,10 @@ int main (int argc, char **argv) {
         T_MAX*=2;
         T_MONITOR*=2;
         sprintf(benchmark_name,"extend-%d",T_MAX);
+#ifndef HUGE_JOB_MODE
         start_collection(benchmark_name);
         fapp_start(benchmark_name, 0,0);
+#endif
       }else{
         break;
       }
@@ -216,8 +220,10 @@ int main (int argc, char **argv) {
     }
     if (navi.time_step == 0) {
       t_begin = wctime();
+#ifndef HUGE_JOB_MODE
       start_collection(benchmark_name);
       fapp_start(benchmark_name, 0,0);
+#endif
     }
 
     Formura_Forward(&navi); // navi.time_step increases
@@ -226,8 +232,10 @@ int main (int argc, char **argv) {
 
     if (navi.time_step >= T_MAX) {
       t_end = wctime();
+#ifndef HUGE_JOB_MODE
       stop_collection(benchmark_name);
       fapp_stop(benchmark_name, 0,0);
+#endif
     }
   }
   //printf("total wct = %lf sec\n",t_end - t_begin);

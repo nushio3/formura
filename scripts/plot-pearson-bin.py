@@ -26,7 +26,7 @@ sx=sy=sz=0
 if sys.argv[1] == 'big':
     dtype_int32 = '>i4'
     dtype_float64= '>f8'
-    #img_shrink=500.0
+    #img_shrink=150.0
     #pylab.rcParams.update({'font.size': 48})
     img_shrink=300.0
     pylab.rcParams.update({'font.size': 72})
@@ -86,7 +86,8 @@ canvas_size_z = max(z_ax)+sz
 
 
 
-for t in t_ax:
+for t in sorted(t_ax):
+    print "visualizing time: ", t
     field=np.zeros((canvas_size_x, canvas_size_z, 2))
     for key,val in secs_y.iteritems():
         t1, x1, y1, z1 = key
@@ -116,10 +117,10 @@ for t in t_ax:
     pylab.imshow(canvas)
     if sys.argv[1] == 'big':
         CS=pylab.contour(c_field,[0.5],colors='blue')
-        #pylab.clabel(CS,fontsize=0)
+        pylab.clabel(CS,fontsize=0)
         for c in CS.collections:
             pylab.setp(c,linewidth=4)
-        if t ==262144:
-            pylab.gca().add_patch(patches.Rectangle((10200,1450),2000,2000,fill=False,edgecolor='white',linewidth=8))
+        #if t ==262144:
+        #    pylab.gca().add_patch(patches.Rectangle((10200,1450),2000,2000,fill=False,edgecolor='white',linewidth=8))
     pylab.title('t = {}'.format(t))
     pylab.savefig('images/{:06}.png'.format(t))

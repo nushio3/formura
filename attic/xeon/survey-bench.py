@@ -2,8 +2,6 @@
 
 import subprocess, re
 
-# p = subprocess.Popen(['curl', '--compressed', '-L', '-H', 'Expect:', '-H', 'X-API-Key: ' + userkey, 'http://2016sv.icfpcontest.org/api/blob/'+hashstr], stdout=subprocess.PIPE)
-#    con, _ = p.communicate(None)
 with open("/proc/cpuinfo","r") as fp:
     for l in fp:
         if re.match('model name', l):
@@ -13,8 +11,8 @@ with open("/proc/cpuinfo","r") as fp:
             print cpuname
 
 
-def generate_modified_code(sx,sy,sz,t_max):
-    with open("saya.cpp","r") as f_in:
+def generate_modified_code(sx,sy,sz,t_max,hier):
+    with open("saya-saya.cpp","r") as f_in:
       with open("saya-mod.cpp","w") as f_out:
         for l in f_in:
             ret=l
@@ -26,20 +24,23 @@ def generate_modified_code(sx,sy,sz,t_max):
                 ret = "#define SZ {}\n".format(sz)
             if re.match('\#define T_MAX',l):
                 ret = "#define T_MAX {}\n".format(t_max)
+            if re.match('\#define HIERARCHY_ITER',l):
+                ret = "#define HIERARCHY_ITER {}\n".format(hier)
             f_out.write(ret)
 
 #dims = [32,34,64,68,96,128,130,192,256,258,320,512,514]
-dims = [32,34,64,68,128,130,256,258,512,514]
+dims = [6,10,32,34,64,66,128,130,256,258]
 
 for ipow in range(18,1000):
     zpow = 2**ipow
-    for sx in dims:
-        for sz in dims:
-            for sy in [sx,sz]:
+    for sx in [4,8,10]:
+        for sz in [66,130,258]:
+            for sy in dims:
                 size = sx*sy*sz
                 if size < zpow or size >= 2*zpow:
                     continue
-                for t in [1000,2000]:
-                    generate_modified_code(sx,sy,sz,t)
-                    subprocess.call(["make","saya-mod.out"])
-                    subprocess.call("./run-saya-mod.sh",shell=True)
+                for t in [128,256,1024]:
+                    for h in [8,16,32]:
+                        generate_modified_code(sx,sy,sz,t,h)
+                        subprocess.call(["make","saya-mod.out"])
+                        subprocess.call("./run-saya-mod.sh",shell=True)
