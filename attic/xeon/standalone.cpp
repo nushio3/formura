@@ -12,11 +12,11 @@
 
 #define SX 18
 #define SY 18
-#define SZ 18
+#define SZ 128
 
 #define BANK 64
 
-#define T_MAX 128
+#define T_MAX 1024
 
 typedef double Real;
 
@@ -28,8 +28,8 @@ Real U_other[NX][NY][NZ], V_other[NX][NY][NZ];
 int global_clock;
 
 
-Real Uwx[BANK][T_MAX][2][SY][SZ], Uwy[BANK][T_MAX][SX][2][SZ], Uwz[BANK][T_MAX][SX][SY][2];
-Real Vwx[BANK][T_MAX][2][SY][SZ], Vwy[BANK][T_MAX][SX][2][SZ], Vwz[BANK][T_MAX][SX][SY][2];
+//Real Uwx[BANK][T_MAX][2][SY][SZ], Uwy[BANK][T_MAX][SX][2][SZ], Uwz[BANK][T_MAX][SX][SY][2];
+//Real Vwx[BANK][T_MAX][2][SY][SZ], Vwy[BANK][T_MAX][SX][2][SZ], Vwz[BANK][T_MAX][SX][SY][2];
 
 Real sU0[BANK][SX][SY][SZ], sV0[BANK][SX][SY][SZ];
 Real sU[BANK][SX][SY][SZ], sV[BANK][SX][SY][SZ];
@@ -146,6 +146,7 @@ int main () {
 
   std::cerr << "Setting up wall values..." << std::endl;
   for(int t = 0;t<T_MAX;++t){
+    /*
 #pragma omp parallel
     {
       int tid=2*omp_get_thread_num();
@@ -176,7 +177,7 @@ int main () {
           }
         }
       }
-    }
+    */
   }
 
   for(int trial=0;trial<10;++trial) {
@@ -198,19 +199,27 @@ int main () {
 
     for(int heating=0;heating<10;++heating) {
       time_begin = wctime();
-#pragma omp parallel
-      {
-        const int tid=2*omp_get_thread_num();
+#pragma omp parallel for
+      for (int tid=0;tid<n_thre;++tid) {
+        //const int tid=2*omp_get_thread_num();
         for(int t = 0; t < T_MAX; ++t){
 
           // destructively update the state
+          /*
           const auto lap = [](Real ar[SX][SY][SZ],int x, int y, int z) {
             auto ret = ar[x][y+1][z+1] + ar[x+2][y+1][z+1]
             + ar[x+1][y][z+1] + ar[x+1][y+2][z+1]
             + ar[x+1][y+1][z] + ar[x+1][y+1][z+2]
             - 6*ar[x+1][y+1][z+1];
             return ret / dx / dx;
-          };
+            };*/
+
+#define lap(ar,x,y,z) \
+          (ar[x][y+1][z+1] + ar[x+2][y+1][z+1] \
+            + ar[x+1][y][z+1] + ar[x+1][y+2][z+1] \
+            + ar[x+1][y+1][z] + ar[x+1][y+1][z+2] \
+              - 6*ar[x+1][y+1][z+1]) / dx / dx
+
 
           for(int x=0;x<SX-2;++x) {
             for(int y=0;y<SY-2;++y) {
