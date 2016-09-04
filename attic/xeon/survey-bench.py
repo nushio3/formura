@@ -12,7 +12,7 @@ with open("/proc/cpuinfo","r") as fp:
 
 
 def generate_modified_code(sx,sy,sz,t_max,hier):
-    with open("saya-saya.cpp","r") as f_in:
+    with open("saya-bara.cpp","r") as f_in:
       with open("saya-mod.cpp","w") as f_out:
         for l in f_in:
             ret=l
@@ -29,18 +29,18 @@ def generate_modified_code(sx,sy,sz,t_max,hier):
             f_out.write(ret)
 
 #dims = [32,34,64,68,96,128,130,192,256,258,320,512,514]
-dims = [6,10,32,34,64,66,128,130,256,258]
+dims = [10,16,18,32,34,66,130,258]
 
 for ipow in range(14,1000):
     zpow = 2**ipow
-    for sx in [4,10,34,66]:
+    for sx in [4,10,18,34,66]:
         for sz in [34,66,130,258]:
-            for sy in dims:
+            for sy in [10,16,18,32,34,66,130,258]:
                 size = sx*sy*sz
                 if size < zpow or size >= 2*zpow:
                     continue
-                for t in [128,256,1024]:
-                    for h in [8,16,32]:
+                for t in [32,128,1024]:
+                    for h in [0]:
                         generate_modified_code(sx,sy,sz,t,h)
                         subprocess.call(["make","saya-mod.out"])
                         subprocess.call("./run-saya-mod.sh",shell=True)

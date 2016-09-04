@@ -16,7 +16,7 @@
 #define HIERARCHY_ITER 16
 
 
-#define T_MAX 64
+#define T_MAX 16
 
 typedef double Real;
 

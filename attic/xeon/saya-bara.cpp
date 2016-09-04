@@ -14,7 +14,7 @@
 #define SY 18
 #define SZ 130
 
-#define BANK 8
+#define BANK 64
 
 #define T_MAX 128
 
