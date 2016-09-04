@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import subprocess, re
+import subprocess, random, re
 
 with open("/proc/cpuinfo","r") as fp:
     for l in fp:
@@ -31,16 +31,26 @@ def generate_modified_code(sx,sy,sz,t_max,hier):
 #dims = [32,34,64,68,96,128,130,192,256,258,320,512,514]
 dims = [10,16,18,32,34,66,130,258]
 
-for ipow in range(14,1000):
-    zpow = 2**ipow
-    for sx in [4,10,18,34,66]:
-        for sz in [34,66,130,258]:
-            for sy in [10,16,18,32,34,66,130,258]:
-                size = sx*sy*sz
-                if size < zpow or size >= 2*zpow:
-                    continue
-                for t in [32,128,1024]:
-                    for h in [0]:
-                        generate_modified_code(sx,sy,sz,t,h)
-                        subprocess.call(["make","saya-mod.out"])
-                        subprocess.call("./run-saya-mod.sh",shell=True)
+used = set()
+
+while True:
+    for ipow in range(5,20):
+        zpow = 2**ipow
+        for draw in range(1000):
+            sx = random.choice([6,10,18,34,66])
+            sy = random.choice([6,10,16,18,32,34,66,130,258])
+            sz = random.choice([18,34,66,130,258])
+            size = sx*sy*sz
+            if size < zpow or size >= 8*zpow:
+                continue
+            if (sx,sy,sz) in used:
+                continue
+        if (sx,sy,sz) in used:
+            continue
+    
+        used.add((sx,sy,sz))
+        for t in [32,128,1024]:
+            for h in [0]:
+                generate_modified_code(sx,sy,sz,t,h)
+                subprocess.call(["make","saya-mod.out"])
+                subprocess.call("./run-saya-mod.sh",shell=True)

@@ -306,7 +306,7 @@ int main () {
       }
 
       std::ostringstream msg;
-      msg << SX << " " << SY << " " << SZ << " " << T_MAX << " "
+      msg << n_thre << "  " << SX << " " << SY << " " << SZ << " " << T_MAX << " "
           << " t: " << time_elapse << " " << time_comm << " " << time_comp << " GFlops: " << flop/time_elapse/1e9<<  " GBps: " << bw_gb/time_elapse/1e9<< " error: " << (sum_num/sum_den);
       std::ofstream log_file("benchmark-saya-bara.txt", std::ios::app);
       std::cout << msg.str() << std::endl;
