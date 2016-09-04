@@ -12,7 +12,7 @@ with open("/proc/cpuinfo","r") as fp:
 
 
 def generate_modified_code(sx,sy,sz,t_max,hier):
-    with open("standalone.cpp","r") as f_in:
+    with open("saya-bara.cpp","r") as f_in:
       with open("saya-mod.cpp","w") as f_out:
         for l in f_in:
             ret=l
