@@ -11,4 +11,4 @@ set arrow from 4,10 to 4,1000 nohead lc 2
 set label 1 at first 100,12 "Memory"
 set label 3 at first 10,12 "L3"
 set label 2 at first 1,12 "L2"
-plot 'benchmark-stream-xeon.txt' u (4*$1/2**20):(2*$4) lw 2 ps 4 t ""
+plot 'benchmark-stream-xeon.txt' u (8*$1/2**20):(2*$4) lw 2 ps 4 t ""
