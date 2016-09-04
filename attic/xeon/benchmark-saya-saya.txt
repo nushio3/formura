@@ -22302,3 +22302,4 @@
 16  66 64 258  1024 32  t: 21.3661 t_com: 0 t_comp: 0 GFlops: 45.1787 GBps: 199.409 error: 0
 16  66 64 258  1024 32  t: 21.4328 t_com: 0 t_comp: 0 GFlops: 45.0381 GBps: 198.789 error: 0
 16  66 64 258  1024 32  t: 25.6033 t_com: 0 t_comp: 0 GFlops: 37.7019 GBps: 166.408 error: 0
+16  66 64 258  1024 32  t: 29.5487 t_com: 0 t_comp: 0 GFlops: 32.668 GBps: 144.19 error: 0
