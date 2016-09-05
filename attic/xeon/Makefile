@@ -16,6 +16,14 @@ standalone.out: standalone.cpp Makefile
 	-Wa,-adhln=standalone.s -g -fverbose-asm -masm=intel \
 	standalone.cpp -o standalone.out
 
+
+standalone-1d.out: standalone-1d.cpp Makefile
+	g++ -std=c++11 \
+	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large \
+	-Wa,-adhln=standalone-1d.s -g -fverbose-asm -masm=intel \
+	standalone-1d.cpp -o standalone-1d.out
+
+
 saya-saya.out: saya-saya.cpp Makefile
 	g++ -std=c++11 \
 	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large \
@@ -45,6 +53,12 @@ stencilstream.out: stencilstream.cpp Makefile
 	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large \
 	-Wa,-adhln=stencilstream.s -g -fverbose-asm -masm=intel \
 	stencilstream.cpp -o stencilstream.out
+
+mystream-3d.out: mystream-3d.cpp Makefile
+	g++ -std=c++11 \
+	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large \
+	-Wa,-adhln=mystream-3d.s -g -fverbose-asm -masm=intel \
+	mystream-3d.cpp -o mystream-3d.out
 
 
 
