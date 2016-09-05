@@ -10,13 +10,13 @@
 #define NY 50
 #define NZ 50
 
-#define SX 18
-#define SY 18
-#define SZ 128
+#define SX 16
+#define SY 16
+#define SZ 130
 
-#define BANK 64
+#define BANK 1
 
-#define T_MAX 1024
+#define T_MAX 8192
 
 typedef double Real;
 
@@ -197,9 +197,9 @@ int main () {
     }
     double time_comp=0, time_comm=0, time_begin, time_end;
 
-    for(int heating=0;heating<10;++heating) {
+    //for(int heating=0;heating<10;++heating) {
       time_begin = wctime();
-#pragma omp parallel for
+#pragma omp parallel 
       for (int tid=0;tid<n_thre;++tid) {
         //const int tid=2*omp_get_thread_num();
         for(int t = 0; t < T_MAX; ++t){
@@ -221,6 +221,7 @@ int main () {
               - 6*ar[x+1][y+1][z+1]) / dx / dx
 
 
+#pragma omp for collapse(2)
           for(int x=0;x<SX-2;++x) {
             for(int y=0;y<SY-2;++y) {
 #pragma omp simd
@@ -238,7 +239,7 @@ int main () {
         }
       }
       time_end = wctime();
-    }
+      //}
 
     double flop = 29.0 * (SX-2)*(SY-2)*(SZ-2) *T_MAX * n_thre;
     double bw_gb= 8.0 * 2 * 7 * (SX-2)*(SY-2)*(SZ-2) *T_MAX * n_thre;
