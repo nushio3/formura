@@ -14,9 +14,9 @@
 #define SY 18
 #define SZ 130
 
-#define BANK 64
+#define BANK 1
 
-#define T_MAX 128
+#define T_MAX 1024
 
 typedef double Real;
 
