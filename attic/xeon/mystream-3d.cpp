@@ -26,7 +26,9 @@ int main (int argc, char **argv) {
   double time_begin, time_end;
 
 
+
   for (N=1024;N<NN && N>0; N*=2) {
+    if (N<0) break;
 #pragma omp parallel
     {
       for (int i=0;i<NN;++i) {
