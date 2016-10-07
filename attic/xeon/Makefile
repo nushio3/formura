@@ -4,6 +4,10 @@ all:
 x.out: main.cpp initial-condition.hpp naive-integrator.hpp Makefile
 	g++ -std=c++11 -fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 main.cpp -o x.out
 
+saya-intel.out: saya.cpp Makefile
+	icpc -fopenmp -std=c++11 -O3 saya.cpp -o saya-intel.out
+
+
 saya.out: saya.cpp Makefile
 	g++ -std=c++11 \
 	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large\
@@ -59,6 +63,13 @@ mystream-3d.out: mystream-3d.cpp Makefile
 	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -mcmodel=large \
 	-Wa,-adhln=mystream-3d.s -g -fverbose-asm -masm=intel \
 	mystream-3d.cpp -o mystream-3d.out
+
+
+knlstream.out: knlstream.cpp Makefile
+	icpc -std=c++11 \
+	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -shared-intel -mcmodel=large \
+	-Wa,-adhln=knlstream.s -g -fverbose-asm -masm=intel -lmemkind \
+	knlstream.cpp -o knlstream.out
 
 
 
