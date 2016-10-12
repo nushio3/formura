@@ -37,6 +37,8 @@ void compute (task_ar aar, task_ar bar, int n_time, int n_task) {
         const double z3 = (1.0-l)*(1.0-c)*(1.0-r);
         bar[i] = 1.0-z1-z2-z3;
       }
+    }
+    for (int i = 1; i < n_task-1; ++i) {
       {
         const double l = bar[i-1];
         const double c = bar[i];
@@ -54,13 +56,16 @@ int main () {
   const int n_thre = omp_get_max_threads();
   cout << n_thre << endl;
 
-  vector<double_ptr> ptrs;
+  vector<double_ptr> ptra;
+  vector<double_ptr> ptrb;
   const int n_time = 1048576;
 
   for (int i=0;i<n_thre;++i) {
-    ptrs.push_back((double*)hbw_malloc(sizeof(double) * n_task));
+    ptra.push_back((double*)hbw_malloc(sizeof(double) * n_task));
+    ptrb.push_back((double*)hbw_malloc(sizeof(double) * n_task));
     for (int x=0;x<n_task;++x) {
-      ptrs[i][x] = drand();
+      ptra[i][x] = drand();
+      ptrb[i][x] = drand();
     }
   }
 
@@ -69,7 +74,7 @@ int main () {
 #pragma omp parallel
   {
     int tid=omp_get_thread_num();
-    compute(ptrs[tid], n_time, n_task);
+    compute(ptra[tid], ptrb[tid], n_time, n_task);
   }
 
 
@@ -80,7 +85,7 @@ int main () {
 
   for (int i=0;i<n_thre;++i) {
     for (int x=0;x<n_task;++x) {
-      sum += ptrs[i][x];
+      sum += ptra[i][x];
     }
   }
   cout << sum << "\tGflop " << gflop << "\ttime " << (time_end - time_begin)
