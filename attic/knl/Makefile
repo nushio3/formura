@@ -1,6 +1,14 @@
 all: knlstream.out task-parallel.out
 
 
+tmp.out: tmp.cpp Makefile
+	icpc -std=c++11 \
+	-fopenmp -O3  -mtune=knl -restrict  -mcmodel=large -ax=MIC-AVX512 \
+	-lmemkind \
+	-Wa,-adhln=tmp.s \
+	tmp.cpp -o tmp.out
+
+
 knlstream.out: knlstream.cpp Makefile
 	icpc -std=c++11 \
 	-fopenmp -O3 -funroll-loops  -shared-intel -mcmodel=large \

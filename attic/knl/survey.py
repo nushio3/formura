@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import copy
+import copy,re,subprocess
 
 class Parameter:
     def __init__(this, typ, name):
@@ -27,15 +27,45 @@ def param_choices_internal(list_of_ranges):
             ret.append(tv)
     return ret
 
+
+def replace_params(src, params):
+    ret = ''
+    for l in src.split("\n"):
+        for k,v in params.items():
+            typ, name = k
+            if re.search('const',l) and re.search(typ,l) and re.search(name,l):
+                l = "const {} {} = {};".format(typ, name, v)
+        ret += l + "\n"
+    return ret
+        
+
+global ctr
+ctr = 0
+
 class SurveyTask:
     def __init__(this):
-        this.template = "task-parallel.cpp"
+        this.template = "1d-stencil-barrier.cpp"
         this.ranges = {
-            ("int", "n_time") : [2**n for n in range(10,20)],
-            ("int", "n_unroll") : [2**n for n in range(1,5)]
+            ("int", "n_unroll") : [2**n for n in range(1,10)]
+#            ("int", "n_time") : [2**n for n in range(10,15)]
         }
     def survey(this):
         for x in param_choices(this.ranges):
-            print x
+            this.benchmark(x)
+
+    def benchmark(this, params):
+        global ctr
+        ctr +=1
+        src = ''
+        with open(this.template,'r') as fp:
+            src = fp.read()
+        src2 = replace_params(src, params)
+
+        with open('tmp.cpp'.format(ctr),'w') as fp:
+            fp.write(src2)
+        subprocess.call("make tmp.out",shell=True)
+        for t in range(10):
+            subprocess.call("./tmp.out >> benchmark.txt",shell=True)
+        
 
 SurveyTask().survey()

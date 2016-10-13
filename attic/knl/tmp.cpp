@@ -21,8 +21,8 @@ double wctime() {
 
 
 const int n_task =2048;
-const int n_time = 16384;
-const int n_unroll=4;
+const int n_time = 16536;
+const int n_unroll = 4;
 
 typedef double *double_ptr;
 typedef double task_ar[n_task];
@@ -114,3 +114,4 @@ int main () {
 	 << "\tGflops " << gflop/(time_end - time_begin)  << " n_barrier " << n_time/n_unroll << endl;
 
   }
+

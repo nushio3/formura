@@ -21,15 +21,15 @@ double wctime() {
 
 
 const int n_task =2048;
-const int n_time = 16384;
-const int n_unroll=4;
+const int n_time = 2048;
 
 typedef double *double_ptr;
 typedef double task_ar[n_task];
 
 void compute (task_ar aar, task_ar bar, int n_time, int n_task) {
-  for (int t = 0; t < n_time; t+=n_unroll) {
-    for(int t2=0;t2<n_unroll; ++t2) {
+  const int t_unroll=4;
+  for (int t = 0; t < n_time; t+=t_unroll) {
+    for(int t2=0;t2<t_unroll; ++t2) {
       for (int i = 1; i < n_task-1; ++i) {
 
         double l = aar[i-1];
@@ -111,6 +111,7 @@ int main () {
   }
   }
     cout << sum << "\tGflop " << gflop << "\ttime " << (time_end - time_begin)
-	 << "\tGflops " << gflop/(time_end - time_begin)  << " n_barrier " << n_time/n_unroll << endl;
+	 << "\tGflops " << gflop/(time_end - time_begin)  << " n_barrier " << n_time << endl;
 
   }
+
