@@ -1,2 +1,0 @@
-n_thre 256 523704	Gflop 4947.8	time 5.24762	Gflops 942.867 n_barrier 131072
-n_thre 256 

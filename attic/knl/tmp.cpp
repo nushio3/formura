@@ -21,8 +21,8 @@ double wctime() {
 
 
 const int n_task =2048;
-const int n_time = 16536;
-const int n_unroll = 4;
+const int n_time = 16384*16;
+const int n_unroll = 2;
 
 typedef double *double_ptr;
 typedef double task_ar[n_task];
@@ -38,12 +38,6 @@ void compute (task_ar aar, task_ar bar, int n_time, int n_task) {
 	c = 0.2*l+0.4*c+0.3*r+0.1;
 	l = 0.4*l+0.3*c+0.2*r+0.1;
 	r = 0.3*l+0.2*c+0.4*r+0.1;
-	c = 0.2*l+0.4*c+0.3*r+0.1;
-	l = 0.4*l+0.3*c+0.2*r+0.1;
-	r = 0.3*l+0.2*c+0.4*r+0.1;
-	c = 0.2*l+0.4*c+0.3*r+0.1;
-	l = 0.4*l+0.3*c+0.2*r+0.1;
-	r = 0.3*l+0.2*c+0.4*r+0.1;
         bar[i] = c;
 
       }
@@ -53,12 +47,6 @@ void compute (task_ar aar, task_ar bar, int n_time, int n_task) {
 	double l = bar[i-1];
 	double c = bar[i];
 	double r = bar[i+1];
-	c = 0.2*l+0.4*c+0.3*r+0.1;
-	l = 0.4*l+0.3*c+0.2*r+0.1;
-	r = 0.3*l+0.2*c+0.4*r+0.1;
-	c = 0.2*l+0.4*c+0.3*r+0.1;
-	l = 0.4*l+0.3*c+0.2*r+0.1;
-	r = 0.3*l+0.2*c+0.4*r+0.1;
 	c = 0.2*l+0.4*c+0.3*r+0.1;
 	l = 0.4*l+0.3*c+0.2*r+0.1;
 	r = 0.3*l+0.2*c+0.4*r+0.1;
@@ -101,7 +89,7 @@ int main () {
 
 
     double time_end = wctime();
-    double gflop = double(108)/1e9 * n_time * n_task * n_thre;
+    double gflop = double(36)/1e9 * n_time * n_task * n_thre;
 
     double sum = 0;
 
