@@ -41,6 +41,8 @@ int main (int argc, char **argv) {
 
       for (int i=0;i<N;++i) {
 	for (int t=0;t<NN/N*fac;++t) {
+	  //a[i]=2*b[i];
+	  //b[i]=a[i]/2;
 	  a[i]=b[i];
 	  b[i]=a[i];
 	}

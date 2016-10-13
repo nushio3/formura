@@ -20,16 +20,19 @@ double wctime() {
 }
 
 
-const int n_task = 4098;
+const int n_task = 4096;
 const int n_time = 4096;
 const int n_unroll=16;
+const int n_sode = 256;
 
 typedef double *double_ptr;
-typedef double task_ar[n_task];
+typedef double task_ar[n_task + 2 * n_sode];
 
-void compute (task_ar aar, task_ar bar, int n_time, int n_task) {
+
+
+void compute (task_ar aar, task_ar bar, task_ar lar, task_ar rar,int n_time, int n_task) {
   for (int t = 0; t < n_time; ++t) {
-    for (int i = 1; i < n_task-1; ++i) {
+    for (int i = n_sode; i < n_task+n_sode; ++i) {
 
       double l = aar[i-1];
       double c = aar[i];
@@ -59,7 +62,15 @@ void compute (task_ar aar, task_ar bar, int n_time, int n_task) {
 	r = 0.3*l+0.2*c+0.4*r+0.1;
       }
       aar[i] = c;
+    }
 
+#pragma simd
+    for (int i=0;i<n_sode;++i) {
+      lar[n_task+n_sode+i] = aar[n_sode+i];
+    }
+#pragma simd
+    for (int i=0;i<n_sode;++i) {
+      rar[i] = aar[n_task+i];
     }
 #pragma omp barrier
   }
@@ -86,8 +97,10 @@ int main () {
 
 #pragma omp parallel
   {
-    int tid=omp_get_thread_num();
-    compute(ptra[tid], ptrb[tid], n_time, n_task);
+    const int tid=omp_get_thread_num();
+    const int ltid = ((tid-1)%n_thre + n_thre) %n_thre;
+    const int rtid = ((tid+1)%n_thre + n_thre) %n_thre;
+    compute(ptra[tid], ptrb[tid], ptra[ltid], ptra[rtid], n_time, n_task);
   }
 
 
@@ -101,6 +114,7 @@ int main () {
       sum += ptra[i][x];
     }
   }
+  sum /= (n_thre * n_task);
   cout << sum << "\tGflop " << gflop << "\ttime " << (time_end - time_begin)
        << "\tGflops " << gflop/(time_end - time_begin)  << endl;
 

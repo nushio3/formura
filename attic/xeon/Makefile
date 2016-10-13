@@ -72,6 +72,13 @@ knlstream.out: knlstream.cpp Makefile
 	knlstream.cpp -o knlstream.out
 
 
+task-parallel.out: task-parallel.cpp Makefile
+	icpc -std=c++11 \
+	-fopenmp -O3 -funroll-loops -march=core-avx2 -ftree-vectorize -ftree-vectorizer-verbose=1 -shared-intel -mcmodel=large \
+	-Wa,-adhln=task-parallel.s -g -fverbose-asm -masm=intel -lmemkind \
+	task-parallel.cpp -o task-parallel.out
+
+
 
 tv.out: tv.cpp
 	g++ -std=c++11 \
