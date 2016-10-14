@@ -20,10 +20,10 @@ double wctime() {
 }
 
 
-const int n_task = 4096;
-const int n_time = 4096;
-const int n_unroll=1;
-const int n_sode = 256;
+const int n_task = 2048;
+const int n_time = 16384;
+const int n_unroll=16;
+const int n_sode = 0;
 
 typedef double *double_ptr;
 typedef double task_ar[n_task + 2 * n_sode];
@@ -72,13 +72,13 @@ void compute (task_ar aar, task_ar bar, task_ar lar, task_ar rar,int n_time, int
     for (int i=0;i<n_sode;++i) {
       rar[i] = aar[n_task+i];
     }
-    #pragma omp barrier
+    //#pragma omp barrier
   }
 }
 
 int main () {
   const int n_thre = omp_get_max_threads();
-  cout << n_thre << endl;
+
 
   vector<double_ptr> ptra;
   vector<double_ptr> ptrb;
@@ -115,7 +115,10 @@ int main () {
     }
   }
   sum /= (n_thre * n_task);
-  cout << sum << "\tGflop " << gflop << "\ttime " << (time_end - time_begin)
-       << "\tGflops " << gflop/(time_end - time_begin)  << endl;
+  cout << "\tnthre " << n_thre;
+  cout << "\tB/flop " << (8 * 8) / double(36 * n_unroll) 
+       << "\tGflops " << gflop/(time_end - time_begin)  
+       << "\tGflop " << gflop << "\ttime " << (time_end - time_begin)
+       << "\tchecksum " << sum <<endl;
 
 }

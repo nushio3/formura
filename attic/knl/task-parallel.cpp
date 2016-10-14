@@ -21,6 +21,7 @@ double wctime() {
 
 
 const int n_task = 1024;
+const int n_time = 32768;
 
 typedef double *double_ptr;
 typedef double task_ar[n_task];
@@ -32,14 +33,28 @@ void compute (task_ar ar, int n_time, int n_task) {
       double y = 1.0 - ar[i];
       double z = x*y;
       x = 0.2*x+0.3*y+0.5*z;
-      y = 0.2*x+0.3*y+0.5*z;
-      z = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+
       x = 0.2*x+0.3*y+0.5*z;
-      y = 0.2*x+0.3*y+0.5*z;
-      z = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+
       x = 0.2*x+0.3*y+0.5*z;
-      y = 0.2*x+0.3*y+0.5*z;
-      z = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
       ar[i] = x;
     }
   }  
@@ -47,10 +62,9 @@ void compute (task_ar ar, int n_time, int n_task) {
 
 int main () {
   const int n_thre = omp_get_max_threads();
-  cout << n_thre << endl;
+  cout << "threads " << n_thre << " " << flush;
   
   vector<double_ptr> ptrs;
-  const int n_time = 1048576;
 
   for (int i=0;i<n_thre;++i) {
     ptrs.push_back((double*)hbw_malloc(sizeof(double) * n_task));
@@ -69,7 +83,7 @@ int main () {
 
 
   double time_end = wctime();
-  double gflop = double(47)/1e9 * n_time * n_task * n_thre;
+  double gflop = double(2 + 18 * 6)/1e9 * n_time * n_task * n_thre;
 
   double sum = 0;
 
@@ -78,7 +92,9 @@ int main () {
       sum += ptrs[i][x];
     }
   }
-  cout << sum << "\tGflop " << gflop << "\ttime " << (time_end - time_begin) 
-       << "\tGflops " << gflop/(time_end - time_begin)  << endl;
-
+  cout << "tasksize "<< n_task  
+       << "\tGflops " << gflop/(time_end - time_begin)  
+       << "\tGflop " << gflop << "\ttime " << (time_end - time_begin) 
+       << sum 
+       << endl;
 }
