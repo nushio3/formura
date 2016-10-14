@@ -1,121 +1,100 @@
-threads 256 tasksize 32	Gflops 254.823	Gflop 29.5279	time 0.1158763276.2
-threads 256 tasksize 32	Gflops 308.27	Gflop 29.5279	time 0.09578593276.2
-threads 256 tasksize 32	Gflops 356.196	Gflop 29.5279	time 0.08289793276.2
-threads 256 tasksize 32	Gflops 286.682	Gflop 29.5279	time 0.1029993276.2
-threads 256 tasksize 32	Gflops 344.573	Gflop 29.5279	time 0.08569413276.2
-threads 256 tasksize 32	Gflops 351.414	Gflop 29.5279	time 0.08402593276.2
-threads 256 tasksize 32	Gflops 324.379	Gflop 29.5279	time 0.09102893276.2
-threads 256 tasksize 32	Gflops 346.632	Gflop 29.5279	time 0.08518513276.2
-threads 256 tasksize 32	Gflops 349.617	Gflop 29.5279	time 0.08445793276.2
-threads 256 tasksize 32	Gflops 345.866	Gflop 29.5279	time 0.08537393276.2
-threads 256 tasksize 64	Gflops 581.23	Gflop 59.0558	time 0.1016056552.39
-threads 256 tasksize 64	Gflops 602.727	Gflop 59.0558	time 0.0979816552.39
-threads 256 tasksize 64	Gflops 561.671	Gflop 59.0558	time 0.1051436552.39
-threads 256 tasksize 64	Gflops 571.338	Gflop 59.0558	time 0.1033646552.39
-threads 256 tasksize 64	Gflops 580.157	Gflop 59.0558	time 0.1017936552.39
-threads 256 tasksize 64	Gflops 590.682	Gflop 59.0558	time 0.09997896552.39
-threads 256 tasksize 64	Gflops 592.441	Gflop 59.0558	time 0.09968216552.39
-threads 256 tasksize 64	Gflops 593.215	Gflop 59.0558	time 0.09955226552.39
-threads 256 tasksize 64	Gflops 609.375	Gflop 59.0558	time 0.09691216552.39
-threads 256 tasksize 64	Gflops 603.269	Gflop 59.0558	time 0.0978936552.39
-threads 256 tasksize 128	Gflops 896.428	Gflop 118.112	time 0.13175813104.8
-threads 256 tasksize 128	Gflops 904.702	Gflop 118.112	time 0.13055313104.8
-threads 256 tasksize 128	Gflops 926.641	Gflop 118.112	time 0.12746213104.8
-threads 256 tasksize 128	Gflops 900.425	Gflop 118.112	time 0.13117313104.8
-threads 256 tasksize 128	Gflops 888.966	Gflop 118.112	time 0.13286413104.8
-threads 256 tasksize 128	Gflops 864.197	Gflop 118.112	time 0.13667213104.8
-threads 256 tasksize 128	Gflops 918.964	Gflop 118.112	time 0.12852713104.8
-threads 256 tasksize 128	Gflops 908.062	Gflop 118.112	time 0.1300713104.8
-threads 256 tasksize 128	Gflops 906.953	Gflop 118.112	time 0.13022913104.8
-threads 256 tasksize 128	Gflops 766.788	Gflop 118.112	time 0.15403413104.8
-threads 256 tasksize 256	Gflops 1317.28	Gflop 236.223	time 0.17932626209.6
-threads 256 tasksize 256	Gflops 1359.81	Gflop 236.223	time 0.17371826209.6
-threads 256 tasksize 256	Gflops 1296.86	Gflop 236.223	time 0.1821526209.6
-threads 256 tasksize 256	Gflops 1338.59	Gflop 236.223	time 0.17647126209.6
-threads 256 tasksize 256	Gflops 1291.65	Gflop 236.223	time 0.18288526209.6
-threads 256 tasksize 256	Gflops 1355.16	Gflop 236.223	time 0.17431426209.6
-threads 256 tasksize 256	Gflops 1313.16	Gflop 236.223	time 0.17988926209.6
-threads 256 tasksize 256	Gflops 1294.95	Gflop 236.223	time 0.18241926209.6
-threads 256 tasksize 256	Gflops 1364.53	Gflop 236.223	time 0.17311726209.6
-threads 256 tasksize 256	Gflops 1335.38	Gflop 236.223	time 0.17689626209.6
-threads 256 tasksize 512	Gflops 1655.59	Gflop 472.446	time 0.28536552419.1
-threads 256 tasksize 512	Gflops 1714.93	Gflop 472.446	time 0.27549152419.1
-threads 256 tasksize 512	Gflops 1542.61	Gflop 472.446	time 0.30626552419.1
-threads 256 tasksize 512	Gflops 1706.63	Gflop 472.446	time 0.2768352419.1
-threads 256 tasksize 512	Gflops 1726.2	Gflop 472.446	time 0.27369152419.1
-threads 256 tasksize 512	Gflops 1714.42	Gflop 472.446	time 0.27557252419.1
-threads 256 tasksize 512	Gflops 1715.44	Gflop 472.446	time 0.27540952419.1
-threads 256 tasksize 512	Gflops 1702.48	Gflop 472.446	time 0.27750552419.1
-threads 256 tasksize 512	Gflops 1715.75	Gflop 472.446	time 0.27535852419.1
-threads 256 tasksize 512	Gflops 1720.25	Gflop 472.446	time 0.27463852419.1
-threads 256 tasksize 1024	Gflops 1834.71	Gflop 944.893	time 0.51501104838
-threads 256 tasksize 1024	Gflops 1992.2	Gflop 944.893	time 0.474296104838
-threads 256 tasksize 1024	Gflops 1992.49	Gflop 944.893	time 0.474226104838
-threads 256 tasksize 1024	Gflops 1977	Gflop 944.893	time 0.477942104838
-threads 256 tasksize 1024	Gflops 1980.19	Gflop 944.893	time 0.477172104838
-threads 256 tasksize 1024	Gflops 1950.65	Gflop 944.893	time 0.4844104838
-threads 256 tasksize 1024	Gflops 1976.39	Gflop 944.893	time 0.478091104838
-threads 256 tasksize 1024	Gflops 1701.25	Gflop 944.893	time 0.555411104838
-threads 256 tasksize 1024	Gflops 1980.28	Gflop 944.893	time 0.477152104838
-threads 256 tasksize 1024	Gflops 1966.09	Gflop 944.893	time 0.480594104838
-threads 256 tasksize 2048	Gflops 2120.84	Gflop 1889.79	time 0.891057209677
-threads 256 tasksize 2048	Gflops 2119.43	Gflop 1889.79	time 0.891647209677
-threads 256 tasksize 2048	Gflops 2068.25	Gflop 1889.79	time 0.913712209677
-threads 256 tasksize 2048	Gflops 2139.48	Gflop 1889.79	time 0.88329209677
-threads 256 tasksize 2048	Gflops 2139.16	Gflop 1889.79	time 0.883424209677
-threads 256 tasksize 2048	Gflops 2129.73	Gflop 1889.79	time 0.887334209677
-threads 256 tasksize 2048	Gflops 2121.69	Gflop 1889.79	time 0.890698209677
-threads 256 tasksize 2048	Gflops 2146.95	Gflop 1889.79	time 0.88022209677
-threads 256 tasksize 2048	Gflops 2130.25	Gflop 1889.79	time 0.887119209677
-threads 256 tasksize 2048	Gflops 2121.15	Gflop 1889.79	time 0.890925209677
-threads 256 tasksize 4096	Gflops 1789.38	Gflop 3779.57	time 2.11223419353
-threads 256 tasksize 4096	Gflops 1791.65	Gflop 3779.57	time 2.10954419353
-threads 256 tasksize 4096	Gflops 1795.05	Gflop 3779.57	time 2.10556419353
-threads 256 tasksize 4096	Gflops 1738.05	Gflop 3779.57	time 2.1746419353
-threads 256 tasksize 4096	Gflops 1789.56	Gflop 3779.57	time 2.11202419353
-threads 256 tasksize 4096	Gflops 1788.65	Gflop 3779.57	time 2.11308419353
-threads 256 tasksize 4096	Gflops 1787.79	Gflop 3779.57	time 2.1141419353
-threads 256 tasksize 4096	Gflops 1793.14	Gflop 3779.57	time 2.10779419353
-threads 256 tasksize 4096	Gflops 1796.43	Gflop 3779.57	time 2.10394419353
-threads 256 tasksize 4096	Gflops 1793.6	Gflop 3779.57	time 2.10726419353
-threads 256 tasksize 8192	Gflops 1844.03	Gflop 7559.14	time 4.09924838706
-threads 256 tasksize 8192	Gflops 1848.86	Gflop 7559.14	time 4.08855838706
-threads 256 tasksize 8192	Gflops 1846.57	Gflop 7559.14	time 4.09361838706
-threads 256 tasksize 8192	Gflops 1786.31	Gflop 7559.14	time 4.2317838706
-threads 256 tasksize 8192	Gflops 1851.11	Gflop 7559.14	time 4.08357838706
-threads 256 tasksize 8192	Gflops 1820.15	Gflop 7559.14	time 4.15302838706
-threads 256 tasksize 8192	Gflops 1794.09	Gflop 7559.14	time 4.21336838706
-threads 256 tasksize 8192	Gflops 1848.51	Gflop 7559.14	time 4.08933838706
-threads 256 tasksize 8192	Gflops 1839.28	Gflop 7559.14	time 4.10983838706
-threads 256 tasksize 8192	Gflops 1847.3	Gflop 7559.14	time 4.09199838706
-threads 256 tasksize 16384	Gflops 1745.27	Gflop 15118.3	time 8.662421.67741e+06
-threads 256 tasksize 16384	Gflops 1752.68	Gflop 15118.3	time 8.62581.67741e+06
-threads 256 tasksize 16384	Gflops 1709.37	Gflop 15118.3	time 8.844341.67741e+06
-threads 256 tasksize 16384	Gflops 1734.52	Gflop 15118.3	time 8.71611.67741e+06
-threads 256 tasksize 16384	Gflops 1751.49	Gflop 15118.3	time 8.631671.67741e+06
-threads 256 tasksize 16384	Gflops 1750.52	Gflop 15118.3	time 8.636461.67741e+06
-threads 256 tasksize 16384	Gflops 1753.23	Gflop 15118.3	time 8.623081.67741e+06
-threads 256 tasksize 16384	Gflops 1750.48	Gflop 15118.3	time 8.636661.67741e+06
-threads 256 tasksize 16384	Gflops 1753.41	Gflop 15118.3	time 8.622221.67741e+06
-threads 256 tasksize 16384	Gflops 1717.81	Gflop 15118.3	time 8.800891.67741e+06
-threads 256 tasksize 32768	Gflops 1669.53	Gflop 30236.6	time 18.11093.35482e+06
-threads 256 tasksize 32768	Gflops 1663.7	Gflop 30236.6	time 18.17433.35482e+06
-threads 256 tasksize 32768	Gflops 1650.1	Gflop 30236.6	time 18.32413.35482e+06
-threads 256 tasksize 32768	Gflops 1671.94	Gflop 30236.6	time 18.08473.35482e+06
-threads 256 tasksize 32768	Gflops 1661.42	Gflop 30236.6	time 18.19933.35482e+06
-threads 256 tasksize 32768	Gflops 1664.72	Gflop 30236.6	time 18.16323.35482e+06
-threads 256 tasksize 32768	Gflops 1631.22	Gflop 30236.6	time 18.53623.35482e+06
-threads 256 tasksize 32768	Gflops 1662.41	Gflop 30236.6	time 18.18843.35482e+06
-threads 256 tasksize 32768	Gflops 1659.12	Gflop 30236.6	time 18.22443.35482e+06
-threads 256 tasksize 32768	Gflops 1636.34	Gflop 30236.6	time 18.47823.35482e+06
-threads 256 tasksize 65536	Gflops 1644.7	Gflop 60473.1	time 36.76846.70965e+06
-threads 256 tasksize 65536	Gflops 1654.99	Gflop 60473.1	time 36.53996.70965e+06
-threads 256 tasksize 65536	Gflops 1647.24	Gflop 60473.1	time 36.71186.70965e+06
-threads 256 tasksize 65536	Gflops 1654.2	Gflop 60473.1	time 36.55746.70965e+06
-threads 256 tasksize 65536	Gflops 1650.12	Gflop 60473.1	time 36.64786.70965e+06
-threads 256 tasksize 65536	Gflops 1636.55	Gflop 60473.1	time 36.95166.70965e+06
-threads 256 tasksize 65536	Gflops 1658.85	Gflop 60473.1	time 36.45486.70965e+06
-threads 256 tasksize 65536	Gflops 1649.39	Gflop 60473.1	time 36.66386.70965e+06
-threads 256 tasksize 65536	Gflops 1656.48	Gflop 60473.1	time 36.5076.70965e+06
-threads 256 tasksize 65536	Gflops 1654.53	Gflop 60473.1	time 36.556.70965e+06
-threads 256 
+threads 256 	tasksize 32	Gflops 1959.52	Gflop 944.893	time 0.482206	3276.2
+threads 256 	tasksize 32	Gflops 1916.38	Gflop 944.893	time 0.493061	3276.2
+threads 256 	tasksize 32	Gflops 1981.99	Gflop 944.893	time 0.476739	3276.2
+threads 256 	tasksize 32	Gflops 1856.24	Gflop 944.893	time 0.509037	3276.2
+threads 256 	tasksize 32	Gflops 1973.89	Gflop 944.893	time 0.478696	3276.2
+threads 256 	tasksize 32	Gflops 1945.3	Gflop 944.893	time 0.485731	3276.2
+threads 256 	tasksize 32	Gflops 1978.45	Gflop 944.893	time 0.477592	3276.2
+threads 256 	tasksize 32	Gflops 1969.89	Gflop 944.893	time 0.479669	3276.2
+threads 256 	tasksize 32	Gflops 1941.83	Gflop 944.893	time 0.4866	3276.2
+threads 256 	tasksize 32	Gflops 1977.05	Gflop 944.893	time 0.477931	3276.2
+threads 256 	tasksize 64	Gflops 1882.77	Gflop 944.893	time 0.501864	6552.39
+threads 256 	tasksize 64	Gflops 1890.72	Gflop 944.893	time 0.499753	6552.39
+threads 256 	tasksize 64	Gflops 1893.83	Gflop 944.893	time 0.498933	6552.39
+threads 256 	tasksize 64	Gflops 1877.94	Gflop 944.893	time 0.503155	6552.39
+threads 256 	tasksize 64	Gflops 1877.7	Gflop 944.893	time 0.503217	6552.39
+threads 256 	tasksize 64	Gflops 1888.23	Gflop 944.893	time 0.500413	6552.39
+threads 256 	tasksize 64	Gflops 1881.61	Gflop 944.893	time 0.502173	6552.39
+threads 256 	tasksize 64	Gflops 1874.72	Gflop 944.893	time 0.504019	6552.39
+threads 256 	tasksize 64	Gflops 1882.65	Gflop 944.893	time 0.501896	6552.39
+threads 256 	tasksize 64	Gflops 1882.66	Gflop 944.893	time 0.501891	6552.39
+threads 256 	tasksize 128	Gflops 1765.83	Gflop 944.893	time 0.535098	13104.8
+threads 256 	tasksize 128	Gflops 1760.72	Gflop 944.893	time 0.536651	13104.8
+threads 256 	tasksize 128	Gflops 1779.98	Gflop 944.893	time 0.530846	13104.8
+threads 256 	tasksize 128	Gflops 1780.43	Gflop 944.893	time 0.53071	13104.8
+threads 256 	tasksize 128	Gflops 1776.74	Gflop 944.893	time 0.531814	13104.8
+threads 256 	tasksize 128	Gflops 1784.01	Gflop 944.893	time 0.529644	13104.8
+threads 256 	tasksize 128	Gflops 1765.26	Gflop 944.893	time 0.535272	13104.8
+threads 256 	tasksize 128	Gflops 1773.45	Gflop 944.893	time 0.5328	13104.8
+threads 256 	tasksize 128	Gflops 1777.17	Gflop 944.893	time 0.531683	13104.8
+threads 256 	tasksize 128	Gflops 1774.41	Gflop 944.893	time 0.532511	13104.8
+threads 256 	tasksize 256	Gflops 1928.28	Gflop 944.893	time 0.490018	26209.6
+threads 256 	tasksize 256	Gflops 1960.87	Gflop 944.893	time 0.481875	26209.6
+threads 256 	tasksize 256	Gflops 1937.26	Gflop 944.893	time 0.487746	26209.6
+threads 256 	tasksize 256	Gflops 1865.37	Gflop 944.893	time 0.506543	26209.6
+threads 256 	tasksize 256	Gflops 1968.17	Gflop 944.893	time 0.480087	26209.6
+threads 256 	tasksize 256	Gflops 1928.13	Gflop 944.893	time 0.490057	26209.6
+threads 256 	tasksize 256	Gflops 1957.59	Gflop 944.893	time 0.482682	26209.6
+threads 256 	tasksize 256	Gflops 1980.12	Gflop 944.893	time 0.47719	26209.6
+threads 256 	tasksize 256	Gflops 1944.78	Gflop 944.893	time 0.48586	26209.6
+threads 256 	tasksize 256	Gflops 1969.66	Gflop 944.893	time 0.479725	26209.6
+threads 256 	tasksize 512	Gflops 1958.56	Gflop 944.893	time 0.482442	52419.1
+threads 256 	tasksize 512	Gflops 1970.71	Gflop 944.893	time 0.479469	52419.1
+threads 256 	tasksize 512	Gflops 1956.17	Gflop 944.893	time 0.483033	52419.1
+threads 256 	tasksize 512	Gflops 1860.75	Gflop 944.893	time 0.507803	52419.1
+threads 256 	tasksize 512	Gflops 1940.61	Gflop 944.893	time 0.486905	52419.1
+threads 256 	tasksize 512	Gflops 1985.61	Gflop 944.893	time 0.47587	52419.1
+threads 256 	tasksize 512	Gflops 1982.24	Gflop 944.893	time 0.476679	52419.1
+threads 256 	tasksize 512	Gflops 1981.69	Gflop 944.893	time 0.476812	52419.1
+threads 256 	tasksize 512	Gflops 1988.23	Gflop 944.893	time 0.475244	52419.1
+threads 256 	tasksize 512	Gflops 1986.36	Gflop 944.893	time 0.475691	52419.1
+threads 256 	tasksize 1024	Gflops 1928.29	Gflop 944.893	time 0.490016	104838
+threads 256 	tasksize 1024	Gflops 1984.07	Gflop 944.893	time 0.47624	104838
+threads 256 	tasksize 1024	Gflops 1977.63	Gflop 944.893	time 0.47779	104838
+threads 256 	tasksize 1024	Gflops 1855.94	Gflop 944.893	time 0.509117	104838
+threads 256 	tasksize 1024	Gflops 1987.41	Gflop 944.893	time 0.47544	104838
+threads 256 	tasksize 1024	Gflops 1984.74	Gflop 944.893	time 0.476078	104838
+threads 256 	tasksize 1024	Gflops 1926.42	Gflop 944.893	time 0.490491	104838
+threads 256 	tasksize 1024	Gflops 1950.46	Gflop 944.893	time 0.484447	104838
+threads 256 	tasksize 1024	Gflops 1950.17	Gflop 944.893	time 0.484519	104838
+threads 256 	tasksize 1024	Gflops 1981.51	Gflop 944.893	time 0.476856	104838
+threads 256 	tasksize 2048	Gflops 1973.27	Gflop 944.893	time 0.478845	209677
+threads 256 	tasksize 2048	Gflops 1786.52	Gflop 944.893	time 0.5289	209677
+threads 256 	tasksize 2048	Gflops 1705.07	Gflop 944.893	time 0.554167	209677
+threads 256 	tasksize 2048	Gflops 1776.56	Gflop 944.893	time 0.531865	209677
+threads 256 	tasksize 2048	Gflops 1615.09	Gflop 944.893	time 0.585042	209677
+threads 256 	tasksize 2048	Gflops 1744.77	Gflop 944.893	time 0.541556	209677
+threads 256 	tasksize 2048	Gflops 1949.67	Gflop 944.893	time 0.484643	209677
+threads 256 	tasksize 2048	Gflops 1978.04	Gflop 944.893	time 0.477692	209677
+threads 256 	tasksize 2048	Gflops 1957.54	Gflop 944.893	time 0.482693	209677
+threads 256 	tasksize 2048	Gflops 1955.02	Gflop 944.893	time 0.483317	209677
+threads 256 	tasksize 4096	Gflops 1645.97	Gflop 944.893	time 0.574064	419353
+threads 256 	tasksize 4096	Gflops 1572.3	Gflop 944.893	time 0.600962	419353
+threads 256 	tasksize 4096	Gflops 1599.34	Gflop 944.893	time 0.590801	419353
+threads 256 	tasksize 4096	Gflops 1638.32	Gflop 944.893	time 0.576746	419353
+threads 256 	tasksize 4096	Gflops 1667.35	Gflop 944.893	time 0.566705	419353
+threads 256 	tasksize 4096	Gflops 1660.77	Gflop 944.893	time 0.568948	419353
+threads 256 	tasksize 4096	Gflops 1657.67	Gflop 944.893	time 0.570012	419353
+threads 256 	tasksize 4096	Gflops 1631.8	Gflop 944.893	time 0.579051	419353
+threads 256 	tasksize 4096	Gflops 1675.33	Gflop 944.893	time 0.564005	419353
+threads 256 	tasksize 4096	Gflops 1641.48	Gflop 944.893	time 0.575633	419353
+threads 256 	tasksize 8192	Gflops 1599.88	Gflop 944.893	time 0.590601	838706
+threads 256 	tasksize 8192	Gflops 1646.94	Gflop 944.893	time 0.573726	838706
+threads 256 	tasksize 8192	Gflops 1646.84	Gflop 944.893	time 0.57376	838706
+threads 256 	tasksize 8192	Gflops 1604.25	Gflop 944.893	time 0.588992	838706
+threads 256 	tasksize 8192	Gflops 1654.52	Gflop 944.893	time 0.571098	838706
+threads 256 	tasksize 8192	Gflops 1661.81	Gflop 944.893	time 0.568592	838706
+threads 256 	tasksize 8192	Gflops 1652.77	Gflop 944.893	time 0.571701	838706
+threads 256 	tasksize 8192	Gflops 1625.87	Gflop 944.893	time 0.58116	838706
+threads 256 	tasksize 8192	Gflops 1624.46	Gflop 944.893	time 0.581666	838706
+threads 256 	tasksize 8192	Gflops 1653.92	Gflop 944.893	time 0.571305	838706
+threads 256 	tasksize 16384	Gflops 1549.33	Gflop 944.893	time 0.60987	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1522.84	Gflop 944.893	time 0.620482	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1555.85	Gflop 944.893	time 0.607316	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1536.9	Gflop 944.893	time 0.614804	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1541	Gflop 944.893	time 0.61317	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1516.04	Gflop 944.893	time 0.623263	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1537.87	Gflop 944.893	time 0.614418	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1562.24	Gflop 944.893	time 0.604833	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1548.4	Gflop 944.893	time 0.61024	1.67741e+06
+threads 256 	tasksize 16384	Gflops 1535.18	Gflop 944.893	time 0.615495	1.67741e+06

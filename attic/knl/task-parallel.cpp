@@ -21,7 +21,8 @@ double wctime() {
 
 
 const int n_task = 1024;
-const int n_time = 32768;
+const int n_time = size_t(32768)* 1024
+  /n_task ;
 
 typedef double *double_ptr;
 typedef double task_ar[n_task];
@@ -92,9 +93,9 @@ int main () {
       sum += ptrs[i][x];
     }
   }
-  cout << "tasksize "<< n_task  
+  cout << "\ttasksize "<< n_task  
        << "\tGflops " << gflop/(time_end - time_begin)  
        << "\tGflop " << gflop << "\ttime " << (time_end - time_begin) 
-       << sum 
+       << "\t" << sum 
        << endl;
 }

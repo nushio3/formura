@@ -20,76 +20,57 @@ double wctime() {
 }
 
 
-const int n_task = 2048;
-const int n_time = 16384;
-const int n_unroll = 64;
-const int n_sode = 0;
+const int n_task = 16384;
+const int n_time = size_t(32768)* 1024
+  /n_task ;
 
 typedef double *double_ptr;
-typedef double task_ar[n_task + 2 * n_sode];
+typedef double task_ar[n_task];
 
-
-
-void compute (task_ar aar, task_ar bar, task_ar lar, task_ar rar,int n_time, int n_task) {
+void compute (task_ar ar, int n_time, int n_task) {
   for (int t = 0; t < n_time; ++t) {
-    for (int i = n_sode; i < n_task+n_sode; ++i) {
+    for (int i = 0; i < n_task; ++i) {
+      double x = ar[i];
+      double y = 1.0 - ar[i];
+      double z = x*y;
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
 
-      double l = aar[i-1];
-      double c = aar[i];
-      double r = aar[i+1];
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
 
-#pragma unroll(4)
-#pragma simd
-      for (int u=0;u<n_unroll;++u) {
-	c = 0.2*l+0.4*c+0.3*r+0.1;
-	l = 0.4*l+0.3*c+0.2*r+0.1;
-	r = 0.3*l+0.2*c+0.4*r+0.1;
-      }
-      bar[i] = c;
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
 
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+
+      x = 0.2*x+0.3*y+0.5*z;
+      y = 0.3*x+0.5*y+0.2*z;
+      z = 0.5*x+0.2*y+0.3*z;
+      ar[i] = x;
     }
-
-    for (int i = 1; i < n_task-1; ++i) {
-
-      double l = bar[i-1];
-      double c = bar[i];
-      double r = bar[i+1];
-#pragma unroll(4)
-#pragma simd
-      for (int u=0;u<n_unroll;++u) {
-	c = 0.2*l+0.4*c+0.3*r+0.1;
-	l = 0.4*l+0.3*c+0.2*r+0.1;
-	r = 0.3*l+0.2*c+0.4*r+0.1;
-      }
-      aar[i] = c;
-    }
-
-#pragma simd
-    for (int i=0;i<n_sode;++i) {
-      lar[n_task+n_sode+i] = aar[n_sode+i];
-    }
-#pragma simd
-    for (int i=0;i<n_sode;++i) {
-      rar[i] = aar[n_task+i];
-    }
-    //#pragma omp barrier
-  }
+  }  
 }
 
 int main () {
   const int n_thre = omp_get_max_threads();
-
-
-  vector<double_ptr> ptra;
-  vector<double_ptr> ptrb;
-
+  cout << "threads " << n_thre << " " << flush;
+  
+  vector<double_ptr> ptrs;
 
   for (int i=0;i<n_thre;++i) {
-    ptra.push_back((double*)hbw_malloc(sizeof(double) * n_task));
-    ptrb.push_back((double*)hbw_malloc(sizeof(double) * n_task));
+    ptrs.push_back((double*)hbw_malloc(sizeof(double) * n_task));
     for (int x=0;x<n_task;++x) {
-      ptra[i][x] = drand();
-      ptrb[i][x] = drand();
+      ptrs[i][x] = drand();
     }
   }
 
@@ -97,29 +78,25 @@ int main () {
 
 #pragma omp parallel
   {
-    const int tid=omp_get_thread_num();
-    const int ltid = ((tid-1)%n_thre + n_thre) %n_thre;
-    const int rtid = ((tid+1)%n_thre + n_thre) %n_thre;
-    compute(ptra[tid], ptrb[tid], ptra[ltid], ptra[rtid], n_time, n_task);
+    int tid=omp_get_thread_num();
+    compute(ptrs[tid], n_time, n_task);
   }
 
 
   double time_end = wctime();
-  double gflop = double(36)/1e9 * n_time * n_task * n_unroll * n_thre;
+  double gflop = double(2 + 18 * 6)/1e9 * n_time * n_task * n_thre;
 
   double sum = 0;
 
   for (int i=0;i<n_thre;++i) {
     for (int x=0;x<n_task;++x) {
-      sum += ptra[i][x];
+      sum += ptrs[i][x];
     }
   }
-  sum /= (n_thre * n_task);
-  cout << "\tnthre " << n_thre;
-  cout << "\tB/flop " << (8 * 8) / double(36 * n_unroll) 
+  cout << "\ttasksize "<< n_task  
        << "\tGflops " << gflop/(time_end - time_begin)  
-       << "\tGflop " << gflop << "\ttime " << (time_end - time_begin)
-       << "\tchecksum " << sum <<endl;
-
+       << "\tGflop " << gflop << "\ttime " << (time_end - time_begin) 
+       << "\t" << sum 
+       << endl;
 }
 
