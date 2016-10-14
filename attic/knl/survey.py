@@ -48,7 +48,7 @@ class SurveyTask:
         this.template = "task-parallel.cpp"
         #this.template = "1d-stencil-realcomm.cpp"
         this.ranges = {
-            ("int", "n_task") : [2**n for n in range(5,15)]
+            ("int", "n_task") : [2**n for n in range(15,20)]
 #            ("int", "n_unroll") : [2**n for n in range(0,7)]
 #            ("int", "n_time") : [2**n for n in range(10,15)]
         }

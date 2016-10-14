@@ -20,7 +20,7 @@ double wctime() {
 }
 
 
-const int n_task = 16384;
+const int n_task = 524288;
 const int n_time = size_t(32768)* 1024
   /n_task ;
 
