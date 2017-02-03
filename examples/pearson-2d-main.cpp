@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "pearson.h"
+#include "pearson-2d.h"
 
 int T_MAX;
 int mpi_my_rank;
