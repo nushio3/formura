@@ -7,7 +7,7 @@
 int T_MAX;
 int mpi_my_rank;
 
-Formura_Navigator navi;
+extern Formura_Navigator navi;
 
 float frand() {
   return rand() / float(RAND_MAX);
