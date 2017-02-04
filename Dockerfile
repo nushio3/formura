@@ -1,7 +1,7 @@
 FROM debian:jessie-slim
 
 RUN apt-get update \
-    && apt-get install -y wget libopenmpi-dev openmpi-bin libgmp-dev cmake ssh \
+    && apt-get install -y wget libmpich-dev mpich libgmp-dev cmake ssh \
     && wget -qO- https://get.haskellstack.org/ | sh \
     && rm -rf /var/lib/apt/lists/*
 
