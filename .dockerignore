@@ -16,3 +16,4 @@ specification/
 stack.yaml.template
 developper-note.md
 CMakeFiles/
+try/

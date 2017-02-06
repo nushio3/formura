@@ -27,6 +27,7 @@ COPY ./fj_dummy/ /work/fj_dummy/
 
 RUN ./bin/formura examples/pearson-3d.fmr \
     && bash ./cmake-for-x86.sh \
-    && make bin/pearson-3d.out
+    && make bin/pearson-3d.out \
+    && mkdir frames out
 
 CMD ["mpirun", "-n", "1", "bin/pearson-3d.out"]
