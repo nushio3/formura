@@ -22,14 +22,18 @@ secs_x = {}
 
 sx=sy=sz=0
 
-
+zoom_flag = False
 if sys.argv[1] == 'big':
     dtype_int32 = '>i4'
     dtype_float64= '>f8'
-    #img_shrink=150.0
-    #pylab.rcParams.update({'font.size': 48})
     img_shrink=300.0
     pylab.rcParams.update({'font.size': 72})
+elif sys.argv[1] == 'zoom':
+    dtype_int32 = '>i4'
+    dtype_float64= '>f8'
+    img_shrink=400.0
+    pylab.rcParams.update({'font.size': 24})
+    zoom_flag = True
 
 elif sys.argv[1] == 'little':
     dtype_int32 = '<i4'
@@ -42,14 +46,12 @@ else:
 
 
 for fn in sys.argv[2:]:
-    print fn
     m = re.search('monitorY-([\d]+)-([\d]+)',fn)
     if m is None:
         continue
     t = int(m.group(1))
     with open(fn,'rb') as fp:
         gps = np.fromfile(fp, dtype=dtype_int32,count=6)
-        print gps
         x,y,z,sx,sy,sz = gps
 
         t_ax.add(t)
@@ -60,9 +62,7 @@ for fn in sys.argv[2:]:
 
         secy_u = np.fromfile(fp, dtype=dtype_float64,count=sx*sz).reshape(sx,sz,1)
         tmp = np.fromfile(fp, dtype=dtype_float64,count=sx*sz)
-        print tmp.shape
         secy_v = tmp.reshape(sx,sz,1)
-        print secy_u
         key = (t,x,y,z)
 
         val = np.concatenate((secy_u,secy_v),axis=2)
@@ -98,6 +98,17 @@ for t in sorted(t_ax):
     secy_u = field[:, :, 0:1]
     secy_v = field[:, :, 1:2]
 
+    fn_header = ''
+
+    if zoom_flag:
+        canvas_size_z = 5952
+        canvas_size_x = 3348
+        pylab.rcParams['figure.figsize'] = (canvas_size_z/img_shrink,canvas_size_x/img_shrink)
+        fn_header = 'zoom_'
+        secy_u = secy_u[:canvas_size_x,:canvas_size_z,:]
+        secy_v = secy_v[:canvas_size_x,:canvas_size_z,:]
+
+
     peak = np.maximum(0,(secy_v-0.3)/0.1)
     colony = secy_v*3.0
     aura = 0.3 * secy_v**0.2
@@ -113,6 +124,8 @@ for t in sorted(t_ax):
     c_field = ndimage.interpolation.zoom(c_field,4.0,order=3,mode='wrap')
 
     pylab.rcParams['figure.figsize'] = (canvas_size_z/img_shrink,canvas_size_x/img_shrink)
+
+
     pylab.clf()
     pylab.imshow(canvas)
     if sys.argv[1] == 'big':
@@ -123,4 +136,4 @@ for t in sorted(t_ax):
         #if t ==262144:
         #    pylab.gca().add_patch(patches.Rectangle((10200,1450),2000,2000,fill=False,edgecolor='white',linewidth=8))
     pylab.title('t = {}'.format(t))
-    pylab.savefig('images/{:06}.png'.format(t))
+    pylab.savefig('images/{}{:08}.png'.format(fn_header,t))
