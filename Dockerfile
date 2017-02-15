@@ -9,12 +9,11 @@ RUN mkdir -p /work/bin
 WORKDIR /work
 
 COPY stack.yaml formura.cabal Setup.hs /work/
-RUN stack setup
-
 COPY ./src/ /work/src/
 COPY ./exe-src/ /work/exe-src/
 COPY LICENSE /work/
-RUN stack install \
+RUN stack setup \
+    && stack install \
     && rm -r .stack-work/ \
     && rm -r /root/.stack
 
